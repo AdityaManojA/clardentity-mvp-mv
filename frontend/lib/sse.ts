@@ -204,6 +204,17 @@ export type ChatStreamHandlers = {
    *  if they'd rather skip it. */
   onClarifyingOptions?: (suggestion: ClarifyingOptionsSuggestion) => void;
   onError: (detail: string) => void;
+  /** Any bytes at all from the server, including the keep-alive pings it
+   *  sends every 15 seconds. The caller uses it as a liveness signal: an
+   *  answer that takes a minute still pings, so silence means the connection
+   *  is gone rather than the thinking being slow. */
+  onActivity?: () => void;
+  /** The stream ended - dropped, timed out, or the server went away - without
+   *  a final event, an error, or a gate. Nothing else will arrive on it. The
+   *  answer may still exist: it is written and committed at `onAnswer`, so a
+   *  connection lost after that point has left a complete answer behind that
+   *  a re-read of the conversation will find. */
+  onDropped?: () => void;
 };
 
 export type SendMessageAttachment = {
@@ -319,6 +330,47 @@ export async function streamChatMessage(
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
+  // Whether anything arrived that means "this stream is over and the caller
+  // knows why": the finished answer, an error, or a gate that replaced the
+  // answer. Without one of these, the stream ending is a dropped connection,
+  // not a conclusion - and saying nothing about it left the screen on
+  // "Thinking…" for as long as the reader was willing to wait.
+  let concluded = false;
+  const watched: ChatStreamHandlers = {
+    ...handlers,
+    onFinal: (event) => {
+      concluded = true;
+      handlers.onFinal(event);
+    },
+    onError: (detail) => {
+      concluded = true;
+      handlers.onError(detail);
+    },
+    onModeSuggestion: handlers.onModeSuggestion
+      ? (s) => {
+          concluded = true;
+          handlers.onModeSuggestion?.(s);
+        }
+      : undefined,
+    onContextQuestion: handlers.onContextQuestion
+      ? (q) => {
+          concluded = true;
+          handlers.onContextQuestion?.(q);
+        }
+      : undefined,
+    onRefinedQuestion: handlers.onRefinedQuestion
+      ? (q) => {
+          concluded = true;
+          handlers.onRefinedQuestion?.(q);
+        }
+      : undefined,
+    onClarifyingOptions: handlers.onClarifyingOptions
+      ? (o) => {
+          concluded = true;
+          handlers.onClarifyingOptions?.(o);
+        }
+      : undefined,
+  };
 
   while (true) {
     let value: Uint8Array | undefined;
@@ -327,9 +379,15 @@ export async function streamChatMessage(
       ({ value, done } = await reader.read());
     } catch (err) {
       if (isAbortError(err)) return;
-      throw err;
+      // A read that throws is the connection going away mid-answer - a phone
+      // changing network, a proxy timing out, the server restarting. It used
+      // to be rethrown into a caller that had no catch for it, so the UI
+      // simply never heard back.
+      handlers.onDropped?.();
+      return;
     }
     if (done) break;
+    handlers.onActivity?.();
     // sse-starlette terminates lines/records with \r\n, not \n - normalize
     // before splitting so frame boundaries actually match.
     buffer += decoder.decode(value, { stream: true }).replace(/\r\n/g, "\n");
@@ -338,10 +396,12 @@ export async function streamChatMessage(
     while (boundary !== -1) {
       const rawEvent = buffer.slice(0, boundary);
       buffer = buffer.slice(boundary + 2);
-      handleRawEvent(rawEvent, handlers);
+      handleRawEvent(rawEvent, watched);
       boundary = buffer.indexOf("\n\n");
     }
   }
+
+  if (!concluded) handlers.onDropped?.();
 }
 
 function handleRawEvent(raw: string, handlers: ChatStreamHandlers) {

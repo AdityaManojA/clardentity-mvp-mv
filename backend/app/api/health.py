@@ -1,3 +1,4 @@
+import time
 from typing import Literal
 
 import redis.asyncio as redis
@@ -11,6 +12,13 @@ from app.services.storage import get_s3_client
 router = APIRouter(tags=["health"])
 
 DependencyStatus = Literal["ok", "error"]
+
+# When this process started. On a plan that spins the service down when idle
+# and restarts it under memory pressure, "how long has this container been
+# alive" is the difference between "the app is slow" and "the app was not
+# running when you asked" - and neither is visible from the outside without
+# it. A low uptime beside a report of a hung request is the answer.
+_STARTED_AT = time.monotonic()
 
 
 async def _check_database() -> DependencyStatus:
@@ -61,4 +69,5 @@ async def health_check():
         "status": overall,
         "dependencies": dependencies,
         "search": "tavily" if tavily_available() else "model-tool",
+        "uptime_seconds": round(time.monotonic() - _STARTED_AT),
     }

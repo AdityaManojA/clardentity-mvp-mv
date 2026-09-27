@@ -44,6 +44,11 @@ type AvatarCue = { expression: AvatarExpression; gesture: AvatarGesture };
 /** How long an answer may go with nothing to show before the Quick answer
  *  button appears on its own (the server's "slow" warning shows it sooner). */
 const SLOW_AFTER_MS = 7000;
+/* The server pings its stream every 15 seconds while it works, so a gap this
+ * long is a connection that has gone away, not an answer taking its time.
+ * Generous enough to survive a phone switching cell tower, short enough that
+ * nobody sits watching "Thinking…" wondering whether to wait. */
+const SILENCE_MS = 45000;
 
 const GESTURE_BY_MODE: Record<CognitiveMode, AvatarGesture> = {
   knowing: "presenting",
@@ -121,6 +126,9 @@ export function ChatView({ conversationId }: { conversationId: string }) {
   const lastSendRef = useRef<{ content: string; attachments: PendingAttachment[]; mode: CognitiveMode } | null>(
     null,
   );
+  // When the stream last produced anything, pings included. The watchdog
+  // below reads it; the stream writes it.
+  const lastActivityRef = useRef<number>(0);
   // The verdict box that arrived during streaming, until "final" writes it
   // onto the message itself.
   const earlyReviewRef = useRef<{
@@ -305,6 +313,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
     pendingUserMessageIdRef.current = userMessage?.id ?? null;
     const controller = new AbortController();
     abortControllerRef.current = controller;
+    lastActivityRef.current = Date.now();
 
     await streamChatMessage(
       conversationId,
@@ -499,6 +508,12 @@ export function ChatView({ conversationId }: { conversationId: string }) {
           setSlowHint(false);
           setValidatingId(null);
         },
+        onActivity: () => {
+          lastActivityRef.current = Date.now();
+        },
+        onDropped: () => {
+          void recoverAfterDrop();
+        },
       },
       controller.signal,
     );
@@ -531,6 +546,59 @@ export function ChatView({ conversationId }: { conversationId: string }) {
     handleStop();
     void handleSend(last.content, last.attachments, "rapid", true);
   }
+
+  /** The stream died before it finished. The answer may well exist anyway:
+   *  the server writes and commits it before it starts checking claims, so
+   *  anything lost after that point is only the analysis. Re-read the
+   *  conversation and show whatever is there; say so plainly if the answer
+   *  never landed, instead of leaving the rabbit thinking for ever.
+   *
+   *  This is what a ten-minute "Thinking…" actually was: a connection that
+   *  went away - a phone changing network, a proxy timing out, the server
+   *  restarting - and a client with nothing listening for that. */
+  const recoverAfterDrop = useCallback(async () => {
+    abortControllerRef.current?.abort();
+    const askedAt = pendingUserMessageIdRef.current;
+    try {
+      const fresh = await apiFetch<ChatMessage[]>(`/chat/${conversationId}/messages`);
+      const answered =
+        fresh.length > 0 && fresh[fresh.length - 1].role === "assistant";
+      if (answered) {
+        setMessages(fresh);
+        setError(null);
+        setStreaming(null);
+        setSending(false);
+        setSlowHint(false);
+        setValidatingId(null);
+        return;
+      }
+      // Nothing was saved, so the question is still the user's to re-ask.
+      // Drop the optimistic copy, the way stopping does.
+      if (askedAt) setMessages((prev) => prev.filter((m) => m.id !== askedAt));
+      setError(
+        "The connection dropped before the answer came back. Nothing was lost - ask again.",
+      );
+    } catch {
+      setError("The connection dropped. Check your network and ask again.");
+    } finally {
+      setStreaming(null);
+      setSending(false);
+      setSlowHint(false);
+      setValidatingId(null);
+    }
+  }, [conversationId]);
+
+  /** The watchdog. `onDropped` covers a stream that ends or errors; this
+   *  covers the case where it does neither and simply stops arriving, which
+   *  is what a dead mobile connection looks like from inside fetch(). */
+  useEffect(() => {
+    if (!sending) return;
+    const timer = setInterval(() => {
+      const since = Date.now() - lastActivityRef.current;
+      if (lastActivityRef.current > 0 && since > SILENCE_MS) void recoverAfterDrop();
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [sending, recoverAfterDrop]);
 
   // The fallback timer behind the slow hint: a stream with nothing to show
   // after this long gets the button whether or not the server warned.
