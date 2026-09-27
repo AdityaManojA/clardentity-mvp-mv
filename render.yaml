@@ -1,18 +1,26 @@
 services:
-  # Render's free plan only allows "web service" type (no separate paid-tier
-  # background-worker service), so the Celery consumer runs inside this same
-  # container via backend/start.sh instead of as its own Render service.
+  # The Celery consumer runs inside this same container via backend/start.sh
+  # rather than as its own Render service. That began as a free-plan
+  # constraint and is now a choice worth revisiting: on a paid plan a
+  # separate background-worker service would mean one worker for the whole
+  # cluster instead of one per instance, which is what autoscaling turns it
+  # into.
   - type: web
     name: clardentity-backend
     runtime: docker
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
-    plan: free
+    # Standard ($25/mo), with autoscaling enabled on the dashboard. Written
+    # here so a Blueprint sync cannot quietly put the service back on free
+    # and reintroduce the spin-down - the same trap as the model pins below.
+    # Autoscaling min/max instances live on the dashboard; Blueprint has no
+    # field for them, so do not expect this file to carry them.
+    plan: standard
     healthCheckPath: /health
-    # Inert on the free plan - Render accepts and stores it but never runs it,
-    # which is why backend/start.sh applies migrations at boot instead. Kept
-    # so the intent survives a plan upgrade; alembic upgrade head is
-    # idempotent, so running in both places is harmless.
+    # Runs for real on a paid plan. backend/start.sh also migrates at boot,
+    # which is deliberate belt-and-braces: alembic upgrade head is idempotent
+    # and both paths take a Postgres advisory lock (alembic/env.py), so
+    # several instances starting at once serialise instead of racing.
     preDeployCommand: alembic upgrade head
     envVars:
       - fromGroup: clardentity-shared
@@ -67,6 +75,13 @@ envVarGroups:
         sync: false
       - key: MAX_UPLOAD_SIZE_MB
         value: "25"
+      # Per-container Postgres connections. What matters with autoscaling is
+      # this times the instance count against the pooler's client limit, so
+      # these stay small; raise them only alongside the database plan.
+      - key: DB_POOL_SIZE
+        value: "3"
+      - key: DB_MAX_OVERFLOW
+        value: "2"
       # Set on the service but missing here, which is the same trap as the
       # model pin above - a Blueprint sync would drop them back to the code
       # defaults in app/core/config.py, and those defaults are wrong for

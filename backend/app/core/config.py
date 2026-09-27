@@ -63,6 +63,16 @@ class Settings(BaseSettings):
     fast_generation_modes: str = "knowing,learning,creative,decision,legal"
     # The companions a paid tier would open. Locked in the picker; a signed-in
     # user can open them for testing from the plans dialog, capped per day.
+    # How many Postgres connections one container may hold. Multiplied by
+    # every running instance: the pooler in front of Supabase caps total
+    # client connections (a couple of hundred on the smaller plans), so the
+    # default SQLAlchemy pool of 5 + 10 overflow is 15 per container and puts
+    # the ceiling at a dozen or so instances before new ones start failing to
+    # connect. Kept small deliberately - a request holds a connection for the
+    # length of a query, not the length of an answer - and tunable from the
+    # dashboard if the database plan grows.
+    db_pool_size: int = 3
+    db_max_overflow: int = 2
     preview_modes: str = "mentoring,therapy,creative,legal"
     preview_daily_messages: int = 25
     # Depth and spend per call. "low" preserves the latency posture the

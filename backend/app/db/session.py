@@ -14,7 +14,19 @@ from app.core.config import settings
 # (local dev), so this is safe either way.
 _connect_args = {"statement_cache_size": 0}
 
-engine = create_async_engine(settings.database_url, pool_pre_ping=True, connect_args=_connect_args)
+engine = create_async_engine(
+    settings.database_url,
+    pool_pre_ping=True,
+    # Bounded on purpose - see config.db_pool_size. With autoscaling, the
+    # number that matters is per-container connections times instances, and
+    # the pooler's client limit is the thing that runs out first.
+    pool_size=settings.db_pool_size,
+    max_overflow=settings.db_max_overflow,
+    # A connection idle this long is returned rather than held against the
+    # pooler's budget while this container waits for its next request.
+    pool_recycle=300,
+    connect_args=_connect_args,
+)
 
 AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
 

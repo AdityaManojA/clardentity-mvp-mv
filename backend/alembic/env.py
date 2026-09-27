@@ -83,7 +83,20 @@ async def run_async_migrations() -> None:
     )
 
     async with connectable.connect() as connection:
-        await connection.run_sync(do_run_migrations)
+        # One migrator at a time, cluster-wide. Every container applies
+        # migrations at boot (see start.sh), which was fine when there was
+        # one container: with autoscaling, a scale-out event starts several
+        # at once and they would run the same DDL concurrently - lock
+        # contention at best, a half-applied revision and a crash-looping
+        # instance at worst. A session-level advisory lock serialises them;
+        # whoever gets it migrates, the rest wait and then find there is
+        # nothing left to do. The key is an arbitrary constant - it just has
+        # to be the same in every container.
+        await connection.exec_driver_sql("SELECT pg_advisory_lock(8374652910)")
+        try:
+            await connection.run_sync(do_run_migrations)
+        finally:
+            await connection.exec_driver_sql("SELECT pg_advisory_unlock(8374652910)")
 
     await connectable.dispose()
 
