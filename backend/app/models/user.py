@@ -45,6 +45,14 @@ class User(Base):
     onboarding_completed_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
     )
+    # When this account accepted the terms and the privacy notice, and which
+    # version it accepted. Consent has to be demonstrable to be worth
+    # anything - "they must have ticked it" is not a record - and versioning
+    # it means a later revision can tell who has seen which.
+    terms_accepted_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    terms_version: Mapped[str | None] = mapped_column(String(20), nullable=True)
     # Set when the user opened the paid-tier companions for testing from the
     # plans dialog ("Skip for now"). Not a subscription: it only lifts the
     # picker's locks, and usage is capped per day (services/preview_access).

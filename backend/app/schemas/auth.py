@@ -8,6 +8,10 @@ class RegisterRequest(BaseModel):
     email: EmailStr
     password: str = Field(min_length=8, max_length=72)
     display_name: str | None = None
+    # The tick on the sign-up form. Required: an account cannot be created
+    # without it, and the version accepted is stored on the row so the record
+    # says what was agreed to rather than merely that something was.
+    accepted_terms: bool = False
 
 
 class LoginRequest(BaseModel):

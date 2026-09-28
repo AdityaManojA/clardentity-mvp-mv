@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { identify, resetIdentity, routePattern, track, trackPageView } from "@/lib/analytics";
 import { useAuth } from "@/lib/auth";
+import { useConsent } from "@/lib/consent";
 
 /** Mounted once, under the providers. Sends the session-level events - the
  *  app opening, who is signed in (by account id; never an email), and which
@@ -11,11 +12,16 @@ import { useAuth } from "@/lib/auth";
 export function Analytics() {
   const pathname = usePathname();
   const { user } = useAuth();
+  // Consent usually arrives after the page has loaded - somebody reads the
+  // banner and taps Allow - so every effect here keys on it and runs from
+  // that moment. Without this the first session after agreeing would be
+  // missing its opening events.
+  const consent = useConsent();
   const opened = useRef(false);
   const identified = useRef<string | null>(null);
 
   useEffect(() => {
-    if (opened.current) return;
+    if (consent !== "granted" || opened.current) return;
     opened.current = true;
     track("app_opened", {
       // Enough to tell a phone from a desktop, which is the one split that
@@ -23,13 +29,21 @@ export function Analytics() {
       viewport: window.innerWidth < 640 ? "phone" : window.innerWidth < 1024 ? "tablet" : "desktop",
       installed: window.matchMedia("(display-mode: standalone)").matches,
     });
-  }, []);
+  }, [consent]);
 
   useEffect(() => {
     trackPageView(routePattern(pathname));
-  }, [pathname]);
+  }, [pathname, consent]);
 
   useEffect(() => {
+    if (consent !== "granted") {
+      // Withdrawn, or never given: drop any identity the SDK is holding.
+      if (identified.current) {
+        identified.current = null;
+        resetIdentity();
+      }
+      return;
+    }
     if (user && identified.current !== user.id) {
       identified.current = user.id;
       identify(user.id);
@@ -38,7 +52,7 @@ export function Analytics() {
       identified.current = null;
       resetIdentity();
     }
-  }, [user]);
+  }, [user, consent]);
 
   return null;
 }

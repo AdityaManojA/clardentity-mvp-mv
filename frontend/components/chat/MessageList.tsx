@@ -26,6 +26,7 @@ import { ExportFileMenu } from "@/components/chat/ExportFileMenu";
 import { cleanMessageText } from "@/lib/text";
 import { renderInline, splitBlocks } from "@/lib/markdown";
 import { cx, Spinner } from "@/components/ui/primitives";
+import { track } from "@/lib/analytics";
 
 export type StreamingMessage = {
   mode_used: string;
@@ -182,7 +183,14 @@ export function MessageList({
           siblingIds={m.sibling_ids}
           onSwitchBranch={onSwitchBranch}
           isPlaying={playingMessageId === m.id}
-          onPlayAudio={onPlayAudio ? () => onPlayAudio(m.id, m.content ?? "") : undefined}
+          onPlayAudio={
+            onPlayAudio
+              ? () => {
+                  track("answer_listened");
+                  onPlayAudio(m.id, m.content ?? "");
+                }
+              : undefined
+          }
           isValidating={validatingId === m.id}
           canEdit={m.role === "user" && Boolean(onSubmitEdit)}
           onRegenerate={
@@ -618,7 +626,13 @@ function MessageBubble({
             </div>
             <div className="flex items-center gap-1.5">
               {!isStreaming && content && (
-                <FlipButton flipped={devil.flipped} onClick={devil.toggle} />
+                <FlipButton
+                  flipped={devil.flipped}
+                  onClick={() => {
+                    if (!devil.flipped) track("counterfactual_flipped");
+                    devil.toggle();
+                  }}
+                />
               )}
               {onPlayAudio && content && (
                 <button
@@ -1021,7 +1035,10 @@ function MessageActions({
       {onRegenerate && (
         <button
           type="button"
-          onClick={onRegenerate}
+          onClick={() => {
+            track("answer_regenerated");
+            onRegenerate();
+          }}
           disabled={busy}
           title="Regenerate this answer"
           aria-label="Regenerate this answer"

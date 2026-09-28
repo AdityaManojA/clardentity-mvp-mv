@@ -5,6 +5,7 @@ import { API_BASE_URL, apiFetch } from "@/lib/apiClient";
 import { authErrorMessage, getAccessToken } from "@/lib/auth";
 import { Badge, Spinner } from "@/components/ui/primitives";
 import { DOCUMENT_ACCEPT } from "@/components/chat/MessageInput";
+import { track } from "@/lib/analytics";
 
 type DocumentItem = {
   id: string;
@@ -67,6 +68,10 @@ export function DocumentUploader({ workspaceId }: { workspaceId: string }) {
       form.append("file", file);
 
       const accessToken = getAccessToken();
+      track("document_uploaded", {
+        extension: file.name.includes(".") ? file.name.split(".").pop()?.toLowerCase() : undefined,
+        size_kb: Math.round(file.size / 1024),
+      });
       const res = await fetch(`${API_BASE_URL}/documents/upload`, {
         method: "POST",
         headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,

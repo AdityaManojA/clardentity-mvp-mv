@@ -126,7 +126,10 @@ type AuthContextValue = {
   register: (
     email: string,
     password: string,
-    displayName?: string,
+    displayName: string | undefined,
+    /** The tick on the sign-up form. The server will not create an account
+     *  without it, so it is a required argument rather than an option. */
+    acceptedTerms: boolean,
   ) => Promise<void>;
   logout: () => void;
   /** Redeem a reset link and sign in on the new password in one step. */
@@ -180,12 +183,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const register = useCallback(
-    async (email: string, password: string, displayName?: string) => {
+    async (email: string, password: string, displayName: string | undefined, acceptedTerms: boolean) => {
       const result = await apiFetch<TokenResponse & { user: User }>(
         "/auth/register",
         {
           method: "POST",
-          body: { email, password, display_name: displayName || undefined },
+          // The server refuses without it; sent explicitly rather than
+          // defaulted so the tick on the form is what causes it.
+          body: {
+            email,
+            password,
+            display_name: displayName || undefined,
+            accepted_terms: acceptedTerms,
+          },
         },
       );
       setTokens(result.access_token, result.refresh_token);

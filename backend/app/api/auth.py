@@ -1,5 +1,6 @@
 import logging
 import uuid
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from google.auth.transport import requests as google_requests
@@ -124,6 +125,14 @@ async def register(
 ) -> AuthResponse:
     await check_rate_limit(f"auth:register:{_client_ip(request)}", max_requests=10, window_seconds=300)
 
+    # Checked before the email lookup: refusing for the reason the caller can
+    # fix, without first telling them whether that address is registered.
+    if not payload.accepted_terms:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Please accept the Terms of Service and Privacy Policy to create an account",
+        )
+
     existing = await db.scalar(select(User).where(User.email == payload.email))
     if existing is not None:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already registered")
@@ -132,6 +141,8 @@ async def register(
         email=payload.email,
         password_hash=hash_password(payload.password),
         display_name=payload.display_name,
+        terms_accepted_at=datetime.now(UTC),
+        terms_version=settings.terms_version,
     )
     db.add(user)
     await db.flush()

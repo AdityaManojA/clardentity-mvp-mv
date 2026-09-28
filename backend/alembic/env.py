@@ -56,10 +56,30 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 
+# One migrator at a time, cluster-wide. Every container applies migrations at
+# boot (see start.sh) and Render's preDeployCommand does too, so a scale-out
+# can start several at once; without this they would run the same DDL
+# concurrently - lock contention at best, a half-applied revision and a
+# crash-looping instance at worst.
+#
+# Transaction-scoped (pg_advisory_xact_lock), taken inside Alembic's own
+# transaction, for two reasons. It is released by the commit or rollback, so
+# a container killed mid-migration cannot leave the lock held. And a
+# session-scoped lock is meaningless through Supabase's transaction-mode
+# pooler, where the next statement may land on a different backend.
+#
+# Taking it on the connection *outside* that transaction - the first version
+# of this - was worse than useless: it opened an implicit transaction that
+# nothing ever committed, so every migration rolled back at close while
+# Alembic logged "Running upgrade ..." and the schema never moved.
+_MIGRATION_LOCK_KEY = 8374652910
+
+
 def do_run_migrations(connection: Connection) -> None:
     context.configure(connection=connection, target_metadata=target_metadata)
 
     with context.begin_transaction():
+        connection.exec_driver_sql(f"SELECT pg_advisory_xact_lock({_MIGRATION_LOCK_KEY})")
         context.run_migrations()
 
 
@@ -83,20 +103,7 @@ async def run_async_migrations() -> None:
     )
 
     async with connectable.connect() as connection:
-        # One migrator at a time, cluster-wide. Every container applies
-        # migrations at boot (see start.sh), which was fine when there was
-        # one container: with autoscaling, a scale-out event starts several
-        # at once and they would run the same DDL concurrently - lock
-        # contention at best, a half-applied revision and a crash-looping
-        # instance at worst. A session-level advisory lock serialises them;
-        # whoever gets it migrates, the rest wait and then find there is
-        # nothing left to do. The key is an arbitrary constant - it just has
-        # to be the same in every container.
-        await connection.exec_driver_sql("SELECT pg_advisory_lock(8374652910)")
-        try:
-            await connection.run_sync(do_run_migrations)
-        finally:
-            await connection.exec_driver_sql("SELECT pg_advisory_unlock(8374652910)")
+        await connection.run_sync(do_run_migrations)
 
     await connectable.dispose()
 

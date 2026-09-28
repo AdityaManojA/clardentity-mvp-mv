@@ -73,6 +73,10 @@ class Settings(BaseSettings):
     # dashboard if the database plan grows.
     db_pool_size: int = 3
     db_max_overflow: int = 2
+    # The version of the terms and privacy notice currently in force. Bump it
+    # when either document changes materially; stored against each account at
+    # sign-up so a later revision knows who has agreed to what.
+    terms_version: str = "2026-09-28"
     preview_modes: str = "mentoring,therapy,creative,legal"
     preview_daily_messages: int = 25
     # Depth and spend per call. "low" preserves the latency posture the

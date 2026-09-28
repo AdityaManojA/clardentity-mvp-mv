@@ -15,6 +15,7 @@ export default function RegisterPage() {
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -23,7 +24,7 @@ export default function RegisterPage() {
     setError(null);
     setSubmitting(true);
     try {
-      await register(email, password, displayName);
+      await register(email, password, displayName, acceptedTerms);
       // RequireAuth routes a not-yet-onboarded account to /welcome from
       // here; the tour starts when those questions are finished or skipped.
       router.push("/start");
@@ -91,6 +92,30 @@ export default function RegisterPage() {
               onChange={(e) => setPassword(e.target.value)}
             />
           </Field>
+
+          {/* Unticked by default and required to submit. A pre-ticked box is
+              not consent in any jurisdiction that has thought about it, and
+              the two links open the documents rather than describing them. */}
+          <label className="flex cursor-pointer items-start gap-2.5 text-[13px] leading-relaxed text-ink-secondary">
+            <input
+              type="checkbox"
+              required
+              checked={acceptedTerms}
+              onChange={(e) => setAcceptedTerms(e.target.checked)}
+              className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--brand)]"
+            />
+            <span>
+              I agree to the{" "}
+              <Link href="/terms" target="_blank" className="text-brand hover:underline">
+                Terms of Service
+              </Link>{" "}
+              and the{" "}
+              <Link href="/privacy" target="_blank" className="text-brand hover:underline">
+                Privacy Policy
+              </Link>
+              .
+            </span>
+          </label>
 
           {error && (
             <div className="rounded-lg border border-band-low-border bg-band-low-bg px-3 py-2 text-sm text-band-low">

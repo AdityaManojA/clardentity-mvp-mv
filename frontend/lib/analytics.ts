@@ -21,6 +21,8 @@ import type { PostHog } from "posthog-js";
  * loop without polluting the numbers.
  */
 
+import { consentGranted } from "@/lib/consent";
+
 const KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
 /** EU by default: the app has users in India and the EU, and the EU host
  *  keeps the data under one regime rather than two. Overridable for a
@@ -64,7 +66,13 @@ export type AnalyticsEvent =
   | "chat_deleted"
   | "tour_started"
   | "tour_finished"
-  | "feedback_given";
+  | "feedback_given"
+  | "answer_regenerated"
+  | "counterfactual_flipped"
+  | "answer_listened"
+  | "conversation_exported"
+  | "document_uploaded"
+  | "consent_choice";
 
 /** Property values are deliberately narrow. A string here is a mode name, a
  *  gate kind, a file extension - never anything a user typed. */
@@ -73,14 +81,20 @@ export type AnalyticsProps = Record<string, string | number | boolean | null | u
 let client: PostHog | null = null;
 let loading: Promise<PostHog | null> | null = null;
 
+/** Configured *and* permitted. Both are required before anything is sent or
+ *  even downloaded: a key without consent is a tracker nobody agreed to. */
+function on(): boolean {
+  return Boolean(KEY) && consentGranted();
+}
+
 export function analyticsEnabled(): boolean {
-  return Boolean(KEY);
+  return on();
 }
 
 /** Loaded on demand, after the first event rather than at boot: the SDK is
  *  ~60KB and nothing on the first paint depends on it. */
 async function getClient(): Promise<PostHog | null> {
-  if (!KEY) return null;
+  if (!on() || !KEY) return null;
   if (client) return client;
   if (loading) return loading;
   loading = import("posthog-js")
@@ -114,7 +128,7 @@ async function getClient(): Promise<PostHog | null> {
 const FORBIDDEN = /content|question|answer|text|title|email|name|filename|query|prompt/i;
 
 export function track(event: AnalyticsEvent, props?: AnalyticsProps) {
-  if (!KEY) return;
+  if (!on()) return;
   const safe: AnalyticsProps = {};
   for (const [k, v] of Object.entries(props ?? {})) {
     // The guard is here, at the send, because this is the only place every
@@ -157,20 +171,23 @@ function sanitize(properties: Record<string, unknown>): Record<string, unknown> 
 
 /** The route pattern, not the address: `/chat/[id]`, never the id. */
 export function trackPageView(pattern: string) {
-  if (!KEY) return;
+  if (!on()) return;
   void getClient().then((c) => c?.capture("$pageview", { pattern }));
 }
 
 /** Called once a session is known. The id is the account's UUID - the email
  *  is not sent, here or anywhere else. */
 export function identify(userId: string) {
-  if (!KEY) return;
+  if (!on()) return;
   void getClient().then((c) => c?.identify(userId));
 }
 
+/** Signing out, or withdrawing consent. Not gated on `on()`: when consent is
+ *  withdrawn this is exactly the call that has to still go through, to drop
+ *  the identity and the stored distinct id rather than leave them behind. */
 export function resetIdentity() {
-  if (!KEY) return;
-  void getClient().then((c) => c?.reset());
+  if (!KEY || !client) return;
+  client.reset();
 }
 
 /** Durations as buckets rather than milliseconds: the question is "did that

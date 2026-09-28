@@ -217,7 +217,7 @@ class TestOnboardingAndAccountDeletion:
             async with client() as c:
                 reg = await c.post(
                     f"{API}/auth/register",
-                    json={"email": email, "password": password, "display_name": "Onboard"},
+                    json={"email": email, "password": password, "display_name": "Onboard", "accepted_terms": True},
                 )
                 if reg.status_code >= 500:
                     pytest.skip("no database available")
@@ -1108,7 +1108,7 @@ class TestRefreshAcrossDevices:
             async with client() as c:
                 reg = await c.post(
                     f"{API}/auth/register",
-                    json={"email": email, "password": password, "display_name": "Two"},
+                    json={"email": email, "password": password, "display_name": "Two", "accepted_terms": True},
                 )
                 if reg.status_code >= 500:
                     pytest.skip("no database available")
@@ -1157,7 +1157,7 @@ class TestMoveConversation:
             async with client() as c:
                 reg = await c.post(
                     f"{API}/auth/register",
-                    json={"email": email, "password": password, "display_name": "Mover"},
+                    json={"email": email, "password": password, "display_name": "Mover", "accepted_terms": True},
                 )
                 if reg.status_code >= 500:
                     pytest.skip("no database available")
@@ -1191,7 +1191,7 @@ class TestMoveConversation:
                 # Someone else's workspace is not a destination.
                 other = await c.post(
                     f"{API}/auth/register",
-                    json={"email": other_email, "password": password, "display_name": "Other"},
+                    json={"email": other_email, "password": password, "display_name": "Other", "accepted_terms": True},
                 )
                 tokens.append(other.json()["access_token"])
                 foreign = (
@@ -1211,6 +1211,52 @@ class TestMoveConversation:
                     await c.delete(f"{API}/auth/me", headers={"Authorization": f"Bearer {t}"})
 
 
+class TestTermsAcceptance:
+    """An account cannot be created without accepting, and what was accepted
+    is recorded rather than assumed. Needs a database."""
+
+    async def test_registration_requires_and_records_acceptance(self):
+        from app.core.config import settings
+        from app.models import User
+
+        email = f"terms-{uuid.uuid4().hex[:8]}@example.com"
+        password = "terms-password-123"
+        token = None
+        try:
+            async with client() as c:
+                refused = await c.post(
+                    f"{API}/auth/register",
+                    json={"email": email, "password": password, "display_name": "T"},
+                )
+                if refused.status_code >= 500:
+                    pytest.skip("no database available")
+                assert refused.status_code == 400, refused.text
+                assert "Terms" in refused.json()["detail"]
+
+                # Refused for the reason the caller can fix, and nothing was
+                # created - the same address still registers cleanly.
+                accepted = await c.post(
+                    f"{API}/auth/register",
+                    json={
+                        "email": email,
+                        "password": password,
+                        "display_name": "T",
+                        "accepted_terms": True,
+                    },
+                )
+                assert accepted.status_code == 201, accepted.text
+                token = accepted.json()["access_token"]
+
+            async with AsyncSessionLocal() as db:
+                user = await db.scalar(select(User).where(User.email == email))
+                assert user.terms_accepted_at is not None
+                assert user.terms_version == settings.terms_version
+        finally:
+            if token:
+                async with client() as c:
+                    await c.delete(f"{API}/auth/me", headers={"Authorization": f"Bearer {token}"})
+
+
 class TestRenameAndPin:
     """The other two edits on the chat menu. Needs a database."""
 
@@ -1222,7 +1268,7 @@ class TestRenameAndPin:
             async with client() as c:
                 reg = await c.post(
                     f"{API}/auth/register",
-                    json={"email": email, "password": password, "display_name": "Pinner"},
+                    json={"email": email, "password": password, "display_name": "Pinner", "accepted_terms": True},
                 )
                 if reg.status_code >= 500:
                     pytest.skip("no database available")

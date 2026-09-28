@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { apiFetch } from "@/lib/apiClient";
 import { cx } from "@/components/ui/primitives";
+import { track } from "@/lib/analytics";
 
 /* "Was this helpful?" - a thumb, or a thumb and a sentence, on one answer.
  *
@@ -54,6 +55,7 @@ export function FeedbackWidget({
 
   function toggleRating(value: "up" | "down") {
     const next = rating === value ? null : value;
+    track("feedback_given", { rating: next ?? "cleared" });
     setRating(next);
     void save({ rating: next, comment });
   }
