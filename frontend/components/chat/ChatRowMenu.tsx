@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { apiFetch } from "@/lib/apiClient";
 import { cx } from "@/components/ui/primitives";
+import { track } from "@/lib/analytics";
 
 /* The chat row's own menu.
  *
@@ -121,6 +122,9 @@ export function ChatRowMenu({
     setError(null);
     try {
       await apiFetch(`/chat/conversations/${conversationId}`, { method: "PATCH", body });
+      if ("title" in body) track("chat_renamed");
+      if ("pinned" in body) track("chat_pinned", { pinned: Boolean(body.pinned) });
+      if ("workspace_id" in body) track("chat_moved");
       setOpenState(false);
       onChanged?.();
     } catch {
@@ -135,6 +139,7 @@ export function ChatRowMenu({
     setError(null);
     try {
       await apiFetch(`/chat/conversations/${conversationId}`, { method: "DELETE" });
+      track("chat_deleted");
       setOpenState(false);
       onDeleted?.();
     } catch {

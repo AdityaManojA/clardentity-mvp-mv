@@ -2,6 +2,7 @@
 
 import { useEffect, useSyncExternalStore, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
+import { track } from "@/lib/analytics";
 
 export type TourId = "workspace" | "chat";
 
@@ -233,6 +234,7 @@ export function startTour(id: TourId, options: { force?: boolean } = {}) {
   if (!options.force && (current.done[id] || current.active === id)) return;
   const done = { ...current.done };
   delete done[id];
+  track("tour_started", { tour: id, replayed: Boolean(options.force) });
   setTourState({ active: id, stepIndex: 0, done });
 }
 
@@ -241,6 +243,7 @@ export function advanceTour() {
   if (!current.active) return;
   const nextIndex = current.stepIndex + 1;
   if (nextIndex >= TOURS[current.active].length) {
+    track("tour_finished", { tour: current.active, outcome: "completed" });
     setTourState({ active: null, stepIndex: 0, done: { ...current.done, [current.active]: "completed" } });
   } else {
     setTourState({ ...current, stepIndex: nextIndex });
@@ -260,6 +263,11 @@ export function resetTours() {
 export function endTour() {
   const current = getTourSnapshot();
   if (!current.active) return;
+  track("tour_finished", {
+    tour: current.active,
+    outcome: "skipped",
+    at_step: current.stepIndex + 1,
+  });
   setTourState({ active: null, stepIndex: 0, done: { ...current.done, [current.active]: "skipped" } });
 }
 

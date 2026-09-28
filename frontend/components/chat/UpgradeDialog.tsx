@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { apiFetch } from "@/lib/apiClient";
 import { cx } from "@/components/ui/primitives";
+import { track } from "@/lib/analytics";
 import {
   closePreviewAccess,
   loadPreviewAccess,
@@ -86,6 +87,7 @@ export function UpgradeDialog({
     try {
       if (open) {
         await openPreviewAccess();
+        track("preview_opened");
       } else {
         await closePreviewAccess();
       }

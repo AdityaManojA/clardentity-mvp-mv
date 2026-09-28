@@ -5,6 +5,7 @@ import { AuthProvider } from "@/lib/auth";
 import { ThemeProvider, THEME_INIT_SCRIPT } from "@/lib/theme";
 import { TourProvider } from "@/lib/tour";
 import { TourOverlay } from "@/components/tour/TourOverlay";
+import { Analytics } from "@/components/system/Analytics";
 
 /* Registered from the document rather than a client component, so it runs
    once per page load regardless of which route mounted. Failure is silent and
@@ -73,6 +74,7 @@ export default function RootLayout({
             <TourProvider>
               {children}
               <TourOverlay />
+              <Analytics />
             </TourProvider>
           </AuthProvider>
         </ThemeProvider>

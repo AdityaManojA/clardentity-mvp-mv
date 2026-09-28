@@ -7,6 +7,7 @@ import { AudioRecorder } from "@/components/upload/AudioRecorder";
 import { ModelPicker } from "@/components/chat/ModelPicker";
 import { cx } from "@/components/ui/primitives";
 import { useTouchKeyboard } from "@/lib/useTouchKeyboard";
+import { track } from "@/lib/analytics";
 
 /** Something the next message carries. An image goes to the model as
  *  vision context; a document is read on the server and its text put in
@@ -168,6 +169,7 @@ export function MessageInput({
 
   function acceptGhost() {
     if (!ghostVisible) return;
+    track("completion_accepted", { words: ghostVisible.trim().split(/\s+/).length });
     const next = value + ghostVisible;
     setGhost(null);
     pendingCaretRef.current = next.length;
@@ -293,6 +295,11 @@ export function MessageInput({
       });
       const base64 = dataUrl.split(",")[1] ?? "";
       const isImage = file.type.startsWith("image/");
+      track("attachment_added", {
+        kind: isImage ? "image" : "document",
+        extension: isImage ? undefined : fileExtension(file.name),
+        size_kb: Math.round(file.size / 1024),
+      });
       setAttachments((prev) => [
         ...prev,
         isImage
@@ -366,7 +373,10 @@ export function MessageInput({
 
           <AudioRecorder
             disabled={disabled}
-            onTranscribed={(text) => handleChange((value ? value + " " : "") + text)}
+            onTranscribed={(text) => {
+              track("voice_recorded", { words: text.trim().split(/\s+/).length });
+              handleChange((value ? value + " " : "") + text);
+            }}
           />
 
         {/* Next to the mic, because they are the same intention at two
@@ -374,7 +384,10 @@ export function MessageInput({
         <button
           type="button"
           data-tour="live-call"
-          onClick={onStartCall}
+          onClick={() => {
+            track("call_started");
+            onStartCall?.();
+          }}
           disabled={disabled || !onStartCall}
           title="Start a live call"
           aria-label="Start a live call"

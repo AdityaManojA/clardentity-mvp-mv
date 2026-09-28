@@ -19,6 +19,7 @@ import { LiveCallOverlay } from "@/components/chat/LiveCallOverlay";
 import { UpgradeDialog } from "@/components/chat/UpgradeDialog";
 import { DEFAULT_MODE, MODE_BY_VALUE, type PickableMode } from "@/lib/modes";
 import { usePreviewAccess } from "@/lib/previewAccess";
+import { durationBucket, track } from "@/lib/analytics";
 import { setSmartSwitching, useSmartSwitching } from "@/lib/modeSwitching";
 import { ContextQuestionCard } from "@/components/chat/ContextQuestionCard";
 import { ModeSwitchToast } from "@/components/chat/ModeSwitchToast";
@@ -314,6 +315,14 @@ export function ChatView({ conversationId }: { conversationId: string }) {
     const controller = new AbortController();
     abortControllerRef.current = controller;
     lastActivityRef.current = Date.now();
+    const askedAtMs = Date.now();
+    track("question_asked", {
+      mode: sendMode,
+      attachments: attachments.length,
+      documents: attachments.filter((a) => a.kind === "document").length,
+      smart_switching: smartSwitching,
+      follow_up: messages.length > 0,
+    });
 
     await streamChatMessage(
       conversationId,
@@ -360,6 +369,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
           );
         },
         onCrux: (text) => {
+          track("gist_shown", { mode: sendMode, after: durationBucket(Date.now() - askedAtMs) });
           setSlowHint(false);
           setStreaming((prev) => (prev ? { ...prev, crux: text } : prev));
         },
@@ -372,6 +382,10 @@ export function ChatView({ conversationId }: { conversationId: string }) {
           );
         },
         onAnswer: (message, realUserMessage) => {
+          track("answer_shown", {
+            mode: message.mode_used ?? sendMode,
+            after: durationBucket(Date.now() - askedAtMs),
+          });
           // The text is written and saved; only the analysis is outstanding.
           // Waiting for that to finish before letting you type again is what
           // made the app feel like it was still working long after it had
@@ -432,6 +446,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
           setTimeout(() => setReacting(false), 700);
         },
         onModeSuggestion: (suggestion) => {
+          track("gate_shown", { kind: "mode", mode: sendMode, suggested: suggestion.suggested_mode });
           // Nothing was written server-side, so the optimistic user message is
           // rolled back too - it will be re-sent for real once they choose.
           // (Regenerating never reaches this - the server skips the mode
@@ -445,6 +460,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
             // Outside what can be started today: show the plans, and answer
             // in the mode they chose meanwhile - closing the dialog without
             // choosing simply leaves them where they were.
+            track("locked_mode_tapped", { mode: next, via: "smart_switch" });
             setUpsell(MODE_BY_VALUE[next]?.label ?? next);
             void handleSend(
               content, attachments, sendMode, true, contextAcknowledged, contextRounds,
@@ -457,6 +473,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
           // answer is being written.
           setMode(next);
           const flags = { contextAcknowledged, contextRounds, refinedConfirmed, clarifyingConfirmed };
+          track("mode_switched_automatically", { from: sendMode, to: next });
           setSwitchedFrom({ from: sendMode, to: next, content, attachments, flags });
           setSwitchToast(true);
           void handleSend(
@@ -465,6 +482,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
           );
         },
         onContextQuestion: (asked) => {
+          track("gate_shown", { kind: "context", mode: sendMode });
           // Nothing was written server-side, so the optimistic user message is
           // rolled back the same way the mode gate rolls it back. `content`
           // here is already the accumulated text (original message plus any
@@ -481,6 +499,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
           setSending(false);
         },
         onRefinedQuestion: (suggestion) => {
+          track("gate_shown", { kind: "refined", mode: sendMode });
           // Nothing was written server-side, so the optimistic user message is
           // rolled back the same way the other two gates roll it back.
           // (Regenerating never reaches this - it sends refinedConfirmed=true
@@ -491,6 +510,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
           setSending(false);
         },
         onClarifyingOptions: (suggestion) => {
+          track("gate_shown", { kind: "options", mode: sendMode });
           // Nothing was written server-side, so the optimistic user message is
           // rolled back the same way the other gates roll it back.
           // (Regenerating never reaches this - it sends
@@ -502,6 +522,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
           setSending(false);
         },
         onError: (detail) => {
+          track("answer_failed", { mode: sendMode, after: durationBucket(Date.now() - askedAtMs) });
           setError(detail);
           setStreaming(null);
           setSending(false);
@@ -543,6 +564,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
   function handleQuickAnswer() {
     const last = lastSendRef.current;
     if (!last) return;
+    track("quick_answer_tapped", { mode: last.mode });
     handleStop();
     void handleSend(last.content, last.attachments, "rapid", true);
   }
@@ -557,6 +579,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
    *  went away - a phone changing network, a proxy timing out, the server
    *  restarting - and a client with nothing listening for that. */
   const recoverAfterDrop = useCallback(async () => {
+    track("stream_dropped");
     abortControllerRef.current?.abort();
     const askedAt = pendingUserMessageIdRef.current;
     try {
@@ -1075,6 +1098,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
                 // the server the mode is settled so it doesn't suggest again.
                 handleStop();
                 const { from, content, attachments, flags } = switchedFrom;
+                track("mode_switch_reverted", { to: from, via: "countdown" });
                 setSwitchToast(false);
                 setSwitchedFrom(null);
                 setMode(from);
@@ -1134,11 +1158,15 @@ export function ChatView({ conversationId }: { conversationId: string }) {
                 value={mode}
                 onChange={(next) => {
                   // Picking a mode by hand supersedes any accepted suggestion.
+                  track("mode_picked", { mode: next });
                   setSwitchedFrom(null);
                   setMode(next);
                 }}
                 disabled={sending}
-                onLocked={(locked) => setUpsell(MODE_BY_VALUE[locked]?.label ?? locked)}
+                onLocked={(locked) => {
+                  track("locked_mode_tapped", { mode: locked, via: "picker" });
+                  setUpsell(MODE_BY_VALUE[locked]?.label ?? locked);
+                }}
               />
             </div>
             {mode && (
@@ -1173,6 +1201,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
                     handleStop();
                     setMode(switchedFrom.from);
                     const { from, content, attachments, flags } = switchedFrom;
+                    track("mode_switch_reverted", { to: from, via: "banner" });
                     setSwitchedFrom(null);
                     void handleSend(
                       content, attachments, from, true, flags.contextAcknowledged, flags.contextRounds,
