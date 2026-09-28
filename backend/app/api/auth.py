@@ -170,7 +170,7 @@ async def register(
 
     queue_welcome_email(user)
     tokens = _issue_tokens(user)
-    return AuthResponse(user=UserPublic.model_validate(user), **tokens.model_dump())
+    return AuthResponse(user=UserPublic.of(user), **tokens.model_dump())
 
 
 @router.post("/login", response_model=TokenResponse)
@@ -370,7 +370,7 @@ async def oauth_google(
 
 @router.get("/me", response_model=UserPublic)
 async def me(current_user: User = Depends(get_current_user)) -> UserPublic:
-    return UserPublic.model_validate(current_user)
+    return UserPublic.of(current_user)
 
 
 @router.delete("/me", status_code=status.HTTP_204_NO_CONTENT)

@@ -117,6 +117,11 @@ export type User = {
    *  field sees `undefined` and gates nothing, rather than sending every
    *  signed-in user to a page that can't complete yet. */
   onboarding_completed_at?: string | null;
+  /** Whether this account may open /admin. Computed by the server from its
+   *  configured list; optional so a client deployed ahead of the backend
+   *  that added it simply shows no link. Hiding the link is a courtesy, not
+   *  the control - the admin endpoints check on every request. */
+  is_admin?: boolean;
 };
 
 type AuthContextValue = {

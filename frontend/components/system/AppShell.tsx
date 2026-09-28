@@ -89,6 +89,7 @@ const icons = {
   menu: <><path d="M3 6h18M3 12h18M3 18h18" /></>,
   panelLeft: <><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M9 3v18" /></>,
   trash: <><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" /></>,
+  admin: <><path d="M3 13h4v7H3zM10 8h4v12h-4zM17 4h4v16h-4z" /></>,
   close: <><path d="M18 6 6 18M6 6l12 12" /></>,
 };
 
@@ -565,6 +566,19 @@ export function AppShell({ children }: { children: ReactNode }) {
         >
           Chats
         </NavItem>
+        {/* Only an administrator has anywhere to go here, and only the
+            server knows who that is. Absent for everyone else rather than
+            present and refusing, which would be an advertisement. */}
+        {user?.is_admin && (
+          <NavItem
+            href="/admin"
+            icon={icons.admin}
+            active={pathname.startsWith("/admin")}
+            onNavigate={close}
+          >
+            Admin
+          </NavItem>
+        )}
       </div>
 
       <RecentConversations

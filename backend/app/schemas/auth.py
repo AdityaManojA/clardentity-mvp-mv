@@ -50,8 +50,21 @@ class UserPublic(BaseModel):
     # None until the first-run welcome questions are answered or skipped; the
     # client routes a signed-in user with None through them before the app.
     onboarding_completed_at: datetime | None = None
+    # Whether this account may open the admin dashboard. Computed from the
+    # configured list on the way out, never stored: the client uses it to
+    # decide whether to show the link, and the server re-checks on every
+    # admin request, so a tampered response buys nothing.
+    is_admin: bool = False
 
     model_config = {"from_attributes": True}
+
+    @classmethod
+    def of(cls, user) -> "UserPublic":
+        from app.services.admin_access import is_admin
+
+        return cls.model_validate(user, from_attributes=True).model_copy(
+            update={"is_admin": is_admin(user)}
+        )
 
 
 class TokenResponse(BaseModel):
