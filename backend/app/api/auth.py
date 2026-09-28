@@ -58,6 +58,23 @@ def _issue_tokens(user: User) -> TokenResponse:
     )
 
 
+def resolve_login(identifier: str) -> str:
+    """The address to look up for what was typed in the email field.
+
+    An address is itself. A bare name is only meaningful for the
+    administrator - "admin" is the local part of the configured admin
+    address - so it resolves to that and nothing else; every other name falls
+    through and matches no row, which fails exactly as a wrong address does.
+    """
+    value = (identifier or "").strip().lower()
+    if "@" in value:
+        return value
+    admin = (settings.admin_bootstrap_email or "").strip().lower()
+    if admin and value and admin.split("@", 1)[0] == value:
+        return admin
+    return value
+
+
 async def provision_new_user(db: AsyncSession, user: User) -> None:
     """Everything a brand-new account needs, whichever way they signed up.
 
@@ -166,7 +183,7 @@ async def login(
         status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password"
     )
 
-    user = await db.scalar(select(User).where(User.email == payload.email))
+    user = await db.scalar(select(User).where(User.email == resolve_login(payload.email)))
     if user is None or user.password_hash is None:
         raise invalid_credentials
 

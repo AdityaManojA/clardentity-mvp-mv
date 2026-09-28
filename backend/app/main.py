@@ -1,7 +1,11 @@
+import logging
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.admin import router as admin_router
+from app.api.admin_dashboard import router as admin_dashboard_router
 from app.api.audio import router as audio_router
 from app.api.compose import router as compose_router
 from app.api.auth import router as auth_router
@@ -19,10 +23,29 @@ from app.api.workspaces import router as workspaces_router
 from app.core.config import settings
 from app.core.logging_config import configure_logging
 from app.core.middleware import CorrelationIdMiddleware
+from app.db.session import AsyncSessionLocal
+from app.services.admin_access import ensure_bootstrap_admin
 
 configure_logging()
 
-app = FastAPI(title="Clardentity API")
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    """Boot work that must happen once per process. Seeding the administrator
+    is safe to run in every instance: it creates the account only when it is
+    missing, and two containers racing resolve to one row on the email's
+    unique index."""
+    try:
+        async with AsyncSessionLocal() as db:
+            await ensure_bootstrap_admin(db)
+    except Exception:  # noqa: BLE001 - an un-seeded admin must not stop serving
+        logging.getLogger("clardentity.admin").warning(
+            "bootstrap admin not created", exc_info=True
+        )
+    yield
+
+
+app = FastAPI(title="Clardentity API", lifespan=lifespan)
 
 app.add_middleware(CorrelationIdMiddleware)
 app.add_middleware(
@@ -36,6 +59,7 @@ app.add_middleware(
 API_PREFIX = "/api/v1"
 
 app.include_router(health_router)
+app.include_router(admin_dashboard_router, prefix=API_PREFIX)
 app.include_router(auth_router, prefix=API_PREFIX)
 app.include_router(workspaces_router, prefix=API_PREFIX)
 app.include_router(chat_router, prefix=API_PREFIX)

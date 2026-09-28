@@ -77,6 +77,15 @@ class Settings(BaseSettings):
     # when either document changes materially; stored against each account at
     # sign-up so a later revision knows who has agreed to what.
     terms_version: str = "2026-09-28"
+    # Who may open /admin. Comma-separated emails; empty means nobody, which
+    # is the right default for a deployment that never sets it.
+    admin_emails: str = "admin@clardentity.ai"
+    # Seeded at boot when the account does not exist, so a fresh deployment
+    # has an administrator without anyone running SQL by hand. Change the
+    # password from the dashboard and restart to rotate it; the seed never
+    # overwrites an existing account's password.
+    admin_bootstrap_email: str = "admin@clardentity.ai"
+    admin_bootstrap_password: str = ""
     preview_modes: str = "mentoring,therapy,creative,legal"
     preview_daily_messages: int = 25
     # Depth and spend per call. "low" preserves the latency posture the

@@ -32,6 +32,7 @@ from openai import AsyncOpenAI
 from tenacity import retry, retry_if_exception, stop_after_attempt, wait_exponential
 
 from app.core.config import settings
+from app.services.token_meter import record
 
 logger = logging.getLogger("clardentity.openai")
 
@@ -114,6 +115,22 @@ async def _create_response(**kwargs):
     return await _client.responses.create(**kwargs)
 
 
+def _meter(response, model: str | None) -> None:
+    """One completed call added to the turn's tally - see token_meter. Never
+    raises: a missing usage block is a reporting gap, not a failed answer."""
+    try:
+        usage = getattr(response, "usage", None)
+        if usage is None:
+            return
+        record(
+            getattr(response, "model", None) or model,
+            getattr(usage, "input_tokens", 0) or 0,
+            getattr(usage, "output_tokens", 0) or 0,
+        )
+    except Exception:  # noqa: BLE001
+        logger.debug("token usage not recorded", exc_info=True)
+
+
 async def _resilient_call(fn, **kwargs):
     _circuit_breaker.before_call()
     try:
@@ -194,6 +211,7 @@ async def stream_generation(
         elif event.type == "response.completed":
             response = event.response
             usage = response.usage
+            _meter(response, kwargs.get("model"))
             yield {
                 "type": "done",
                 "full_text": response.output_text,
@@ -220,6 +238,7 @@ async def generate_text(
         **_generation_kwargs(model, instructions, input_text, fast=fast),
         stream=False,
     )
+    _meter(response, model)
     return response.output_text
 
 
@@ -270,6 +289,7 @@ async def generate_structured(
         kwargs["tools"] = [_translate_tool(t) for t in tools]
 
     response = await _resilient_call(_create_response, **kwargs, stream=False)
+    _meter(response, kwargs.get("model"))
     raw = response.output_text
     try:
         parsed = json.loads(raw)

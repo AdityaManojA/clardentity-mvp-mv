@@ -52,12 +52,20 @@ export default function LoginPage() {
             <p className="text-sm text-ink-muted">Welcome back.</p>
           </div>
 
-          <Field label="Email" htmlFor="email">
+          {/* type="text", not "email": the administrator signs in as a
+              username, and the browser's own validation on an email field
+              refuses that before the form is ever submitted. inputMode keeps
+              the phone keyboard the same for everyone else, and the server
+              still decides what matches. */}
+          <Field label="Email or username" htmlFor="email">
             <Input
               id="email"
-              type="email"
+              type="text"
+              inputMode="email"
+              autoCapitalize="none"
+              spellCheck={false}
               required
-              autoComplete="email"
+              autoComplete="username"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />

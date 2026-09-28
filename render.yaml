@@ -78,6 +78,15 @@ envVarGroups:
       # Per-container Postgres connections. What matters with autoscaling is
       # this times the instance count against the pooler's client limit, so
       # these stay small; raise them only alongside the database plan.
+      # The admin dashboard: who may open it, and the account seeded at boot
+      # when it is missing. The password is set on the dashboard only - it is
+      # never in this file and never in git.
+      - key: ADMIN_EMAILS
+        value: admin@clardentity.ai
+      - key: ADMIN_BOOTSTRAP_EMAIL
+        value: admin@clardentity.ai
+      - key: ADMIN_BOOTSTRAP_PASSWORD
+        sync: false
       - key: DB_POOL_SIZE
         value: "3"
       - key: DB_MAX_OVERFLOW

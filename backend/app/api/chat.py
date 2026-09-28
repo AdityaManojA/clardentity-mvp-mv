@@ -6,6 +6,7 @@ import time
 import uuid
 from datetime import UTC, datetime
 from collections.abc import AsyncIterator
+from contextlib import AsyncExitStack
 from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
@@ -95,6 +96,7 @@ from app.services.search_planner import SearchPlan, needs_live_data, plan_search
 from app.services.reflection_agent import reflect_and_revise
 from app.services.preview_access import daily_limit, is_preview_mode, spend, used_today
 from app.services.retrieval import RetrievedChunk, retrieve_chunks
+from app.services.token_meter import meter as token_meter
 from app.services.storage import upload_file
 from app.services.router import InvalidModeError, InvalidReasoningLensError, validate_mode, validate_reasoning_lens
 from app.services.taxonomy import describe_bias
@@ -1317,6 +1319,12 @@ async def send_message(
     gen_temperature = admin_settings.get("openai_temperature")
 
     async def event_stream() -> AsyncIterator[dict]:
+        # Everything this turn spends - the answer, the plan, the gates, one
+        # verification per claim, the research, the reviews - lands in one
+        # tally, written onto the assistant's row when the turn finishes.
+        # Opened around the whole generator rather than the generation call,
+        # because the fan-out after the answer is most of the bill.
+        turn_usage = token_meter_stack.enter_context(token_meter())
         full_text = ""
         stripper = ClaimTagStripper()
         crux_splitter = CruxSplitter()
@@ -1553,6 +1561,7 @@ async def send_message(
             avatar_cue = compute_avatar_cue(mode, None, False, gesture_map)
             async with AsyncSessionLocal() as gen_db:
                 assistant_message = await gen_db.get(Message, assistant_message_id)
+                assistant_message.token_usage = turn_usage.as_dict()
                 assistant_message.avatar_expression = avatar_cue.expression
                 assistant_message.avatar_gesture = avatar_cue.gesture
                 await gen_db.commit()
@@ -1875,6 +1884,10 @@ async def send_message(
             # produced, and rewrites the text only if reflection changed it.
             assistant_message = await gen_db.get(Message, assistant_message_id)
             assistant_message.content = display_text
+            # The column has existed since the first schema and nothing ever
+            # wrote to it, so "what does a turn cost, and for whom" had no
+            # answer. It does now - see services/token_meter.
+            assistant_message.token_usage = turn_usage.as_dict()
             assistant_message.confidence_score = message_score.score
             assistant_message.confidence_band = message_score.band
             assistant_message.distortion_penalty_applied = message_score.distortion_penalty_applied
@@ -2035,7 +2048,17 @@ async def send_message(
         logger.info("turn timing mode=%s claims=%d %s", mode, len(scored_claims), " ".join(marks))
         yield {"event": "final", "data": json.dumps(final_payload)}
 
-    return EventSourceResponse(event_stream())
+    # The meter is opened inside the generator and has to be closed when the
+    # generator is - including when a client disconnects mid-answer, which is
+    # an exception thrown into it rather than a clean return.
+    token_meter_stack = AsyncExitStack()
+
+    async def metered_stream() -> AsyncIterator[dict]:
+        async with token_meter_stack:
+            async for event in event_stream():
+                yield event
+
+    return EventSourceResponse(metered_stream())
 
 
 @router.post(

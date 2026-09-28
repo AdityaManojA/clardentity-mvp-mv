@@ -36,6 +36,7 @@ import anthropic
 from tenacity import retry, retry_if_exception, stop_after_attempt, wait_exponential
 
 from app.core.config import settings
+from app.services.token_meter import record
 from app.services import openai_client as _fallback
 
 logger = logging.getLogger("clardentity.anthropic")
@@ -138,6 +139,22 @@ _retry_model = retry(
 @_retry_model
 async def _create_message(**kwargs):
     return await _client.messages.create(**kwargs)
+
+
+def _meter(response, model: str | None) -> None:
+    """Add one completed call to the turn's tally. Never raises: a missing or
+    oddly-shaped usage block is a reporting gap, not a failed answer."""
+    try:
+        usage = getattr(response, "usage", None)
+        if usage is None:
+            return
+        record(
+            getattr(response, "model", None) or model,
+            getattr(usage, "input_tokens", 0) or 0,
+            getattr(usage, "output_tokens", 0) or 0,
+        )
+    except Exception:  # noqa: BLE001 - accounting must not break generation
+        logger.debug("token usage not recorded", exc_info=True)
 
 
 async def _resilient_call(fn, **kwargs):
@@ -364,6 +381,7 @@ async def _claude_stream_generation(
         _circuit_breaker.record_failure()
         raise
 
+    _meter(final, kwargs.get("model"))
     yield {
         "type": "done",
         "full_text": "".join(b.text for b in final.content if b.type == "text"),
@@ -421,14 +439,12 @@ async def _claude_generate_text(
     model: str | None = None,
     fast: bool = False,
 ) -> str:
+    resolved = model or (settings.anthropic_fast_model if fast else None)
     response = await _resilient_call(
         _create_message,
-        **_base_kwargs(
-            model or (settings.anthropic_fast_model if fast else None),
-            instructions,
-            input_text,
-        ),
+        **_base_kwargs(resolved, instructions, input_text),
     )
+    _meter(response, resolved)
     return "".join(b.text for b in response.content if b.type == "text")
 
 
@@ -527,6 +543,7 @@ async def _claude_generate_structured(
         kwargs["tools"] = tools
 
     response = await _resilient_call(_create_message, **kwargs)
+    _meter(response, kwargs.get("model"))
 
     # A refusal is a successful HTTP call with no usable content. Left to the
     # caller's own error path, it would surface as an empty-object parse and

@@ -15,7 +15,12 @@ class RegisterRequest(BaseModel):
 
 
 class LoginRequest(BaseModel):
-    email: EmailStr
+    # Not EmailStr: the administrator signs in as "admin", a name rather than
+    # an address, and a 422 on the shape of the field would be a confusing
+    # way to say "wrong password". Anything without an "@" is resolved
+    # against the configured admin account and otherwise simply fails to
+    # match a row, which is the same answer as a wrong address.
+    email: str = Field(min_length=1, max_length=254)
     password: str = Field(min_length=1, max_length=72)
 
 
