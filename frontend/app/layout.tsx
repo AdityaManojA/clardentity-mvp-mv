@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Outfit } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth";
 import { ThemeProvider, THEME_INIT_SCRIPT } from "@/lib/theme";
@@ -23,6 +23,15 @@ if ('serviceWorker' in navigator) {
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+});
+
+/* The landing page's typeface, from the Figma design. Loaded here rather
+   than in the page so it is part of the font CSS the document already emits;
+   scoped to that page by the variable, so the app itself is untouched. */
+const outfit = Outfit({
+  variable: "--font-outfit",
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
 });
 
 const geistMono = Geist_Mono({
@@ -61,7 +70,7 @@ export default function RootLayout({
       // the server-rendered markup deliberately omits it - React would
       // otherwise flag the difference as a hydration mismatch.
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${outfit.variable} h-full antialiased`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
