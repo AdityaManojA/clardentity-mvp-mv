@@ -3,6 +3,8 @@
 import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { Reveal } from "@/components/marketing/Reveal";
+import { TypedQuestions } from "@/components/marketing/TypedQuestions";
 
 /* The landing page, built from the Figma design (file mTefBk432edigQvPwag6mK,
  * node 69:7). Every measurement, colour and asset here came from the design
@@ -298,7 +300,7 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
                       className="absolute left-[26px] top-[24.74px] whitespace-nowrap font-normal text-white"
                       style={{ fontSize: 20 }}
                     >
-                      Are we alone in this universe?
+                      <TypedQuestions />
                     </p>
                     <span
                       className="absolute bottom-[15.25px] right-[22px] flex size-[32px] items-center justify-center rounded-[22px]"
@@ -362,7 +364,7 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
       {/* ---------------------------------------------------------------- */}
       <section className="mx-auto flex w-full max-w-[1728px] items-center px-4 py-[140px] sm:px-8">
         <div className="mx-auto w-full max-w-[1110px]">
-          <div className="flex items-center justify-between">
+          <Reveal className="flex items-center justify-between">
             <Wordmark size={32} tone={INK} src="/landing/logo-dots-audit.svg" />
             <p
               className="whitespace-nowrap text-center font-semibold uppercase"
@@ -370,21 +372,28 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
             >
               The audit
             </p>
-          </div>
+          </Reveal>
 
-          <h2
+          <Reveal
+            as="h2"
+            delay={90}
             className="mt-[4px] text-center font-normal"
-            style={{ fontSize: "clamp(40px, 5.6vw, 96px)", color: INK }}
           >
-            An answer is many claims.
-          </h2>
-          <div
+            <span style={{ fontSize: "clamp(40px, 5.6vw, 96px)", color: INK }}>
+              An answer is many claims.
+            </span>
+          </Reveal>
+          <Reveal
+            delay={180}
             className="mt-[4px] max-w-[852.553px] font-normal"
+          >
+          <div
             style={{ fontSize: "clamp(18px, 1.9vw, 32px)", color: INK_BODY }}
           >
             <p>Clardentity splits every answer into individual claims.</p>
             <p>Each one is checked against sources. You see what holds up and what doesn&apos;t.</p>
           </div>
+          </Reveal>
         </div>
       </section>
 
@@ -393,24 +402,31 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
       {/* ---------------------------------------------------------------- */}
       <section className="mx-auto w-full max-w-[1728px] px-4 py-[67px] sm:px-8">
         <div className="mx-auto flex w-full max-w-[1299px] flex-col items-end gap-[16px]">
-          <h2
-            className="w-full max-w-[366px] text-right font-normal capitalize"
-            style={{ fontSize: "clamp(22px, 2.6vw, 32px)", color: INK }}
-          >
-            <span style={{ color: PLUM }}>Different questions</span> need{" "}
-            <span style={{ color: PLUM }}>different thinking.</span>
-          </h2>
+          <Reveal as="h2" className="w-full max-w-[366px] text-right font-normal capitalize">
+            <span style={{ fontSize: "clamp(22px, 2.6vw, 32px)", color: INK }}>
+              <span style={{ color: PLUM }}>Different questions</span> need{" "}
+              <span style={{ color: PLUM }}>different thinking.</span>
+            </span>
+          </Reveal>
 
           {/* Four across at the design's width, reflowing below it. The cards
               keep their 300 x 400 shape, so the wall of them reads the same
               at every breakpoint. */}
           <div className="grid w-full grid-cols-1 justify-items-center gap-[32px] sm:grid-cols-2 lg:grid-cols-4">
-            {MODES.map((mode) => (
-              <article
+            {MODES.map((mode, i) => (
+              <Reveal
+                as="article"
                 key={mode.name}
-                className="relative h-[400px] w-full max-w-[300px] overflow-hidden rounded-[12px] border"
-                style={{ borderColor: HAIRLINE }}
+                // Staggered across the row, capped so the second row does not
+                // wait most of a second behind the first.
+                delay={(i % 4) * 70}
+                className="landing-card relative h-[400px] w-full max-w-[300px] overflow-hidden rounded-[12px] border"
               >
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 rounded-[12px] border"
+                  style={{ borderColor: HAIRLINE }}
+                />
                 <div className="absolute left-[23px] top-[26px] flex w-[252px] items-center justify-between">
                   <h3
                     className="whitespace-nowrap font-semibold"
@@ -437,16 +453,15 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
                 >
                   {mode.blurb}
                 </p>
-              </article>
+              </Reveal>
             ))}
           </div>
 
-          <p
-            className="w-full text-right font-semibold uppercase"
-            style={{ fontSize: "clamp(14px, 1.2vw, 20px)", color: MUTED }}
-          >
-            Switch modes yourself, or let Clardentity pick.
-          </p>
+          <Reveal as="p" delay={120} className="w-full text-right font-semibold uppercase">
+            <span style={{ fontSize: "clamp(14px, 1.2vw, 20px)", color: MUTED }}>
+              Switch modes yourself, or let Clardentity pick.
+            </span>
+          </Reveal>
         </div>
       </section>
 
@@ -458,23 +473,30 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
         className="mx-auto w-full max-w-[1728px] scroll-mt-8 px-4 py-[140px] sm:px-8"
       >
         <div className="mx-auto flex w-full max-w-[1174px] flex-col items-center gap-[29.22px]">
-          <h2
-            className="text-center font-normal capitalize"
-            style={{ fontSize: "clamp(28px, 3.1vw, 38.96px)", color: INK }}
-          >
-            How it works
-          </h2>
+          <Reveal as="h2" className="text-center font-normal capitalize">
+            <span style={{ fontSize: "clamp(28px, 3.1vw, 38.96px)", color: INK }}>
+              How it works
+            </span>
+          </Reveal>
 
           <div className="grid w-full grid-cols-1 justify-items-center gap-[38.96px] md:grid-cols-3">
-            {STEPS.map((step) => (
-              <article
+            {STEPS.map((step, i) => (
+              <Reveal
+                as="article"
                 key={step.word}
-                className="relative h-[486.997px] w-full max-w-[365.248px] overflow-hidden rounded-[14.61px]"
-                // Fractional border width inline for the same reason as the
-                // hero crop: the arbitrary-value class rounds to 1px because
-                // the rule is never generated.
-                style={{ border: `1.217px solid ${HAIRLINE}` }}
+                // Ask, then Check, then See - in that order, which is the
+                // point the three cards are making.
+                delay={i * 110}
+                className="landing-card relative h-[486.997px] w-full max-w-[365.248px] overflow-hidden rounded-[14.61px]"
               >
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 rounded-[14.61px]"
+                  // Fractional border width inline for the same reason as the
+                  // hero crop: the arbitrary-value class rounds to 1px
+                  // because the rule is never generated.
+                  style={{ border: `1.217px solid ${HAIRLINE}` }}
+                />
                 <p
                   className="absolute left-[28px] font-normal"
                   style={{ top: 32.26, width: step.blurbWidth, fontSize: 28, color: MUTED }}
@@ -496,16 +518,15 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
                     className="block h-[38.96px] w-[40.278px]"
                   />
                 </div>
-              </article>
+              </Reveal>
             ))}
           </div>
 
-          <p
-            className="text-right font-normal uppercase"
-            style={{ fontSize: "clamp(16px, 1.4vw, 24px)", color: MUTED }}
-          >
-            Clardentity uses multiple AI models, not just one.
-          </p>
+          <Reveal as="p" delay={160} className="text-right font-normal uppercase">
+            <span style={{ fontSize: "clamp(16px, 1.4vw, 24px)", color: MUTED }}>
+              Clardentity uses multiple AI models, not just one.
+            </span>
+          </Reveal>
         </div>
       </section>
 
@@ -513,7 +534,7 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
       {/* Closing call to action (69:153) */}
       {/* ---------------------------------------------------------------- */}
       <section className="mx-auto w-full max-w-[1728px] px-4 pb-[99px] pt-[100px] sm:px-8 xl:px-[160px]">
-        <div className="flex flex-col items-start justify-between gap-10 xl:flex-row xl:items-center">
+        <Reveal className="flex flex-col items-start justify-between gap-10 xl:flex-row xl:items-center">
           <div className="flex w-full max-w-[1110px] flex-col gap-[12px]">
             <h2
               className="font-semibold"
@@ -538,7 +559,7 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
             </Link>
           </div>
           <Wordmark size={32} tone={MUTED} src="/landing/logo-dots-footer.svg" />
-        </div>
+        </Reveal>
       </section>
 
       {/* The legal pages are a requirement of the terms people accept at
