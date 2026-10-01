@@ -3,84 +3,160 @@
 import { useEffect, useRef } from "react";
 import { usePrefersReducedMotion } from "@/lib/useReducedMotion";
 
-/* Light running along the curtain under the cursor.
+/* The curtain catches the light - and the wind - where the cursor is.
  *
- * The effect is the asset, not a drawing of it: a second copy of the same
- * curtain image, brightened and a little more saturated, laid in exactly the
- * same place as the first and then masked down to almost nothing. What shows
- * through is a soft horizontal pool of light following the pointer, cut into
- * vertical bands so it reads as individual pleats catching it rather than a
- * spotlight sliding across a flat picture. The colour is whatever the
- * photograph already has there - crimson in the folds, near-black at the
- * edges - which is why it sits in the page rather than on top of it.
+ * The effect is built out of the asset's own measurements. A column-
+ * brightness profile of the band the design actually shows, autocorrelated,
+ * has its strongest repeat at 1.709% of the image's width: that is one fold
+ * to the next, about fifty pleats across the stage. The colour is the mean of
+ * every lit-fabric pixel in the same band, #a72341, with #d74564 for the edge
+ * of a fold turned toward the light. So the bands land on the real folds and
+ * wear the curtain's own burgundy.
  *
- * PLEAT is measured from the picture rather than guessed: a column-brightness
- * profile of the band the design actually shows, autocorrelated, has its
- * strongest repeat at 1.709% of the image's width - about fifty pleats across
- * the stage. The bands line up with the real folds because that is where the
- * number came from.
+ * Each pleat is its own element rather than one repeating-gradient mask,
+ * because a gradient can only be slid as a whole and wind has to move each
+ * fold by a different amount. They are flat colour, not copies of the
+ * photograph: fifty cheap divs instead of fifty textures, and every pleat the
+ * same shade - brightening a copy of the picture gave each one a different
+ * one, depending on what happened to be behind it.
+ *
+ * Nothing here runs under prefers-reduced-motion.
  */
-const PLEAT = 1.709; // % of the image's width, one fold to the next
-const LIT = 0.62; // how much of each pleat catches the light
-const REACH = 16; // % of the image's width the pool spans either side
 
-/* The burgundy, sampled from the curtain itself rather than picked: the mean
- * of every lit-fabric pixel in the band the design shows is #A72341, and the
- * folds that face the light average #D74564. Every pleat is lit in exactly
- * these, so the shimmer is one shade across the whole stage.
- *
- * Brightening a copy of the photograph was the first attempt and was wrong
- * twice over: brightness() walks the colour toward white, so the crimson came
- * back pink, and the picture is not evenly lit, so each pleat lit to a
- * different shade depending on what was behind it. */
+const PLEAT = 1.709; // % of the curtain's width, one fold to the next
+const LIT = 0.62; // how much of a pleat catches the light
+const COUNT = Math.ceil(100 / PLEAT) + 1;
+
 const BURGUNDY = "#a72341";
 const BURGUNDY_LIT = "#d74564";
 
-export function CurtainShimmer({
-  style,
-}: {
-  /** The base image's geometry, so the light lands exactly on the curtain. */
-  style: React.CSSProperties;
-}) {
-  const ref = useRef<HTMLSpanElement>(null);
+/* The light pool. */
+const REACH = 12; // % of the width it spans either side of the cursor
+
+/* Where the curtain is lit at all, measured off the picture: a luminance
+ * field of the slice the design shows puts the bright arch at 50% across and
+ * 38% down, half-strength from 30% to 70% horizontally and fading to nothing
+ * below two thirds of the height - the bottom of the frame is black fabric.
+ *
+ * Without this the light was flat top to bottom and flooded the corners the
+ * photograph keeps dark, which read as a coloured overlay rather than as the
+ * curtain catching anything. Shaping it this way is what the brightened copy
+ * of the picture used to do for free. */
+const LIGHT_FIELD =
+  "radial-gradient(34% 54% at 50% 36%, #000 0%, rgba(0,0,0,0.78) 42%, rgba(0,0,0,0.3) 72%, transparent 100%)";
+
+/* The wind. A gust is a travelling ripple: it starts where the cursor was
+ * when it moved, spreads outward, and dies. Everything below is in percent
+ * of the curtain's width, so it scales with the stage. */
+const GUST_FROM_SPEED = 0.55; // how much pointer speed becomes gust strength
+const GUST_MAX = 2.6; // ceiling, so a fast flick billows rather than tears
+const GUST_DECAY = 0.91; // per frame - about a second to settle
+const GUST_WIDTH = 26; // how far along the curtain a gust is felt
+const WAVE_LENGTH = 11; // distance between crests
+const WAVE_SPEED = 0.009; // how fast crests travel outward
+const SWAY = 0.1; // the idle drift, present whether or not anything moved
+
+export function CurtainShimmer({ style }: { style: React.CSSProperties }) {
+  const hostRef = useRef<HTMLSpanElement>(null);
   const reducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
-    const node = ref.current;
-    // The stage is this element's parent: it is the thing with a size and
-    // the thing the pointer is actually over.
-    const stage = node?.parentElement;
-    if (!node || !stage || reducedMotion) return;
+    const host = hostRef.current;
+    const stage = host?.parentElement;
+    if (!host || !stage || reducedMotion) return;
 
+    const pleats = Array.from(host.children) as HTMLElement[];
+
+    // Everything the loop needs, kept out of React state: this updates every
+    // frame, and a re-render per frame to move a gradient is a great deal of
+    // work for no benefit.
+    let pointerX = 50; // % across the curtain
+    let lastPointerX = 50;
+    let gust = 0; // current strength
+    let gustX = 50; // where it started
+    let lit = 0; // 0 at rest, 1 under the cursor - eased, so it fades
+    let target = 0;
+    let phase = 0;
     let frame = 0;
-    let pending: number | null = null;
+    let idle = 0;
 
-    /* Written straight to the element's own custom properties rather than
-       held in React state: this fires on every pointer move, and a page-wide
-       re-render per mouse position is a lot of work to move a gradient. */
-    const paint = () => {
-      frame = 0;
-      if (pending === null) return;
-      node.style.setProperty("--shimmer-x", `${pending}%`);
+    const step = (now: number) => {
+      phase = now * WAVE_SPEED;
+      lit += (target - lit) * 0.08;
+      gust *= GUST_DECAY;
+      // A curtain is never perfectly still, so a little sway continues after
+      // the gust has gone - otherwise the fabric freezes the instant you stop
+      // moving, which is the one thing real fabric never does.
+      idle = Math.sin(now * 0.0012) * SWAY;
+
+      for (let i = 0; i < pleats.length; i++) {
+        const x = i * PLEAT; // this pleat's position across the curtain
+        const toCursor = x - pointerX;
+        const toGust = x - gustX;
+
+        // How much of the gust reaches this fold, and the ripple it rides.
+        const falloff = Math.exp(-(toGust * toGust) / (2 * GUST_WIDTH * GUST_WIDTH));
+        const ripple = Math.sin((Math.abs(toGust) / WAVE_LENGTH) * Math.PI * 2 - phase);
+        const shift = gust * falloff * ripple + idle * Math.sin(x * 0.4);
+
+        // The light: a pool around the cursor, fading with distance.
+        const glow = Math.exp(-(toCursor * toCursor) / (2 * REACH * REACH));
+
+        const node = pleats[i];
+        // translate moves the fold; scaleX narrows it as it turns edge-on,
+        // which is what sells the billow - a pleat swinging toward you gets
+        // wider, one swinging away gets thinner.
+        node.style.transform = `translate3d(${shift.toFixed(3)}%, 0, 0) scaleX(${(1 + shift * 0.09).toFixed(4)})`;
+        node.style.opacity = (glow * lit * 0.8).toFixed(3);
+      }
+
+      // Keep going while there is anything to show: the light fading out, or
+      // the fabric still settling.
+      if (lit > 0.002 || gust > 0.002) {
+        frame = requestAnimationFrame(step);
+      } else {
+        frame = 0;
+        for (const node of pleats) node.style.opacity = "0";
+      }
+    };
+
+    const wake = () => {
+      if (!frame) frame = requestAnimationFrame(step);
     };
 
     const onMove = (event: PointerEvent) => {
       const rect = stage.getBoundingClientRect();
-      pending = ((event.clientX - rect.left) / rect.width) * 100;
-      if (!frame) frame = requestAnimationFrame(paint);
+      lastPointerX = pointerX;
+      pointerX = ((event.clientX - rect.left) / rect.width) * 100;
+
+      // Speed becomes wind. A slow drift barely stirs it; a quick sweep
+      // sends a gust along the fabric from wherever the cursor was.
+      const speed = Math.abs(pointerX - lastPointerX);
+      const strength = Math.min(speed * GUST_FROM_SPEED, GUST_MAX);
+      if (strength > gust) {
+        gust = strength;
+        gustX = pointerX;
+      }
+      target = 1;
+      wake();
     };
 
     const onEnter = (event: PointerEvent) => {
-      onMove(event);
-      node.style.setProperty("--shimmer-on", "1");
+      const rect = stage.getBoundingClientRect();
+      pointerX = ((event.clientX - rect.left) / rect.width) * 100;
+      lastPointerX = pointerX;
+      target = 1;
+      wake();
     };
 
     const onLeave = () => {
-      node.style.setProperty("--shimmer-on", "0");
+      target = 0;
+      // The gust that was in flight keeps travelling and dies on its own.
+      wake();
     };
 
-    // Pointer events rather than mouse: a finger on a touchscreen gets the
-    // same light where it taps, which is a small delight and costs nothing.
+    // Pointer rather than mouse events: a finger on a touchscreen gets the
+    // same light, and a drag across the stage the same wind.
     stage.addEventListener("pointerenter", onEnter);
     stage.addEventListener("pointermove", onMove);
     stage.addEventListener("pointerleave", onLeave);
@@ -96,44 +172,33 @@ export function CurtainShimmer({
 
   if (reducedMotion) return null;
 
-  /* Two masks, intersected. The radial one is the pool of light around the
-     pointer; the repeating one is the pleats. Where both are opaque, the
-     brightened copy shows - so the light only ever appears on a fold, and
-     only near the cursor. */
-  const mask = [
-    `radial-gradient(${REACH}% 120% at var(--shimmer-x, 50%) 50%, #000 0%, rgba(0,0,0,0.55) 45%, transparent 78%)`,
-    `repeating-linear-gradient(90deg, #000 0 ${(PLEAT * LIT).toFixed(3)}%, transparent ${(PLEAT * LIT).toFixed(3)}% ${PLEAT}%)`,
-  ].join(", ");
-
   return (
     <span
-      ref={ref}
+      ref={hostRef}
       aria-hidden="true"
-      className="landing-shimmer pointer-events-none absolute"
+      className="landing-shimmer pointer-events-none absolute overflow-hidden"
       style={{
         ...style,
-        maskImage: mask,
-        WebkitMaskImage: mask,
-        maskComposite: "intersect",
-        WebkitMaskComposite: "source-in",
-        maskSize: "100% 100%",
-        WebkitMaskSize: "100% 100%",
+        maskImage: LIGHT_FIELD,
+        WebkitMaskImage: LIGHT_FIELD,
       }}
     >
-      {/* One flat burgundy, the curtain's own, rather than a brightened copy
-          of it - so pleat forty looks exactly like pleat one. The gradient
-          across each band is the single shade going from its lit value at
-          the fold's edge to its base value in the hollow, which is the
-          shading a real pleat has; `screen` lets it sit into the fabric as
-          light rather than over it as paint. */}
-      <span
-        className="block h-full w-full"
-        style={{
-          backgroundImage: `linear-gradient(90deg, ${BURGUNDY_LIT} 0%, ${BURGUNDY} 70%, ${BURGUNDY} 100%)`,
-          backgroundSize: `${PLEAT}% 100%`,
-          mixBlendMode: "screen",
-        }}
-      />
+      {Array.from({ length: COUNT }, (_, i) => (
+        <span
+          key={i}
+          className="absolute top-0 block h-full"
+          style={{
+            left: `${i * PLEAT}%`,
+            width: `${PLEAT * LIT}%`,
+            // Lit edge to hollow, in the curtain's own two burgundies.
+            backgroundImage: `linear-gradient(90deg, ${BURGUNDY_LIT}, ${BURGUNDY})`,
+            // Light on fabric, not paint over it.
+            mixBlendMode: "screen",
+            opacity: 0,
+            willChange: "transform, opacity",
+          }}
+        />
+      ))}
     </span>
   );
 }
