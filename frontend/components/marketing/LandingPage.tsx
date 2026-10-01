@@ -30,6 +30,13 @@ const INK_BODY = "#6b5c60"; // body copy under a heading
 const MUTED = "#9e8e93"; // captions, eyebrow text, footer wordmark
 const PLUM = "#6b2d5c"; // accent: send button, "Ask./Check./See.", emphasis
 const CANVAS = "#faf8f9";
+
+/* A twenty-pixel-wide copy of the curtain, from the design file's own
+ * downscaled version of it, as the blur-up placeholder. The stage is the
+ * first thing on the page and its source image is a 4096px master: without
+ * this the hero is an empty dark box until that arrives. 800 bytes inline
+ * costs less than one round trip. */
+const CURTAIN_BLUR = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4QBMRXhpZgAATU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAFKADAAQAAAABAAAACwAAAAD/wAARCAALABQDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9sAQwAEBAQEBAQIBAQICwgICAsPCwsLCw8SDw8PDw8SFhISEhISEhYWFhYWFhYWGxsbGxsbHx8fHx8jIyMjIyMjIyMj/9sAQwEFBgYJCAkPCAgPJBkUGSQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQk/90ABAAC/9oADAMBAAIRAxEAPwD4p014r8W2jztsQzMzH6gD+laV/Y21tZnUBA1rJDMFVWOd49ee4/KuNHXNSSzzTY812bHTJzVOOp6sMZFU3Gcbvo/lp92+nzLN9cfa7yW5/wCejlvzNVKjoqrHnzk5Scn1P//Z";
 const HAIRLINE = "#e8e3e7"; // card borders
 const OUTLINE = "#5f5551"; // the Login pill
 
@@ -238,6 +245,8 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
                 width={4096}
                 height={2286}
                 priority
+                placeholder="blur"
+                blurDataURL={CURTAIN_BLUR}
                 sizes="(max-width: 1200px) 140vw, 1400px"
                 className="absolute"
                 style={{
