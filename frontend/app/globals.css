@@ -247,6 +247,15 @@ body {
   box-shadow: 0 18px 40px -22px rgba(107, 45, 92, 0.45);
 }
 
+/* The shimmer layer fades in and out with the pointer rather than snapping,
+   and the fade is the only thing that transitions - the pool's position
+   follows the cursor directly, because a lagging highlight reads as a bug
+   rather than as weight. */
+.landing-shimmer {
+  opacity: calc(var(--shimmer-on, 0) * 0.85);
+  transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 /* The caret after the typed question. Steady while typing, blinking only
    when the line is finished - which is what a real cursor does. */
 .landing-caret {

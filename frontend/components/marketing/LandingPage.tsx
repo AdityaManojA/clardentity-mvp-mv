@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { CurtainShimmer } from "@/components/marketing/CurtainShimmer";
 import { Reveal } from "@/components/marketing/Reveal";
 import { TypedQuestions } from "@/components/marketing/TypedQuestions";
 
@@ -38,6 +39,17 @@ const CANVAS = "#faf8f9";
  * first thing on the page and its source image is a 4096px master: without
  * this the hero is an empty dark box until that arrives. 800 bytes inline
  * costs less than one round trip. */
+/* Where the curtain sits inside the stage - the design's numbers, shared by
+ * the base image and the shimmer copy laid over it so the two can never
+ * drift apart. */
+const CURTAIN_GEOMETRY: React.CSSProperties = {
+  left: "-8.4%",
+  top: "-50.96%",
+  width: "116.8%",
+  height: "150.96%",
+  maxWidth: "none",
+};
+
 const CURTAIN_BLUR = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4QBMRXhpZgAATU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAFKADAAQAAAABAAAACwAAAAD/wAARCAALABQDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9sAQwAEBAQEBAQIBAQICwgICAsPCwsLCw8SDw8PDw8SFhISEhISEhYWFhYWFhYWGxsbGxsbHx8fHx8jIyMjIyMjIyMj/9sAQwEFBgYJCAkPCAgPJBkUGSQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQk/90ABAAC/9oADAMBAAIRAxEAPwD4p014r8W2jztsQzMzH6gD+laV/Y21tZnUBA1rJDMFVWOd49ee4/KuNHXNSSzzTY812bHTJzVOOp6sMZFU3Gcbvo/lp92+nzLN9cfa7yW5/wCejlvzNVKjoqrHnzk5Scn1P//Z";
 const HAIRLINE = "#e8e3e7"; // card borders
 const OUTLINE = "#5f5551"; // the Login pill
@@ -251,17 +263,16 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
                 blurDataURL={CURTAIN_BLUR}
                 sizes="(max-width: 1200px) 140vw, 1400px"
                 className="absolute"
-                style={{
-                  left: "-8.4%",
-                  top: "-50.96%",
-                  width: "116.8%",
-                  height: "150.96%",
-                  // Explicit, for the same reason: the base stylesheet caps
-                  // every img at 100% of its container, which would shrink
-                  // this back to the frame and undo the crop.
-                  maxWidth: "none",
-                }}
+                // maxWidth is explicit in CURTAIN_GEOMETRY for the same
+                // reason the rest is: the base stylesheet caps every img at
+                // 100% of its container, which would shrink this back to the
+                // frame and undo the crop.
+                style={CURTAIN_GEOMETRY}
               />
+              {/* Under the design's own darkening gradient, so the light
+                  behaves like part of the photograph rather than something
+                  painted over the finished frame. */}
+              <CurtainShimmer style={CURTAIN_GEOMETRY} />
               <div
                 aria-hidden="true"
                 className="absolute inset-0"
