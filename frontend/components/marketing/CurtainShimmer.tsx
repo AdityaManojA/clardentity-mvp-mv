@@ -50,11 +50,29 @@ const LIGHT_FIELD =
  * of the curtain's width, so it scales with the stage. */
 const GUST_FROM_SPEED = 0.55; // how much pointer speed becomes gust strength
 const GUST_MAX = 2.6; // ceiling, so a fast flick billows rather than tears
-const GUST_DECAY = 0.91; // per frame - about a second to settle
+const GUST_DECAY = 0.955; // per frame - a couple of seconds to settle
 const GUST_WIDTH = 26; // how far along the curtain a gust is felt
 const WAVE_LENGTH = 11; // distance between crests
 const WAVE_SPEED = 0.009; // how fast crests travel outward
 const SWAY = 0.1; // the idle drift, present whether or not anything moved
+
+/* A curtain hangs. That one fact is most of what makes this read as fabric
+ * rather than as stripes sliding about: every fold is fixed at the rail and
+ * free at the hem, so it swings from the top and the bottom travels furthest.
+ * Each pleat therefore rotates about its own top edge instead of translating,
+ * and the ripple becomes a pendulum passing along the rail.
+ *
+ * SWING is in degrees at full gust. Small: a curtain in a draught moves an
+ * inch, and anything more looks like a flag. */
+const SWING = 1.35;
+
+/* And cloth is not rigid. On top of the swing, the whole layer is pushed
+ * through a noise field so the folds bend along their length rather than
+ * staying ruler-straight - the difference between a curtain breathing and a
+ * set of blinds tilting. The field stays put while the folds move through
+ * it, which costs nothing per frame; only the amount of bend is animated. */
+const BEND_MAX = 17; // displacement in px at full gust
+const BEND_IDLE = 5;
 
 export function CurtainShimmer({ style }: { style: React.CSSProperties }) {
   const hostRef = useRef<HTMLSpanElement>(null);
@@ -65,7 +83,8 @@ export function CurtainShimmer({ style }: { style: React.CSSProperties }) {
     const stage = host?.parentElement;
     if (!host || !stage || reducedMotion) return;
 
-    const pleats = Array.from(host.children) as HTMLElement[];
+    const pleats = Array.from(host.querySelectorAll("[data-pleat]")) as HTMLElement[];
+    const bend = host.querySelector("feDisplacementMap");
 
     // Everything the loop needs, kept out of React state: this updates every
     // frame, and a re-render per frame to move a gradient is a great deal of
@@ -103,11 +122,21 @@ export function CurtainShimmer({ style }: { style: React.CSSProperties }) {
         const glow = Math.exp(-(toCursor * toCursor) / (2 * REACH * REACH));
 
         const node = pleats[i];
-        // translate moves the fold; scaleX narrows it as it turns edge-on,
-        // which is what sells the billow - a pleat swinging toward you gets
-        // wider, one swinging away gets thinner.
-        node.style.transform = `translate3d(${shift.toFixed(3)}%, 0, 0) scaleX(${(1 + shift * 0.09).toFixed(4)})`;
+        // Rotation about the pleat's own top edge, not a sideways slide: the
+        // rail holds it still up there and the hem swings. scaleX on top of
+        // that narrows a fold as it turns away and widens one turning
+        // toward you, which is the other half of a billow.
+        const angle = shift * SWING;
+        node.style.transform = `rotate(${angle.toFixed(3)}deg) scaleX(${(1 + shift * 0.07).toFixed(4)})`;
         node.style.opacity = (glow * lit * 0.8).toFixed(3);
+      }
+
+      // How much the cloth bends along its length, as opposed to swings.
+      // Driven off the same gust, so a sweep ripples the folds and a still
+      // cursor leaves them breathing.
+      if (bend) {
+        const amount = BEND_IDLE + (BEND_MAX - BEND_IDLE) * Math.min(gust / GUST_MAX, 1);
+        bend.setAttribute("scale", (amount * Math.max(lit, 0.35)).toFixed(2));
       }
 
       // Keep going while there is anything to show: the light fading out, or
@@ -183,22 +212,52 @@ export function CurtainShimmer({ style }: { style: React.CSSProperties }) {
         WebkitMaskImage: LIGHT_FIELD,
       }}
     >
-      {Array.from({ length: COUNT }, (_, i) => (
-        <span
-          key={i}
-          className="absolute top-0 block h-full"
-          style={{
-            left: `${i * PLEAT}%`,
-            width: `${PLEAT * LIT}%`,
-            // Lit edge to hollow, in the curtain's own two burgundies.
-            backgroundImage: `linear-gradient(90deg, ${BURGUNDY_LIT}, ${BURGUNDY})`,
-            // Light on fabric, not paint over it.
-            mixBlendMode: "screen",
-            opacity: 0,
-            willChange: "transform, opacity",
-          }}
-        />
-      ))}
+      {/* The noise the folds bend through. One field, generated once and
+          left alone - only how hard the cloth is pushed into it changes per
+          frame, which keeps this off the per-frame cost of regenerating
+          turbulence. Mostly vertical frequency, so the bend runs down the
+          length of a fold the way gravity and a draught put it there. */}
+      <svg aria-hidden="true" className="absolute h-0 w-0" focusable="false">
+        <filter id="curtain-cloth" x="-12%" y="-12%" width="124%" height="124%">
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.0055 0.016"
+            numOctaves={3}
+            seed={7}
+            stitchTiles="stitch"
+            result="field"
+          />
+          <feDisplacementMap
+            in="SourceGraphic"
+            in2="field"
+            scale="0"
+            xChannelSelector="R"
+            yChannelSelector="G"
+          />
+        </filter>
+      </svg>
+
+      <span className="absolute inset-0 block" style={{ filter: "url(#curtain-cloth)" }}>
+        {Array.from({ length: COUNT }, (_, i) => (
+          <span
+            key={i}
+            data-pleat=""
+            className="absolute top-0 block h-full"
+            style={{
+              left: `${i * PLEAT}%`,
+              width: `${PLEAT * LIT}%`,
+              // Lit edge to hollow, in the curtain's own two burgundies.
+              backgroundImage: `linear-gradient(90deg, ${BURGUNDY_LIT}, ${BURGUNDY})`,
+              // Light on fabric, not paint over it.
+              mixBlendMode: "screen",
+              // The rail. Everything swings from here.
+              transformOrigin: "50% 0%",
+              opacity: 0,
+              willChange: "transform, opacity",
+            }}
+          />
+        ))}
+      </span>
     </span>
   );
 }
