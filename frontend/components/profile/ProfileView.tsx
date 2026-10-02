@@ -5,6 +5,8 @@ import { apiFetch } from "@/lib/apiClient";
 import { ImportHistory } from "@/components/profile/ImportHistory";
 import { CompanionNames } from "@/components/profile/CompanionNames";
 import { DeleteAccount } from "@/components/profile/DeleteAccount";
+import { InstallAppButton } from "@/components/system/InstallAppButton";
+import { UpgradeDialog } from "@/components/chat/UpgradeDialog";
 import { authErrorMessage } from "@/lib/auth";
 import { AspectList, type Aspect } from "@/components/profile/AspectList";
 import {
@@ -32,6 +34,7 @@ type Profile = {
 };
 
 export function ProfileView() {
+  const [plansOpen, setPlansOpen] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [busy, setBusy] = useState<"rebuild" | "clear" | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -230,7 +233,33 @@ export function ProfileView() {
             )}
           </Card>
 
+          {/* Plans live here now. The design's sidebar has no Upgrade row -
+              it ends at the account card - so the surface moved to the page
+              that card opens rather than being dropped. Install sits beside
+              it for the same reason. */}
+          <Card>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 className="text-sm font-semibold text-ink">Your plan</h2>
+                <p className="mt-0.5 text-xs text-ink-muted">
+                  See what each plan opens, or install Clardentity as an app.
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <InstallAppButton className="rounded-full border border-hairline px-3.5 py-2 text-sm text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink" />
+                <button
+                  type="button"
+                  onClick={() => setPlansOpen(true)}
+                  className="rounded-full bg-brand px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-dark"
+                >
+                  See plans
+                </button>
+              </div>
+            </div>
+          </Card>
+
           <DeleteAccount />
+          <UpgradeDialog open={plansOpen} onClose={() => setPlansOpen(false)} />
         </div>
       )}
     </div>

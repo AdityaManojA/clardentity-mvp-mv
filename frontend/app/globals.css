@@ -84,8 +84,10 @@
   --avatar-blush: #f0a8b8;
   --avatar-shadow: rgb(0 0 0 / 0.12);
 
-  --sidebar-width: 264px;
-  --topbar-height: 56px;
+  /* The design's own measurements: a 287px rail and a 67px header, which is
+     what makes the breadcrumb and the sidebar's logo row share a baseline. */
+  --sidebar-width: 287px;
+  --topbar-height: 67px;
 }
 
 /* Keyed off an attribute rather than `prefers-color-scheme` so the in-app

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -13,9 +14,7 @@ import {
 import { apiFetch } from "@/lib/apiClient";
 import { useAuth } from "@/lib/auth";
 import { ThemeToggle } from "@/components/system/ThemeToggle";
-import { UpgradeDialog } from "@/components/chat/UpgradeDialog";
 import { ChatRowMenu } from "@/components/chat/ChatRowMenu";
-import { InstallAppButton } from "@/components/system/InstallAppButton";
 import { rememberWorkspace } from "@/lib/lastWorkspace";
 import { startTour, type TourId } from "@/lib/tour";
 import { cx } from "@/components/ui/primitives";
@@ -164,24 +163,34 @@ function RecentConversations({
 
   return (
     <div className="mt-5 flex min-h-0 flex-1 flex-col">
-      <p className="px-2.5 pb-1 text-[11px] font-semibold uppercase tracking-wider text-ink-muted">
+      <p className="px-4 pb-1 text-[16px] font-medium uppercase text-[color:var(--text-nav-muted)]">
         Recents
       </p>
       <ul className="scroll-slim min-h-0 flex-1 overflow-y-auto">
         {items.map((c) => (
           <li key={c.id} className="group/recent flex items-center">
+            {/* 32px row, 9px radius, a 12px ring and a 20px title - the
+                design's shape. The ring is what gives the list its rhythm
+                against the 48px rows above it. */}
             <Link
               href={`/chat/${c.id}`}
               onClick={onNavigate}
               aria-current={c.id === activeId ? "page" : undefined}
               className={cx(
-                "min-w-0 flex-1 truncate rounded-lg py-1.5 pl-2.5 pr-1.5 text-[13px] transition-colors",
+                "flex h-8 min-w-0 flex-1 items-center gap-5 truncate rounded-[9px] pl-4 pr-1.5 text-[20px] transition-colors",
                 c.id === activeId
-                  ? "bg-surface-hover font-medium text-ink"
-                  : "text-ink-secondary hover:bg-surface-hover hover:text-ink",
+                  ? "bg-[var(--surface-hover)] font-medium text-ink"
+                  : "text-[color:var(--text-nav)] hover:bg-surface-hover hover:text-ink",
               )}
             >
-              {c.title || "Untitled chat"}
+              <Image
+                src="/ui/recent-dot.svg"
+                alt=""
+                width={12}
+                height={12}
+                className="block size-3 shrink-0"
+              />
+              <span className="truncate">{c.title || "Untitled chat"}</span>
             </Link>
             {/* In the row rather than over it, so the title truncates earlier
                 instead of the control printing across the end of it. */}
@@ -211,16 +220,22 @@ function RecentConversations({
   );
 }
 
+/* The design's navigation row: 263 x 48, 9px radius, a 24px icon and a 20px
+ * label in the warm grey it reserves for chrome. `iconSrc` takes one of the
+ * design's own SVGs; `icon` is the inline-path fallback for rows the design
+ * does not draw (Admin). */
 function NavItem({
   href,
   icon,
+  iconSrc,
   children,
   active,
   onNavigate,
   tourId,
 }: {
   href: string;
-  icon: ReactNode;
+  icon?: ReactNode;
+  iconSrc?: string;
   children: ReactNode;
   active: boolean;
   onNavigate?: () => void;
@@ -234,13 +249,17 @@ function NavItem({
       onClick={onNavigate}
       aria-current={active ? "page" : undefined}
       className={cx(
-        "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
+        "flex h-12 items-center gap-3 rounded-[9px] px-4 text-[20px] transition-colors",
         active
-          ? "bg-brand-soft font-medium text-brand"
-          : "text-ink-secondary hover:bg-surface-hover hover:text-ink",
+          ? "bg-[var(--surface-hover)] font-medium text-ink"
+          : "text-[color:var(--text-nav)] hover:bg-surface-hover hover:text-ink",
       )}
     >
-      <Icon path={icon} />
+      {iconSrc ? (
+        <Image src={iconSrc} alt="" width={24} height={24} className="block size-6 shrink-0" />
+      ) : (
+        <Icon path={icon} className="h-6 w-6 shrink-0" />
+      )}
       <span className="truncate">{children}</span>
     </Link>
   );
@@ -455,7 +474,6 @@ export function AppShell({ children }: { children: ReactNode }) {
       ? "workspace"
       : null;
   const [starting, setStarting] = useState(false);
-  const [upgradeOpen, setUpgradeOpen] = useState(false);
   // Bumped after a conversation is created or deleted here, so the recents
   // list refetches without the sidebar owning the list itself.
   const [recentsKey, setRecentsKey] = useState(0);
@@ -520,17 +538,15 @@ export function AppShell({ children }: { children: ReactNode }) {
           void startConversation();
         }}
         disabled={starting}
-        className="mt-3 flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium text-brand transition-colors hover:bg-surface-hover disabled:opacity-50"
+        className="mt-3 flex h-12 items-center gap-3 rounded-[9px] px-4 text-left text-[20px] text-[color:var(--text-nav)] transition-colors hover:bg-surface-hover hover:text-ink disabled:opacity-50"
       >
-        <span className="flex h-4 w-4 items-center justify-center">
-          {/* A speech bubble with a plus - the picture of "new chat" - rather
-              than a bare plus that could mean anything. */}
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9"
-            strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="h-4 w-4">
-              <path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.3 9 9 0 0 1-3.9-.9L3 21l1.6-4.5A8.3 8.3 0 0 1 3.5 11.5 8.5 8.5 0 0 1 12.5 3a8.5 8.5 0 0 1 8.5 8.5z" />
-              <path d="M12.5 8.5v6M9.5 11.5h6" />
-          </svg>
-        </span>
+        <Image
+          src="/ui/nav-newchat.svg"
+          alt=""
+          width={24}
+          height={24}
+          className="block size-6 shrink-0"
+        />
         {starting ? "Starting…" : "New chat"}
       </button>
 
@@ -539,18 +555,12 @@ export function AppShell({ children }: { children: ReactNode }) {
             did nothing: a same-route hash is not re-scrolled by the App
             Router, and with no workspace resolved they fell back to the
             workspace list. */}
-        <NavItem
-          href="/workspace"
-          icon={icons.rooms}
-          active={pathname === "/workspace"}
-          onNavigate={close}
-          tourId="nav-workspaces"
-        >
-          Workspaces
-        </NavItem>
+        {/* Three rows, as drawn. Workspaces is reached from the picker above
+            rather than a row of its own, and Search replaces the old "Chats"
+            - same destination, the name the design gives it. */}
         <NavItem
           href={activeWorkspaceId ? `/workspace/${activeWorkspaceId}/documents` : "/workspace"}
-          icon={icons.docs}
+          iconSrc="/ui/nav-attachments.svg"
           active={pathname.endsWith("/documents")}
           onNavigate={close}
           tourId="nav-attachments"
@@ -559,12 +569,12 @@ export function AppShell({ children }: { children: ReactNode }) {
         </NavItem>
         <NavItem
           href={activeWorkspaceId ? `/workspace/${activeWorkspaceId}/search` : "/workspace"}
-          icon={icons.search}
+          iconSrc="/ui/nav-search.svg"
           active={pathname.endsWith("/search")}
           onNavigate={close}
           tourId="nav-chats"
         >
-          Chats
+          Search
         </NavItem>
         {/* Only an administrator has anywhere to go here, and only the
             server knows who that is. Absent for everyone else rather than
@@ -589,55 +599,34 @@ export function AppShell({ children }: { children: ReactNode }) {
         onNavigate={close}
       />
 
-      <button
-        type="button"
-        data-tour="nav-upgrade"
-        onClick={() => setUpgradeOpen(true)}
-        className="mt-2 flex shrink-0 items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink"
-      >
-        <span className="flex h-4 w-4 items-center justify-center text-brand">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"
-            strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="h-4 w-4">
-            {/* A gem: the picture of "plans and what they unlock". */}
-            <path d="M6 3h12l4 6-10 12L2 9z" />
-            <path d="M2 9h20M9 3l3 18M15 3l-3 18M6 3l3 6M18 3l-3 6" />
-          </svg>
-        </span>
-        Upgrade
-      </button>
-      <InstallAppButton className="flex w-full shrink-0 items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink">
-        <span className="flex h-4 w-4 items-center justify-center">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"
-            strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="h-4 w-4">
-            <path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
-          </svg>
-        </span>
-        Install app
-      </InstallAppButton>
-      <NavItem
-        href="/profile"
-        icon={icons.profile}
-        active={pathname.startsWith("/profile")}
-        onNavigate={close}
-        tourId="nav-profile"
-      >
-        Your profile
-      </NavItem>
     </nav>
   );
 
   const account = (
     <div className="border-t border-hairline p-3">
+      {/* The card is the way into the profile now that the rail has no row
+          for it - which is what the design intends by giving the foot of the
+          sidebar a name, a plan and nothing else. The initials sit in the
+          brand colour, as drawn. */}
       <div className="flex items-center gap-2.5 rounded-lg px-1 py-1">
-        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-surface-sunken text-[11px] font-semibold text-ink-secondary">
-          {(user?.display_name || user?.email || "?").slice(0, 1).toUpperCase()}
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="block truncate text-sm font-medium text-ink">
-            {user?.display_name || "Signed in"}
+        <Link
+          href="/profile"
+          onClick={close}
+          data-tour="nav-profile"
+          className="flex min-w-0 flex-1 items-center gap-2.5 rounded-lg p-1 transition-colors hover:bg-surface-hover"
+        >
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand text-[16px] font-medium text-white">
+            {(user?.display_name || user?.email || "?").slice(0, 1).toUpperCase()}
           </span>
-          <span className="block truncate text-xs text-ink-muted">{user?.email}</span>
-        </span>
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-[16px] text-ink">
+              {user?.display_name || "Signed in"}
+            </span>
+            <span className="block truncate text-[12px] text-ink-muted">
+              {user?.email}
+            </span>
+          </span>
+        </Link>
         <button
           type="button"
           title="Log out"
@@ -675,9 +664,19 @@ export function AppShell({ children }: { children: ReactNode }) {
         // version's JSX types yet.
         style={collapsed ? { pointerEvents: "none" } : undefined}
       >
-        <div className="flex h-[var(--topbar-height)] items-center justify-between border-b border-hairline px-4">
-          <Link href="/" className="text-[15px] font-semibold tracking-tight text-ink">
-            Clardentity
+        <div className="flex h-[var(--topbar-height)] items-center justify-between px-4">
+          {/* The wordmark with its five-dot mark, as the design draws it, and
+              no rule under it: the sidebar's own right-hand border is the
+              only line at this corner. */}
+          <Link href="/" className="flex items-center gap-[3.7px]">
+            <Image
+              src="/ui/logo-dots.svg"
+              alt=""
+              width={23}
+              height={22}
+              className="block h-[22.275px] w-[23.029px]"
+            />
+            <span className="text-[18.563px] text-ink">Clardentity</span>
           </Link>
           <button
             type="button"
@@ -807,9 +806,6 @@ export function AppShell({ children }: { children: ReactNode }) {
         </main>
       </div>
 
-      {/* Lives at shell level so the sidebar's Upgrade works from every page,
-          not only the ones with a composer on them. */}
-      <UpgradeDialog open={upgradeOpen} onClose={() => setUpgradeOpen(false)} />
     </div>
   );
 }
@@ -827,7 +823,7 @@ function Breadcrumbs({
 }) {
   const segments = pathname.split("/").filter(Boolean);
   if (segments.length === 0) {
-    return <span className="text-sm font-medium text-ink">Home</span>;
+    return <span className="text-[20px] text-[color:var(--text-nav)]">Home</span>;
   }
 
   // Any route not listed here falls through to its raw path segment, which
@@ -882,18 +878,20 @@ function Breadcrumbs({
 function Crumbs({ crumbs }: { crumbs: Array<{ label: string; href?: string }> }) {
 
   return (
-    <nav aria-label="Breadcrumb" className="flex min-w-0 items-center gap-1.5 text-sm">
+    // 20px, and the three warm greys the design assigns: the trail in
+    // #4d4339, its separators in #8b7b73, the page you are on in #5f5551.
+    <nav aria-label="Breadcrumb" className="flex min-w-0 items-center gap-2 text-[20px]">
       {crumbs.map((c, i) => {
         const last = i === crumbs.length - 1;
         return (
-          <span key={i} className="flex min-w-0 items-center gap-1.5">
-            {i > 0 && <span className="text-ink-muted">/</span>}
+          <span key={i} className="flex min-w-0 items-center gap-2">
+            {i > 0 && <span className="text-[color:var(--text-nav-muted)]">/</span>}
             {last || !c.href ? (
-              <span className="truncate font-medium text-ink">{c.label}</span>
+              <span className="truncate text-[color:var(--text-nav)]">{c.label}</span>
             ) : (
               <Link
                 href={c.href}
-                className="truncate text-ink-muted transition-colors hover:text-ink"
+                className="truncate text-[color:var(--text-nav-strong)] transition-colors hover:text-ink"
               >
                 {c.label}
               </Link>
