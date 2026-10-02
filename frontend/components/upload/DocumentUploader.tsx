@@ -36,7 +36,8 @@ export function DocumentUploader({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchDocuments = useCallback((): Promise<DocumentItem[]> => {
-    return apiFetch<DocumentItem[]>(`/documents?workspace_id=${workspaceId}`);
+    // Polled while anything is still processing, so never from the cache.
+    return apiFetch<DocumentItem[]>(`/documents?workspace_id=${workspaceId}`, { fresh: true });
   }, [workspaceId]);
 
   useEffect(() => {

@@ -586,7 +586,12 @@ export function ChatView({ conversationId }: { conversationId: string }) {
     abortControllerRef.current?.abort();
     const askedAt = pendingUserMessageIdRef.current;
     try {
-      const fresh = await apiFetch<ChatMessage[]>(`/chat/${conversationId}/messages`);
+      // Read immediately after the server has written an answer, so it must
+      // not come from the cache in lib/apiClient.
+      const fresh = await apiFetch<ChatMessage[]>(
+        `/chat/${conversationId}/messages`,
+        { fresh: true },
+      );
       const answered =
         fresh.length > 0 && fresh[fresh.length - 1].role === "assistant";
       if (answered) {
@@ -775,7 +780,12 @@ export function ChatView({ conversationId }: { conversationId: string }) {
 
   async function reloadMessages() {
     try {
-      setMessages(await apiFetch<ChatMessage[]>(`/chat/${conversationId}/messages`));
+      // Always from the server: this runs right after an edit, a regenerate
+      // or a branch switch, which is exactly when a moment-old answer is the
+      // wrong one.
+      setMessages(
+        await apiFetch<ChatMessage[]>(`/chat/${conversationId}/messages`, { fresh: true }),
+      );
     } catch {
       // The error from the failed action is already on screen; a second one
       // about the recovery attempt would only add noise.
