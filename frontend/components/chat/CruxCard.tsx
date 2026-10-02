@@ -28,7 +28,7 @@ export function CruxCard({ text }: { text: string }) {
             <path d="M12 2c.4 4.8 3.2 7.6 8 8-4.8.4-7.6 3.2-8 8-.4-4.8-3.2-7.6-8-8 4.8-.4 7.6-3.2 8-8z" />
             <path d="M19 15c.2 2 1.3 3.1 3.3 3.3-2 .2-3.1 1.3-3.3 3.3-.2-2-1.3-3.1-3.3-3.3 2-.2 3.1-1.3 3.3-3.3z" opacity="0.6" />
           </svg>
-          <p className="text-sm font-semibold leading-snug tracking-[-0.01em] text-ink">
+          <p className="text-xl font-semibold leading-snug tracking-[-0.01em] text-ink">
             {renderInline(cleanMessageText(text), "crux")}
           </p>
         </div>

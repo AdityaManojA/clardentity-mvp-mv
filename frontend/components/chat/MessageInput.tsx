@@ -430,19 +430,20 @@ export function MessageInput({
               aria-label="Start a live call"
               className="flex size-8 shrink-0 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-surface-hover hover:text-brand disabled:cursor-not-allowed disabled:opacity-50"
             >
+              {/* A waveform, not a telephone handset. The receiver is a
+                  picture of a thing most people asking for this have never
+                  held, and it reads as "phone call" rather than "talk to
+                  it" - which is what this actually opens. */}
               <svg
-                viewBox="0 0 24 24"
+                viewBox="0 0 20 20"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="1.5"
                 strokeLinecap="round"
-                strokeLinejoin="round"
                 aria-hidden="true"
-                className="size-5"
+                className="block size-5"
               >
-                {/* A waveform inside a call bubble: speech, live. */}
-                <path d="M21 15.5v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 1.1 2.8 2 2 0 0 1 3.1 1h3a2 2 0 0 1 2 1.7c.1 1 .3 1.9.7 2.8a2 2 0 0 1-.5 2.1L7.1 8.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z" />
-                <path d="M16 3v4M19.5 1.5v7M13 4.5v1" />
+                <path d="M3 8.6v2.8M6.5 5.6v8.8M10 3.2v13.6M13.5 6.4v7.2M17 8.6v2.8" />
               </svg>
             </button>
 

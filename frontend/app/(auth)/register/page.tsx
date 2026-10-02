@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
+import { Wordmark } from "@/components/system/Wordmark";
 import { authErrorMessage, useAuth } from "@/lib/auth";
 import { Button, Field, Input } from "@/components/ui/primitives";
 import { PasswordInput } from "@/components/auth/PasswordInput";
@@ -40,9 +41,7 @@ export default function RegisterPage() {
       <ThemeToggle className="absolute right-4 top-4 sm:right-6 sm:top-6" />
       <div className="w-full max-w-sm">
         <div className="mb-6 text-center">
-          <Link href="/" className="text-sm font-semibold tracking-tight text-ink">
-            Clardentity
-          </Link>
+          <Wordmark />
         </div>
 
         <form

@@ -74,8 +74,29 @@ export function useConsent(): Consent {
       return () => listeners.delete(onChange);
     },
     getSnapshot,
-    // Server render: assume not asked, so no banner flashes before hydration
-    // decides whether it is needed.
+    // Server render: "unset" is the honest answer, because the server cannot
+    // read the browser's storage. It is not a safe thing to *show* on,
+    // though - see useConsentSettled.
     () => "unset",
+  );
+}
+
+/** Whether the answer above is the browser's own, rather than the server's
+ *  guess at it.
+ *
+ *  The banner was rendered straight off useConsent, which on the server is
+ *  always "unset" - so every page arrived with the banner in the HTML and
+ *  then tore it out again the moment hydration read the real answer. For
+ *  anyone who had already allowed or declined, that is the whole of their
+ *  experience of it: a box that appears and vanishes before it can be read.
+ *
+ *  A store rather than an effect: this has to be false on the server and on
+ *  the first client render, and true after, which is exactly what the two
+ *  snapshots of useSyncExternalStore are for. */
+export function useConsentSettled(): boolean {
+  return useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
   );
 }

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState, type FormEvent } from "react";
+import { Wordmark } from "@/components/system/Wordmark";
 import { authErrorMessage, useAuth } from "@/lib/auth";
 import { Button, Field } from "@/components/ui/primitives";
 import { PasswordInput } from "@/components/auth/PasswordInput";
@@ -125,9 +126,7 @@ export default function ResetPasswordPage() {
       <ThemeToggle className="absolute right-4 top-4 sm:right-6 sm:top-6" />
       <div className="w-full max-w-sm">
         <div className="mb-6 text-center">
-          <Link href="/" className="text-sm font-semibold tracking-tight text-ink">
-            Clardentity
-          </Link>
+          <Wordmark />
         </div>
         {/* useSearchParams needs a Suspense boundary to prerender this route. */}
         <Suspense fallback={null}>

@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Wordmark } from "@/components/system/Wordmark";
 import { apiFetch } from "@/lib/apiClient";
 import { useAuth } from "@/lib/auth";
 import { resetTours } from "@/lib/tour";
@@ -95,9 +95,7 @@ export default function WelcomePage() {
       <ThemeToggle className="absolute right-4 top-4 sm:right-6 sm:top-6" />
       <div className="w-full max-w-lg">
         <div className="mb-6 text-center">
-          <Link href="/" className="text-sm font-semibold tracking-tight text-ink">
-            Clardentity
-          </Link>
+          <Wordmark />
         </div>
 
         <form

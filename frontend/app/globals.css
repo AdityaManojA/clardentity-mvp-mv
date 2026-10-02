@@ -20,22 +20,25 @@
 --------------------------------------------------------------------------- */
 :root {
   /* ------------------------------------------------------------------
-     The interface is drawn at four fifths.
+     The interface is drawn at 85%.
 
      The design was laid out on a 1728px frame, so implementing it a pixel
      at a time put a 20px body size and a 925px composer on screens that are
-     mostly 1440 - which read a size too large everywhere. Four fifths is
-     where it settles, and the whole thing is scaled rather than each number
-     retyped: a scale factor cannot drift the way two hundred hand-adjusted
-     values can, and the file still says what the design says.
+     mostly 1440 - which read a size too large everywhere. 85% is where it
+     settles, and the whole thing is scaled rather than each number retyped:
+     a scale factor cannot drift the way two hundred hand-adjusted values
+     can, and the file still says what the design says.
 
-     Phones are left alone. The same factor there would take a 32px control
-     down to 25px of thumb, and a phone's interface is relatively larger
-     than a desktop's for that reason.
+     Phones get it too. They were left out at first to protect the size of a
+     thumb target, and the result was simply that the app looked bigger on a
+     phone than on the machine beside it. At 85% the smallest control on a
+     phone is 27px rather than 32 - short of the 44 anyone would ask for,
+     but it was short before, and one interface at one size is worth more
+     than those five pixels.
      ------------------------------------------------------------------ */
   --ui-zoom: 1;
   /* One vh, corrected. `vh` is measured on the unzoomed viewport, so under
-     a 0.8 zoom a 100vh box covers four fifths of the screen and leaves a
+     a zoom a 100vh box covers only that fraction of the screen and leaves a
      band at the bottom. Anything that wants to be as tall as the window
      uses this instead. */
   --app-vh: calc(1vh / var(--ui-zoom));
@@ -120,48 +123,55 @@
    stamps data-theme before first paint (from localStorage, falling back to the
    OS preference), so there is no flash and no duplicated token block. */
 :root[data-theme="dark"] {
-  /* Black, and then almost nothing else.
-     The previous palette raised panels to #1d1d1f on a #000 canvas, which is
-     a defensible Apple arrangement but leaves the app reading as a grey theme
-     on a black page - five distinct greys before you count borders. Here the
-     page, the panels and the insets are all black or within a few points of
-     it, and separation is carried by a hairline rather than by fill. One step
-     away from black is reserved for things that genuinely float: the
-     composer, menus, popovers, dialogs.
-     #000 rather than a near-black is the point on an OLED panel - the pixels
-     are off, and the single lifted surface is the only thing that lights. */
-  --canvas: #000000;
-  --surface: #0c0a0b;
-  --surface-muted: #000000;
-  --surface-hover: #181416;
-  --surface-sunken: #000000;
-  --bubble-mine: #221d20;
-  --surface-raised: #1d1a1c;
+  /* Layered, not black.
+     The first dark palette put the page, the sidebar and the insets all on
+     #000 and asked a hairline to carry every edge. On an OLED panel that is a
+     defensible trade, and in use it read as one undifferentiated field: the
+     sidebar and the thread were the same colour, a card sat five points off
+     the page, and at #241f22 the hairline supposed to separate them was the
+     faintest thing on screen. Nothing looked like it sat on anything.
 
-  /* Dimmer than the fills they separate. A hairline doing the work of a fill
-     has to be visible, but at #38383a it was the brightest thing on a black
-     page and every card read as an outlined box. */
-  --border: #241f22;
-  --border-strong: #332b2f;
+     So there are four real steps now - chrome, page, card, floating - far
+     enough apart to be seen without any of them reading as grey, and a
+     hairline above them rather than under them. The warmth of the light
+     theme is kept through all of it, so the two still read as one product.
 
-  /* Not pure white on pure black - that pairing buzzes at small sizes. The
-     warm cast of the light theme is kept, faintly, so the two themes read as
-     one product rather than two. */
-  --text: #f7f3f4;
-  --text-secondary: #a89da0;
-  --text-muted: #8b8085;
+     The sidebar goes below the page rather than above it: it is the thing
+     you look at least. */
+  --canvas: #131011;
+  --surface: #1c1819;
+  --surface-muted: #0d0b0b;
+  --surface-hover: #292325;
+  --surface-sunken: #0d0b0b;
+  --bubble-mine: #2d2628;
+  /* Things that float above the page rather than sit in it: the composer,
+     menus, popovers, dialogs. */
+  --surface-raised: #231e1f;
+
+  /* Visible. A hairline doing the work of a fill has to be seen, and the
+     previous pair were tuned against pure black, where anything brighter
+     glared; against a page that is no longer black they disappeared. */
+  --border: #332b2d;
+  --border-strong: #453a3d;
+
+  /* Not pure white - that pairing buzzes at small sizes. The warm cast of
+     the light theme is kept, faintly, so the two themes read as one product
+     rather than two. */
+  --text: #f5f0f2;
+  --text-secondary: #b6a5aa;
+  --text-muted: #8e8084;
   --text-inverse: #ffffff;
-  --text-nav: #b5a9ad;
-  --text-nav-strong: #d8cdd1;
-  --text-nav-muted: #8b8085;
+  --text-nav: #beafb3;
+  --text-nav-strong: #ded3d6;
+  --text-nav-muted: #8e8084;
 
   /* The burgundy lifts on dark rather than keeping its light-mode value,
-     which goes to mud against black. Same hue, more light in it. There is no
-     dark design to match, so this is derived from the light palette. */
-  --brand: #c86aa8;
-  --brand-dark: #d882b8;
-  --brand-soft: #231020;
-  --brand-border: #4a2440;
+     which goes to mud against a dark page. Same hue, more light in it. There
+     is no dark design to match, so this is derived from the light palette. */
+  --brand: #c86ab1;
+  --brand-dark: #d982c4;
+  --brand-soft: #2b1525;
+  --brand-border: #582f4e;
 
   --band-moderate: #9be34f;
   --band-high: #30d158;
@@ -178,7 +188,7 @@
   --caution-bg: #241705;
   --caution-border: #4d360b;
 
-  --focus-ring: #c86aa8;
+  --focus-ring: #c86ab1;
 
   /* The head stays light in dark mode - a dark face on a dark panel loses the
      eyes entirely - but the shading is pulled down so it doesn't glare. */
@@ -236,24 +246,26 @@
   --focus-ring: #2d3561;
 }
 :root[data-accent="indigo"][data-theme="dark"] {
-  --surface-muted: #000000;
-  --surface: #0a0b0c;
-  --surface-hover: #141518;
-  --bubble-mine: #1d1f22;
-  --surface-raised: #1a1c1d;
-  --border: #1f2124;
-  --border-strong: #2b2e33;
-  --text: #f3f3f7;
-  --text-secondary: #9d9fa8;
-  --text-muted: #80848b;
-  --text-nav: #a9abb5;
-  --text-nav-strong: #cdd0d8;
-  --text-nav-muted: #80848b;
-  --brand: #6a6fc8;
-  --brand-dark: #8284d8;
-  --brand-soft: #101523;
-  --brand-border: #24294a;
-  --focus-ring: #6a6fc8;
+  --surface-muted: #0b0b0d;
+  --surface: #18191c;
+  --surface-hover: #232429;
+  --bubble-mine: #26272d;
+  --surface-raised: #1e1f23;
+  --border: #2b2c33;
+  --border-strong: #3a3c45;
+  --text: #f0f1f5;
+  --text-secondary: #a5a7b6;
+  --text-muted: #80828e;
+  --text-nav: #afb1be;
+  --text-nav-strong: #d3d5de;
+  --text-nav-muted: #80828e;
+  --brand: #6a79c8;
+  --brand-dark: #828fd9;
+  --brand-soft: #15182b;
+  --brand-border: #2f3658;
+  --focus-ring: #6a79c8;
+  --canvas: #101113;
+  --surface-sunken: #0b0b0d;
 }
 
 /* Teal */
@@ -278,24 +290,26 @@
   --focus-ring: #0d7c7b;
 }
 :root[data-accent="teal"][data-theme="dark"] {
-  --surface-muted: #000000;
-  --surface: #0a0c0c;
-  --surface-hover: #141817;
-  --bubble-mine: #1d2220;
-  --surface-raised: #1a1d1c;
-  --border: #1f2422;
-  --border-strong: #2b3331;
-  --text: #f3f7f7;
-  --text-secondary: #9da8a8;
-  --text-muted: #808b89;
-  --text-nav: #a9b5b4;
-  --text-nav-strong: #cdd8d7;
-  --text-nav-muted: #808b89;
-  --brand: #6ac0c8;
-  --brand-dark: #82ced8;
-  --brand-soft: #102321;
-  --brand-border: #244a4a;
-  --focus-ring: #6ac0c8;
+  --surface-muted: #0b0d0d;
+  --surface: #181c1c;
+  --surface-hover: #232929;
+  --bubble-mine: #262d2d;
+  --surface-raised: #1e2323;
+  --border: #2b3333;
+  --border-strong: #3a4545;
+  --text: #f0f5f5;
+  --text-secondary: #a5b6b6;
+  --text-muted: #808e8e;
+  --text-nav: #afbebe;
+  --text-nav-strong: #d3dede;
+  --text-nav-muted: #808e8e;
+  --brand: #6ac8c7;
+  --brand-dark: #82d9d8;
+  --brand-soft: #152b2b;
+  --brand-border: #2f5857;
+  --focus-ring: #6ac8c7;
+  --canvas: #101313;
+  --surface-sunken: #0b0d0d;
 }
 
 /* Plum Velvet */
@@ -320,24 +334,26 @@
   --focus-ring: #4b2f64;
 }
 :root[data-accent="plum"][data-theme="dark"] {
-  --surface-muted: #000000;
-  --surface: #0b0a0c;
-  --surface-hover: #151418;
-  --bubble-mine: #1e1d22;
-  --surface-raised: #1a1a1d;
-  --border: #201f24;
-  --border-strong: #2d2b33;
-  --text: #f5f3f7;
-  --text-secondary: #a29da8;
-  --text-muted: #83808b;
-  --text-nav: #aea9b5;
-  --text-nav-strong: #d1cdd8;
-  --text-nav-muted: #83808b;
-  --brand: #a56ac8;
-  --brand-dark: #bb82d8;
-  --brand-soft: #181023;
-  --brand-border: #39244a;
-  --focus-ring: #a56ac8;
+  --surface-muted: #0c0b0d;
+  --surface: #1a181c;
+  --surface-hover: #262329;
+  --bubble-mine: #2a262d;
+  --surface-raised: #211e23;
+  --border: #2f2b33;
+  --border-strong: #403a45;
+  --text: #f3f0f5;
+  --text-secondary: #ada5b6;
+  --text-muted: #87808e;
+  --text-nav: #b6afbe;
+  --text-nav-strong: #d9d3de;
+  --text-nav-muted: #87808e;
+  --brand: #9c6ac8;
+  --brand-dark: #b082d9;
+  --brand-soft: #20152b;
+  --brand-border: #452f58;
+  --focus-ring: #9c6ac8;
+  --canvas: #121013;
+  --surface-sunken: #0c0b0d;
 }
 
 @theme inline {
@@ -415,20 +431,18 @@
 /* Applied to the root, not to a wrapper: `position: fixed` and the layout
    viewport both resolve against the root's box, so zooming anything lower
    leaves fixed overlays measuring the screen at full size while everything
-   under them is at four fifths. The marketing page is included - it is one
-   product, and a visitor who scrolls from the hero into the app should not
-   find the furniture change size at the door. */
-/* Guarded on `zoom` rather than assumed: a browser without it would otherwise
-   keep --ui-zoom at 0.8, which only --app-vh reads, and every full-height page
-   would grow a quarter of a screen of scroll for nothing. Without the
+   under them is at 85%. The marketing page is included - it is one product,
+   and a visitor who scrolls from the hero into the app should not find the
+   furniture change size at the door.
+
+   Guarded on `zoom` rather than assumed: a browser without it would otherwise
+   keep --ui-zoom at 0.85, which only --app-vh reads, and every full-height
+   page would grow a sixth of a screen of scroll for nothing. Without the
    property, the app simply stays at full size. */
 @supports (zoom: 1) {
-  @media (min-width: 768px) {
-    :root {
-      --ui-zoom: 0.8;
-      zoom: var(--ui-zoom);
-    }
-
+  :root {
+    --ui-zoom: 0.85;
+    zoom: var(--ui-zoom);
   }
 }
 

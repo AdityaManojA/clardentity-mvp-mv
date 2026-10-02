@@ -806,7 +806,13 @@ function MessageBubble({
             front={
               // div, not p: a comparison renders as a real <table>, which
               // cannot live inside a paragraph element.
-              <div className="whitespace-pre-wrap break-words leading-relaxed">{renderBody(content, claims)}</div>
+              // The same step the question above it is set in. The card's
+              // own chrome - the mode, the band, the actions - stays small;
+              // it is the answer that has to be as readable as the thing it
+              // is answering, and it was a step below it.
+              <div className="whitespace-pre-wrap break-words text-xl leading-relaxed">
+                {renderBody(content, claims)}
+              </div>
             }
           />
         )}

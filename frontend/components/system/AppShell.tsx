@@ -177,7 +177,7 @@ function RecentConversations({
               onClick={onNavigate}
               aria-current={c.id === activeId ? "page" : undefined}
               className={cx(
-                "flex h-8 min-w-0 flex-1 items-center gap-5 truncate rounded-[9px] pl-4 pr-1.5 text-xl transition-colors",
+                "flex h-8 min-w-0 flex-1 items-center gap-5 truncate rounded-[9px] pl-4 pr-1.5 text-sm transition-colors",
                 c.id === activeId
                   ? "bg-[var(--surface-hover)] font-medium text-ink"
                   : "text-[color:var(--text-nav)] hover:bg-surface-hover hover:text-ink",
@@ -243,7 +243,7 @@ function NavItem({
       onClick={onNavigate}
       aria-current={active ? "page" : undefined}
       className={cx(
-        "flex h-12 items-center gap-3 rounded-[9px] px-4 text-xl transition-colors",
+        "flex h-12 items-center gap-3 rounded-[9px] px-4 text-sm transition-colors",
         active
           ? "bg-[var(--surface-hover)] font-medium text-ink"
           : "text-[color:var(--text-nav)] hover:bg-surface-hover hover:text-ink",
@@ -532,7 +532,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           void startConversation();
         }}
         disabled={starting}
-        className="mt-3 flex h-12 items-center gap-3 rounded-[9px] px-4 text-left text-xl text-[color:var(--text-nav)] transition-colors hover:bg-surface-hover hover:text-ink disabled:opacity-50"
+        className="mt-3 flex h-12 items-center gap-3 rounded-[9px] px-4 text-left text-sm text-[color:var(--text-nav)] transition-colors hover:bg-surface-hover hover:text-ink disabled:opacity-50"
       >
         <MaskIcon src="/ui/nav-newchat.svg" size={24} />
         {starting ? "Starting…" : "New chat"}

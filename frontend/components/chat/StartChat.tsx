@@ -36,7 +36,22 @@ export function StartChat() {
 
     async function go() {
       try {
-        let workspaces = await apiFetch<Workspace[]>("/workspaces");
+        /* Three round trips in a row is what this used to be, and on a
+           connection to a sleeping server it is the whole of the wait
+           between signing in and seeing a chat. Two of them only ever
+           needed to be in order because the second needs a workspace id -
+           and we already remember one. So when there is a remembered
+           workspace, ask for its chats at the same time as the list that
+           confirms it still exists, and throw the guess away in the rare
+           case it is wrong. */
+        const remembered = lastWorkspaceId();
+        const listPromise = apiFetch<Workspace[]>("/workspaces");
+        const guessedChats = remembered
+          ? apiFetch<Conversation[]>(`/chat/conversations?workspace_id=${remembered}`)
+              .catch(() => null)
+          : null;
+
+        let workspaces = await listPromise;
         if (workspaces.length === 0) {
           const made = await apiFetch<Workspace>("/workspaces", {
             method: "POST",
@@ -44,13 +59,14 @@ export function StartChat() {
           });
           workspaces = [made];
         }
-        const remembered = lastWorkspaceId();
         const workspace = workspaces.find((w) => w.id === remembered) ?? workspaces[0];
         rememberWorkspace(workspace.id);
 
-        const conversations = await apiFetch<Conversation[]>(
-          `/chat/conversations?workspace_id=${workspace.id}`,
-        );
+        const conversations =
+          (workspace.id === remembered ? await guessedChats : null) ??
+          (await apiFetch<Conversation[]>(
+            `/chat/conversations?workspace_id=${workspace.id}`,
+          ));
         // Most recently active first from the server; a null title means
         // nothing has been asked in it yet (the title is derived from the
         // first question), wherever it sits in the list.

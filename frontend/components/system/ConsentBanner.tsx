@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { setConsent, useConsent } from "@/lib/consent";
+import { setConsent, useConsent, useConsentSettled } from "@/lib/consent";
 
 /* The analytics consent banner.
  *
@@ -17,9 +17,12 @@ import { setConsent, useConsent } from "@/lib/consent";
  */
 export function ConsentBanner() {
   const consent = useConsent();
+  const settled = useConsentSettled();
   const configured = Boolean(process.env.NEXT_PUBLIC_POSTHOG_KEY);
 
-  if (!configured || consent !== "unset") return null;
+  // Nothing until the browser's own answer is in. Asking a question for one
+  // frame and withdrawing it is worse than asking it a moment later.
+  if (!settled || !configured || consent !== "unset") return null;
 
   return (
     <div

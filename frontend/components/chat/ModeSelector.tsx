@@ -142,15 +142,21 @@ export function ModeSelector({
               onClick={() => (comingSoon ? onLocked?.(mode.value) : onChange(mode.value))}
               title={comingSoon ? `${mode.when} (included in a paid plan)` : mode.when}
               className={cx(
-                "flex shrink-0 flex-col items-center justify-center gap-[2px] rounded-[8px] border bg-surface px-3 py-1 text-sm leading-[normal] transition-colors disabled:cursor-not-allowed disabled:opacity-50",
+                // touch-manipulation so a tap on a phone is a tap: the rail
+                // scrolls sideways, and without it the browser waits to see
+                // whether a finger down is the start of a drag.
+                "flex shrink-0 touch-manipulation flex-col items-center justify-center gap-[2px] rounded-[8px] border px-3 py-1 text-sm leading-[normal] transition-colors disabled:cursor-not-allowed disabled:opacity-50",
                 comingSoon && "opacity-60",
-                // The design draws every card the same; selection is the one
-                // state it leaves to us, so it is the brand on the border and
-                // the label rather than a filled pill, which would shout over
-                // a rail of eight.
+                // The design draws every card the same and leaves selection
+                // to us. A brand-tinted hairline was what that first became,
+                // and on this canvas it is almost nothing: people were
+                // clicking a mode, getting it, and not being able to tell.
+                // The accent now carries the whole card - its edge, its fill
+                // and its label - which is unmistakable at a glance without
+                // the filled pill that would shout over a rail of eight.
                 selected
-                  ? "border-brand-border text-brand"
-                  : "border-[color:var(--border)] text-ink-secondary hover:border-hairline-strong hover:text-ink",
+                  ? "border-brand bg-brand-soft font-medium text-brand"
+                  : "border-[color:var(--border)] bg-surface text-ink-secondary hover:border-hairline-strong hover:text-ink",
               )}
             >
               <MaskIcon src={mode.icon} className="size-5" />
