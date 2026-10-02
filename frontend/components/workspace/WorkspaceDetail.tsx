@@ -7,13 +7,7 @@ import { apiFetch } from "@/lib/apiClient";
 import { ChatRowMenu } from "@/components/chat/ChatRowMenu";
 import { authErrorMessage } from "@/lib/auth";
 import { modeLabel, type CognitiveMode } from "@/lib/modes";
-import {
-  Badge,
-  Button,
-  Card,
-  PageHeader,
-  Spinner,
-} from "@/components/ui/primitives";
+import { Button, Spinner } from "@/components/ui/primitives";
 
 type Workspace = {
   id: string;
@@ -23,16 +17,11 @@ type Workspace = {
   last_activity_at?: string | null;
 };
 
-/** "14 Aug, 08:17" rather than "14/08/2026, 08:17:19".
- *
- *  The full timestamp is ~150px of a row that also carries a title, a mode
- *  badge and a delete button; at 360px it left the title about a dozen
- *  characters. The exact value stays in the tooltip for anyone who wants it. */
+/** "02 Oct" - the design's form, and all a row needs: it sits beside the
+ *  mode at 12px, where a full timestamp was ~150px of a row that also has to
+ *  carry a title. The exact value stays in the tooltip. */
 function shortDate(iso: string): string {
-  const d = new Date(iso);
-  return d.toLocaleDateString(undefined, { day: "numeric", month: "short" })
-    + ", "
-    + d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+  return new Date(iso).toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
 }
 
 type Conversation = {
@@ -139,118 +128,124 @@ export function WorkspaceDetail({ workspaceId }: { workspaceId: string }) {
   }
 
   return (
-    <div className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6">
-      <PageHeader
-        title={workspace.name}
-        description="Attachments added here ground every answer in this workspace."
-        actions={
-          <Button
-            variant="primary"
-            onClick={() => handleNewConversation()}
-            disabled={creating !== null}
-            data-tour="new-chat"
+    // The same frame as the workspace list: a 1441px page with 140px gutters
+    // at the size the design was drawn at.
+    <div className="mx-auto w-full max-w-[1441px] px-5 pb-16 pt-[69px] sm:px-10 xl:px-[140px]">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="min-w-0">
+          <h1 className="truncate text-[32px] font-medium leading-[normal] text-ink">
+            {workspace.name}
+          </h1>
+          <p className="text-[20px] leading-[normal] text-ink-secondary">
+            Attachments added here ground every answer in this workspace.
+          </p>
+        </div>
+        {/* "Create" on this page means a chat in this workspace - the one
+            thing you came here to do. */}
+        <button
+          type="button"
+          data-tour="new-chat"
+          onClick={() => handleNewConversation()}
+          disabled={creating !== null}
+          className="flex h-[42px] shrink-0 items-center gap-1 rounded-[34px] bg-brand px-3 py-2 text-[20px] leading-[normal] text-white transition-colors hover:bg-brand-dark disabled:opacity-60"
+        >
+          {creating === "any" ? "Creating…" : "Create"}
+          <svg
+            viewBox="0 0 20 20"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            aria-hidden="true"
+            className="block size-5"
           >
-            {creating === "any" ? "Creating…" : "New chat"}
-          </Button>
-        }
-      />
+            <path d="M10 4.2v11.6M4.2 10h11.6" />
+          </svg>
+        </button>
+      </div>
 
       {/* The mode cards used to open this page - six tiles asking you to pick
           a cognitive stance before you had a question. The mode belongs to the
-          message, not to the workspace, and is chosen in the composer where you can
-          see what you're asking; attachments and search moved to the sidebar,
-          where navigation lives. What's left is the one thing you came here
-          to do and the list of what you did before. */}
-      <Card padded={false} tourId="chat-list">
-        <div className="flex items-center justify-between gap-3 border-b border-hairline px-4 py-3 sm:px-5">
-          <h2 className="text-sm font-semibold text-ink">Chats</h2>
-          <span className="text-xs text-ink-muted">
-            {conversations.length}{" "}
-            {conversations.length === 1 ? "chat" : "chats"}
-          </span>
-        </div>
-
-        {conversations.length === 0 ? (
-          <div className="px-5 py-10 text-center">
-            <p className="text-sm font-medium text-ink">No conversations yet</p>
-            <p className="mt-1 text-sm text-ink-muted">
-              Start one to ask questions against this workspace.
-            </p>
-          </div>
-        ) : (
-          <ul className="divide-y divide-hairline">
-            {conversations.map((conv) => (
-              // The row is a link and delete is a button, so they can't nest -
-              // a <button> inside an <a> is invalid and swallows the click on
-              // whichever browser feels like it.
-              <li
-                key={conv.id}
-                className="group/row flex items-center gap-1 transition-colors hover:bg-surface-hover"
+          message, not to the workspace, and is chosen in the composer where you
+          can see what you're asking; attachments and search moved to the
+          sidebar, where navigation lives. What's left is the one thing you came
+          here to do and the list of what you did before. */}
+      {conversations.length === 0 ? (
+        <p className="mt-10 text-[20px] leading-[normal] text-ink-secondary">
+          No chats in this workspace yet. Create one and it collects here.
+        </p>
+      ) : (
+        <ul className="mt-8 space-y-3" data-tour="chat-list">
+          {conversations.map((conv) => (
+            // The row is a link and the menu is a button, so they can't nest -
+            // a <button> inside an <a> is invalid and swallows the click on
+            // whichever browser feels like it.
+            <li
+              key={conv.id}
+              className="flex h-12 items-center rounded-[8px] border border-hairline pr-2 transition-colors hover:border-brand-border hover:bg-surface-hover"
+            >
+              <Link
+                href={`/chat/${conv.id}`}
+                className="flex h-full min-w-0 flex-1 items-center gap-2 px-5"
               >
-                <Link
-                  href={`/chat/${conv.id}`}
-                  className="flex min-w-0 flex-1 items-center justify-between gap-2 px-3 py-3 sm:gap-3 sm:px-5"
-                >
-                  <span className="min-w-0">
-                    <span className="flex min-w-0 items-center gap-1.5">
-                      {conv.pinned && (
-                        <svg
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="1.75"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          aria-label="Pinned"
-                          className="h-3.5 w-3.5 shrink-0 text-brand"
-                        >
-                          <path d="M9 4h6l-1 5 3 3v2H7v-2l3-3-1-5Z" />
-                          <path d="M12 14v6" />
-                        </svg>
-                      )}
-                      <span className="block truncate text-sm font-medium text-ink">
-                        {conv.title || "Untitled chat"}
-                      </span>
-                    </span>
-                    <span
-                      className="block truncate text-xs text-ink-muted"
-                      title={new Date(conv.last_activity_at ?? conv.created_at).toLocaleString()}
-                    >
-                      {shortDate(conv.last_activity_at ?? conv.created_at)}
-                    </span>
+                {conv.pinned && (
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.75"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-label="Pinned"
+                    className="h-3.5 w-3.5 shrink-0 text-brand"
+                  >
+                    <path d="M9 4h6l-1 5 3 3v2H7v-2l3-3-1-5Z" />
+                    <path d="M12 14v6" />
+                  </svg>
+                )}
+                <span className="truncate text-[20px] leading-[normal] text-ink-secondary">
+                  {conv.title || "Untitled chat"}
+                </span>
+                {/* Pushed to the right end of the row: when it was last
+                    touched, and which companion answered in it. */}
+                <span className="ml-auto flex shrink-0 items-center text-[12px] leading-[normal]">
+                  <span
+                    className="text-ink-secondary"
+                    title={new Date(conv.last_activity_at ?? conv.created_at).toLocaleString()}
+                  >
+                    {shortDate(conv.last_activity_at ?? conv.created_at)}
                   </span>
-                  {/* Capped rather than hidden. The title has min-w-0 and
-                      truncates first, so the badge can stay at every width
-                      without squeezing the thing you are actually scanning
-                      for - and a mode label is worth keeping when it is the
-                      only way to tell two similarly-named chats apart. */}
                   {conv.default_mode && (
-                    <Badge tone="neutral" className="max-w-[6.5rem] shrink-0 truncate uppercase">
-                      {modeLabel(conv.default_mode)}
-                    </Badge>
+                    <>
+                      <span aria-hidden="true" className="flex size-3 items-center justify-center">
+                        <span className="size-1 rounded-full bg-ink-muted" />
+                      </span>
+                      <span className="max-w-[9rem] truncate text-ink">
+                        {modeLabel(conv.default_mode)}
+                      </span>
+                    </>
                   )}
-                </Link>
-                <ChatRowMenu
-                  conversationId={conv.id}
-                  title={conv.title}
-                  pinned={Boolean(conv.pinned)}
-                  workspaceId={workspaceId}
-                  workspaces={allWorkspaces}
-                  onChanged={() => setReloadKey((n) => n + 1)}
-                  onDeleted={() => forgetConversation(conv.id)}
-                  className="mr-2"
-                />
-              </li>
-            ))}
-          </ul>
-        )}
-      </Card>
+                </span>
+              </Link>
+              <ChatRowMenu
+                conversationId={conv.id}
+                title={conv.title}
+                pinned={Boolean(conv.pinned)}
+                workspaceId={workspaceId}
+                workspaces={allWorkspaces}
+                onChanged={() => setReloadKey((n) => n + 1)}
+                onDeleted={() => forgetConversation(conv.id)}
+              />
+            </li>
+          ))}
+        </ul>
+      )}
 
       {workspace.role === "owner" && (
         // Owners only - a member leaving isn't the same operation and isn't
         // offered here. Everything in the workspace goes with it: chats,
         // attachments, memory. Same two-click confirm as every other delete.
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-hairline px-4 py-3 sm:px-5">
+        <div className="mt-10 flex flex-wrap items-center justify-between gap-3 rounded-[12px] border border-hairline px-5 py-3">
           <div>
             <p className="text-sm font-medium text-ink">Delete this workspace</p>
             <p className="text-xs text-ink-muted">
@@ -277,16 +272,3 @@ export function WorkspaceDetail({ workspaceId }: { workspaceId: string }) {
     </div>
   );
 }
-
-/** Delete, with the confirmation in the row rather than in a dialog.
- *
- *  A conversation takes its messages, claims and citations with it, so it
- *  asks first - but a modal for a row you can see is heavier than the thing
- *  it is protecting. The button becomes its own "Sure?" and reverts if you
- *  look away. */
-/** "Move to…" - re-file a chat under another of the user's workspaces.
- *  A small menu on the row, same footprint as delete beside it; shown only
- *  when there is somewhere else to move it to. */
-
-
-
