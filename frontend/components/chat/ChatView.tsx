@@ -1141,14 +1141,24 @@ export function ChatView({ conversationId }: { conversationId: string }) {
             the design's measurements. No rule above it; on this canvas the
             card's own shadow is the separation. */}
         <div className="mx-auto w-full max-w-[925px] shrink-0 space-y-2 py-3 sm:py-4">
+          {/* The companion sits above the rail rather than beside it: the
+              design gives the rail the full 925px, so there is no room on
+              that row any more. It appears with the first answer - the new
+              chat the design draws has nothing above the rail, and an
+              expression tracking an answer that hasn't been given yet is an
+              expression about nothing. */}
+          {messages.length > 0 && (
+            <div className="flex justify-end pr-1">
+              <AvatarPanel
+                state={avatarState}
+                gesture={avatarGesture}
+                expression={avatarExpression}
+                className="h-16 w-16"
+                tourId="companion"
+              />
+            </div>
+          )}
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-            {/* Once there are messages the companion moves down here, beside
-                the controls it reacts to. While the chat is empty it is the
-                centrepiece above instead, and showing it twice would just be
-                two of the same thing on one screen. */}
-            {/* The companion is not beside the composer in the design - the
-                rail spans the full width there. It stays in the thread, where
-                it reacts to the answer it is reacting to. */}
             {/* flex-1 so the unselected state - which renders all four modes
                 as cards - gets the full row instead of shrink-wrapping next
                 to the avatar. */}

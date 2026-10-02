@@ -93,12 +93,6 @@ export const TOURS: Record<TourId, TourStep[]> = {
   ],
   chat: [
     {
-      id: "companion",
-      target: "companion",
-      title: "Meet your companion",
-      body: "Its expression tracks how solid each answer is - confident, cautious or concerned - so you can read the mood before the detail.",
-    },
-    {
       id: "mode-picker",
       target: "mode-picker",
       title: "Choose how it thinks",
