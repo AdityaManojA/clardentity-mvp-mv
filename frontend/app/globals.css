@@ -3,48 +3,52 @@
 /* ---------------------------------------------------------------------------
    Design tokens
 
-   Two neutral themes in the Apple house style: white over #f5f5f7 in light,
-   true black under raised #1d1d1f panels in dark, with one accent blue and
-   nothing else. Structure is carried by hairline borders and by the small
-   step between canvas and surface, never by tinting a background.
+   The palette is the Figma design's, read from its own variables rather than
+   matched by eye: background/primary #f5f3f4, text primary #3d2a2f,
+   secondary #6b5c60, tertiary #9e8e93, brand/primary #6b2d5c. Warm greys
+   rather than neutral ones - every step has a little red in it, which is what
+   makes the burgundy sit in the page instead of on it.
 
-   The accent used to be a brand violet applied to every button, pill, focus
-   ring and link, which is what made the dark theme read as purple rather than
-   dark. Colour now appears in three places only: the primary action, links,
-   and the confidence bands - where a saturated hue is the actual signal.
+   Structure is carried by hairline borders and by the small step between the
+   canvas and the things on it, never by tinting a background. Colour appears
+   in three places only: the primary action, links, and the confidence bands,
+   where a saturated hue is the actual signal.
 
-   Light is the primary theme; every token has a dark counterpart below.
+   Light is the designed theme. Dark has no design, so its counterparts below
+   are derived from the same hues rather than drawn - consistent, not
+   pixel-matched.
 --------------------------------------------------------------------------- */
 :root {
-  /* True white for content, with the surrounding chrome one step down. This
-     is the Apple inversion of the usual arrangement: the page is grey and the
-     thing you are reading is white, rather than white cards on white. */
-  --canvas: #ffffff;
+  /* The app's canvas is the design's background/primary; panels sit above it
+     in white, and the chrome - sidebar, header - is the warmer #faf8f9 the
+     landing page uses, so the two halves of the product are one thing. */
+  --canvas: #f5f3f4;
   --surface: #ffffff;
-  --surface-muted: #f5f5f7;
-  --surface-hover: #ebebed;
-  --surface-sunken: #f5f5f7;
+  --surface-muted: #faf8f9;
+  --surface-hover: rgba(77, 67, 57, 0.05);
+  --surface-sunken: #f5f3f4;
   /* Things that float above the page rather than sit in it: the composer,
-     menus, popovers, dialogs. On light this is the same white as a panel -
-     elevation there is carried by the shadow. On dark it is the only step
-     away from black, which is what makes it read as raised. */
+     menus, popovers, dialogs. */
   --surface-raised: #ffffff;
 
-  --border: #d2d2d7;
-  --border-strong: #c7c7cc;
+  --border: #f2f0ed;
+  --border-strong: #e8e3e7;
 
-  /* Not pure black. #1d1d1f is Apple's text colour and is what keeps a white
-     page from glaring at full contrast. */
-  --text: #1d1d1f;
-  --text-secondary: #6e6e73;
-  --text-muted: #86868b;
+  --text: #3d2a2f;
+  --text-secondary: #6b5c60;
+  --text-muted: #9e8e93;
   --text-inverse: #ffffff;
+  /* Two warm greys the design uses for chrome specifically: navigation
+     labels and breadcrumbs sit a step warmer than body copy. */
+  --text-nav: #5f5551;
+  --text-nav-strong: #4d4339;
+  --text-nav-muted: #8b7b73;
 
-  /* The one accent. Apple's action blue. */
-  --brand: #0071e3;
-  --brand-dark: #0077ed;
-  --brand-soft: #f0f6fe;
-  --brand-border: #b9dcff;
+  /* The one accent. */
+  --brand: #6b2d5c;
+  --brand-dark: #5a2550;
+  --brand-soft: #f7f1f6;
+  --brand-border: #e3cfdd;
 
   /* Confidence bands - the one place saturated colour carries meaning rather
      than decoration. Apple's system palette, which keeps them recognisable as
@@ -66,7 +70,7 @@
   --caution-bg: #fff8f1;
   --caution-border: #f7d6b3;
 
-  --focus-ring: #0071e3;
+  --focus-ring: #6b2d5c;
 
   /* Avatar shading. Three stops per surface (lit / base / shaded) is what
      gives the flat SVG its rounded look without a 3D renderer. Re-toned from
@@ -100,30 +104,36 @@
      #000 rather than a near-black is the point on an OLED panel - the pixels
      are off, and the single lifted surface is the only thing that lights. */
   --canvas: #000000;
-  --surface: #0b0b0d;
+  --surface: #0c0a0b;
   --surface-muted: #000000;
-  --surface-hover: #161618;
+  --surface-hover: #181416;
   --surface-sunken: #000000;
-  --surface-raised: #1c1c1e;
+  --surface-raised: #1d1a1c;
 
   /* Dimmer than the fills they separate. A hairline doing the work of a fill
      has to be visible, but at #38383a it was the brightest thing on a black
      page and every card read as an outlined box. */
-  --border: #212124;
-  --border-strong: #2e2e31;
+  --border: #241f22;
+  --border-strong: #332b2f;
 
-  /* Not pure white on pure black - that pairing buzzes at small sizes. */
-  --text: #f5f5f7;
-  --text-secondary: #a1a1a6;
-  --text-muted: #86868b;
-  --text-inverse: #000000;
+  /* Not pure white on pure black - that pairing buzzes at small sizes. The
+     warm cast of the light theme is kept, faintly, so the two themes read as
+     one product rather than two. */
+  --text: #f7f3f4;
+  --text-secondary: #a89da0;
+  --text-muted: #8b8085;
+  --text-inverse: #ffffff;
+  --text-nav: #b5a9ad;
+  --text-nav-strong: #d8cdd1;
+  --text-nav-muted: #8b8085;
 
-  /* Apple's blue lifts on dark rather than keeping the light-mode value,
-     which goes muddy against black. */
-  --brand: #2997ff;
-  --brand-dark: #0a84ff;
-  --brand-soft: #0b1c2e;
-  --brand-border: #1f4468;
+  /* The burgundy lifts on dark rather than keeping its light-mode value,
+     which goes to mud against black. Same hue, more light in it. There is no
+     dark design to match, so this is derived from the light palette. */
+  --brand: #c86aa8;
+  --brand-dark: #d882b8;
+  --brand-soft: #231020;
+  --brand-border: #4a2440;
 
   --band-moderate: #9be34f;
   --band-high: #30d158;
@@ -140,7 +150,7 @@
   --caution-bg: #241705;
   --caution-border: #4d360b;
 
-  --focus-ring: #2997ff;
+  --focus-ring: #c86aa8;
 
   /* The head stays light in dark mode - a dark face on a dark panel loses the
      eyes entirely - but the shading is pulled down so it doesn't glare. */
@@ -191,7 +201,10 @@
   --color-caution-bg: var(--caution-bg);
   --color-caution-border: var(--caution-border);
 
-  --font-sans: var(--font-geist-sans);
+  /* Outfit, the design's typeface, across the whole product - the landing
+     page already used it and the app now matches rather than changing face
+     at the door. */
+  --font-sans: var(--font-outfit);
   --font-mono: var(--font-geist-mono);
 }
 
