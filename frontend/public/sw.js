@@ -11,7 +11,9 @@
  * never cache API traffic, and always go to the network for pages.
  */
 
-const CACHE = "clardentity-shell-v1";
+// Bumping this name is how a deploy drops everything the last one cached:
+// `activate` deletes every cache that isn't this one.
+const CACHE = "clardentity-shell-v2";
 
 // Only things that are content-addressed or genuinely static. HTML is not
 // here on purpose - a stale shell is how a deployed fix fails to reach
@@ -49,19 +51,30 @@ self.addEventListener("fetch", (event) => {
   // users to whichever build they first opened.
   if (request.mode === "navigate") return;
 
-  // Everything else: cache first, since Next's static assets carry hashed
-  // filenames and a hit is always the right file.
+  const save = (response) => {
+    if (response.ok && response.type === "basic") {
+      const copy = response.clone();
+      caches.open(CACHE).then((cache) => cache.put(request, copy));
+    }
+    return response;
+  };
+
+  // Next's build output is content-addressed: the filename changes whenever
+  // the file does, so a hit is always the right file and cache-first is free.
+  if (url.pathname.startsWith("/_next/static/")) {
+    event.respondWith(caches.match(request).then((hit) => hit ?? fetch(request).then(save)));
+    return;
+  }
+
+  // Everything else we serve - the design's icons, the app icons, the
+  // manifest - keeps its name when its contents change, so cache-first would
+  // pin someone to the version they first loaded and never let go. Serve the
+  // cached copy for speed, then replace it in the background, so the change
+  // lands on the next visit instead of never.
   event.respondWith(
-    caches.match(request).then(
-      (hit) =>
-        hit ??
-        fetch(request).then((response) => {
-          if (response.ok && response.type === "basic") {
-            const copy = response.clone();
-            caches.open(CACHE).then((cache) => cache.put(request, copy));
-          }
-          return response;
-        }),
-    ),
+    caches.match(request).then((hit) => {
+      const fresh = fetch(request).then(save);
+      return hit ?? fresh;
+    }),
   );
 });
