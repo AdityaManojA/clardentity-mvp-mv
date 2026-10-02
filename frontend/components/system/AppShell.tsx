@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -17,6 +16,7 @@ import { ThemeToggle } from "@/components/system/ThemeToggle";
 import { ChatRowMenu } from "@/components/chat/ChatRowMenu";
 import { rememberWorkspace } from "@/lib/lastWorkspace";
 import { startTour, type TourId } from "@/lib/tour";
+import { MaskIcon } from "@/components/ui/MaskIcon";
 import { cx } from "@/components/ui/primitives";
 
 /* Sidebar collapse lives in a tiny external store read through
@@ -183,13 +183,7 @@ function RecentConversations({
                   : "text-[color:var(--text-nav)] hover:bg-surface-hover hover:text-ink",
               )}
             >
-              <Image
-                src="/ui/recent-dot.svg"
-                alt=""
-                width={12}
-                height={12}
-                className="block size-3 shrink-0"
-              />
+              <MaskIcon src="/ui/recent-dot.svg" size={12} />
               <span className="truncate">{c.title || "Untitled chat"}</span>
             </Link>
             {/* In the row rather than over it, so the title truncates earlier
@@ -256,7 +250,7 @@ function NavItem({
       )}
     >
       {iconSrc ? (
-        <Image src={iconSrc} alt="" width={24} height={24} className="block size-6 shrink-0" />
+        <MaskIcon src={iconSrc} size={24} />
       ) : (
         <Icon path={icon} className="h-6 w-6 shrink-0" />
       )}
@@ -540,13 +534,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         disabled={starting}
         className="mt-3 flex h-12 items-center gap-3 rounded-[9px] px-4 text-left text-[20px] text-[color:var(--text-nav)] transition-colors hover:bg-surface-hover hover:text-ink disabled:opacity-50"
       >
-        <Image
-          src="/ui/nav-newchat.svg"
-          alt=""
-          width={24}
-          height={24}
-          className="block size-6 shrink-0"
-        />
+        <MaskIcon src="/ui/nav-newchat.svg" size={24} />
         {starting ? "Starting…" : "New chat"}
       </button>
 
@@ -669,12 +657,9 @@ export function AppShell({ children }: { children: ReactNode }) {
               no rule under it: the sidebar's own right-hand border is the
               only line at this corner. */}
           <Link href="/" className="flex items-center gap-[3.7px]">
-            <Image
+            <MaskIcon
               src="/ui/logo-dots.svg"
-              alt=""
-              width={23}
-              height={22}
-              className="block h-[22.275px] w-[23.029px]"
+              className="h-[22.275px] w-[23.029px] text-brand"
             />
             <span className="text-[18.563px] text-ink">Clardentity</span>
           </Link>
@@ -843,12 +828,15 @@ function Breadcrumbs({
   // bare "Conversation" with no way back to the documents it is grounded in.
   if (root === "chat") {
     const ws = workspaces.find((w) => w.id === activeWorkspaceId);
-    crumbs.push({ label: "Workspaces", href: "/workspace" });
+    // Two crumbs, as drawn: the workspace this chat belongs to, then the
+    // chat. "Workspaces /" in front of them was a third level the design
+    // doesn't have, and the sidebar's picker is the way to the list anyway.
     if (ws) crumbs.push({ label: ws.name, href: `/workspace/${ws.id}` });
+    else crumbs.push({ label: "Workspaces", href: "/workspace" });
     // The chat page no longer has a title bar of its own, so this crumb is
-    // where the conversation is named. It falls back to the generic label
-    // until the title has been generated from the first exchange.
-    crumbs.push({ label: conversationTitle || "Conversation" });
+    // where the conversation is named. Until the title has been generated
+    // from the first exchange it reads the way the sidebar does.
+    crumbs.push({ label: conversationTitle || "New chat" });
     return <Crumbs crumbs={crumbs} />;
   }
 

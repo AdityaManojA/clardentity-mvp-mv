@@ -138,17 +138,11 @@ export function MessageList({
       // min-h-0 + overflow so this gives way, on a short screen, to a gate
       // card and the composer beneath it rather than pushing them off the
       // bottom - the same reason the thread itself scrolls.
-      <div className="flex min-h-0 flex-1 flex-col items-center justify-center overflow-y-auto px-4 py-16 sm:px-6">
-        {emptyStateAvatar}
-        <div className="mt-4 max-w-sm text-center">
-          <p className="text-sm font-medium text-ink">Start a chat</p>
-          <p className="mt-1 text-sm text-ink-muted">
-            Ask your question below. Change the cognitive mode above the box any
-            time. Every answer is broken into claims and checked against its
-            sources, so you can see what each part of it rests on.
-          </p>
-        </div>
-      </div>
+      // Empty, deliberately. The design puts nothing above the composer on a
+      // new chat - the rail and the box are the whole invitation, and a
+      // paragraph explaining them is a paragraph nobody reads twice. The
+      // space is kept so the composer below sits on the centre line.
+      <div className="min-h-0 flex-1" />
     );
   }
 

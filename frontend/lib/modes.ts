@@ -14,6 +14,8 @@
 export const COGNITIVE_MODES = [
   {
     value: "knowing",
+    /** The design's own mark for this companion, used by the mode rail. */
+    icon: "/ui/mode-finder.svg",
     // "Finder" (the client's name, after "Knowing", "Verified Knowing" and
     // "Tailored"): it goes and finds the answer - in your documents and on
     // the web - and every claim in it is checked against a source.
@@ -27,6 +29,8 @@ export const COGNITIVE_MODES = [
   },
   {
     value: "decision",
+    /** The design's own mark for this companion, used by the mode rail. */
+    icon: "/ui/mode-decision.svg",
     label: "Decision-making",
     companion: "Decision-making Companion",
     hint: "Make wise choices",
@@ -37,6 +41,8 @@ export const COGNITIVE_MODES = [
   },
   {
     value: "thinking",
+    /** The design's own mark for this companion, used by the mode rail. */
+    icon: "/ui/mode-thought.svg",
     // "Thought coach", per the client (was "Thinking-trainer").
     label: "Thought coach",
     companion: "Thought coach Companion",
@@ -48,6 +54,8 @@ export const COGNITIVE_MODES = [
   },
   {
     value: "learning",
+    /** The design's own mark for this companion, used by the mode rail. */
+    icon: "/ui/mode-learning.svg",
     label: "Learning",
     companion: "Learning Companion",
     hint: "Expand your knowledge and skills",
@@ -58,6 +66,8 @@ export const COGNITIVE_MODES = [
   },
   {
     value: "creative",
+    /** The design's own mark for this companion, used by the mode rail. */
+    icon: "/ui/mode-cocreative.svg",
     // "Co-Creative": it works *with* you on a document, it doesn't produce
     // one unasked - the client's preferred framing over plain "Creative".
     label: "Co-Creative",
@@ -70,6 +80,8 @@ export const COGNITIVE_MODES = [
   },
   {
     value: "mentoring",
+    /** The design's own mark for this companion, used by the mode rail. */
+    icon: "/ui/mode-mentoring.svg",
     label: "Mentoring",
     companion: "Mentoring Companion",
     hint: "Get guided toward a goal",
@@ -80,6 +92,8 @@ export const COGNITIVE_MODES = [
   },
   {
     value: "therapy",
+    /** The design's own mark for this companion, used by the mode rail. */
+    icon: "/ui/mode-reflect.svg",
     // Renamed from "Psycho-Therapy" - that word, and "counselling", read as a
     // claim to a clinical service this product doesn't provide and isn't
     // licensed for. The mode itself is unchanged; only the naming is.
@@ -93,6 +107,8 @@ export const COGNITIVE_MODES = [
   },
   {
     value: "legal",
+    /** The design's own mark for this companion, used by the mode rail. */
+    icon: "/ui/mode-legal.svg",
     // "Legal", not "Legal Companion": no other pill carries the word.
     label: "Legal",
     companion: "Legal Companion",

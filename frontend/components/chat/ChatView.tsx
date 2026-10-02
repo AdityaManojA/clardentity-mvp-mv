@@ -914,9 +914,11 @@ export function ChatView({ conversationId }: { conversationId: string }) {
       <div
         className={cx(
           "mx-auto flex w-full min-h-0 flex-1 flex-col px-4 sm:px-6",
-          // The carousel needs the width its neighbours are peeking into; a
-          // 3xl column would clip them off the sides of the screen.
-          showCarousel ? "max-w-6xl" : "max-w-3xl",
+          // 925px of content plus the 24px gutters: the width the design
+          // gives the composer, and so the width of the thread above it.
+          // The carousel is the exception - it needs the width its
+          // neighbours are peeking into, or they are clipped off the screen.
+          showCarousel ? "max-w-6xl" : "max-w-[973px]",
         )}
       >
         {multiMode && (
@@ -1135,21 +1137,18 @@ export function ChatView({ conversationId }: { conversationId: string }) {
           </div>
         )}
 
-        <div className="shrink-0 space-y-2 border-t border-hairline py-3 sm:space-y-3 sm:py-4">
+        {/* The composer column: 925px, centred, the rail 8px above the card -
+            the design's measurements. No rule above it; on this canvas the
+            card's own shadow is the separation. */}
+        <div className="mx-auto w-full max-w-[925px] shrink-0 space-y-2 py-3 sm:py-4">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
             {/* Once there are messages the companion moves down here, beside
                 the controls it reacts to. While the chat is empty it is the
                 centrepiece above instead, and showing it twice would just be
                 two of the same thing on one screen. */}
-            {messages.length > 0 && (
-              <AvatarPanel
-                state={avatarState}
-                gesture={avatarGesture}
-                expression={avatarExpression}
-                className="h-11 w-11 shrink-0"
-                tourId="companion"
-              />
-            )}
+            {/* The companion is not beside the composer in the design - the
+                rail spans the full width there. It stays in the thread, where
+                it reacts to the answer it is reacting to. */}
             {/* flex-1 so the unselected state - which renders all four modes
                 as cards - gets the full row instead of shrink-wrapping next
                 to the avatar. */}
@@ -1169,21 +1168,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
                 }}
               />
             </div>
-            {mode && (
-              <button
-                type="button"
-                data-tour="switching-toggle"
-                onClick={() => setSmartSwitching(!smartSwitching)}
-                title={
-                  smartSwitching
-                    ? "Smart: a question that fits another mode better is answered there automatically, with a way back. Click for manual."
-                    : "Manual: the mode is whatever you pick; it never switches. Click for smart."
-                }
-                className="shrink-0 rounded-md px-2 py-1 text-[11px] text-ink-muted transition-colors hover:bg-surface-hover hover:text-ink"
-              >
-                Switching: {smartSwitching ? "Smart" : "Manual"}
-              </button>
-            )}
+
           </div>
           {switchedFrom && !switchToast && mode === switchedFrom.to && (
             <div className="flex flex-wrap items-center gap-2 rounded-lg border border-brand-border bg-brand-soft px-3 py-1.5 text-xs text-ink-secondary">
@@ -1247,8 +1232,39 @@ export function ChatView({ conversationId }: { conversationId: string }) {
             onStartCall={mode ? () => setCallOpen(true) : undefined}
             isGenerating={sending}
             onStop={handleStop}
+            trailing={
+              mode ? (
+                // Not drawn in the design, and not droppable either: smart
+                // switching is a feature with a promise attached, and a
+                // promise the user cannot see the state of is worse than no
+                // promise. It sits with the model chip, which is the other
+                // control describing how an answer gets made.
+                <button
+                  type="button"
+                  data-tour="switching-toggle"
+                  onClick={() => setSmartSwitching(!smartSwitching)}
+                  title={
+                    smartSwitching
+                      ? "Smart: a question that fits another mode better is answered there automatically, with a way back. Click for manual."
+                      : "Manual: the mode is whatever you pick; it never switches. Click for smart."
+                  }
+                  className="shrink-0 rounded-md px-2 py-1 text-[13px] text-ink-muted transition-colors hover:bg-surface-hover hover:text-ink"
+                >
+                  <span className="hidden sm:inline">Switching: </span>
+                  {smartSwitching ? "Smart" : "Manual"}
+                </button>
+              ) : undefined
+            }
           />
         </div>
+        {/* On a new chat the design does not sit the composer on the floor:
+            the rail and the box are centred in the space under the topbar,
+            with the empty message list as the spacer above and this one
+            below. Once there are messages the list takes the room back and
+            the composer settles to the bottom, where it belongs. */}
+        {messages.length === 0 && !streaming && !sending && !loadingHistory && (
+          <div className="min-h-0 flex-1" />
+        )}
         <UpgradeDialog open={upsell !== null} trigger={upsell} onClose={() => setUpsell(null)} />
       </div>
     </div>

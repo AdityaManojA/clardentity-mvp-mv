@@ -1,10 +1,18 @@
 "use client";
 
-import { useEffect, useRef, useState, type KeyboardEvent, type RefObject } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type ReactNode,
+  type RefObject,
+} from "react";
 import { autocorrectSupported, fixAtBoundary, loadSpeller, type Fix, type Speller } from "@/lib/autocorrect";
 import { apiFetch } from "@/lib/apiClient";
 import { AudioRecorder } from "@/components/upload/AudioRecorder";
 import { ModelPicker } from "@/components/chat/ModelPicker";
+import { MaskIcon } from "@/components/ui/MaskIcon";
 import { cx } from "@/components/ui/primitives";
 import { useTouchKeyboard } from "@/lib/useTouchKeyboard";
 import { track } from "@/lib/analytics";
@@ -77,6 +85,7 @@ export function MessageInput({
   onTypingChange,
   textareaRef,
   onStartCall,
+  trailing,
   isGenerating,
   onStop,
 }: {
@@ -90,6 +99,10 @@ export function MessageInput({
   /** Owned by the conversation, not the composer: a finished call has to be
    *  saved into the thread, and the composer doesn't know which thread. */
   onStartCall?: () => void;
+  /** Rendered in the foot of the card, beside the model chip. The design puts
+   *  the controls that describe *how* the answer is produced there, which is
+   *  where switching belongs now that the rail spans the full width. */
+  trailing?: ReactNode;
   /** True while an answer is being generated - swaps the send button for a
    *  stop control instead of just greying it out, so cutting a slow or
    *  unwanted answer off doesn't mean waiting it out. */
@@ -359,7 +372,12 @@ export function MessageInput({
           caret is the indicator. */}
       <div
         data-tour="composer"
-        className="flex flex-col gap-1.5 rounded-xl border border-hairline-strong bg-surface-raised p-2 sm:flex-row sm:items-end sm:gap-2"
+        // The design's composer: one tall white card, 20px radius, a hairline
+        // and a shadow stacked from five barely-there layers, with the
+        // question on top and the controls along the foot. Not a row - the
+        // text gets the full width at every size, which is what the old
+        // side-by-side arrangement could not give it on a phone.
+        className="flex min-h-[124px] flex-col rounded-[20px] border border-[color:var(--border)] bg-surface-raised p-0 shadow-[0px_697px_195px_0px_rgba(0,0,0,0),0px_446px_178px_0px_rgba(0,0,0,0.01),0px_251px_150px_0px_rgba(0,0,0,0.03),0px_111px_111px_0px_rgba(0,0,0,0.04),0px_28px_61px_0px_rgba(0,0,0,0.05)]"
       >
         {/* On a phone the five controls and the textarea competed for one
             390px row, and the textarea lost - "Ask a question..." wrapped
@@ -368,69 +386,23 @@ export function MessageInput({
             underneath. `sm:contents` dissolves this wrapper from the small
             breakpoint up, so the desktop layout is still one flat flex row
             rather than a nested one that would align differently. */}
-        <div className="order-2 flex items-center gap-1 sm:contents">
-          <ModelPicker disabled={disabled} />
-
-          <AudioRecorder
+        {/* The foot of the card, as drawn: the paperclip alone on the left,
+            and on the right the chip that says how the answer is made, then
+            the voice controls, then the send disc. Everything in it is 32px
+            tall so the whole row centres 31px above the card's bottom edge,
+            which is where the design puts it. */}
+        <div className="order-2 flex items-center px-[27px] pb-[15px]">
+          <button
+            type="button"
+            data-tour="attach-image"
+            onClick={() => fileInputRef.current?.click()}
             disabled={disabled}
-            onTranscribed={(text) => {
-              track("voice_recorded", { words: text.trim().split(/\s+/).length });
-              handleChange((value ? value + " " : "") + text);
-            }}
-          />
-
-        {/* Next to the mic, because they are the same intention at two
-            lengths: dictate one message, or have a conversation. */}
-        <button
-          type="button"
-          data-tour="live-call"
-          onClick={() => {
-            track("call_started");
-            onStartCall?.();
-          }}
-          disabled={disabled || !onStartCall}
-          title="Start a live call"
-          aria-label="Start a live call"
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-surface-hover hover:text-brand disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.75"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-            className="h-4 w-4"
+            title="Attach a file or image"
+            aria-label="Attach a file or image"
+            className="-ml-1.5 flex size-8 shrink-0 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-surface-hover hover:text-brand disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {/* A waveform inside a call bubble: speech, live. */}
-            <path d="M21 15.5v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 1.1 2.8 2 2 0 0 1 3.1 1h3a2 2 0 0 1 2 1.7c.1 1 .3 1.9.7 2.8a2 2 0 0 1-.5 2.1L7.1 8.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z" />
-            <path d="M16 3v4M19.5 1.5v7M13 4.5v1" />
-          </svg>
-        </button>
-
-        <button
-          type="button"
-          data-tour="attach-image"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={disabled}
-          title="Attach a file or image"
-          aria-label="Attach a file or image"
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-surface-hover hover:text-brand disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.75"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-            className="h-4 w-4"
-          >
-            <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
-          </svg>
-        </button>
+            <MaskIcon src="/ui/composer-paperclip.svg" className="size-5" />
+          </button>
           <input
             ref={fileInputRef}
             type="file"
@@ -440,43 +412,94 @@ export function MessageInput({
             className="hidden"
           />
 
+          <div className="ml-auto flex min-w-0 items-center gap-1">
+            <ModelPicker disabled={disabled} />
+            {trailing}
 
-          {/* Pushed to the right edge of the control row on mobile; on
-              desktop `sm:contents` has removed this wrapper, so the margin
-              would misalign it against the textarea - hence sm:ml-0.
+            {/* Next to the mic, because they are the same intention at two
+                lengths: dictate one message, or have a conversation. */}
+            <button
+              type="button"
+              data-tour="live-call"
+              onClick={() => {
+                track("call_started");
+                onStartCall?.();
+              }}
+              disabled={disabled || !onStartCall}
+              title="Start a live call"
+              aria-label="Start a live call"
+              className="flex size-8 shrink-0 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-surface-hover hover:text-brand disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+                className="size-5"
+              >
+                {/* A waveform inside a call bubble: speech, live. */}
+                <path d="M21 15.5v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 1.1 2.8 2 2 0 0 1 3.1 1h3a2 2 0 0 1 2 1.7c.1 1 .3 1.9.7 2.8a2 2 0 0 1-.5 2.1L7.1 8.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z" />
+                <path d="M16 3v4M19.5 1.5v7M13 4.5v1" />
+              </svg>
+            </button>
 
-              While generating this becomes a stop control rather than a
-              disabled "Ask" - the answer might be slow, wrong-mode, or just
-              no longer wanted, and waiting it out was the only option
-              before. */}
-          <button
-            type="button"
-            data-tour="ask-button"
-            onClick={isGenerating ? onStop : handleSend}
-            disabled={isGenerating ? !onStop : disabled || !value.trim()}
-            className={cx(
-              "ml-auto flex h-9 shrink-0 items-center gap-1.5 rounded-lg px-3.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 sm:order-last sm:ml-0",
-              isGenerating
-                ? "bg-surface-sunken text-ink hover:bg-surface-hover"
-                : "bg-brand text-white hover:bg-brand-dark",
-            )}
-          >
-            {isGenerating ? (
-              <>
+            <AudioRecorder
+              disabled={disabled}
+              onTranscribed={(text) => {
+                track("voice_recorded", { words: text.trim().split(/\s+/).length });
+                handleChange((value ? value + " " : "") + text);
+              }}
+            />
+
+            {/* While generating this becomes a stop control rather than a
+                disabled "Ask" - the answer might be slow, wrong-mode, or just
+                no longer wanted, and waiting it out was the only option
+                before. */}
+            <button
+              type="button"
+              data-tour="ask-button"
+              onClick={isGenerating ? onStop : handleSend}
+              disabled={isGenerating ? !onStop : disabled || !value.trim()}
+              // A 32px burgundy disc at the end of the row, as drawn. It keeps
+              // its accessible name - the circle alone says nothing to a screen
+              // reader - and still becomes a stop control mid-answer.
+              aria-label={isGenerating ? "Stop generating" : "Ask"}
+              className={cx(
+                "-mr-[5px] flex size-8 shrink-0 items-center justify-center rounded-full transition-colors disabled:cursor-not-allowed",
+                isGenerating
+                  ? "bg-surface-sunken text-ink hover:bg-surface-hover"
+                  : "bg-brand text-white hover:bg-brand-dark disabled:hover:bg-brand",
+              )}
+            >
+              {isGenerating ? (
                 <StopIcon />
-                Stop
-              </>
-            ) : (
-              // "Ask", not "Send". Send is what you do to a message; this is
-              // a product where every mode is framed as a question and the
-              // whole value is in the answer coming back. "Submit" is form
-              // language - it belongs on a tax return.
-              "Ask"
-            )}
-          </button>
+              ) : value.trim() ? (
+                // The design draws two faces of this button: the keypad while
+                // the box is empty, and an arrow the moment there is something
+                // to send. The arrow is the one that means "ask this".
+                <svg
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                  className="block size-5"
+                >
+                  <path d="M10 16V4.5M4.6 9.9 10 4.5l5.4 5.4" />
+                </svg>
+              ) : (
+                <MaskIcon src="/ui/composer-send.svg" className="size-5" />
+              )}
+            </button>
+          </div>
         </div>
 
-        <div className="relative order-1 w-full flex-1">
+        <div className="relative order-1 w-full flex-1 px-[27px] pt-[26px]">
           {/* The ghost layer: the typed text invisibly, so the suggestion
               lands exactly where the caret is, then the suggestion in grey.
               Same box, font and padding as the textarea; scroll kept in
@@ -485,7 +508,7 @@ export function MessageInput({
             <div
               ref={mirrorRef}
               aria-hidden="true"
-              className="pointer-events-none absolute inset-0 overflow-hidden whitespace-pre-wrap break-words px-1 py-2 text-sm leading-relaxed"
+              className="pointer-events-none absolute inset-0 overflow-hidden whitespace-pre-wrap break-words px-[27px] pt-[26px] text-[20px] leading-[normal]"
             >
               <span className="invisible">{value}</span>
               <span className="text-ink-muted">{ghostVisible}</span>
@@ -500,7 +523,10 @@ export function MessageInput({
           value={value}
           onChange={(e) => handleChange(e.target.value)}
           onKeyDown={handleKeyDown}
-          rows={2}
+          // One row, not two: the card's own 124px floor is what gives the
+          // box its height, and asking for a second row made it taller than
+          // the design before a word was typed.
+          rows={1}
           disabled={disabled}
           // Explicit, not left to the browser default: the built-in spelling
           // and (in Chromium/Safari) grammar check is the free Grammarly tier
@@ -513,17 +539,24 @@ export function MessageInput({
               ? disabledReason ?? "Select a mode to start typing"
               : "Ask a question…"
           }
-          className="relative w-full resize-none bg-transparent px-1 py-2 text-sm leading-relaxed text-ink placeholder:text-ink-muted focus:outline-none disabled:cursor-not-allowed"
+          title={
+            touchKeyboard
+              ? "Enter starts a new line - tap the arrow to send"
+              : "Enter to ask, Shift+Enter for a new line"
+          }
+          className="relative w-full resize-none bg-transparent p-0 text-[20px] leading-[normal] text-ink placeholder:text-ink-muted focus:outline-none disabled:cursor-not-allowed"
         />
         </div>
       </div>
       {disabled && disabledReason && (
         <p className="text-xs text-ink-muted">{disabledReason}</p>
       )}
-      {/* The keyboard hint left the placeholder, where it cost two of the
-          three visible lines on a phone to explain a chord that phone has no
-          way to type. Kept for pointer devices, where it is discoverable and
-          free. */}
+      {/* No standing keyboard hint under the card - the design puts nothing
+          there, and a line of grey type that never changes stops being read
+          after the first visit. It lives on the box's own tooltip instead,
+          which is where someone who wonders goes looking. The box still
+          speaks up when it has something to say: a suggestion to take, or a
+          word it has just corrected. */}
       {ghostVisible ? (
         <p className="flex items-center gap-2 text-[11px] text-ink-muted" aria-live="polite">
           <span className="truncate">
@@ -551,15 +584,7 @@ export function MessageInput({
             Undo
           </button>
         </p>
-      ) : (
-        !disabled && (
-          <p className={cx("text-[11px] text-ink-muted", touchKeyboard ? "block" : "hidden sm:block")}>
-            {touchKeyboard
-              ? "Enter starts a new line - tap Ask to send"
-              : "Enter to ask, Shift+Enter for a new line"}
-          </p>
-        )
-      )}
+      ) : null}
     </div>
   );
 }

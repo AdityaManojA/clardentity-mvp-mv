@@ -2,9 +2,10 @@
 
 import { useEffect, useRef } from "react";
 
-import { COGNITIVE_MODES, MODE_BY_VALUE, type CognitiveMode } from "@/lib/modes";
+import { COGNITIVE_MODES, type CognitiveMode } from "@/lib/modes";
 import { useLockedModes } from "@/lib/previewAccess";
 import { companionLabel, useCompanionNames } from "@/lib/companionNames";
+import { MaskIcon } from "@/components/ui/MaskIcon";
 import { cx } from "@/components/ui/primitives";
 
 export { COGNITIVE_MODES };
@@ -108,17 +109,17 @@ export function ModeSelector({
     // min-w-0 so the pill row can shrink inside the flex parent instead of
     // forcing it wider; without it a 320px screen pushes the avatar beside it
     // onto its own line, or off the edge entirely.
-    <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1.5">
+    <div className="flex w-full min-w-0 flex-col gap-1.5">
       <div
         ref={stripRef}
         role="radiogroup"
         aria-label="Cognitive mode"
         data-tour="mode-picker"
-        // Four pills already fill 375px edge to edge. Rather than wrap them
-        // into a ragged second row or shrink the text below legibility, the
-        // row scrolls: every mode stays one tap away and the control keeps
-        // its shape at any width.
-        className="scroll-slim inline-flex max-w-full overflow-x-auto rounded-lg border border-hairline-strong bg-surface-muted p-0.5"
+        // The design's rail: eight separate cards spread across the width of
+        // the composer below, each a 20px mark above a 16px name. Below that
+        // width it scrolls rather than wrapping into a ragged second row -
+        // every companion stays one tap away and the rail keeps its shape.
+        className="scroll-slim flex w-full max-w-full items-stretch justify-between gap-1 overflow-x-auto"
       >
         {COGNITIVE_MODES.map((mode) => {
           const selected = value === mode.value;
@@ -135,22 +136,26 @@ export function ModeSelector({
               onClick={() => (comingSoon ? onLocked?.(mode.value) : onChange(mode.value))}
               title={comingSoon ? `${mode.when} (included in a paid plan)` : mode.when}
               className={cx(
-                "shrink-0 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 sm:px-3",
+                "flex shrink-0 flex-col items-center justify-center gap-[2px] rounded-[8px] border bg-surface px-3 py-1 text-[16px] leading-[normal] transition-colors disabled:cursor-not-allowed disabled:opacity-50",
                 comingSoon && "opacity-60",
+                // The design draws every card the same; selection is the one
+                // state it leaves to us, so it is the brand on the border and
+                // the label rather than a filled pill, which would shout over
+                // a rail of eight.
                 selected
-                  ? "bg-brand text-white"
-                  : "text-ink-secondary hover:bg-surface-hover hover:text-ink",
+                  ? "border-brand-border text-brand"
+                  : "border-[color:var(--border)] text-ink-secondary hover:border-hairline-strong hover:text-ink",
               )}
             >
-              {companionLabel(names, mode.value, mode.label)}
+              <MaskIcon src={mode.icon} className="size-5" />
+              <span className="whitespace-nowrap">
+                {companionLabel(names, mode.value, mode.label)}
+              </span>
             </button>
           );
         })}
       </div>
-      {/* The one-line promise under the strip. Not on phones: the pill
-          already names the mode, and on a 760px screen this line was one of
-          the things pushing the thread down to a third of the height. */}
-      <p className="hidden text-xs text-ink-muted sm:block">{MODE_BY_VALUE[value]?.hint}</p>
+
     </div>
   );
 }

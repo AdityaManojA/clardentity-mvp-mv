@@ -61,24 +61,6 @@ const MODELS: Model[] = [
   },
 ];
 
-function ChipIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.75"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      className={className}
-    >
-      <rect x="7" y="7" width="10" height="10" rx="2" />
-      <path d="M9 3v2M15 3v2M9 19v2M15 19v2M3 9h2M3 15h2M19 9h2M19 15h2" />
-    </svg>
-  );
-}
-
 /** A gem, not a padlock: a locked model is a plan you can move to, and the
  *  same mark sits on the Upgrade item in the sidebar, so the two read as
  *  the same thing. A lock said "no"; this says "with a plan". */
@@ -140,9 +122,19 @@ export function ModelPicker({ disabled }: { disabled?: boolean }) {
           aria-expanded={open}
           title={`Model: ${current.label}`}
           aria-label={`Model: ${current.label}. Change model.`}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-surface-hover hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
+          // The design labels this rather than drawing a chip: the model's
+          // name, a dot, and the plan it comes with. A silent icon on the foot
+          // of the composer told nobody which model was answering.
+          className="flex h-8 shrink-0 items-center gap-0.5 rounded-lg px-1.5 text-[16px] leading-[normal] transition-colors hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <ChipIcon className="h-4 w-4" />
+          <span className="text-ink">{current.label}</span>
+          {/* The plan is the first thing to go on a phone: the row has six
+              controls to fit into 289px there, and the model's name is the
+              half of this chip that changes. */}
+          <span aria-hidden="true" className="hidden size-3 items-center justify-center sm:flex">
+            <span className="size-1 rounded-full bg-ink-muted" />
+          </span>
+          <span className="hidden text-ink-muted sm:inline">Free</span>
         </button>
 
         {open && (
