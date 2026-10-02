@@ -5,7 +5,7 @@ import { apiFetch } from "@/lib/apiClient";
 import { authErrorMessage } from "@/lib/auth";
 import { DocumentUploader } from "@/components/upload/DocumentUploader";
 import { AttachmentSearch } from "@/components/workspace/AttachmentSearch";
-import { Card, PageHeader, Spinner } from "@/components/ui/primitives";
+import { Spinner } from "@/components/ui/primitives";
 
 type Workspace = { id: string; name: string };
 
@@ -46,18 +46,19 @@ export function WorkspaceDocuments({ workspaceId }: { workspaceId: string }) {
   }
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6">
-      <PageHeader
-        title="Attachments"
-        description={`Added to ${workspace.name}. Answers in this workspace cite these directly.`}
+    // The same frame as the rest of the design's pages: a 1441px page with
+    // 140px gutters at the size it was drawn at.
+    <div className="mx-auto w-full max-w-[1441px] px-5 pb-16 pt-[69px] sm:px-10 xl:px-[140px]">
+      <DocumentUploader
+        workspaceId={workspaceId}
+        description={`Files added to ${workspace.name} for use across chats.`}
       />
-      <Card>
-        <DocumentUploader workspaceId={workspaceId} />
-      </Card>
 
-      <Card className="mt-5">
+      {/* Not in the design, and not droppable: finding the line you half
+          remember inside a document is the reason to have put it here. */}
+      <div className="mt-12 border-t border-hairline pt-8">
         <AttachmentSearch workspaceId={workspaceId} />
-      </Card>
+      </div>
     </div>
   );
 }

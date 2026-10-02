@@ -41,11 +41,17 @@ export function AspectList({
   onAdd,
   onRemove,
   busy,
+  adding,
+  onAddingChange,
 }: {
   aspects: Aspect[];
   onAdd: (label: string, value: string) => Promise<void>;
   onRemove: (id: string) => Promise<void>;
   busy?: boolean;
+  /** The design puts "Add Aspect" in the section header, so the form it
+   *  opens is controlled from outside this list. */
+  adding?: boolean;
+  onAddingChange?: (open: boolean) => void;
 }) {
   const [label, setLabel] = useState("");
   const [customLabel, setCustomLabel] = useState("");
@@ -86,98 +92,109 @@ export function AspectList({
   const available = SUGGESTED_LABELS.filter((l) => !taken.has(l.toLowerCase()));
 
   return (
-    <div className="space-y-3">
-      {aspects.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-hairline-strong bg-surface-muted px-4 py-6 text-center text-sm text-ink-muted">
-          Nothing here yet. This fills in as you use Clardentity, and you can
-          add anything you want it to know below.
+    <div>
+      {aspects.length === 0 && !adding ? (
+        <p className="text-[20px] leading-[normal] text-ink-secondary">
+          Nothing here yet. This fills in as you use Clardentity, and Add
+          Aspect puts in anything you want it to know from the start.
         </p>
       ) : (
-        <ul className="divide-y divide-hairline overflow-hidden rounded-lg border border-hairline">
+        // The design's rows: the fact's name, the fact underneath, and the
+        // cross that removes it at the right end of the first line.
+        <ul className="space-y-5">
           {aspects.map((aspect) => (
-            <li
-              key={aspect.id}
-              className="group/aspect flex items-start gap-3 bg-surface px-3 py-2.5"
-            >
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-xs font-semibold text-ink">{aspect.label}</span>
+            <li key={aspect.id}>
+              <div className="flex items-start gap-3">
+                <span className="flex min-w-0 flex-1 flex-wrap items-center gap-2 text-[20px] font-medium leading-[normal] text-ink">
+                  {aspect.label}
                   {aspect.source === "user" && <Badge tone="brand">yours</Badge>}
-                </div>
-                <p className="mt-0.5 text-sm leading-relaxed text-ink-secondary">
-                  {aspect.value}
-                </p>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => handleRemove(aspect.id)}
+                  disabled={removingId === aspect.id}
+                  aria-label={`Remove ${aspect.label}`}
+                  title="Remove"
+                  className="shrink-0 rounded p-0.5 text-ink-secondary transition-colors hover:text-band-low"
+                >
+                  {removingId === aspect.id ? (
+                    <Spinner className="size-5" />
+                  ) : (
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      aria-hidden="true"
+                      className="block size-6"
+                    >
+                      <path d="M18 6 6 18M6 6l12 12" />
+                    </svg>
+                  )}
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => handleRemove(aspect.id)}
-                disabled={removingId === aspect.id}
-                aria-label={`Remove ${aspect.label}`}
-                title="Remove"
-                className="shrink-0 rounded-md p-1 text-ink-muted opacity-0 transition-opacity hover:bg-surface-hover hover:text-band-low focus-visible:opacity-100 group-hover/aspect:opacity-100"
-              >
-                {removingId === aspect.id ? (
-                  <Spinner className="h-3.5 w-3.5" />
-                ) : (
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    aria-hidden="true"
-                    className="h-3.5 w-3.5"
-                  >
-                    <path d="M18 6 6 18M6 6l12 12" />
-                  </svg>
-                )}
-              </button>
+              <p className="mt-1 text-[20px] leading-[normal] text-ink-secondary">
+                {aspect.value}
+              </p>
             </li>
           ))}
         </ul>
       )}
 
-      <form onSubmit={handleAdd} className="flex flex-wrap items-center gap-2">
-        <select
-          value={label}
-          onChange={(event) => setLabel(event.target.value)}
-          aria-label="Aspect"
-          className="h-9 rounded-lg border border-hairline-strong bg-surface px-2 text-sm text-ink transition-colors hover:border-brand-border focus:border-brand"
+      {adding && (
+        <form
+          onSubmit={handleAdd}
+          className="mt-8 flex flex-wrap items-center gap-2 rounded-[12px] border border-hairline p-4"
         >
-          <option value="">Add an aspect…</option>
-          {available.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-          <option value={CUSTOM}>Something else…</option>
-        </select>
+          <select
+            value={label}
+            onChange={(event) => setLabel(event.target.value)}
+            aria-label="Aspect"
+            className="h-10 rounded-lg border border-hairline-strong bg-surface px-2 text-sm text-ink transition-colors hover:border-brand-border focus:border-brand"
+          >
+            <option value="">What kind of thing?</option>
+            {available.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+            <option value={CUSTOM}>Something else…</option>
+          </select>
 
-        {usingCustom && (
-          <Input
-            value={customLabel}
-            onChange={(event) => setCustomLabel(event.target.value)}
-            placeholder="Label"
-            aria-label="Custom aspect label"
-            className="w-36"
-          />
-        )}
-
-        {label && (
-          <>
+          {usingCustom && (
             <Input
-              value={value}
-              onChange={(event) => setValue(event.target.value)}
-              placeholder="What should it know?"
-              aria-label="Aspect value"
-              className="min-w-48 flex-1"
+              value={customLabel}
+              onChange={(event) => setCustomLabel(event.target.value)}
+              placeholder="Label"
+              aria-label="Custom aspect label"
+              className="w-36"
             />
-            <Button type="submit" variant="primary" disabled={!canSubmit}>
-              {saving ? <Spinner className="h-4 w-4" /> : "Add"}
-            </Button>
-          </>
-        )}
-      </form>
+          )}
+
+          {label && (
+            <>
+              <Input
+                value={value}
+                onChange={(event) => setValue(event.target.value)}
+                placeholder="What should it know?"
+                aria-label="Aspect value"
+                className="min-w-48 flex-1"
+              />
+              <Button type="submit" variant="primary" disabled={!canSubmit}>
+                {saving ? <Spinner className="h-4 w-4" /> : "Add"}
+              </Button>
+            </>
+          )}
+          <button
+            type="button"
+            onClick={() => onAddingChange?.(false)}
+            className="text-sm text-ink-secondary transition-colors hover:text-ink"
+          >
+            Cancel
+          </button>
+        </form>
+      )}
     </div>
   );
 }

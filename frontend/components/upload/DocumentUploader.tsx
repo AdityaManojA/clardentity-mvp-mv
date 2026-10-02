@@ -17,7 +17,19 @@ type DocumentItem = {
 
 const POLL_INTERVAL_MS = 2000;
 
-export function DocumentUploader({ workspaceId }: { workspaceId: string }) {
+/** The attachments page's body: the title row with its Upload button, and
+ *  the grid of what is in the workspace.
+ *
+ *  The header lives here rather than in the page above because the button in
+ *  it is this component's file input - the upload state (the spinner, the
+ *  error) belongs to the same place as the control that starts it. */
+export function DocumentUploader({
+  workspaceId,
+  description,
+}: {
+  workspaceId: string;
+  description: string;
+}) {
   const [documents, setDocuments] = useState<DocumentItem[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -104,57 +116,114 @@ export function DocumentUploader({ workspaceId }: { workspaceId: string }) {
   }
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center gap-2">
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept={DOCUMENT_ACCEPT}
-          onChange={handleFileSelected}
-          disabled={uploading}
-          aria-label="Upload a document"
-          className="w-full text-xs text-ink-muted file:mr-3 file:cursor-pointer file:rounded-lg file:border-0 file:bg-brand file:px-3 file:py-2 file:text-xs file:font-medium file:text-white hover:file:bg-brand-dark disabled:opacity-60"
-        />
-        {uploading && <Spinner className="shrink-0 text-ink-muted" />}
+    <>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-[32px] font-medium leading-[normal] text-ink">Attachments</h1>
+          <p className="text-[20px] leading-[normal] text-ink-secondary">{description}</p>
+        </div>
+        <div className="flex shrink-0 items-center gap-3">
+          {uploading && <Spinner className="text-ink-muted" />}
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+            className="flex h-[42px] items-center gap-1 rounded-[34px] bg-brand px-3 py-2 text-[20px] leading-[normal] text-white transition-colors hover:bg-brand-dark disabled:opacity-60"
+          >
+            {uploading ? "Uploading…" : "Upload"}
+            <svg
+              viewBox="0 0 20 20"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              className="block size-5"
+            >
+              <path d="M10 12.5V3.6M6.6 7 10 3.6 13.4 7" />
+              <path d="M3.5 12.2v2.6a1.6 1.6 0 0 0 1.6 1.6h9.8a1.6 1.6 0 0 0 1.6-1.6v-2.6" />
+            </svg>
+          </button>
+        </div>
       </div>
 
-      {error && <p className="text-xs text-band-low">{error}</p>}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept={DOCUMENT_ACCEPT}
+        onChange={handleFileSelected}
+        disabled={uploading}
+        aria-label="Upload a document"
+        className="hidden"
+      />
 
-      {documents && documents.length > 0 && (
-        <ul className="space-y-1.5">
+      {error && <p className="mt-4 text-sm text-band-low">{error}</p>}
+
+      {documents === null ? (
+        <div className="flex justify-center py-16">
+          <Spinner className="text-ink-muted" />
+        </div>
+      ) : documents.length === 0 ? (
+        <p className="mt-10 text-[20px] leading-[normal] text-ink-secondary">
+          Nothing attached yet. What you upload here is read once and then
+          available to every chat in this workspace.
+        </p>
+      ) : (
+        // The design draws this as a wall of tiles. Ours carry what a tile
+        // of a document can actually say: what kind of file it is, what it
+        // is called, and whether it has been read yet.
+        <ul className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {documents.map((doc) => (
             <li
               key={doc.id}
-              className="flex items-center justify-between gap-2 rounded-lg border border-hairline bg-surface-muted px-3 py-2"
+              // The design's tiles are a shade off the canvas with no border.
+              // surface-sunken is the canvas itself in this palette, so they
+              // were invisible; the hover wash is the one fill in the system
+              // that is a step away from the background in both themes.
+              className="group/tile relative flex h-[145px] flex-col justify-between rounded-[12px] bg-surface-hover p-4 transition-shadow hover:ring-1 hover:ring-hairline-strong"
             >
-              <span className="truncate text-xs text-ink">{doc.filename}</span>
-              <div className="flex shrink-0 items-center gap-1.5">
-                <StatusBadge status={doc.status} />
-                <button
-                  type="button"
-                  onClick={() => handleDelete(doc.id)}
-                  className="rounded p-0.5 text-ink-muted transition-colors hover:text-band-low"
-                  aria-label={`Delete ${doc.filename}`}
+              <span className="text-[12px] font-medium uppercase tracking-wide text-ink-muted">
+                {extensionOf(doc.filename) || doc.file_type || "file"}
+              </span>
+              <span className="min-w-0">
+                <span className="line-clamp-2 break-words text-[16px] leading-[normal] text-ink">
+                  {doc.filename}
+                </span>
+                <span className="mt-2 block">
+                  <StatusBadge status={doc.status} />
+                </span>
+              </span>
+              <button
+                type="button"
+                onClick={() => handleDelete(doc.id)}
+                className="absolute right-2 top-2 rounded p-1 text-ink-muted opacity-0 transition-opacity hover:text-band-low focus-visible:opacity-100 group-hover/tile:opacity-100"
+                aria-label={`Delete ${doc.filename}`}
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  aria-hidden="true"
+                  className="h-3.5 w-3.5"
                 >
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    aria-hidden="true"
-                    className="h-3 w-3"
-                  >
-                    <path d="M18 6 6 18M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
+                  <path d="M18 6 6 18M6 6l12 12" />
+                </svg>
+              </button>
             </li>
           ))}
         </ul>
       )}
-    </div>
+    </>
   );
+}
+
+/** "PDF", "DOCX" - what the tile leads with. */
+function extensionOf(filename: string): string {
+  const dot = filename.lastIndexOf(".");
+  return dot === -1 ? "" : filename.slice(dot + 1).toUpperCase();
 }
 
 function StatusBadge({ status }: { status: DocumentItem["status"] }) {

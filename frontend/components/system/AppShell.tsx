@@ -840,25 +840,26 @@ function Breadcrumbs({
     return <Crumbs crumbs={crumbs} />;
   }
 
-  crumbs.push({ label: LABELS[root] ?? root, href: `/${root}` });
-
-  if (segments.length > 1) {
+  if (root === "workspace" && segments.length > 1) {
+    // Inside a workspace the design starts at the workspace itself, not at
+    // the list of them: "My workspace / Attachments", two crumbs.
     const id = segments[1];
-    if (root === "workspace") {
-      const ws = workspaces.find((w) => w.id === id);
-      const name = ws?.name ?? "Workspace";
-      const sub = segments[2];
-      if (sub) {
-        // Keep the workspace clickable when we're a level deeper.
-        crumbs.push({ label: name, href: `/workspace/${id}` });
-        crumbs.push({
-          label: sub === "documents" ? "Attachments" : sub === "search" ? "Chats" : sub,
-        });
-      } else {
-        crumbs.push({ label: name });
-      }
+    const ws = workspaces.find((w) => w.id === id);
+    const name = ws?.name ?? "Workspace";
+    const sub = segments[2];
+    if (sub) {
+      // Keep the workspace clickable when we're a level deeper.
+      crumbs.push({ label: name, href: `/workspace/${id}` });
+      crumbs.push({
+        label: sub === "documents" ? "Attachments" : sub === "search" ? "Search" : sub,
+      });
+    } else {
+      crumbs.push({ label: name });
     }
+    return <Crumbs crumbs={crumbs} />;
   }
+
+  crumbs.push({ label: LABELS[root] ?? root, href: `/${root}` });
 
   return <Crumbs crumbs={crumbs} />;
 }

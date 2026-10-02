@@ -328,6 +328,15 @@ textarea[data-tour="composer-input"]:focus-visible {
   outline: none;
 }
 
+/* The same exemption for a field that *is* its card - the search box, the
+   name on a new workspace. A rectangle drawn inside a box that is already
+   lit up is two indicators for one thing, and the inner one lands on a
+   border the design doesn't give the field. The card carries the focus
+   instead, through focus-within. */
+:where(input, textarea)[data-field="bare"]:focus-visible {
+  outline: none;
+}
+
 /* Each rotating "thinking" verb fades in rather than snapping, so a change of
    word reads as the same process continuing, not a new one starting. */
 @keyframes fade-in {

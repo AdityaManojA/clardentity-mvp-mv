@@ -3,7 +3,8 @@
 import { useRef, useState } from "react";
 import { API_BASE_URL } from "@/lib/apiClient";
 import { authErrorMessage, getAccessToken, refreshAccessToken } from "@/lib/auth";
-import { Button, Spinner } from "@/components/ui/primitives";
+import { Spinner } from "@/components/ui/primitives";
+import { OutlineButton } from "@/components/profile/ProfileSection";
 
 /* Seeding the profile from another assistant's export.
  *
@@ -66,27 +67,21 @@ export function ImportHistory({ onImported }: { onImported?: () => void }) {
   }
 
   return (
-    <section className="rounded-xl border border-hairline bg-surface p-4">
-      <h2 className="text-sm font-semibold text-ink">Bring your history with you</h2>
-      <p className="mt-1 text-xs leading-relaxed text-ink-muted">
-        Already have months of conversations elsewhere? Import them and the
-        companion starts knowing how you think, instead of starting from
-        nothing. Only your own messages are read - the other assistant&apos;s
-        replies are discarded and never stored.
-      </p>
-
-      <dl className="mt-3 space-y-1">
+    // No card: on this page the section's own rule is the frame, and the
+    // heading above it already says what this is for.
+    <div>
+      <dl className="space-y-1">
         {WHERE_TO_GET_IT.map((source) => (
-          <div key={source.name} className="flex flex-wrap items-baseline gap-x-2 text-[11px]">
-            <dt className="font-medium text-ink-secondary">{source.name}</dt>
-            <dd className="text-ink-muted">
+          <div key={source.name} className="flex flex-wrap items-baseline gap-x-2 text-[16px] leading-[normal]">
+            <dt className="font-medium text-ink">{source.name}</dt>
+            <dd className="text-ink-secondary">
               {source.path} <span className="opacity-70">({source.file})</span>
             </dd>
           </div>
         ))}
       </dl>
 
-      <div className="mt-3 flex flex-wrap items-center gap-2">
+      <div className="mt-6 flex flex-wrap items-center gap-3">
         <input
           ref={inputRef}
           type="file"
@@ -97,20 +92,20 @@ export function ImportHistory({ onImported }: { onImported?: () => void }) {
             if (file) void upload(file);
           }}
         />
-        <Button onClick={() => inputRef.current?.click()} disabled={busy}>
+        <OutlineButton onClick={() => inputRef.current?.click()} disabled={busy}>
           {busy ? "Reading…" : "Choose export file"}
-        </Button>
+        </OutlineButton>
         {busy && <Spinner className="h-3.5 w-3.5 text-ink-muted" />}
       </div>
 
       {result && (
-        <p className="mt-2.5 text-xs leading-relaxed text-band-high">
+        <p className="mt-3 text-[16px] leading-[normal] text-band-high">
           Imported {result.messages} of your messages from {result.source}
           {result.conversations > 0 && ` across ${result.conversations} conversations`}. Your
           profile is rebuilding now - refresh in a moment to see it.
         </p>
       )}
-      {error && <p className="mt-2.5 text-xs leading-relaxed text-band-low">{error}</p>}
-    </section>
+      {error && <p className="mt-3 text-[16px] leading-[normal] text-band-low">{error}</p>}
+    </div>
   );
 }

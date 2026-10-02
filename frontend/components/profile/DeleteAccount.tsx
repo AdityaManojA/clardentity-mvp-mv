@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { apiFetch } from "@/lib/apiClient";
 import { authErrorMessage, useAuth } from "@/lib/auth";
-import { Button, Card, CardHeader } from "@/components/ui/primitives";
+import { OutlineButton } from "@/components/profile/ProfileSection";
 
 /** Deletes the whole account - workspaces, chats, documents, profile. The
  *  same two-click confirm the rest of the app uses for destructive actions
@@ -31,29 +31,25 @@ export function DeleteAccount() {
   }
 
   return (
-    <Card>
-      <CardHeader
-        title="Delete your account"
-        description="Removes your account and everything in it - every workspace, chat, attachment and this profile. This can't be undone."
-      />
-      <div className="flex flex-wrap items-center gap-3">
-        {confirming ? (
-          <Button
-            variant="danger"
-            autoFocus
-            onBlur={() => !busy && setConfirming(false)}
-            onClick={handleDelete}
-            disabled={busy}
-          >
-            {busy ? "Deleting…" : "Sure? Delete everything"}
-          </Button>
-        ) : (
-          <Button variant="danger" onClick={() => setConfirming(true)}>
-            Delete account
-          </Button>
-        )}
-        {error && <span className="text-sm text-band-low">{error}</span>}
-      </div>
-    </Card>
+    // The heading and the warning live in the section above; this is only
+    // the button, and the two-click confirm it has always had.
+    <div className="flex flex-wrap items-center gap-3">
+      {confirming ? (
+        <OutlineButton
+          danger
+          autoFocus
+          onBlur={() => !busy && setConfirming(false)}
+          onClick={handleDelete}
+          disabled={busy}
+        >
+          {busy ? "Deleting…" : "Sure? Delete everything"}
+        </OutlineButton>
+      ) : (
+        <OutlineButton danger onClick={() => setConfirming(true)}>
+          Delete Account
+        </OutlineButton>
+      )}
+      {error && <span className="text-sm text-band-low">{error}</span>}
+    </div>
   );
 }

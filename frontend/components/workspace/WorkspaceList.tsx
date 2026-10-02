@@ -152,7 +152,7 @@ export function WorkspaceList() {
             <li>
               <form
                 onSubmit={handleCreate}
-                className="flex h-[113px] items-start gap-6 rounded-[12px] border border-hairline-strong p-[9px]"
+                className="flex h-[113px] items-start gap-6 rounded-[12px] border border-hairline-strong p-[9px] focus-within:border-brand-border"
               >
                 <FolderTile />
                 <div className="min-w-0 flex-1 pt-0.5">
@@ -169,6 +169,7 @@ export function WorkspaceList() {
                     }}
                     placeholder="Name this workspace"
                     aria-label="New workspace name"
+                    data-field="bare"
                     className="w-full bg-transparent text-[24px] leading-[normal] text-ink placeholder:text-ink-muted focus:outline-none"
                   />
                   <div className="mt-2 flex items-center gap-3 text-[12px] leading-[normal]">
