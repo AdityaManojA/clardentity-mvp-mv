@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { usePathname } from "next/navigation";
 import { layoutViewport, toLayoutRect } from "@/lib/uiScale";
 import { useTour } from "@/lib/tour";
 import { usePrefersReducedMotion } from "@/lib/useReducedMotion";
@@ -35,8 +36,16 @@ function resolveVisibleTarget(target: string): HTMLElement | null {
 const GRACE_MS = 500;
 const MARGIN = 12;
 
+/** Where a tour has anything to point at. The overlay lives in the root
+ *  layout, so without this a tour left half-finished drew its coachmark over
+ *  the marketing page and the login card - which is what a new account sees
+ *  if it signs up, starts the tour and then clicks the wordmark. Suspended,
+ *  not cancelled: coming back to the app picks it up where it was. */
+const APP_ROUTES = /^\/(chat|workspace|profile|admin)(\/|$)/;
+
 export function TourOverlay() {
   const { tour, active, step, stepIndex, total, isLast, advance, skip } = useTour();
+  const inApp = APP_ROUTES.test(usePathname() ?? "");
   const reducedMotion = usePrefersReducedMotion();
   const panelRef = useRef<HTMLDivElement>(null);
   // Per-step one-shots, keyed on the step so they fire once per step and
@@ -73,7 +82,7 @@ export function TourOverlay() {
     // Nothing to reset when inactive: the component renders null below
     // whenever `!active`, so stale rect/pos values just sit unused until
     // the next step's tick() loop overwrites them fresh.
-    if (!active || !step) return;
+    if (!active || !step || !inApp) return;
 
     let raf = 0;
     let cancelled = false;
@@ -177,7 +186,7 @@ export function TourOverlay() {
       cancelled = true;
       cancelAnimationFrame(raf);
     };
-  }, [active, step, stepKey, reducedMotion]);
+  }, [active, step, stepKey, reducedMotion, inApp]);
 
   // Focus the panel once per step, at the first moment it has a real
   // position - not on every measurement tick. This is what makes a step
@@ -204,7 +213,7 @@ export function TourOverlay() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [active, skip]);
 
-  if (!active || !step) return null;
+  if (!active || !step || !inApp) return null;
 
   const visible = calloutPos !== null;
 
