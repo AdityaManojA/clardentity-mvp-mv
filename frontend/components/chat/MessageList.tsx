@@ -605,7 +605,12 @@ function MessageBubble({
       <div
         className={
           isUser
-            ? "max-w-[78%] rounded-2xl rounded-br-md bg-brand px-4 py-2.5 text-sm leading-relaxed text-white"
+            // Grey, not burgundy, and the same 20px the composer types at:
+            // the design gives your own message a step off the canvas and
+            // keeps the brand for the one control you press. A column of
+            // filled brand blocks was the loudest thing on a page whose
+            // subject is the answer underneath them.
+            ? "max-w-[78%] rounded-[12px] bg-bubble-mine px-[23px] py-[11px] text-[20px] leading-[normal] text-ink"
             : "w-full max-w-[88%] rounded-2xl rounded-bl-md border border-hairline bg-surface px-4 py-3 text-sm text-ink"
         }
       >
@@ -762,23 +767,23 @@ function MessageBubble({
                   event.currentTarget.form?.requestSubmit();
                 }
               }}
-              className="w-full resize-none rounded-lg bg-black/15 px-2 py-1.5 text-sm leading-relaxed text-white outline-none ring-1 ring-white/25 focus:ring-white/50"
+              className="w-full resize-none rounded-lg bg-surface px-2 py-1.5 text-[20px] leading-[normal] text-ink outline-none ring-1 ring-hairline-strong focus:ring-brand-border"
             />
             <div className="mt-1.5 flex items-center justify-end gap-2 text-[11px]">
-              <span className="mr-auto text-white/60">Enter to resend, Esc to cancel</span>
+              <span className="mr-auto text-ink-muted">Enter to resend, Esc to cancel</span>
               <button
                 type="button"
                 onClick={() => {
                   setDraft(content);
                   setEditing(false);
                 }}
-                className="rounded-md px-2 py-0.5 text-white/80 transition-colors hover:bg-white/15"
+                className="rounded-md px-2 py-0.5 text-ink-secondary transition-colors hover:bg-surface-hover"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="rounded-md bg-white/20 px-2 py-0.5 font-medium text-white transition-colors hover:bg-white/30"
+                className="rounded-md bg-brand px-2 py-0.5 font-medium text-white transition-colors hover:bg-brand-dark"
               >
                 Resend
               </button>
@@ -838,7 +843,7 @@ function MessageBubble({
             siblingIds={siblingIds}
             siblingIndex={siblingIndex ?? 0}
             onSwitchBranch={onSwitchBranch}
-            tone={isUser ? "onBrand" : "default"}
+            side={isUser ? "mine" : "theirs"}
           />
         )}
 
@@ -856,7 +861,7 @@ function MessageBubble({
             onRegenerate={onRegenerate}
             onDelete={onDelete}
             busy={busy}
-            tone={isUser ? "onBrand" : "default"}
+            side={isUser ? "mine" : "theirs"}
           />
         )}
         {!isStreaming && createdAt && (
@@ -867,7 +872,7 @@ function MessageBubble({
             dateTime={createdAt}
             className={cx(
               "mt-1 block text-[10px] tabular-nums",
-              isUser ? "text-right text-white/50" : "text-ink-muted",
+              isUser ? "text-right text-ink-muted" : "text-ink-muted",
             )}
           >
             {formatMessageTime(createdAt)}
@@ -887,24 +892,25 @@ function ForkSwitcher({
   siblingIds,
   siblingIndex,
   onSwitchBranch,
-  tone,
+  side,
 }: {
   siblingIds: string[];
   siblingIndex: number;
   onSwitchBranch: (messageId: string) => void;
-  tone: "onBrand" | "default";
+  /** Whose message this row belongs to. It no longer changes the colours -
+   *  the bubble is grey now - only where the row sits and whether it waits
+   *  for a hover. */
+  side: "mine" | "theirs";
 }) {
   const count = siblingIds.length;
   const base =
-    tone === "onBrand"
-      ? "text-white/70 hover:bg-white/15 hover:text-white"
-      : "text-ink-muted hover:bg-surface-hover hover:text-ink";
+    "text-ink-muted hover:bg-surface-hover hover:text-ink";
 
   return (
     <div
       className={cx(
         "mt-1.5 flex items-center gap-0.5 text-[11px] text-ink-muted",
-        tone === "onBrand" && "justify-end",
+        side === "mine" && "justify-end",
       )}
     >
       <button
@@ -956,14 +962,17 @@ function MessageActions({
   onRegenerate,
   onDelete,
   busy,
-  tone,
+  side,
 }: {
   content: string;
   onEdit?: () => void;
   onRegenerate?: () => void;
   onDelete?: () => void;
   busy?: boolean;
-  tone: "onBrand" | "default";
+  /** Whose message this row belongs to. It no longer changes the colours -
+   *  the bubble is grey now - only where the row sits and whether it waits
+   *  for a hover. */
+  side: "mine" | "theirs";
 }) {
   const [copied, setCopied] = useState(false);
   // Two clicks, not a browser confirm() - same pattern the sidebar's own
@@ -989,9 +998,7 @@ function MessageActions({
   }
 
   const base =
-    tone === "onBrand"
-      ? "text-white/70 hover:bg-white/15 hover:text-white"
-      : "text-ink-muted hover:bg-surface-hover hover:text-ink";
+    "text-ink-muted hover:bg-surface-hover hover:text-ink";
 
   return (
     <div
@@ -1001,8 +1008,8 @@ function MessageActions({
         // An answer's actions stay visible. Hover-only was fine for your own
         // messages - short, and you know what you wrote - but on a response
         // it put Copy behind a hover, below the evidence panel, where nobody
-        // found it. On the brand bubble a permanent row is just noise.
-        tone === "onBrand" ? "justify-end opacity-0" : "opacity-45",
+        // found it. Under your own bubble a permanent row is just noise.
+        side === "mine" ? "justify-end opacity-0" : "opacity-45",
       )}
     >
       <button
@@ -1054,7 +1061,7 @@ function MessageActions({
             disabled={busy}
             className={cx(
               "rounded-md px-1.5 py-1 text-[10px] font-semibold uppercase tracking-wide transition-colors disabled:opacity-40",
-              tone === "onBrand" ? "text-white" : "text-band-low",
+              "text-band-low",
             )}
           >
             Sure?

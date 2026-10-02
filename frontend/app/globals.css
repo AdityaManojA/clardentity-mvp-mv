@@ -27,6 +27,10 @@
   --surface-muted: #faf8f9;
   --surface-hover: rgba(77, 67, 57, 0.05);
   --surface-sunken: #f5f3f4;
+  /* Your own message in the thread: a step off the canvas, as drawn - not
+     the brand. A wall of burgundy blocks is the loudest thing on a page
+     whose whole subject is the answer underneath them. */
+  --bubble-mine: #edeaeb;
   /* Things that float above the page rather than sit in it: the composer,
      menus, popovers, dialogs. */
   --surface-raised: #ffffff;
@@ -110,6 +114,7 @@
   --surface-muted: #000000;
   --surface-hover: #181416;
   --surface-sunken: #000000;
+  --bubble-mine: #221d20;
   --surface-raised: #1d1a1c;
 
   /* Dimmer than the fills they separate. A hairline doing the work of a fill
@@ -173,6 +178,7 @@
   --color-surface-muted: var(--surface-muted);
   --color-surface-hover: var(--surface-hover);
   --color-surface-sunken: var(--surface-sunken);
+  --color-bubble-mine: var(--bubble-mine);
   --color-surface-raised: var(--surface-raised);
 
   --color-hairline: var(--border);

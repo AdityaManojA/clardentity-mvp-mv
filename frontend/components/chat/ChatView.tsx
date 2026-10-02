@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { API_BASE_URL, apiFetch } from "@/lib/apiClient";
 import { authErrorMessage, getAccessToken } from "@/lib/auth";
 import {
@@ -25,6 +25,8 @@ import { ContextQuestionCard } from "@/components/chat/ContextQuestionCard";
 import { ModeSwitchToast } from "@/components/chat/ModeSwitchToast";
 import { RefinedQuestionCard } from "@/components/chat/RefinedQuestionCard";
 import { ClarifyingOptionsCard } from "@/components/chat/ClarifyingOptionsCard";
+import { MaskIcon } from "@/components/ui/MaskIcon";
+import { companionLabel, useCompanionNames } from "@/lib/companionNames";
 import { cx } from "@/components/ui/primitives";
 import {
   AvatarPanel,
@@ -150,6 +152,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
   const [draft, setDraft] = useState("");
   // Carousel (split-by-mode) view is opt-IN, and only offered once a second
   // mode exists - "read as one thread" is the default view.
+  const companionNames = useCompanionNames();
   const [carousel, setCarousel] = useState(false);
   const [activeTrack, setActiveTrack] = useState(0);
   const [callOpen, setCallOpen] = useState(false);
@@ -921,15 +924,48 @@ export function ChatView({ conversationId }: { conversationId: string }) {
           showCarousel ? "max-w-6xl" : "max-w-[973px]",
         )}
       >
+        {/* The design's row at the head of a thread that has been answered in
+            more than one mode: "Single thread", then one pill per companion
+            that has spoken here. It replaces a "Split by mode" text button
+            that said what it would do but never which modes were in play. */}
         {multiMode && (
-          <div className="flex shrink-0 items-center justify-end pt-2">
-            <button
-              type="button"
-              onClick={() => setCarousel((v) => !v)}
-              className="rounded-md px-2 py-1 text-xs text-ink-muted transition-colors hover:bg-surface-hover hover:text-ink"
-            >
-              {carousel ? "Read as one thread" : "Split by mode"}
-            </button>
+          <div className="flex shrink-0 justify-center pt-[37px] pb-4">
+            <div className="scroll-slim flex max-w-full items-center gap-1 overflow-x-auto">
+              <ThreadPill
+                selected={!carousel}
+                onClick={() => setCarousel(false)}
+                icon={
+                  <svg
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.3"
+                    strokeLinecap="round"
+                    aria-hidden="true"
+                    className="block size-4"
+                  >
+                    <path d="M3.3 12.7 12.7 3.3" />
+                  </svg>
+                }
+                label="Single thread"
+              />
+              {tracks.map((track, index) => {
+                const entry = MODE_BY_VALUE[track.mode];
+                return (
+                  <ThreadPill
+                    key={track.mode}
+                    selected={carousel && index === activeIndex}
+                    onClick={() => {
+                      setCarousel(true);
+                      setActiveTrack(index);
+                      setMode(track.mode);
+                    }}
+                    icon={entry ? <MaskIcon src={entry.icon} size={16} /> : null}
+                    label={companionLabel(companionNames, track.mode, entry?.label ?? track.mode)}
+                  />
+                );
+              })}
+            </div>
           </div>
         )}
 
@@ -1278,5 +1314,37 @@ export function ChatView({ conversationId }: { conversationId: string }) {
         <UpgradeDialog open={upsell !== null} trigger={upsell} onClose={() => setUpsell(null)} />
       </div>
     </div>
+  );
+}
+
+/** One pill in the thread's mode row. Filled in the secondary ink when it is
+ *  the view you are in, a hairline in the muted ink when it is not - the two
+ *  states the design draws. */
+function ThreadPill({
+  selected,
+  onClick,
+  icon,
+  label,
+}: {
+  selected: boolean;
+  onClick: () => void;
+  icon: ReactNode;
+  label: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={selected}
+      className={cx(
+        "flex h-[30px] shrink-0 items-center gap-1 rounded-full border px-[9px] text-[16px] leading-[normal] transition-colors",
+        selected
+          ? "border-transparent bg-[color:var(--text-secondary)] text-white"
+          : "border-[color:var(--text-muted)] text-ink hover:bg-surface-hover",
+      )}
+    >
+      {icon}
+      <span className="whitespace-nowrap">{label}</span>
+    </button>
   );
 }
