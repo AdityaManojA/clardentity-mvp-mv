@@ -193,6 +193,153 @@
   --avatar-shadow: rgb(255 255 255 / 0.10);
 }
 
+/* ---------------------------------------------------------------------
+   The other three accents.
+
+   The design gives a colour study per accent rather than a full palette, so
+   what those studies actually fix is measured from them - the accent itself,
+   the three steps of the text ramp, the canvas and the chrome - and the rest
+   is carried over from the burgundy, which is the one that was built out in
+   full. Carried by hue: a token keeps its saturation, its lightness and its
+   distance from the hue it belongs to, so every relationship the burgundy was
+   tuned for survives. The accent family turns with the accent; everything
+   else turns with the text, because the two are not on the same hue in the
+   burgundy either.
+
+   Dark mode has no design in any accent, so it is the burgundy's dark palette
+   turned the same way.
+
+   Written with :not([data-theme="dark"]) rather than left to source order:
+   both the accent and the dark block are one attribute deep, so an accent
+   placed after dark would otherwise win in dark mode.
+   --------------------------------------------------------------------- */
+
+/* Indigo */
+:root[data-accent="indigo"]:not([data-theme="dark"]) {
+  --canvas: #f3f3f5;
+  --surface-muted: #f5f6fb;
+  --surface-sunken: #f3f3f5;
+  --text: #2f334c;
+  --text-secondary: #5f6582;
+  --text-muted: #8b8fa6;
+  --surface-hover: rgba(70, 57, 77, 0.05);
+  --bubble-mine: #eaebed;
+  --border: #f1edf2;
+  --border-strong: #e3e6e8;
+  --text-nav: #57515f;
+  --text-nav-strong: #46394d;
+  --text-nav-muted: #7e738b;
+  --brand: #2d3561;
+  --brand-dark: #25305a;
+  --brand-soft: #f1f2f7;
+  --brand-border: #cfd1e3;
+  --focus-ring: #2d3561;
+}
+:root[data-accent="indigo"][data-theme="dark"] {
+  --surface-muted: #000000;
+  --surface: #0a0b0c;
+  --surface-hover: #141518;
+  --bubble-mine: #1d1f22;
+  --surface-raised: #1a1c1d;
+  --border: #1f2124;
+  --border-strong: #2b2e33;
+  --text: #f3f3f7;
+  --text-secondary: #9d9fa8;
+  --text-muted: #80848b;
+  --text-nav: #a9abb5;
+  --text-nav-strong: #cdd0d8;
+  --text-nav-muted: #80848b;
+  --brand: #6a6fc8;
+  --brand-dark: #8284d8;
+  --brand-soft: #101523;
+  --brand-border: #24294a;
+  --focus-ring: #6a6fc8;
+}
+
+/* Teal */
+:root[data-accent="teal"]:not([data-theme="dark"]) {
+  --canvas: #f3f5f5;
+  --surface-muted: #f8fcfc;
+  --surface-sunken: #f3f5f5;
+  --text: #1a3434;
+  --text-secondary: #4a6b6a;
+  --text-muted: #7b9898;
+  --surface-hover: rgba(57, 62, 77, 0.05);
+  --bubble-mine: #eaeded;
+  --border: #edeef2;
+  --border-strong: #e3e8e5;
+  --text-nav: #51575f;
+  --text-nav-strong: #393e4d;
+  --text-nav-muted: #737d8b;
+  --brand: #0d7c7b;
+  --brand-dark: #255a57;
+  --brand-soft: #f1f7f6;
+  --brand-border: #cfe2e3;
+  --focus-ring: #0d7c7b;
+}
+:root[data-accent="teal"][data-theme="dark"] {
+  --surface-muted: #000000;
+  --surface: #0a0c0c;
+  --surface-hover: #141817;
+  --bubble-mine: #1d2220;
+  --surface-raised: #1a1d1c;
+  --border: #1f2422;
+  --border-strong: #2b3331;
+  --text: #f3f7f7;
+  --text-secondary: #9da8a8;
+  --text-muted: #808b89;
+  --text-nav: #a9b5b4;
+  --text-nav-strong: #cdd8d7;
+  --text-nav-muted: #808b89;
+  --brand: #6ac0c8;
+  --brand-dark: #82ced8;
+  --brand-soft: #102321;
+  --brand-border: #244a4a;
+  --focus-ring: #6ac0c8;
+}
+
+/* Plum Velvet */
+:root[data-accent="plum"]:not([data-theme="dark"]) {
+  --canvas: #f5f3f4;
+  --surface-muted: #f9f7fc;
+  --surface-sunken: #f5f3f4;
+  --text: #2f1f3f;
+  --text-secondary: #6b5a7b;
+  --text-muted: #9d8ba6;
+  --surface-hover: rgba(77, 57, 72, 0.05);
+  --bubble-mine: #ebeaed;
+  --border: #f2edf0;
+  --border-strong: #e3e3e8;
+  --text-nav: #5f515e;
+  --text-nav-strong: #4d3948;
+  --text-nav-muted: #8b7389;
+  --brand: #4b2f64;
+  --brand-dark: #3e255a;
+  --brand-soft: #f4f1f7;
+  --brand-border: #dbcfe3;
+  --focus-ring: #4b2f64;
+}
+:root[data-accent="plum"][data-theme="dark"] {
+  --surface-muted: #000000;
+  --surface: #0b0a0c;
+  --surface-hover: #151418;
+  --bubble-mine: #1e1d22;
+  --surface-raised: #1a1a1d;
+  --border: #201f24;
+  --border-strong: #2d2b33;
+  --text: #f5f3f7;
+  --text-secondary: #a29da8;
+  --text-muted: #83808b;
+  --text-nav: #aea9b5;
+  --text-nav-strong: #d1cdd8;
+  --text-nav-muted: #83808b;
+  --brand: #a56ac8;
+  --brand-dark: #bb82d8;
+  --brand-soft: #181023;
+  --brand-border: #39244a;
+  --focus-ring: #a56ac8;
+}
+
 @theme inline {
   --color-canvas: var(--canvas);
   --color-surface: var(--surface);
@@ -268,7 +415,9 @@
 /* Applied to the root, not to a wrapper: `position: fixed` and the layout
    viewport both resolve against the root's box, so zooming anything lower
    leaves fixed overlays measuring the screen at full size while everything
-   under them is at four fifths. */
+   under them is at four fifths. The marketing page is included - it is one
+   product, and a visitor who scrolls from the hero into the app should not
+   find the furniture change size at the door. */
 /* Guarded on `zoom` rather than assumed: a browser without it would otherwise
    keep --ui-zoom at 0.8, which only --app-vh reads, and every full-height page
    would grow a quarter of a screen of scroll for nothing. Without the
@@ -280,13 +429,6 @@
       zoom: var(--ui-zoom);
     }
 
-    /* The marketing page opts back out. It was drawn to its own frame and
-       already scales itself to whatever window it is in, so it was never the
-       thing that read too large - and zoom compounds down the tree, so undoing
-       it is the reciprocal rather than a second number to keep in step. */
-    .landing {
-      zoom: calc(1 / var(--ui-zoom));
-    }
   }
 }
 

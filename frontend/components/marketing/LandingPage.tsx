@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { MaskIcon } from "@/components/ui/MaskIcon";
 import { CurtainShimmer } from "@/components/marketing/CurtainShimmer";
 import { Reveal } from "@/components/marketing/Reveal";
 import { TypedQuestions } from "@/components/marketing/TypedQuestions";
@@ -22,17 +23,19 @@ import { TypedQuestions } from "@/components/marketing/TypedQuestions";
  * the grids reflow. Nothing about the design is lost, and it survives a
  * phone.
  *
- * The palette is the design's, not the app's: a warm off-white canvas with
- * plum accents, which is a different identity from the product's near-black
- * interior. It is deliberately scoped to this file (and its own token block
- * below) so it cannot leak into the app's theme.
+ * The palette reads through to the app's tokens rather than being written out
+ * here. The hexes these used to hold were the burgundy's, to the digit - but
+ * an account that has chosen another accent should find this page in it once
+ * they are signed in, and a page holding its own copy of the colour can only
+ * ever be burgundy. The one exception is the curtain, which is a photograph
+ * of burgundy fabric and stays what it is.
  */
 
-const INK = "#3d2a2f"; // headings
-const INK_BODY = "#6b5c60"; // body copy under a heading
-const MUTED = "#9e8e93"; // captions, eyebrow text, footer wordmark
-const PLUM = "#6b2d5c"; // accent: send button, "Ask./Check./See.", emphasis
-const CANVAS = "#faf8f9";
+const INK = "var(--text)"; // headings
+const INK_BODY = "var(--text-secondary)"; // body copy under a heading
+const MUTED = "var(--text-muted)"; // captions, eyebrow text, footer wordmark
+const PLUM = "var(--brand)"; // accent: send button, "Ask./Check./See.", emphasis
+const CANVAS = "var(--surface-muted)";
 
 /* A twenty-pixel-wide copy of the curtain, from the design file's own
  * downscaled version of it, as the blur-up placeholder. The stage is the
@@ -51,8 +54,8 @@ const CURTAIN_GEOMETRY: React.CSSProperties = {
 };
 
 const CURTAIN_BLUR = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4QBMRXhpZgAATU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAFKADAAQAAAABAAAACwAAAAD/wAARCAALABQDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9sAQwAEBAQEBAQIBAQICwgICAsPCwsLCw8SDw8PDw8SFhISEhISEhYWFhYWFhYWGxsbGxsbHx8fHx8jIyMjIyMjIyMj/9sAQwEFBgYJCAkPCAgPJBkUGSQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQk/90ABAAC/9oADAMBAAIRAxEAPwD4p014r8W2jztsQzMzH6gD+laV/Y21tZnUBA1rJDMFVWOd49ee4/KuNHXNSSzzTY812bHTJzVOOp6sMZFU3Gcbvo/lp92+nzLN9cfa7yW5/wCejlvzNVKjoqrHnzk5Scn1P//Z";
-const HAIRLINE = "#e8e3e7"; // card borders
-const OUTLINE = "#5f5551"; // the Login pill
+const HAIRLINE = "var(--border-strong)"; // card borders
+const OUTLINE = "var(--text-nav)"; // the Login pill
 
 type Mode = {
   name: string;
@@ -156,18 +159,25 @@ const STEPS = [
   { word: "See.", blurb: "You get the answer and the audit, side by side.", blurbWidth: 266.631 },
 ];
 
+/* One mark, painted. There used to be four copies of this file with four
+ * different fills baked in, which meant the mark was the one part of the page
+ * that could not follow an accent - and three of the four were the same shape
+ * in a different colour anyway. */
 function Wordmark({
   size,
   tone,
-  src,
+  mark,
 }: {
   size: number;
   tone: string;
-  src: string;
+  /** The dots, which are not always the colour of the word beside them. */
+  mark: string;
 }) {
   return (
     <span className="flex shrink-0 items-center gap-[12px]">
-      <Image src={src} alt="" width={33} height={32} className="block h-[32px] w-[33.083px]" />
+      <span style={{ color: mark }} className="flex">
+        <MaskIcon src="/landing/logo-dots.svg" className="h-[32px] w-[33.083px]" />
+      </span>
       <span
         className="whitespace-nowrap font-normal leading-none"
         style={{ fontSize: size, color: tone }}
@@ -210,7 +220,7 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
       {/* ---------------------------------------------------------------- */}
       <section className="relative mx-auto w-full max-w-[1728px] px-4 pb-[40px] pt-[70px] sm:px-8">
         <div className="flex items-center justify-center">
-          <Wordmark size={32} tone={INK} src="/landing/logo-dots-plum.svg" />
+          <Wordmark size={32} tone={INK} mark={PLUM} />
         </div>
 
         {/* Absolute at the design's width, in flow below it on narrow screens,
@@ -305,7 +315,7 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
                 <div className="flex flex-col gap-[13px]">
                   <div
                     className="relative h-[124px] w-full overflow-hidden rounded-[20px] border"
-                    style={{ background: "rgba(255,255,255,0.1)", borderColor: "#f2edf2" }}
+                    style={{ background: "rgba(255,255,255,0.1)", borderColor: "var(--border)" }}
                   >
                     <p
                       className="absolute left-[26px] top-[24.74px] whitespace-nowrap font-normal text-white"
@@ -332,7 +342,7 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
                       <span
                         key={mode.name}
                         className="flex shrink-0 flex-col items-center justify-center gap-[4px] rounded-[8px] border px-[12px] py-[4px]"
-                        style={{ background: "rgba(255,255,255,0.1)", borderColor: "#f2edf2" }}
+                        style={{ background: "rgba(255,255,255,0.1)", borderColor: "var(--border)" }}
                       >
                         <Image
                           src={mode.heroIcon}
@@ -359,11 +369,11 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
             className="mt-[16px] w-full text-center font-semibold uppercase"
             style={{ fontSize: "clamp(14px, 1.2vw, 20px)", color: MUTED }}
           >
-            <Link href={enter} className="transition-colors hover:text-[#6b2d5c]">
+            <Link href={enter} className="transition-colors hover:text-brand">
               Start asking
             </Link>
             {" · "}
-            <a href="#how-it-works" className="transition-colors hover:text-[#6b2d5c]">
+            <a href="#how-it-works" className="transition-colors hover:text-brand">
               See how it works
             </a>
           </p>
@@ -376,7 +386,7 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
       <section className="mx-auto flex w-full max-w-[1728px] items-center px-4 py-[140px] sm:px-8">
         <div className="mx-auto w-full max-w-[1110px]">
           <Reveal className="flex items-center justify-between">
-            <Wordmark size={32} tone={INK} src="/landing/logo-dots-audit.svg" />
+            <Wordmark size={32} tone={INK} mark={PLUM} />
             <p
               className="whitespace-nowrap text-center font-semibold uppercase"
               style={{ fontSize: "clamp(14px, 1.2vw, 20px)", color: MUTED }}
@@ -521,13 +531,12 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
                   >
                     {step.word}
                   </span>
-                  <Image
-                    src="/landing/logo-dots-steps.svg"
-                    alt=""
-                    width={40}
-                    height={39}
-                    className="block h-[38.96px] w-[40.278px]"
-                  />
+                  <span style={{ color: HAIRLINE }} className="flex">
+                    <MaskIcon
+                      src="/landing/logo-dots.svg"
+                      className="h-[38.96px] w-[40.278px]"
+                    />
+                  </span>
                 </div>
               </Reveal>
             ))}
@@ -555,7 +564,7 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
             </h2>
             <Link href={enter} className="group flex items-start self-start">
               <span
-                className="whitespace-nowrap font-medium uppercase underline decoration-dotted transition-colors group-hover:text-[#6b2d5c]"
+                className="whitespace-nowrap font-medium uppercase underline decoration-dotted transition-colors group-hover:text-brand"
                 style={{ fontSize: "clamp(20px, 2vw, 32px)", color: MUTED }}
               >
                 Start asking
@@ -569,7 +578,7 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
               />
             </Link>
           </div>
-          <Wordmark size={32} tone={MUTED} src="/landing/logo-dots-footer.svg" />
+          <Wordmark size={32} tone={MUTED} mark={MUTED} />
         </Reveal>
       </section>
 

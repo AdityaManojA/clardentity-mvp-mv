@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/apiClient";
 import { ImportHistory } from "@/components/profile/ImportHistory";
+import { Appearance } from "@/components/profile/Appearance";
 import { CompanionNames } from "@/components/profile/CompanionNames";
 import { DeleteAccount } from "@/components/profile/DeleteAccount";
 import { InstallAppButton } from "@/components/system/InstallAppButton";
@@ -225,6 +226,13 @@ export function ProfileView() {
             description="Bring your previous conversations with you. Only your messages are read."
           >
             <ImportHistory onImported={() => setReloadKey((k) => k + 1)} />
+          </ProfileSection>
+
+          <ProfileSection
+            title="Appearance"
+            description="The colour the app is drawn in, and whether it runs light or dark. The marketing page follows your colour too, once you are signed in."
+          >
+            <Appearance />
           </ProfileSection>
 
           <ProfileSection

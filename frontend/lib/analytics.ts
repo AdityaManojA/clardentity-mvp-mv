@@ -45,6 +45,9 @@ export type AnalyticsEvent =
   | "answer_failed"
   // What people reach for
   | "mode_picked"
+  // What the app is drawn in
+  | "accent_picked"
+  | "theme_picked"
   | "mode_switched_automatically"
   | "mode_switch_reverted"
   | "quick_answer_tapped"

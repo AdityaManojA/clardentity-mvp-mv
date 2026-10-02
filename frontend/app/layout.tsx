@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Outfit } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth";
-import { ThemeProvider, THEME_INIT_SCRIPT } from "@/lib/theme";
+import { AccentScope, ThemeProvider, THEME_INIT_SCRIPT } from "@/lib/theme";
 import { TourProvider } from "@/lib/tour";
 import { TourOverlay } from "@/components/tour/TourOverlay";
 import { Analytics } from "@/components/system/Analytics";
@@ -82,6 +82,7 @@ export default function RootLayout({
         <ThemeProvider>
           <AuthProvider>
             <TourProvider>
+              <AccentScope />
               {children}
               <TourOverlay />
               <Analytics />
