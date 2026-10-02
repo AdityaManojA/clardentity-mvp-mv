@@ -34,15 +34,18 @@ type RequestOptions = Omit<RequestInit, "body"> & {
  * seconds of each other.
  *
  * So identical GETs share one request while it is open, and the answer is
- * kept for a moment afterwards for the ones that arrive just behind it. Short
- * enough that nothing goes stale in a way anyone could notice - a second and
- * a half is less than the round trip it saves - and anything that polls says
+ * kept for a moment afterwards for the ones that arrive just behind it. Three
+ * seconds, because the two that survived a shorter window were the shell's -
+ * it mounts after the route changes, which is a round trip later. Nothing can
+ * go stale in it that this client caused, since a write empties the cache;
+ * what is left is a change made somewhere else, which was never going to
+ * arrive in this tab without a reload anyway. Anything that polls says
  * `fresh` and opts out.
  *
  * Only GETs, and only successful ones: a failure must be retryable
  * immediately, and a write must always reach the server.
  */
-const CACHE_MS = 1500;
+const CACHE_MS = 3000;
 const inFlight = new Map<string, { at: number; promise: Promise<unknown> }>();
 
 function cacheable(options: RequestOptions): boolean {
