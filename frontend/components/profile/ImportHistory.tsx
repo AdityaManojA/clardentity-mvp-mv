@@ -72,7 +72,7 @@ export function ImportHistory({ onImported }: { onImported?: () => void }) {
     <div>
       <dl className="space-y-1">
         {WHERE_TO_GET_IT.map((source) => (
-          <div key={source.name} className="flex flex-wrap items-baseline gap-x-2 text-[16px] leading-[normal]">
+          <div key={source.name} className="flex flex-wrap items-baseline gap-x-2 text-sm leading-[normal]">
             <dt className="font-medium text-ink">{source.name}</dt>
             <dd className="text-ink-secondary">
               {source.path} <span className="opacity-70">({source.file})</span>
@@ -99,13 +99,13 @@ export function ImportHistory({ onImported }: { onImported?: () => void }) {
       </div>
 
       {result && (
-        <p className="mt-3 text-[16px] leading-[normal] text-band-high">
+        <p className="mt-3 text-sm leading-[normal] text-band-high">
           Imported {result.messages} of your messages from {result.source}
           {result.conversations > 0 && ` across ${result.conversations} conversations`}. Your
           profile is rebuilding now - refresh in a moment to see it.
         </p>
       )}
-      {error && <p className="mt-3 text-[16px] leading-[normal] text-band-low">{error}</p>}
+      {error && <p className="mt-3 text-sm leading-[normal] text-band-low">{error}</p>}
     </div>
   );
 }

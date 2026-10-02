@@ -90,13 +90,18 @@ export function ConfidenceBadge({
         aria-label={`${band}${score !== null ? `, ${Math.round(score)} out of 100` : ""}. What this means`}
         title="What this score means"
         className={cx(
-          "inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[11px] font-medium transition-opacity hover:opacity-80",
+          "inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md border px-2 py-0.5 text-xs font-medium transition-opacity hover:opacity-80",
           style,
         )}
       >
         <span className={cx("h-1.5 w-1.5 rounded-full", dot)} aria-hidden="true" />
         {band}
-        {score !== null && <span className="tabular-nums opacity-70">{Math.round(score)}</span>}
+        {/* The number goes first when the row is tight: the band beside it
+            already says what it means, and keeping it cost the mode name
+            on the left its last few characters. */}
+        {score !== null && (
+          <span className="hidden tabular-nums opacity-70 sm:inline">{Math.round(score)}</span>
+        )}
         <svg
           viewBox="0 0 24 24"
           fill="none"
@@ -114,7 +119,7 @@ export function ConfidenceBadge({
         <span
           role="dialog"
           aria-label="What this score means"
-          className="absolute right-0 top-full z-30 mt-1.5 block w-64 max-w-[calc(100vw-2rem)] rounded-lg border border-hairline bg-surface-raised p-3 text-left text-[11px] normal-case tracking-normal shadow-lg"
+          className="absolute right-0 top-full z-30 mt-1.5 block w-64 max-w-[calc(100vw-2rem)] rounded-lg border border-hairline bg-surface-raised p-3 text-left text-xs normal-case tracking-normal shadow-lg"
         >
           <span className="block text-xs font-semibold text-ink">
             {band}

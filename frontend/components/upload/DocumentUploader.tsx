@@ -119,8 +119,8 @@ export function DocumentUploader({
     <>
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-[32px] font-medium leading-[normal] text-ink">Attachments</h1>
-          <p className="text-[20px] leading-[normal] text-ink-secondary">{description}</p>
+          <h1 className="text-4xl font-medium leading-[normal] text-ink">Attachments</h1>
+          <p className="text-xl leading-[normal] text-ink-secondary">{description}</p>
         </div>
         <div className="flex shrink-0 items-center gap-3">
           {uploading && <Spinner className="text-ink-muted" />}
@@ -128,7 +128,7 @@ export function DocumentUploader({
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            className="flex h-[42px] items-center gap-1 rounded-[34px] bg-brand px-3 py-2 text-[20px] leading-[normal] text-white transition-colors hover:bg-brand-dark disabled:opacity-60"
+            className="flex h-[42px] items-center gap-1 rounded-[34px] bg-brand px-3 py-2 text-xl leading-[normal] text-white transition-colors hover:bg-brand-dark disabled:opacity-60"
           >
             {uploading ? "Uploading…" : "Upload"}
             <svg
@@ -165,7 +165,7 @@ export function DocumentUploader({
           <Spinner className="text-ink-muted" />
         </div>
       ) : documents.length === 0 ? (
-        <p className="mt-10 text-[20px] leading-[normal] text-ink-secondary">
+        <p className="mt-10 text-xl leading-[normal] text-ink-secondary">
           Nothing attached yet. What you upload here is read once and then
           available to every chat in this workspace.
         </p>
@@ -183,11 +183,11 @@ export function DocumentUploader({
               // that is a step away from the background in both themes.
               className="group/tile relative flex h-[145px] flex-col justify-between rounded-[12px] bg-surface-hover p-4 transition-shadow hover:ring-1 hover:ring-hairline-strong"
             >
-              <span className="text-[12px] font-medium uppercase tracking-wide text-ink-muted">
+              <span className="text-xs font-medium uppercase tracking-wide text-ink-muted">
                 {extensionOf(doc.filename) || doc.file_type || "file"}
               </span>
               <span className="min-w-0">
-                <span className="line-clamp-2 break-words text-[16px] leading-[normal] text-ink">
+                <span className="line-clamp-2 break-words text-sm leading-[normal] text-ink">
                   {doc.filename}
                 </span>
                 <span className="mt-2 block">

@@ -163,7 +163,7 @@ function RecentConversations({
 
   return (
     <div className="mt-5 flex min-h-0 flex-1 flex-col">
-      <p className="px-4 pb-1 text-[16px] font-medium uppercase text-[color:var(--text-nav-muted)]">
+      <p className="px-4 pb-1 text-sm font-medium uppercase text-[color:var(--text-nav-muted)]">
         Recents
       </p>
       <ul className="scroll-slim min-h-0 flex-1 overflow-y-auto">
@@ -177,7 +177,7 @@ function RecentConversations({
               onClick={onNavigate}
               aria-current={c.id === activeId ? "page" : undefined}
               className={cx(
-                "flex h-8 min-w-0 flex-1 items-center gap-5 truncate rounded-[9px] pl-4 pr-1.5 text-[20px] transition-colors",
+                "flex h-8 min-w-0 flex-1 items-center gap-5 truncate rounded-[9px] pl-4 pr-1.5 text-xl transition-colors",
                 c.id === activeId
                   ? "bg-[var(--surface-hover)] font-medium text-ink"
                   : "text-[color:var(--text-nav)] hover:bg-surface-hover hover:text-ink",
@@ -205,7 +205,7 @@ function RecentConversations({
         <Link
           href={`/workspace/${workspaceId}/search`}
           onClick={onNavigate}
-          className="mt-1 rounded-lg px-2.5 py-1.5 text-[12px] text-ink-muted transition-colors hover:bg-surface-hover hover:text-ink"
+          className="mt-1 rounded-lg px-2.5 py-1.5 text-xs text-ink-muted transition-colors hover:bg-surface-hover hover:text-ink"
         >
           See all {total} chats
         </Link>
@@ -243,7 +243,7 @@ function NavItem({
       onClick={onNavigate}
       aria-current={active ? "page" : undefined}
       className={cx(
-        "flex h-12 items-center gap-3 rounded-[9px] px-4 text-[20px] transition-colors",
+        "flex h-12 items-center gap-3 rounded-[9px] px-4 text-xl transition-colors",
         active
           ? "bg-[var(--surface-hover)] font-medium text-ink"
           : "text-[color:var(--text-nav)] hover:bg-surface-hover hover:text-ink",
@@ -297,7 +297,7 @@ function WorkspaceSwitcher({
         aria-expanded={open}
         className="flex w-full items-center gap-2.5 rounded-lg border border-hairline bg-surface px-2.5 py-2 text-left transition-colors hover:bg-surface-hover"
       >
-        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-brand text-[11px] font-semibold text-white">
+        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-brand text-xs font-semibold text-white">
           {(active?.name ?? "W").slice(0, 1).toUpperCase()}
         </span>
         <span className="min-w-0 flex-1">
@@ -333,7 +333,7 @@ function WorkspaceSwitcher({
               )}
             >
               <span className="truncate">{w.name}</span>
-              <span className="shrink-0 text-[10px] uppercase tracking-wide text-ink-muted">
+              <span className="shrink-0 text-xs uppercase tracking-wide text-ink-muted">
                 {w.role}
               </span>
             </Link>
@@ -532,7 +532,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           void startConversation();
         }}
         disabled={starting}
-        className="mt-3 flex h-12 items-center gap-3 rounded-[9px] px-4 text-left text-[20px] text-[color:var(--text-nav)] transition-colors hover:bg-surface-hover hover:text-ink disabled:opacity-50"
+        className="mt-3 flex h-12 items-center gap-3 rounded-[9px] px-4 text-left text-xl text-[color:var(--text-nav)] transition-colors hover:bg-surface-hover hover:text-ink disabled:opacity-50"
       >
         <MaskIcon src="/ui/nav-newchat.svg" size={24} />
         {starting ? "Starting…" : "New chat"}
@@ -603,14 +603,14 @@ export function AppShell({ children }: { children: ReactNode }) {
           data-tour="nav-profile"
           className="flex min-w-0 flex-1 items-center gap-2.5 rounded-lg p-1 transition-colors hover:bg-surface-hover"
         >
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand text-[16px] font-medium text-white">
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand text-sm font-medium text-white">
             {(user?.display_name || user?.email || "?").slice(0, 1).toUpperCase()}
           </span>
           <span className="min-w-0 flex-1">
-            <span className="block truncate text-[16px] text-ink">
+            <span className="block truncate text-sm text-ink">
               {user?.display_name || "Signed in"}
             </span>
-            <span className="block truncate text-[12px] text-ink-muted">
+            <span className="block truncate text-xs text-ink-muted">
               {user?.email}
             </span>
           </span>
@@ -637,7 +637,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     // message list to the viewport and keep the composer pinned. With an
     // unbounded shell the list's overflow-y-auto never engages and the page
     // grows past the viewport instead.
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-[calc(var(--app-vh)*100)] overflow-hidden">
       {/* Desktop sidebar. Slides out of view rather than unmounting, so
           collapsing and re-opening doesn't refetch the workspace list or lose
           the switcher's open/closed state. */}
@@ -688,7 +688,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           />
           <aside className="absolute inset-y-0 left-0 flex w-[var(--sidebar-width)] flex-col border-r border-hairline bg-surface-muted">
             <div className="flex h-[var(--topbar-height)] items-center justify-between border-b border-hairline px-4">
-              <span className="text-[15px] font-semibold tracking-tight text-ink">
+              <span className="text-sm font-semibold tracking-tight text-ink">
                 Clardentity
               </span>
               <button
@@ -808,7 +808,7 @@ function Breadcrumbs({
 }) {
   const segments = pathname.split("/").filter(Boolean);
   if (segments.length === 0) {
-    return <span className="text-[20px] text-[color:var(--text-nav)]">Home</span>;
+    return <span className="text-xl text-[color:var(--text-nav)]">Home</span>;
   }
 
   // Any route not listed here falls through to its raw path segment, which
@@ -869,7 +869,7 @@ function Crumbs({ crumbs }: { crumbs: Array<{ label: string; href?: string }> })
   return (
     // 20px, and the three warm greys the design assigns: the trail in
     // #4d4339, its separators in #8b7b73, the page you are on in #5f5551.
-    <nav aria-label="Breadcrumb" className="flex min-w-0 items-center gap-2 text-[20px]">
+    <nav aria-label="Breadcrumb" className="flex min-w-0 items-center gap-2 text-xl">
       {crumbs.map((c, i) => {
         const last = i === crumbs.length - 1;
         return (

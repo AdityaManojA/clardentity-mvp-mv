@@ -72,7 +72,7 @@ export function ExportFileMenu({
   }
 
   return (
-    <div className="mt-1.5 text-[11px]">
+    <div className="mt-1.5 text-xs">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}

@@ -78,7 +78,7 @@ export function SourcesFooter({ claims }: { claims: Claim[] }) {
   if (sources.length === 0) return null;
   return (
     <div className="mt-3 border-t border-hairline pt-2.5">
-      <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-ink-muted">
+      <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-ink-muted">
         Sources
       </p>
       <ul className="flex flex-wrap gap-1.5">
@@ -90,7 +90,7 @@ export function SourcesFooter({ claims }: { claims: Claim[] }) {
               </span>
               <span className="min-w-0">
                 <span className="block truncate text-xs font-medium text-ink">{s.title}</span>
-                <span className="block truncate text-[10px] text-ink-muted">
+                <span className="block truncate text-xs text-ink-muted">
                   {s.host ?? "Your attachment"}
                   {" · "}
                   {s.cites === 1 ? "1 claim" : `${s.cites} claims`}

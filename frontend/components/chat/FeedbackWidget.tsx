@@ -69,7 +69,7 @@ export function FeedbackWidget({
   }
 
   return (
-    <div className="mt-1.5 flex flex-col gap-1.5 text-[11px] text-ink-muted">
+    <div className="mt-1.5 flex flex-col gap-1.5 text-xs text-ink-muted">
       <div className="flex items-center gap-2">
         <span>Was this helpful?</span>
         <button
@@ -144,7 +144,7 @@ export function FeedbackWidget({
               type="button"
               onClick={submitComment}
               disabled={saving}
-              className="rounded-full bg-brand px-2.5 py-1 text-[11px] font-medium text-white transition-colors hover:bg-brand-dark disabled:opacity-40"
+              className="rounded-full bg-brand px-2.5 py-1 text-xs font-medium text-white transition-colors hover:bg-brand-dark disabled:opacity-40"
             >
               Send
             </button>
@@ -154,7 +154,7 @@ export function FeedbackWidget({
                 setDraft(comment ?? "");
                 setCommentOpen(false);
               }}
-              className="rounded-full px-2 py-1 text-[11px] text-ink-secondary transition-colors hover:bg-surface-hover"
+              className="rounded-full px-2 py-1 text-xs text-ink-secondary transition-colors hover:bg-surface-hover"
             >
               Cancel
             </button>

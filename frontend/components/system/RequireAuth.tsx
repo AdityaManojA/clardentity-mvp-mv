@@ -41,7 +41,7 @@ export function RequireAuth({ children }: { children: ReactNode }) {
 
   if (loading || !user || needsWelcome) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-[calc(var(--app-vh)*100)] items-center justify-center">
         <Spinner className="text-ink-muted" />
       </div>
     );

@@ -121,11 +121,11 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <div className="relative flex min-h-screen items-center justify-center px-4 py-12 sm:px-6 sm:py-16">
+    <div className="relative flex min-h-[calc(var(--app-vh)*100)] items-center justify-center px-4 py-12 sm:px-6 sm:py-16">
       <ThemeToggle className="absolute right-4 top-4 sm:right-6 sm:top-6" />
       <div className="w-full max-w-sm">
         <div className="mb-6 text-center">
-          <Link href="/" className="text-[15px] font-semibold tracking-tight text-ink">
+          <Link href="/" className="text-sm font-semibold tracking-tight text-ink">
             Clardentity
           </Link>
         </div>

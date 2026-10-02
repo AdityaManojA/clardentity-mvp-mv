@@ -344,7 +344,7 @@ export function MessageInput({
                   className="flex h-14 max-w-[220px] items-center gap-2 rounded-md border border-hairline-strong bg-surface-muted px-2.5 text-xs text-ink-secondary"
                   title={item.filename}
                 >
-                  <span className="rounded bg-surface px-1 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-ink-muted">
+                  <span className="rounded bg-surface px-1 py-0.5 text-xs font-semibold uppercase tracking-wide text-ink-muted">
                     {fileExtension(item.filename) || "file"}
                   </span>
                   <span className="truncate">{item.filename}</span>
@@ -353,7 +353,7 @@ export function MessageInput({
               <button
                 type="button"
                 onClick={() => removeAttachment(i)}
-                className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-ink text-[9px] text-surface transition-opacity hover:opacity-80"
+                className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-ink text-xs text-surface transition-opacity hover:opacity-80"
                 aria-label={`Remove ${item.kind === "image" ? "image" : item.filename}`}
               >
                 ✕
@@ -508,7 +508,7 @@ export function MessageInput({
             <div
               ref={mirrorRef}
               aria-hidden="true"
-              className="pointer-events-none absolute inset-0 overflow-hidden whitespace-pre-wrap break-words px-[27px] pt-[26px] text-[20px] leading-[normal]"
+              className="pointer-events-none absolute inset-0 overflow-hidden whitespace-pre-wrap break-words px-[27px] pt-[26px] text-xl leading-[normal]"
             >
               <span className="invisible">{value}</span>
               <span className="text-ink-muted">{ghostVisible}</span>
@@ -544,7 +544,7 @@ export function MessageInput({
               ? "Enter starts a new line - tap the arrow to send"
               : "Enter to ask, Shift+Enter for a new line"
           }
-          className="relative w-full resize-none bg-transparent p-0 text-[20px] leading-[normal] text-ink placeholder:text-ink-muted focus:outline-none disabled:cursor-not-allowed"
+          className="relative w-full resize-none bg-transparent p-0 text-xl leading-[normal] text-ink placeholder:text-ink-muted focus:outline-none disabled:cursor-not-allowed"
         />
         </div>
       </div>
@@ -558,7 +558,7 @@ export function MessageInput({
           speaks up when it has something to say: a suggestion to take, or a
           word it has just corrected. */}
       {ghostVisible ? (
-        <p className="flex items-center gap-2 text-[11px] text-ink-muted" aria-live="polite">
+        <p className="flex items-center gap-2 text-xs text-ink-muted" aria-live="polite">
           <span className="truncate">
             Suggestion: <span className="text-ink-secondary">{ghostVisible.trim()}</span>
           </span>
@@ -571,7 +571,7 @@ export function MessageInput({
           </button>
         </p>
       ) : lastFix && value === lastFix.text ? (
-        <p className="flex items-center gap-2 text-[11px] text-ink-muted">
+        <p className="flex items-center gap-2 text-xs text-ink-muted">
           <span>
             Corrected <s className="text-ink-muted/70">{lastFix.from}</s> to{" "}
             <span className="font-medium text-ink-secondary">{lastFix.to}</span>

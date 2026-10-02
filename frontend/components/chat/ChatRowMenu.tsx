@@ -248,7 +248,7 @@ export function ChatRowMenu({
 
           {view === "move" && (
             <>
-              <span className="block px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-ink-muted">
+              <span className="block px-2 py-1 text-xs font-semibold uppercase tracking-wide text-ink-muted">
                 Move to
               </span>
               {destinations.map((w) => (
@@ -274,7 +274,7 @@ export function ChatRowMenu({
                 void patch({ title: draft });
               }}
             >
-              <label className="block px-1 pb-1 text-[10px] font-semibold uppercase tracking-wide text-ink-muted">
+              <label className="block px-1 pb-1 text-xs font-semibold uppercase tracking-wide text-ink-muted">
                 Chat name
               </label>
               <input
@@ -329,7 +329,7 @@ export function ChatRowMenu({
             </span>
           )}
 
-          {error && <span className="block px-2 py-1 text-[11px] text-band-low">{error}</span>}
+          {error && <span className="block px-2 py-1 text-xs text-band-low">{error}</span>}
         </span>
       )}
     </span>

@@ -138,7 +138,7 @@ export function LineChart({ points }: { points: Slice[] }) {
       <svg viewBox="0 0 100 30" preserveAspectRatio="none" className="h-20 w-full">
         <path d={path} fill="none" stroke="var(--brand)" strokeWidth="0.8" vectorEffect="non-scaling-stroke" />
       </svg>
-      <div className="flex justify-between text-[10px] text-ink-muted">
+      <div className="flex justify-between text-xs text-ink-muted">
         <span>{points[0].label}</span>
         <span>{formatTokens(max)} peak</span>
         <span>{points[points.length - 1].label}</span>

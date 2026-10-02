@@ -28,7 +28,7 @@ export function RefinedQuestionCard({
     <div className="mt-2 rounded-xl border border-brand-border bg-brand-soft p-3.5">
       <p className="text-sm font-medium text-ink">Did you mean: “{refinedQuestion}”?</p>
       {reason && <p className="mt-1 text-xs leading-relaxed text-ink-secondary">{reason}</p>}
-      <p className="mt-1 text-[11px] leading-relaxed text-ink-muted">
+      <p className="mt-1 text-xs leading-relaxed text-ink-muted">
         Nothing has been answered yet - whichever you pick is what gets written,
         checked and scored.
       </p>

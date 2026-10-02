@@ -19,6 +19,27 @@
    pixel-matched.
 --------------------------------------------------------------------------- */
 :root {
+  /* ------------------------------------------------------------------
+     The interface is drawn at four fifths.
+
+     The design was laid out on a 1728px frame, so implementing it a pixel
+     at a time put a 20px body size and a 925px composer on screens that are
+     mostly 1440 - which read a size too large everywhere. Four fifths is
+     where it settles, and the whole thing is scaled rather than each number
+     retyped: a scale factor cannot drift the way two hundred hand-adjusted
+     values can, and the file still says what the design says.
+
+     Phones are left alone. The same factor there would take a 32px control
+     down to 25px of thumb, and a phone's interface is relatively larger
+     than a desktop's for that reason.
+     ------------------------------------------------------------------ */
+  --ui-zoom: 1;
+  /* One vh, corrected. `vh` is measured on the unzoomed viewport, so under
+     a 0.8 zoom a 100vh box covers four fifths of the screen and leaves a
+     band at the bottom. Anything that wants to be as tall as the window
+     uses this instead. */
+  --app-vh: calc(1vh / var(--ui-zoom));
+
   /* The app's canvas is the design's background/primary; panels sit above it
      in white, and the chrome - sidebar, header - is the warmer #faf8f9 the
      landing page uses, so the two halves of the product are one thing. */
@@ -214,6 +235,59 @@
      at the door. */
   --font-sans: var(--font-outfit);
   --font-mono: var(--font-geist-mono);
+
+  /* ------------------------------------------------------------------
+     The type scale, and the only sizes in the app.
+
+     The design draws six: 12 for anything that labels something else, 16
+     for controls and dense copy, 20 for body text and every row, 24 for
+     the name on a card, 28 for a section, 32 for a page. What was here
+     before had thirteen - 9, 10, 11, 12, 13, 14, 15, 16, 18, 20, 24, 28,
+     30 - which is how a timestamp in the sidebar ended up a different
+     size from a timestamp under a message.
+
+     Tailwind's own names are redefined onto those six rather than adding
+     a parallel set, so the hundreds of `text-sm` and `text-xs` already in
+     the app land on the scale without being touched. Two names share 16px
+     on purpose: there is no step between "small" and "normal" here.
+
+     Line heights are left as Tailwind's ratios, so they follow the size.
+     Anything that needs the design's tighter leading says leading-[normal]
+     where it is used.
+     ------------------------------------------------------------------ */
+  --text-xs: 12px;
+  --text-sm: 16px;
+  --text-base: 16px;
+  --text-lg: 20px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+  --text-3xl: 28px;
+  --text-4xl: 32px;
+}
+
+/* Applied to the root, not to a wrapper: `position: fixed` and the layout
+   viewport both resolve against the root's box, so zooming anything lower
+   leaves fixed overlays measuring the screen at full size while everything
+   under them is at four fifths. */
+/* Guarded on `zoom` rather than assumed: a browser without it would otherwise
+   keep --ui-zoom at 0.8, which only --app-vh reads, and every full-height page
+   would grow a quarter of a screen of scroll for nothing. Without the
+   property, the app simply stays at full size. */
+@supports (zoom: 1) {
+  @media (min-width: 768px) {
+    :root {
+      --ui-zoom: 0.8;
+      zoom: var(--ui-zoom);
+    }
+
+    /* The marketing page opts back out. It was drawn to its own frame and
+       already scales itself to whatever window it is in, so it was never the
+       thing that read too large - and zoom compounds down the tree, so undoing
+       it is the reciprocal rather than a second number to keep in step. */
+    .landing {
+      zoom: calc(1 / var(--ui-zoom));
+    }
+  }
 }
 
 body {

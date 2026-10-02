@@ -74,7 +74,7 @@ export function ModeSwitchToast({
             }
           />
         </svg>
-        <span className="absolute text-[9px] font-semibold tabular-nums text-brand">{left}</span>
+        <span className="absolute text-xs font-semibold tabular-nums text-brand">{left}</span>
       </span>
       <span className="min-w-0 flex-1">
         <span className="font-medium">Switched to {to}</span>

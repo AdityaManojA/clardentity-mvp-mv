@@ -6,6 +6,7 @@ import { COGNITIVE_MODES, type CognitiveMode } from "@/lib/modes";
 import { useLockedModes } from "@/lib/previewAccess";
 import { companionLabel, useCompanionNames } from "@/lib/companionNames";
 import { MaskIcon } from "@/components/ui/MaskIcon";
+import { uiZoom } from "@/lib/uiScale";
 import { cx } from "@/components/ui/primitives";
 
 export { COGNITIVE_MODES };
@@ -54,7 +55,12 @@ export function ModeSelector({
     const strip = stripRef.current;
     const pill = selectedRef.current;
     if (!strip || !pill) return;
-    const offset = pill.getBoundingClientRect().left - strip.getBoundingClientRect().left + strip.scrollLeft;
+    // scrollLeft, clientWidth and offsetWidth are in layout pixels; a measured
+    // rect is in screen pixels, which the root's zoom has already shrunk. The
+    // gap between the two has to be converted before it joins them.
+    const gap =
+      (pill.getBoundingClientRect().left - strip.getBoundingClientRect().left) / uiZoom();
+    const offset = gap + strip.scrollLeft;
     strip.scrollLeft = Math.max(0, offset - (strip.clientWidth - pill.offsetWidth) / 2);
   }, [value]);
 
@@ -89,7 +95,7 @@ export function ModeSelector({
                 <span className="flex items-center gap-1.5 text-sm font-semibold text-ink">
                   {companionLabel(names, mode.value, mode.label)}
                   {comingSoon && (
-                    <span className="rounded-full bg-surface-hover px-1.5 py-[1px] text-[10px] font-medium uppercase tracking-wide text-ink-muted">
+                    <span className="rounded-full bg-surface-hover px-1.5 py-[1px] text-xs font-medium uppercase tracking-wide text-ink-muted">
                       Soon
                     </span>
                   )}
@@ -136,7 +142,7 @@ export function ModeSelector({
               onClick={() => (comingSoon ? onLocked?.(mode.value) : onChange(mode.value))}
               title={comingSoon ? `${mode.when} (included in a paid plan)` : mode.when}
               className={cx(
-                "flex shrink-0 flex-col items-center justify-center gap-[2px] rounded-[8px] border bg-surface px-3 py-1 text-[16px] leading-[normal] transition-colors disabled:cursor-not-allowed disabled:opacity-50",
+                "flex shrink-0 flex-col items-center justify-center gap-[2px] rounded-[8px] border bg-surface px-3 py-1 text-sm leading-[normal] transition-colors disabled:cursor-not-allowed disabled:opacity-50",
                 comingSoon && "opacity-60",
                 // The design draws every card the same; selection is the one
                 // state it leaves to us, so it is the brand on the border and

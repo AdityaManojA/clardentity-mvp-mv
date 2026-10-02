@@ -133,10 +133,10 @@ export function WorkspaceDetail({ workspaceId }: { workspaceId: string }) {
     <div className="mx-auto w-full max-w-[1441px] px-5 pb-16 pt-[69px] sm:px-10 xl:px-[140px]">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
-          <h1 className="truncate text-[32px] font-medium leading-[normal] text-ink">
+          <h1 className="truncate text-4xl font-medium leading-[normal] text-ink">
             {workspace.name}
           </h1>
-          <p className="text-[20px] leading-[normal] text-ink-secondary">
+          <p className="text-xl leading-[normal] text-ink-secondary">
             Attachments added here ground every answer in this workspace.
           </p>
         </div>
@@ -147,7 +147,7 @@ export function WorkspaceDetail({ workspaceId }: { workspaceId: string }) {
           data-tour="new-chat"
           onClick={() => handleNewConversation()}
           disabled={creating !== null}
-          className="flex h-[42px] shrink-0 items-center gap-1 rounded-[34px] bg-brand px-3 py-2 text-[20px] leading-[normal] text-white transition-colors hover:bg-brand-dark disabled:opacity-60"
+          className="flex h-[42px] shrink-0 items-center gap-1 rounded-[34px] bg-brand px-3 py-2 text-xl leading-[normal] text-white transition-colors hover:bg-brand-dark disabled:opacity-60"
         >
           {creating === "any" ? "Creating…" : "Create"}
           <svg
@@ -171,7 +171,7 @@ export function WorkspaceDetail({ workspaceId }: { workspaceId: string }) {
           sidebar, where navigation lives. What's left is the one thing you came
           here to do and the list of what you did before. */}
       {conversations.length === 0 ? (
-        <p className="mt-10 text-[20px] leading-[normal] text-ink-secondary">
+        <p className="mt-10 text-xl leading-[normal] text-ink-secondary">
           No chats in this workspace yet. Create one and it collects here.
         </p>
       ) : (
@@ -203,12 +203,12 @@ export function WorkspaceDetail({ workspaceId }: { workspaceId: string }) {
                     <path d="M12 14v6" />
                   </svg>
                 )}
-                <span className="truncate text-[20px] leading-[normal] text-ink-secondary">
+                <span className="truncate text-xl leading-[normal] text-ink-secondary">
                   {conv.title || "Untitled chat"}
                 </span>
                 {/* Pushed to the right end of the row: when it was last
                     touched, and which companion answered in it. */}
-                <span className="ml-auto flex shrink-0 items-center text-[12px] leading-[normal]">
+                <span className="ml-auto flex shrink-0 items-center text-xs leading-[normal]">
                   <span
                     className="text-ink-secondary"
                     title={new Date(conv.last_activity_at ?? conv.created_at).toLocaleString()}

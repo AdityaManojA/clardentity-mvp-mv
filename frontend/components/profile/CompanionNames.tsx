@@ -66,7 +66,7 @@ export function CompanionNames() {
           const isEditing = editing === mode.value;
           return (
             <li key={mode.value} className="flex items-center gap-4">
-              <span className="flex w-[200px] shrink-0 items-center gap-2 text-[20px] leading-[normal] text-ink">
+              <span className="flex w-[200px] shrink-0 items-center gap-2 text-xl leading-[normal] text-ink">
                 <MaskIcon src={mode.icon} size={24} />
                 <span className="truncate">{mode.label}</span>
               </span>
@@ -88,13 +88,13 @@ export function CompanionNames() {
                     }}
                     aria-label={`Name for ${mode.label}`}
                     data-field="bare"
-                    className="min-w-0 flex-1 border-b border-brand-border bg-transparent pb-0.5 text-[20px] leading-[normal] text-ink placeholder:text-ink-muted"
+                    className="min-w-0 flex-1 border-b border-brand-border bg-transparent pb-0.5 text-xl leading-[normal] text-ink placeholder:text-ink-muted"
                     placeholder={`${mode.label} (Default)`}
                   />
                 ) : (
                   <span
                     className={cx(
-                      "min-w-0 flex-1 truncate text-[20px] leading-[normal]",
+                      "min-w-0 flex-1 truncate text-xl leading-[normal]",
                       name ? "text-ink" : "text-ink-secondary",
                     )}
                   >
@@ -129,7 +129,7 @@ export function CompanionNames() {
       </ul>
 
       {state === "error" && (
-        <p className="mt-4 text-[16px] leading-[normal] text-band-low">
+        <p className="mt-4 text-sm leading-[normal] text-band-low">
           Could not save that name. Try again.
         </p>
       )}

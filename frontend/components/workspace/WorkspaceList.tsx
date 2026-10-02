@@ -111,15 +111,15 @@ export function WorkspaceList() {
     <div className="mx-auto w-full max-w-[1441px] px-5 pb-16 pt-[69px] sm:px-10 xl:px-[140px]">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-[32px] font-medium leading-[normal] text-ink">Workspaces</h1>
-          <p className="text-[20px] leading-[normal] text-ink-secondary">
+          <h1 className="text-4xl font-medium leading-[normal] text-ink">Workspaces</h1>
+          <p className="text-xl leading-[normal] text-ink-secondary">
             Keep everything for each workspace in one place.
           </p>
         </div>
         <button
           type="button"
           onClick={() => setComposing(true)}
-          className="flex h-[42px] shrink-0 items-center gap-1 rounded-[34px] bg-brand px-3 py-2 text-[20px] leading-[normal] text-white transition-colors hover:bg-brand-dark"
+          className="flex h-[42px] shrink-0 items-center gap-1 rounded-[34px] bg-brand px-3 py-2 text-xl leading-[normal] text-white transition-colors hover:bg-brand-dark"
         >
           Create
           <svg
@@ -170,9 +170,9 @@ export function WorkspaceList() {
                     placeholder="Name this workspace"
                     aria-label="New workspace name"
                     data-field="bare"
-                    className="w-full bg-transparent text-[24px] leading-[normal] text-ink placeholder:text-ink-muted focus:outline-none"
+                    className="w-full bg-transparent text-2xl leading-[normal] text-ink placeholder:text-ink-muted focus:outline-none"
                   />
-                  <div className="mt-2 flex items-center gap-3 text-[12px] leading-[normal]">
+                  <div className="mt-2 flex items-center gap-3 text-xs leading-[normal]">
                     <button
                       type="submit"
                       disabled={creating || !name.trim()}
@@ -198,7 +198,7 @@ export function WorkspaceList() {
 
           {workspaces.length === 0 && !composing && (
             <li className="lg:col-span-2">
-              <p className="text-[20px] leading-[normal] text-ink-secondary">
+              <p className="text-xl leading-[normal] text-ink-secondary">
                 No workspaces yet. Create one and everything you attach and ask
                 collects inside it.
               </p>
@@ -213,10 +213,10 @@ export function WorkspaceList() {
               >
                 <FolderTile />
                 <span className="min-w-0 pt-0.5">
-                  <span className="block truncate text-[24px] leading-[normal] text-ink">
+                  <span className="block truncate text-2xl leading-[normal] text-ink">
                     {ws.name}
                   </span>
-                  <span className="mt-0.5 block text-[12px] leading-[normal] text-ink-secondary">
+                  <span className="mt-0.5 block text-xs leading-[normal] text-ink-secondary">
                     Created {created(ws.created_at)}
                   </span>
                 </span>

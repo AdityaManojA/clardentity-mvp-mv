@@ -34,7 +34,7 @@ export function GuidanceCard({
   return (
     <div className="group/guide mt-2.5 space-y-1.5 opacity-55 transition-opacity hover:opacity-100">
       {modeLabel && mode && (
-        <p className="text-[11px] leading-relaxed text-ink-muted">
+        <p className="text-xs leading-relaxed text-ink-muted">
           <span className="text-ink-secondary">Better suited to </span>
           <button
             type="button"
@@ -49,7 +49,7 @@ export function GuidanceCard({
       )}
 
       {refined && (
-        <p className="text-[11px] leading-relaxed text-ink-muted">
+        <p className="text-xs leading-relaxed text-ink-muted">
           <span className="text-ink-secondary">Did you mean: </span>
           <button
             type="button"

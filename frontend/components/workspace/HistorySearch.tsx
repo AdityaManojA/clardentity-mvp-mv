@@ -80,7 +80,7 @@ export function HistorySearch({ workspaceId }: { workspaceId: string }) {
           placeholder="Search…"
           aria-label="Search chat history"
           data-field="bare"
-          className="min-w-0 flex-1 bg-transparent text-[20px] leading-[normal] text-ink placeholder:text-ink-muted focus:outline-none [&::-webkit-search-cancel-button]:appearance-none"
+          className="min-w-0 flex-1 bg-transparent text-xl leading-[normal] text-ink placeholder:text-ink-muted focus:outline-none [&::-webkit-search-cancel-button]:appearance-none"
         />
         <button
           type="submit"
@@ -116,7 +116,7 @@ export function HistorySearch({ workspaceId }: { workspaceId: string }) {
 
       {results !== null &&
         (results.length === 0 ? (
-          <p className="mt-8 px-[17px] text-[16px] leading-[normal] text-ink-secondary">
+          <p className="mt-8 px-[17px] text-sm leading-[normal] text-ink-secondary">
             Nothing said in this workspace matches that.
           </p>
         ) : (
@@ -127,7 +127,7 @@ export function HistorySearch({ workspaceId }: { workspaceId: string }) {
                   href={`/chat/${r.conversation_id}`}
                   className="block border-b border-hairline px-[17px] py-[14px] transition-colors hover:bg-surface-hover"
                 >
-                  <span className="flex items-center gap-2 text-[12px] leading-[normal] text-ink-secondary">
+                  <span className="flex items-center gap-2 text-xs leading-[normal] text-ink-secondary">
                     <ChatMark />
                     <span className="min-w-0 truncate">
                       {r.conversation_title || "Untitled chat"}
@@ -144,7 +144,7 @@ export function HistorySearch({ workspaceId }: { workspaceId: string }) {
                       <span>{modeLabel(r.mode_used)}</span>
                     </span>
                   </span>
-                  <p className="mt-2 line-clamp-2 text-[16px] leading-[normal] text-ink-secondary">
+                  <p className="mt-2 line-clamp-2 text-sm leading-[normal] text-ink-secondary">
                     {r.content}
                   </p>
                 </Link>

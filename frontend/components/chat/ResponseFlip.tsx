@@ -133,7 +133,7 @@ export function ResponseFlip({
               needs while flipped. The counterfactual runs about half the
               length of the answer, so the front governs the height. */}
           <div className="rounded-xl border border-caution-border bg-caution-bg px-3 py-2.5">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-caution">
+            <p className="text-xs font-semibold uppercase tracking-wide text-caution">
               Unchecked - caveats removed
             </p>
             {loading && (

@@ -2,6 +2,7 @@
 
 import { useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { layoutViewport, toLayoutRect } from "@/lib/uiScale";
 import type { Evidence } from "@/lib/sse";
 import { cx } from "@/components/ui/primitives";
 
@@ -181,18 +182,20 @@ export function CitationPopover({
     const pop = popoverRef.current;
     if (!btn || !pop) return;
     const margin = 8;
-    const btnRect = btn.getBoundingClientRect();
-    const popRect = pop.getBoundingClientRect();
+    // Measured in screen pixels, placed in layout pixels - see lib/uiScale.
+    const btnRect = toLayoutRect(btn.getBoundingClientRect());
+    const popRect = toLayoutRect(pop.getBoundingClientRect());
+    const view = layoutViewport();
 
     let left = btnRect.left;
-    left = Math.min(left, window.innerWidth - popRect.width - margin);
+    left = Math.min(left, view.width - popRect.width - margin);
     left = Math.max(left, margin);
 
     // Prefer above the marker; flip below only if there's no room above,
     // rather than letting it run off the top of the screen.
     let top = btnRect.top - popRect.height - margin;
     if (top < margin) top = btnRect.bottom + margin;
-    top = Math.min(top, window.innerHeight - popRect.height - margin);
+    top = Math.min(top, view.height - popRect.height - margin);
     top = Math.max(top, margin);
 
     setPos({ top, left });
@@ -219,7 +222,7 @@ export function CitationPopover({
         onBlur={() => setTimeout(() => setOpen(false), 150)}
         aria-expanded={open}
         title={`Source: ${evidence.document_filename}`}
-        className="mx-0.5 rounded border border-brand-border bg-brand-soft px-1 align-super text-[10px] font-semibold text-brand transition-colors hover:bg-brand hover:text-white"
+        className="mx-0.5 rounded border border-brand-border bg-brand-soft px-1 align-super text-xs font-semibold text-brand transition-colors hover:bg-brand hover:text-white"
       >
         {marker}
       </button>
@@ -243,7 +246,7 @@ export function CitationPopover({
                 ? { position: "fixed", top: pos.top, left: pos.left, visibility: "visible" }
                 : { position: "fixed", top: -9999, left: -9999, visibility: "hidden" }
             }
-            className="z-30 block w-64 max-w-[calc(100vw-1rem)] rounded-lg border border-hairline bg-surface-raised p-2.5 text-left text-[11px] normal-case shadow-lg"
+            className="z-30 block w-64 max-w-[calc(100vw-1rem)] rounded-lg border border-hairline bg-surface-raised p-2.5 text-left text-xs normal-case shadow-lg"
           >
             {isWeb ? (
               <a

@@ -169,12 +169,12 @@ export function ProfileView() {
             learned anything, and the two things you can do to it. */}
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex min-w-0 items-center gap-2">
-            <span className="flex size-[60px] shrink-0 items-center justify-center rounded-full bg-brand text-[24px] font-medium text-white">
+            <span className="flex size-[60px] shrink-0 items-center justify-center rounded-full bg-brand text-2xl font-medium text-white">
               {initials}
             </span>
             <div className="min-w-0">
-              <p className="truncate text-[32px] font-medium leading-[normal] text-ink">{name}</p>
-              <p className="text-[20px] leading-[normal] text-ink-secondary">
+              <p className="truncate text-4xl font-medium leading-[normal] text-ink">{name}</p>
+              <p className="text-xl leading-[normal] text-ink-secondary">
                 {sinceLabel(profile?.updated_at ?? null)}
               </p>
             </div>
@@ -264,7 +264,7 @@ export function ProfileView() {
                 type="button"
                 onClick={handleClear}
                 disabled={busy !== null}
-                className="mt-6 text-[16px] leading-[normal] text-ink-muted underline-offset-4 transition-colors hover:text-band-low hover:underline disabled:opacity-50"
+                className="mt-6 text-sm leading-[normal] text-ink-muted underline-offset-4 transition-colors hover:text-band-low hover:underline disabled:opacity-50"
               >
                 {busy === "clear" ? "Deleting…" : "Forget everything learned so far"}
               </button>
@@ -280,7 +280,7 @@ export function ProfileView() {
                 {roles.map((r) => (
                   <li key={r.role_id}>
                     <div className="flex items-start gap-3">
-                      <span className="flex flex-wrap items-center gap-2 text-[20px] font-medium leading-[normal] text-ink">
+                      <span className="flex flex-wrap items-center gap-2 text-xl font-medium leading-[normal] text-ink">
                         {r.label}
                         {Object.values(r.qualifiers)
                           .flat()
@@ -292,7 +292,7 @@ export function ProfileView() {
                       </span>
                     </div>
                     {r.evidence && (
-                      <p className="mt-1 text-[20px] leading-[normal] text-ink-secondary">
+                      <p className="mt-1 text-xl leading-[normal] text-ink-secondary">
                         {r.evidence}
                       </p>
                     )}
@@ -300,7 +300,7 @@ export function ProfileView() {
                 ))}
               </ul>
             ) : (
-              <p className="text-[20px] leading-[normal] text-ink-secondary">
+              <p className="text-xl leading-[normal] text-ink-secondary">
                 No roles inferred yet - nothing in your history clearly indicated one.
               </p>
             )}
@@ -315,11 +315,11 @@ export function ProfileView() {
             description="See what each plan opens, or install Clardentity as an app."
             action={
               <>
-                <InstallAppButton className="flex h-[42px] items-center rounded-[34px] border border-hairline-strong px-[21px] text-[20px] leading-[normal] text-ink transition-colors hover:bg-surface-hover" />
+                <InstallAppButton className="flex h-[42px] items-center rounded-[34px] border border-hairline-strong px-[21px] text-xl leading-[normal] text-ink transition-colors hover:bg-surface-hover" />
                 <button
                   type="button"
                   onClick={() => setPlansOpen(true)}
-                  className="flex h-[42px] items-center rounded-[34px] bg-brand px-[21px] text-[20px] leading-[normal] text-white transition-colors hover:bg-brand-dark"
+                  className="flex h-[42px] items-center rounded-[34px] bg-brand px-[21px] text-xl leading-[normal] text-white transition-colors hover:bg-brand-dark"
                 >
                   See plans
                 </button>

@@ -56,7 +56,7 @@ export function ClarifierCard({
   // with nothing above it to say what it was answering.
   if (answered !== null) {
     return (
-      <p className="mt-2.5 text-[11px] leading-relaxed text-ink-muted">Asked: {question}</p>
+      <p className="mt-2.5 text-xs leading-relaxed text-ink-muted">Asked: {question}</p>
     );
   }
 
@@ -98,7 +98,7 @@ export function ClarifierCard({
                 "hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-50",
               )}
             >
-              <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded border border-hairline-strong text-[10px] tabular-nums text-ink-muted">
+              <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded border border-hairline-strong text-xs tabular-nums text-ink-muted">
                 {index + 1}
               </span>
               <span className="text-ink">{option}</span>
@@ -126,7 +126,7 @@ export function ClarifierCard({
         <button
           type="button"
           onClick={() => setDismissed(true)}
-          className="shrink-0 rounded-md border border-hairline-strong px-2 py-0.5 text-[11px] text-ink-secondary transition-colors hover:bg-surface-hover"
+          className="shrink-0 rounded-md border border-hairline-strong px-2 py-0.5 text-xs text-ink-secondary transition-colors hover:bg-surface-hover"
         >
           Skip
         </button>

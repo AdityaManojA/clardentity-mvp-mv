@@ -117,7 +117,7 @@ export function AttachmentSearch({
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                   <span className="text-xs font-medium text-ink">{hit.filename}</span>
                   {hit.page_number !== null && (
-                    <span className="text-[11px] text-ink-muted">page {hit.page_number}</span>
+                    <span className="text-xs text-ink-muted">page {hit.page_number}</span>
                   )}
                   {hit.cited_here && (
                     <Badge tone="brand">cited here</Badge>

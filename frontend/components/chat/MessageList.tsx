@@ -360,7 +360,7 @@ function renderBody(text: string, claims: Claim[]): ReactNode {
     }
     return (
       <span key={`b${n}`} className="my-2 block overflow-x-auto whitespace-normal">
-        <table className="w-full border-collapse text-left text-[13px]">
+        <table className="w-full border-collapse text-left text-sm">
           <thead>
             <tr>
               {block.rows[0].map((cell, c) => (
@@ -435,8 +435,8 @@ function UserMessageBody({ content }: { content: string }) {
         {exchanges.map((x, i) => (
           <div key={i} className="space-y-1.5">
             <div className="flex justify-start">
-              <div className="max-w-[88%] rounded-xl rounded-bl-sm bg-white/15 px-2.5 py-1.5 text-[13px] leading-snug">
-                <span className="mb-0.5 block text-[10px] font-semibold uppercase tracking-wide text-white/70">
+              <div className="max-w-[88%] rounded-xl rounded-bl-sm bg-white/15 px-2.5 py-1.5 text-sm leading-snug">
+                <span className="mb-0.5 block text-xs font-semibold uppercase tracking-wide text-white/70">
                   Clardentity
                 </span>
                 <span className="whitespace-pre-wrap">{x.question}</span>
@@ -444,8 +444,8 @@ function UserMessageBody({ content }: { content: string }) {
             </div>
             {x.answer && (
               <div className="flex justify-end">
-                <div className="max-w-[88%] rounded-xl rounded-br-sm bg-white px-2.5 py-1.5 text-[13px] leading-snug text-brand">
-                  <span className="mb-0.5 block text-[10px] font-semibold uppercase tracking-wide text-brand/70">
+                <div className="max-w-[88%] rounded-xl rounded-br-sm bg-white px-2.5 py-1.5 text-sm leading-snug text-brand">
+                  <span className="mb-0.5 block text-xs font-semibold uppercase tracking-wide text-brand/70">
                     You
                   </span>
                   <span className="whitespace-pre-wrap">{x.answer}</span>
@@ -610,7 +610,7 @@ function MessageBubble({
             // keeps the brand for the one control you press. A column of
             // filled brand blocks was the loudest thing on a page whose
             // subject is the answer underneath them.
-            ? "max-w-[78%] rounded-[12px] bg-bubble-mine px-[23px] py-[11px] text-[20px] leading-[normal] text-ink"
+            ? "max-w-[78%] rounded-[12px] bg-bubble-mine px-[23px] py-[11px] text-xl leading-[normal] text-ink"
             : "w-full max-w-[88%] rounded-2xl rounded-bl-md border border-hairline bg-surface px-4 py-3 text-sm text-ink"
         }
       >
@@ -620,8 +620,11 @@ function MessageBubble({
                 never surfaced - it is an internal choice about how to think,
                 and naming it ("critical", "non-linear") asked the reader to
                 hold a vocabulary that was only ever meant for the model. */}
-            <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-ink-muted">
-              <span>{modeLabel(modeUsed)}</span>
+            <div className="flex min-w-0 items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-ink-muted">
+              {/* The band badge beside this one has to stay on one line, so
+                  when the row runs out of width it is the mode name that
+                  gives way. */}
+              <span className="truncate">{modeLabel(modeUsed)}</span>
             </div>
             <div className="flex items-center gap-1.5">
               {!isStreaming && content && (
@@ -767,9 +770,9 @@ function MessageBubble({
                   event.currentTarget.form?.requestSubmit();
                 }
               }}
-              className="w-full resize-none rounded-lg bg-surface px-2 py-1.5 text-[20px] leading-[normal] text-ink outline-none ring-1 ring-hairline-strong focus:ring-brand-border"
+              className="w-full resize-none rounded-lg bg-surface px-2 py-1.5 text-xl leading-[normal] text-ink outline-none ring-1 ring-hairline-strong focus:ring-brand-border"
             />
-            <div className="mt-1.5 flex items-center justify-end gap-2 text-[11px]">
+            <div className="mt-1.5 flex items-center justify-end gap-2 text-xs">
               <span className="mr-auto text-ink-muted">Enter to resend, Esc to cancel</span>
               <button
                 type="button"
@@ -813,7 +816,7 @@ function MessageBubble({
           // The answer above is complete and saved. This says what is still
           // happening, so a message that gains a score a few seconds later
           // doesn't look like it changed on its own.
-          <p className="mt-2 flex items-center gap-1.5 text-[11px] text-ink-muted">
+          <p className="mt-2 flex items-center gap-1.5 text-xs text-ink-muted">
             <Spinner className="h-3 w-3" />
             Checking claims…
           </p>
@@ -871,7 +874,7 @@ function MessageBubble({
           <time
             dateTime={createdAt}
             className={cx(
-              "mt-1 block text-[10px] tabular-nums",
+              "mt-1 block text-xs tabular-nums",
               isUser ? "text-right text-ink-muted" : "text-ink-muted",
             )}
           >
@@ -909,7 +912,7 @@ function ForkSwitcher({
   return (
     <div
       className={cx(
-        "mt-1.5 flex items-center gap-0.5 text-[11px] text-ink-muted",
+        "mt-1.5 flex items-center gap-0.5 text-xs text-ink-muted",
         side === "mine" && "justify-end",
       )}
     >
@@ -1060,7 +1063,7 @@ function MessageActions({
             autoFocus
             disabled={busy}
             className={cx(
-              "rounded-md px-1.5 py-1 text-[10px] font-semibold uppercase tracking-wide transition-colors disabled:opacity-40",
+              "rounded-md px-1.5 py-1 text-xs font-semibold uppercase tracking-wide transition-colors disabled:opacity-40",
               "text-band-low",
             )}
           >

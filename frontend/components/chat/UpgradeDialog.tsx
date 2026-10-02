@@ -150,10 +150,10 @@ export function UpgradeDialog({
         className="absolute inset-0 cursor-default bg-black/60 backdrop-blur-sm"
       />
 
-      <div className="relative max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-hairline bg-surface-raised p-5 shadow-2xl sm:p-6">
+      <div className="relative max-h-[calc(var(--app-vh)*85)] w-full max-w-2xl overflow-y-auto rounded-2xl border border-hairline bg-surface-raised p-5 shadow-2xl sm:p-6">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-brand">
+            <p className="text-xs font-semibold uppercase tracking-wide text-brand">
               Clardentity Pro
             </p>
             <h2 className="mt-1 text-xl font-semibold tracking-tight text-ink">

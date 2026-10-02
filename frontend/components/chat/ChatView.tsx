@@ -1000,7 +1000,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
             the input" reports). shrink-0 makes the thread give way instead,
             and the cap keeps a long card scrollable within itself rather than
             pushing the composer off the bottom. */}
-        <div className="scroll-slim max-h-[50vh] shrink-0 overflow-y-auto">
+        <div className="scroll-slim max-h-[calc(var(--app-vh)*50)] shrink-0 overflow-y-auto">
         {pendingContext && (
           <ContextQuestionCard
             // A new round is a new question with its own fresh textarea, not
@@ -1294,7 +1294,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
                       ? "Smart: a question that fits another mode better is answered there automatically, with a way back. Click for manual."
                       : "Manual: the mode is whatever you pick; it never switches. Click for smart."
                   }
-                  className="shrink-0 rounded-md px-2 py-1 text-[13px] text-ink-muted transition-colors hover:bg-surface-hover hover:text-ink"
+                  className="shrink-0 rounded-md px-2 py-1 text-sm text-ink-muted transition-colors hover:bg-surface-hover hover:text-ink"
                 >
                   <span className="hidden sm:inline">Switching: </span>
                   {smartSwitching ? "Smart" : "Manual"}
@@ -1337,7 +1337,7 @@ function ThreadPill({
       onClick={onClick}
       aria-pressed={selected}
       className={cx(
-        "flex h-[30px] shrink-0 items-center gap-1 rounded-full border px-[9px] text-[16px] leading-[normal] transition-colors",
+        "flex h-[30px] shrink-0 items-center gap-1 rounded-full border px-[9px] text-sm leading-[normal] transition-colors",
         selected
           ? "border-transparent bg-[color:var(--text-secondary)] text-white"
           : "border-[color:var(--text-muted)] text-ink hover:bg-surface-hover",

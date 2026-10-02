@@ -20,7 +20,7 @@ export function ThinkingReview({ review }: { review: ThinkingReviewData }) {
 
   return (
     <section className="mb-2.5 rounded-xl border border-hairline bg-surface-muted p-3">
-      <h4 className="text-[11px] font-semibold uppercase tracking-wide text-ink-secondary">
+      <h4 className="text-xs font-semibold uppercase tracking-wide text-ink-secondary">
         How to think about this
       </h4>
 
@@ -30,14 +30,14 @@ export function ThinkingReview({ review }: { review: ThinkingReviewData }) {
           losing the side-by-side. */}
       <div className="mt-2.5 grid grid-cols-2 gap-2.5 sm:gap-3">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-band-high">
+          <p className="text-xs font-semibold uppercase tracking-wide text-band-high">
             Correct or appropriate
           </p>
           <ul className="mt-1.5 space-y-2">
             {review.sound.map((entry, i) => (
               <li key={i}>
-                <p className="text-[11px] font-medium leading-relaxed text-ink sm:text-xs">{entry.approach}</p>
-                <p className="mt-0.5 text-[10px] leading-relaxed text-ink-secondary sm:text-[11px]">
+                <p className="text-xs font-medium leading-relaxed text-ink sm:text-xs">{entry.approach}</p>
+                <p className="mt-0.5 text-xs leading-relaxed text-ink-secondary sm:text-xs">
                   {entry.why}
                 </p>
               </li>
@@ -46,17 +46,17 @@ export function ThinkingReview({ review }: { review: ThinkingReviewData }) {
         </div>
 
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-caution">
+          <p className="text-xs font-semibold uppercase tracking-wide text-caution">
             Incorrect or inappropriate
           </p>
           <ul className="mt-1.5 space-y-2">
             {review.biased.map((entry, i) => (
               <li key={i}>
-                <p className="text-[11px] font-medium leading-relaxed text-ink sm:text-xs">{entry.approach}</p>
+                <p className="text-xs font-medium leading-relaxed text-ink sm:text-xs">{entry.approach}</p>
                 {entry.bias_name && (
-                  <p className="mt-0.5 text-[11px] font-medium text-caution">{entry.bias_name}</p>
+                  <p className="mt-0.5 text-xs font-medium text-caution">{entry.bias_name}</p>
                 )}
-                <p className="mt-0.5 text-[10px] leading-relaxed text-ink-secondary sm:text-[11px]">
+                <p className="mt-0.5 text-xs leading-relaxed text-ink-secondary sm:text-xs">
                   {entry.why}
                 </p>
               </li>

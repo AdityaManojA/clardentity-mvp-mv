@@ -197,7 +197,7 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
 
   return (
     <div
-      className="landing min-h-screen w-full font-[family-name:var(--font-outfit)]"
+      className="landing min-h-[calc(var(--app-vh)*100)] w-full font-[family-name:var(--font-outfit)]"
       // line-height: normal, inherited by everything inside. The design sets
       // every text node to CSS `normal` (about 1.2 for Outfit); Tailwind's
       // `leading-normal` is 1.5, which is a different number and re-wraps
@@ -218,7 +218,7 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
         <div className="mt-6 flex justify-center xl:mt-0 xl:block">
           <Link
             href="/login"
-            className="inline-flex items-center rounded-[37px] border px-[12px] py-[4px] text-[24px] transition-colors hover:bg-black/[0.03] xl:absolute xl:right-[160px] xl:top-[79px]"
+            className="inline-flex items-center rounded-[37px] border px-[12px] py-[4px] text-2xl transition-colors hover:bg-black/[0.03] xl:absolute xl:right-[160px] xl:top-[79px]"
             style={{ borderColor: OUTLINE, color: OUTLINE }}
           >
             Login
@@ -577,7 +577,7 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
           sign-up, so they need a route from the public page. Not in the
           design; kept quiet at the very bottom rather than added to it. */}
       <footer className="mx-auto w-full max-w-[1728px] px-4 pb-10 sm:px-8 xl:px-[160px]">
-        <p className="text-[13px]" style={{ color: MUTED }}>
+        <p className="text-sm" style={{ color: MUTED }}>
           <Link href="/privacy" className="hover:underline">
             Privacy
           </Link>

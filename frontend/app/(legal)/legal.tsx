@@ -43,7 +43,7 @@ export function Section({ n, title, children }: { n: number; title: string; chil
 export function Table({ head, rows }: { head: string[]; rows: ReactNode[][] }) {
   return (
     <div className="overflow-x-auto">
-      <table className="w-full border-collapse text-left text-[13px]">
+      <table className="w-full border-collapse text-left text-sm">
         <thead>
           <tr>
             {head.map((h) => (

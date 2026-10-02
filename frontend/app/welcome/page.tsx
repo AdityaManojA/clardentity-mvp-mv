@@ -80,7 +80,7 @@ export default function WelcomePage() {
 
   if (loading || !user || user.onboarding_completed_at !== null) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-[calc(var(--app-vh)*100)] items-center justify-center">
         <Spinner className="text-ink-muted" />
       </div>
     );
@@ -91,11 +91,11 @@ export default function WelcomePage() {
   const firstName = (user.display_name || "").trim().split(/\s+/)[0];
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center px-4 py-12 sm:px-6 sm:py-16">
+    <div className="relative flex min-h-[calc(var(--app-vh)*100)] items-center justify-center px-4 py-12 sm:px-6 sm:py-16">
       <ThemeToggle className="absolute right-4 top-4 sm:right-6 sm:top-6" />
       <div className="w-full max-w-lg">
         <div className="mb-6 text-center">
-          <Link href="/" className="text-[15px] font-semibold tracking-tight text-ink">
+          <Link href="/" className="text-sm font-semibold tracking-tight text-ink">
             Clardentity
           </Link>
         </div>
@@ -109,7 +109,7 @@ export default function WelcomePage() {
           className="space-y-5 rounded-xl border border-hairline bg-surface p-6"
         >
           <div className="space-y-1">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-brand">
+            <p className="text-xs font-semibold uppercase tracking-wide text-brand">
               {page === 0
                 ? `Welcome${firstName ? `, ${firstName}` : ""}`
                 : `Question ${page + 1} of ${QUESTIONS.length}`}

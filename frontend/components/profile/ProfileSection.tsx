@@ -25,8 +25,8 @@ export function ProfileSection({
             block's intrinsic width, which is wide enough to push the button
             onto its own line on every screen. */}
         <div className="min-w-0 flex-1">
-          <h2 className="text-[28px] font-medium leading-[normal] text-ink">{title}</h2>
-          <p className="text-[20px] leading-[normal] text-ink-secondary">{description}</p>
+          <h2 className="text-3xl font-medium leading-[normal] text-ink">{title}</h2>
+          <p className="text-xl leading-[normal] text-ink-secondary">{description}</p>
         </div>
         {action && <div className="flex shrink-0 items-center gap-2">{action}</div>}
       </div>
@@ -67,7 +67,7 @@ export function OutlineButton({
       title={title}
       aria-label={ariaLabel}
       className={cx(
-        "flex h-[42px] shrink-0 items-center gap-2 rounded-[34px] border px-[21px] text-[20px] leading-[normal] transition-colors disabled:cursor-not-allowed disabled:opacity-50",
+        "flex h-[42px] shrink-0 items-center gap-2 rounded-[34px] border px-[21px] text-xl leading-[normal] transition-colors disabled:cursor-not-allowed disabled:opacity-50",
         danger
           ? "border-band-low-border text-band-low hover:bg-band-low-bg"
           : "border-hairline-strong text-ink hover:bg-surface-hover",

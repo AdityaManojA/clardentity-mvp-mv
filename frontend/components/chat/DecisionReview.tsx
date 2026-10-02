@@ -41,7 +41,7 @@ export function DecisionReview({ review }: { review: DecisionReviewData }) {
   return (
     <section className="mb-2.5 rounded-xl border border-hairline bg-surface-muted p-3">
       {hasOptions && (
-      <h4 className="text-[11px] font-semibold uppercase tracking-wide text-ink-secondary">
+      <h4 className="text-xs font-semibold uppercase tracking-wide text-ink-secondary">
         Your options, checked
         <span className="ml-1.5 font-normal normal-case tracking-normal text-ink-muted">
           {unsound === 0
@@ -69,14 +69,14 @@ export function DecisionReview({ review }: { review: DecisionReviewData }) {
                     own reasoning being described, which is the one place the
                     taxonomy label earns its keep. */}
                 {option.bias_name && (
-                  <span className="text-[11px] font-medium text-caution">{option.bias_name}</span>
+                  <span className="text-xs font-medium text-caution">{option.bias_name}</span>
                 )}
               </span>
               <span className="mt-0.5 block text-xs leading-relaxed text-ink-secondary">
                 {option.why}
               </span>
               {option.bias_definition && (
-                <span className="mt-0.5 block text-[11px] leading-relaxed text-ink-muted">
+                <span className="mt-0.5 block text-xs leading-relaxed text-ink-muted">
                   {option.bias_definition}
                 </span>
               )}
@@ -91,14 +91,14 @@ export function DecisionReview({ review }: { review: DecisionReviewData }) {
         // their choices are compromised and stopping there is a criticism
         // rather than help.
         <div className="mt-3 rounded-lg border border-brand-border bg-brand-soft px-3 py-2">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-brand">
+          <p className="text-xs font-semibold uppercase tracking-wide text-brand">
             None of these are correct. Consider instead
           </p>
           <p className="mt-1 text-xs font-medium leading-relaxed text-ink">
             {review.alternative}
           </p>
           {review.alternative_why && (
-            <p className="mt-1 text-[11px] leading-relaxed text-ink-secondary">
+            <p className="mt-1 text-xs leading-relaxed text-ink-secondary">
               {review.alternative_why}
             </p>
           )}
@@ -109,7 +109,7 @@ export function DecisionReview({ review }: { review: DecisionReviewData }) {
         // or not they brought options of their own: the useful output of a
         // decision question is decisions, and there is nothing to cite.
         <div className={hasOptions ? "mt-3 border-t border-hairline pt-3" : ""}>
-          <h4 className="text-[11px] font-semibold uppercase tracking-wide text-ink-secondary">
+          <h4 className="text-xs font-semibold uppercase tracking-wide text-ink-secondary">
             One decision that&apos;s correct, and the ones that aren&apos;t
           </h4>
           {/* Not numbered. A numbered list of decisions reads as a ranking,
@@ -138,17 +138,17 @@ export function DecisionReview({ review }: { review: DecisionReviewData }) {
                   </span>
                   <span
                     className={cx(
-                      "mt-0.5 block text-[10px] font-semibold uppercase tracking-wide",
+                      "mt-0.5 block text-xs font-semibold uppercase tracking-wide",
                       s.sound ? "text-band-high" : "text-caution",
                     )}
                   >
                     {s.sound ? "Correct" : (s.bias_name ?? "Incorrect")}
                   </span>
-                  <span className="mt-0.5 block text-[11px] leading-relaxed text-ink-secondary">
+                  <span className="mt-0.5 block text-xs leading-relaxed text-ink-secondary">
                     {s.why}
                   </span>
                   {!s.sound && s.bias_definition && (
-                    <span className="mt-0.5 block text-[11px] leading-relaxed text-ink-muted">
+                    <span className="mt-0.5 block text-xs leading-relaxed text-ink-muted">
                       {s.bias_definition}
                     </span>
                   )}

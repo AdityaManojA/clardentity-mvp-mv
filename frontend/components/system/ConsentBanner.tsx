@@ -53,7 +53,7 @@ export function ConsentBanner() {
             No thanks
           </button>
         </div>
-        <p className="mt-2.5 text-[11px] text-ink-muted">
+        <p className="mt-2.5 text-xs text-ink-muted">
           <Link href="/privacy" className="hover:underline">
             What we collect
           </Link>

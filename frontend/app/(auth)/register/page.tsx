@@ -36,11 +36,11 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center px-4 py-12 sm:px-6 sm:py-16">
+    <div className="relative flex min-h-[calc(var(--app-vh)*100)] items-center justify-center px-4 py-12 sm:px-6 sm:py-16">
       <ThemeToggle className="absolute right-4 top-4 sm:right-6 sm:top-6" />
       <div className="w-full max-w-sm">
         <div className="mb-6 text-center">
-          <Link href="/" className="text-[15px] font-semibold tracking-tight text-ink">
+          <Link href="/" className="text-sm font-semibold tracking-tight text-ink">
             Clardentity
           </Link>
         </div>
@@ -96,7 +96,7 @@ export default function RegisterPage() {
           {/* Unticked by default and required to submit. A pre-ticked box is
               not consent in any jurisdiction that has thought about it, and
               the two links open the documents rather than describing them. */}
-          <label className="flex cursor-pointer items-start gap-2.5 text-[13px] leading-relaxed text-ink-secondary">
+          <label className="flex cursor-pointer items-start gap-2.5 text-sm leading-relaxed text-ink-secondary">
             <input
               type="checkbox"
               required

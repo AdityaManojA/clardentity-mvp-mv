@@ -69,7 +69,7 @@ function Stat({ label, value, hint }: { label: string; value: string; hint?: str
     <div className="rounded-xl border border-hairline bg-surface px-4 py-3">
       <p className="text-xs text-ink-muted">{label}</p>
       <p className="mt-1 text-xl font-semibold tabular-nums text-ink">{value}</p>
-      {hint && <p className="mt-0.5 text-[11px] text-ink-muted">{hint}</p>}
+      {hint && <p className="mt-0.5 text-xs text-ink-muted">{hint}</p>}
     </div>
   );
 }
@@ -197,7 +197,7 @@ export function AdminDashboard() {
 
       <Card title="Users" subtitle={`${data.user_count} accounts`}>
         <div className="scroll-slim -mx-1 overflow-x-auto px-1">
-          <table className="w-full min-w-[640px] border-collapse text-left text-[13px]">
+          <table className="w-full min-w-[640px] border-collapse text-left text-sm">
             <thead>
               <tr className="text-ink-muted">
                 {["Email", "Joined", "Last active", "Asked", "Tokens", "Flags"].map((h) => (
@@ -213,7 +213,7 @@ export function AdminDashboard() {
                   <td className="border-b border-hairline py-2 pr-3">
                     <span className="block truncate text-ink">{u.email}</span>
                     {u.display_name && (
-                      <span className="block truncate text-[11px] text-ink-muted">
+                      <span className="block truncate text-xs text-ink-muted">
                         {u.display_name}
                         {u.location ? ` · ${u.location}` : ""}
                       </span>
@@ -267,7 +267,7 @@ export function AdminDashboard() {
             {result.chart === "bar" && <BarChart slices={chartRows} />}
             {result.chart === "line" && <LineChart points={chartRows} />}
             <div className="scroll-slim overflow-x-auto">
-              <table className="w-full border-collapse text-left text-[13px]">
+              <table className="w-full border-collapse text-left text-sm">
                 <thead>
                   <tr className="text-ink-muted">
                     {result.columns.map((c) => (
@@ -291,11 +291,11 @@ export function AdminDashboard() {
               </table>
             </div>
             {result.rows.length > 50 && (
-              <p className="text-[11px] text-ink-muted">Showing 50 of {result.rows.length} rows.</p>
+              <p className="text-xs text-ink-muted">Showing 50 of {result.rows.length} rows.</p>
             )}
-            <details className="text-[11px] text-ink-muted">
+            <details className="text-xs text-ink-muted">
               <summary className="cursor-pointer">The query that ran</summary>
-              <pre className="mt-1.5 overflow-x-auto rounded-lg bg-surface-muted p-2.5 text-[11px] text-ink-secondary">
+              <pre className="mt-1.5 overflow-x-auto rounded-lg bg-surface-muted p-2.5 text-xs text-ink-secondary">
                 {result.sql}
               </pre>
             </details>
@@ -310,7 +310,7 @@ function Flag({ children, tone = "muted" }: { children: React.ReactNode; tone?: 
   return (
     <span
       className={cx(
-        "rounded border px-1.5 py-0.5 text-[10px] uppercase tracking-wide",
+        "rounded border px-1.5 py-0.5 text-xs uppercase tracking-wide",
         tone === "warn" && "border-caution-border bg-caution-bg text-caution",
         tone === "brand" && "border-brand-border bg-brand-soft text-brand",
         tone === "muted" && "border-hairline bg-surface-muted text-ink-muted",

@@ -94,7 +94,7 @@ export function AspectList({
   return (
     <div>
       {aspects.length === 0 && !adding ? (
-        <p className="text-[20px] leading-[normal] text-ink-secondary">
+        <p className="text-xl leading-[normal] text-ink-secondary">
           Nothing here yet. This fills in as you use Clardentity, and Add
           Aspect puts in anything you want it to know from the start.
         </p>
@@ -105,7 +105,7 @@ export function AspectList({
           {aspects.map((aspect) => (
             <li key={aspect.id}>
               <div className="flex items-start gap-3">
-                <span className="flex min-w-0 flex-1 flex-wrap items-center gap-2 text-[20px] font-medium leading-[normal] text-ink">
+                <span className="flex min-w-0 flex-1 flex-wrap items-center gap-2 text-xl font-medium leading-[normal] text-ink">
                   {aspect.label}
                   {aspect.source === "user" && <Badge tone="brand">yours</Badge>}
                 </span>
@@ -134,7 +134,7 @@ export function AspectList({
                   )}
                 </button>
               </div>
-              <p className="mt-1 text-[20px] leading-[normal] text-ink-secondary">
+              <p className="mt-1 text-xl leading-[normal] text-ink-secondary">
                 {aspect.value}
               </p>
             </li>

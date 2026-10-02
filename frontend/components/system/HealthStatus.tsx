@@ -37,7 +37,7 @@ export function HealthStatus() {
 
   return (
     <div className="rounded-xl border border-hairline bg-surface p-4 text-left">
-      <h2 className="mb-2.5 text-[11px] font-semibold uppercase tracking-wide text-ink-muted">
+      <h2 className="mb-2.5 text-xs font-semibold uppercase tracking-wide text-ink-muted">
         Backend connectivity
       </h2>
 

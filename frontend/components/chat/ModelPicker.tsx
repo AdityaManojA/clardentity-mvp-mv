@@ -125,7 +125,7 @@ export function ModelPicker({ disabled }: { disabled?: boolean }) {
           // The design labels this rather than drawing a chip: the model's
           // name, a dot, and the plan it comes with. A silent icon on the foot
           // of the composer told nobody which model was answering.
-          className="flex h-8 shrink-0 items-center gap-0.5 rounded-lg px-1.5 text-[16px] leading-[normal] transition-colors hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex h-8 shrink-0 items-center gap-0.5 rounded-lg px-1.5 text-sm leading-[normal] transition-colors hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-50"
         >
           <span className="text-ink">{current.label}</span>
           {/* The plan is the first thing to go on a phone: the row has six
@@ -192,12 +192,12 @@ export function ModelPicker({ disabled }: { disabled?: boolean }) {
                   <span className="flex items-center gap-1.5">
                     <span className="text-sm font-medium text-ink">{model.label}</span>
                     {model.locked && (
-                      <span className="rounded-full bg-brand-soft px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand">
+                      <span className="rounded-full bg-brand-soft px-1.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-brand">
                         Pro
                       </span>
                     )}
                   </span>
-                  <span className="mt-0.5 block text-[11px] leading-relaxed text-ink-muted">
+                  <span className="mt-0.5 block text-xs leading-relaxed text-ink-muted">
                     {model.blurb}
                   </span>
                 </span>
@@ -214,11 +214,11 @@ export function ModelPicker({ disabled }: { disabled?: boolean }) {
                 className="absolute bottom-0 left-full ml-2 hidden w-60 rounded-xl border border-hairline bg-surface-raised p-3 shadow-xl lg:block"
               >
                 <p className="text-xs font-semibold text-ink">{described.label}</p>
-                <p className="mt-1 text-[11px] leading-relaxed text-ink-secondary">
+                <p className="mt-1 text-xs leading-relaxed text-ink-secondary">
                   {described.detail}
                 </p>
                 {described.locked && (
-                  <p className="mt-2 text-[11px] font-medium text-brand">Included with Pro</p>
+                  <p className="mt-2 text-xs font-medium text-brand">Included with Pro</p>
                 )}
               </div>
             )}

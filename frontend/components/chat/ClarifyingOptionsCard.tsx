@@ -51,7 +51,7 @@ export function ClarifyingOptionsCard({
                 "hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-50",
               )}
             >
-              <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded border border-hairline-strong text-[10px] tabular-nums text-ink-muted">
+              <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded border border-hairline-strong text-xs tabular-nums text-ink-muted">
                 {index + 1}
               </span>
               <span className="text-ink">{option}</span>

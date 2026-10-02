@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { layoutViewport, toLayoutRect } from "@/lib/uiScale";
 import { useTour } from "@/lib/tour";
 import { usePrefersReducedMotion } from "@/lib/useReducedMotion";
 import { cx } from "@/components/ui/primitives";
@@ -97,7 +98,11 @@ export function TourOverlay() {
       const target = resolveVisibleTarget(step!.target);
 
       if (panel) {
-        const panelRect = panel.getBoundingClientRect();
+        // Everything below is in layout pixels: the ring and the callout are
+        // placed with inline styles, which the root's zoom scales on the way
+        // to the screen, while a measured rect arrives already scaled.
+        const panelRect = toLayoutRect(panel.getBoundingClientRect());
+        const view = layoutViewport();
 
         if (target) {
           // Some steps' targets sit well below the fold - the composer, in
@@ -108,13 +113,15 @@ export function TourOverlay() {
           if (scrolledStepRef.current !== stepKey) {
             scrolledStepRef.current = stepKey;
             const initialRect = target.getBoundingClientRect();
+            // Still screen pixels on both sides of this one - it only asks
+            // whether the thing is on screen.
             const fullyVisible = initialRect.top >= 0 && initialRect.bottom <= window.innerHeight;
             if (!fullyVisible) {
               target.scrollIntoView({ block: "center", behavior: reducedMotion ? "auto" : "smooth" });
             }
           }
 
-          const rect = target.getBoundingClientRect();
+          const rect = toLayoutRect(target.getBoundingClientRect());
           setRingState((prev) =>
             prev &&
             prev.key === stepKey &&
@@ -130,14 +137,14 @@ export function TourOverlay() {
           );
 
           let left = rect.left;
-          left = Math.min(left, window.innerWidth - panelRect.width - MARGIN);
+          left = Math.min(left, view.width - panelRect.width - MARGIN);
           left = Math.max(left, MARGIN);
 
           let top = rect.bottom + MARGIN;
-          if (top + panelRect.height + MARGIN > window.innerHeight) {
+          if (top + panelRect.height + MARGIN > view.height) {
             top = rect.top - panelRect.height - MARGIN;
           }
-          top = Math.min(top, window.innerHeight - panelRect.height - MARGIN);
+          top = Math.min(top, view.height - panelRect.height - MARGIN);
           top = Math.max(top, MARGIN);
 
           placeCallout(top, left);
@@ -153,8 +160,8 @@ export function TourOverlay() {
           // user wandered elsewhere). Stay dismissable and legible rather
           // than disappearing or waiting indefinitely.
           setRingState((prev) => (prev && prev.key === stepKey ? null : prev));
-          const top = (window.innerHeight - panelRect.height) / 2;
-          const left = (window.innerWidth - panelRect.width) / 2;
+          const top = (view.height - panelRect.height) / 2;
+          const left = (view.width - panelRect.width) / 2;
           placeCallout(top, left);
         }
         // Within the grace period and not yet found: leave state as-is
@@ -262,7 +269,7 @@ export function TourOverlay() {
           visible && !reducedMotion && "animate-[fade-in_0.35s_ease]",
         )}
       >
-        <p className="text-[11px] font-semibold uppercase tracking-wide text-brand">
+        <p className="text-xs font-semibold uppercase tracking-wide text-brand">
           {tour === "chat" ? "Chat tour" : "Workspace tour"} · {stepIndex + 1} of {total}
         </p>
         <h2 id={titleId} className="mt-1 text-sm font-semibold text-ink">
