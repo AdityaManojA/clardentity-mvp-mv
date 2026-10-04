@@ -47,7 +47,14 @@ export const metadata: Metadata = {
   applicationName: "Clardentity",
   appleWebApp: { capable: true, title: "Clardentity", statusBarStyle: "black-translucent" },
   icons: {
-    icon: [{ url: "/favicon-32.png", sizes: "32x32", type: "image/png" }],
+    icon: [
+      // First, and sizes="any", which is how a browser is told to prefer the
+      // vector: the mark on nothing, in whichever of its two colours suits
+      // the chrome it lands in. The PNG and the .ico behind it are the tile,
+      // for anything that cannot render an SVG icon.
+      { url: "/icon.svg", type: "image/svg+xml", sizes: "any" },
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+    ],
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
   },
   // What a pasted link shows. app/opengraph-image.png is picked up by file
