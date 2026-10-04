@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
+import { RedirectIfSignedIn } from "@/components/auth/RedirectIfSignedIn";
 import { Wordmark } from "@/components/system/Wordmark";
 import { authErrorMessage, useAuth } from "@/lib/auth";
 import { Button, Field, Input } from "@/components/ui/primitives";
@@ -28,7 +29,10 @@ export default function RegisterPage() {
       await register(email, password, displayName, acceptedTerms);
       // RequireAuth routes a not-yet-onboarded account to /welcome from
       // here; the tour starts when those questions are finished or skipped.
-      router.push("/start");
+      // replace, not push: the form is a step they have completed, and
+      // leaving it in the history means one press of Back puts a sign-in
+      // screen in front of someone who never signed out.
+      router.replace("/start");
     } catch (err) {
       setError(authErrorMessage(err));
     } finally {
@@ -38,6 +42,7 @@ export default function RegisterPage() {
 
   return (
     <div className="relative flex min-h-[calc(var(--app-vh)*100)] items-center justify-center px-4 py-12 sm:px-6 sm:py-16">
+      <RedirectIfSignedIn />
       <ThemeToggle className="absolute right-4 top-4 sm:right-6 sm:top-6" />
       <div className="w-full max-w-sm">
         <div className="mb-6 text-center">

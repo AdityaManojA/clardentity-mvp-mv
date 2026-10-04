@@ -29,7 +29,10 @@ function ResetPasswordForm() {
       await completePasswordReset(token, password);
       // Straight in, rather than back to a login form to retype what was just
       // chosen. The reset endpoint returns tokens for exactly this reason.
-      router.push("/start");
+      // replace, not push: the form is a step they have completed, and
+      // leaving it in the history means one press of Back puts a sign-in
+      // screen in front of someone who never signed out.
+      router.replace("/start");
     } catch (err) {
       setError(authErrorMessage(err));
     } finally {

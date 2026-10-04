@@ -227,11 +227,15 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
             where a right-pinned button would sit on top of the wordmark. */}
         <div className="mt-6 flex justify-center xl:mt-0 xl:block">
           <Link
-            href="/login"
+            // Someone who is already signed in and lands here - which is
+            // where Back from the app now goes - must not be offered a login
+            // button. It reads as having been signed out, which is the same
+            // confusion the back button used to cause outright.
+            href={signedIn ? enter : "/login"}
             className="inline-flex items-center rounded-[37px] border px-[12px] py-[4px] text-2xl transition-colors hover:bg-black/[0.03] xl:absolute xl:right-[160px] xl:top-[79px]"
             style={{ borderColor: OUTLINE, color: OUTLINE }}
           >
-            Login
+            {signedIn ? "Open" : "Login"}
           </Link>
         </div>
 

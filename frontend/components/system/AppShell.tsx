@@ -621,7 +621,10 @@ export function AppShell({ children }: { children: ReactNode }) {
           aria-label="Log out"
           onClick={() => {
             logout();
-            router.push("/login");
+            // replace, so Back after signing out does not return to the app
+            // shell with no session behind it - which only bounces straight
+            // here again.
+            router.replace("/login");
           }}
           className="rounded-md p-1.5 text-ink-muted transition-colors hover:bg-surface-hover hover:text-ink"
         >
