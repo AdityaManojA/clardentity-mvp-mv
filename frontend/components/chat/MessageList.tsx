@@ -704,7 +704,7 @@ function MessageBubble({
         {!isUser &&
           isStreaming &&
           ((panel === "decision" && !decisionReview) || (panel === "thinking" && !thinkingReview)) && (
-            <div className="mb-2.5 rounded-xl border border-dashed border-hairline-strong px-3 py-2.5">
+            <div className="mb-3 rounded-[12px] border border-dashed border-hairline-strong p-4">
               <ThinkingIndicator
                 compact
                 label={panel === "decision" ? "Weighing the decisions" : "Working out how to think about this"}
@@ -723,7 +723,7 @@ function MessageBubble({
             type="button"
             onClick={() => setDetailOpen((v) => !v)}
             aria-expanded={detailOpen}
-            className="group -mx-1 mb-1.5 flex w-[calc(100%+0.5rem)] items-center gap-1.5 rounded-md px-1 py-1 text-left text-xs text-ink-muted transition-colors hover:bg-surface-hover hover:text-ink-secondary"
+            className="group -mx-1 mb-2 flex w-[calc(100%+0.5rem)] items-center gap-1.5 rounded-md px-1 py-1 text-left text-sm text-ink-muted transition-colors hover:bg-surface-hover hover:text-ink-secondary"
           >
             <svg
               viewBox="0 0 24 24"
@@ -733,7 +733,7 @@ function MessageBubble({
               strokeLinecap="round"
               strokeLinejoin="round"
               aria-hidden="true"
-              className={cx("h-3 w-3 shrink-0 transition-transform", detailOpen && "rotate-90")}
+              className={cx("size-4 shrink-0 transition-transform", detailOpen && "rotate-90")}
             >
               <path d="m9 18 6-6-6-6" />
             </svg>
