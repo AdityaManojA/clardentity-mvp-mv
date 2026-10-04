@@ -13,7 +13,7 @@
 
 // Bumping this name is how a deploy drops everything the last one cached:
 // `activate` deletes every cache that isn't this one.
-const CACHE = "clardentity-shell-v2";
+const CACHE = "clardentity-shell-v3";
 
 // Only things that are content-addressed or genuinely static. HTML is not
 // here on purpose - a stale shell is how a deployed fix fails to reach

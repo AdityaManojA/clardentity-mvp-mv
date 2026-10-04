@@ -50,12 +50,30 @@ export const metadata: Metadata = {
     icon: [{ url: "/favicon-32.png", sizes: "32x32", type: "image/png" }],
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
   },
+  // What a pasted link shows. app/opengraph-image.png is picked up by file
+  // name; this is the alt text that goes with it, and the absolute base a
+  // crawler needs to resolve the image at all.
+  metadataBase: new URL("https://clardentity.ai"),
+  openGraph: {
+    title: "Clardentity",
+    description: "Validated, mode-aware, citation-backed conversations.",
+    url: "https://clardentity.ai",
+    siteName: "Clardentity",
+    type: "website",
+  },
+  twitter: { card: "summary_large_image", title: "Clardentity" },
 };
 
 export const viewport: Viewport = {
-  // Matches the manifest, so the installed window's chrome is the same black
-  // as the canvas rather than flashing white on launch.
-  themeColor: "#000000",
+  // The colour the browser paints its chrome - and, on a phone, the status
+  // bar - before the page has rendered. It was #000000, which was the dark
+  // canvas until the dark palette was rebuilt and stopped being black; it
+  // now names the canvas of whichever theme is about to load, so the chrome
+  // never has to correct itself a frame later.
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f5f3f4" },
+    { media: "(prefers-color-scheme: dark)", color: "#121013" },
+  ],
 };
 
 export default function RootLayout({

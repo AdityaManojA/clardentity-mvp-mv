@@ -21,10 +21,12 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: "/workspace",
     scope: "/",
     display: "standalone",
-    // True black to match the app's own canvas, so the splash and the window
-    // chrome don't flash white before the first paint.
-    background_color: "#000000",
-    theme_color: "#000000",
+    // The dark canvas, which the icon's burgundy sits on cleanly. It was
+    // true black, chosen when the dark theme was black; the rebuilt dark
+    // palette has no #000 in it, so the splash was painting a colour that
+    // appears nowhere in the app it opens into.
+    background_color: "#121013",
+    theme_color: "#121013",
     orientation: "any",
     categories: ["productivity", "education", "utilities"],
     icons: [
