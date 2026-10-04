@@ -71,6 +71,11 @@ export default function PrivacyPage() {
               "So regional questions get regional answers (prices, rules, weather)",
             ],
             [
+              "Language and time zone",
+              "The language preferences and time zone your browser already reports, sent when you start a voice call. Not stored",
+              "So the voice speaks your language the way it is spoken where you are, rather than with an accent laid over it",
+            ],
+            [
               "Technical records",
               "Server logs with timestamps, endpoints, error traces and per-request timings",
               "To keep the service running and diagnose faults",

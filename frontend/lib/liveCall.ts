@@ -25,20 +25,50 @@ export type LiveCallHandlers = {
   onTranscript?: (role: "user" | "assistant", text: string) => void;
 };
 
+/* What the browser already knows about where it is.
+ *
+ * `navigator.languages` is the best accent signal there is - "ml-IN" names
+ * both the language and the region in four characters, and it is the user's
+ * own setting rather than a guess about them. The timezone backs it up for
+ * someone whose device is in English but who is sitting in Kochi. Neither is
+ * new information: both ride along with ordinary web requests already.
+ *
+ * It goes to the call rather than being looked up server-side because the
+ * server only has the address the request came from, and that is wrong for
+ * anyone on a VPN, a corporate network or a mobile carrier routing through
+ * another state. */
+function localeSignals(): { timezone: string | null; languages: string[] } {
+  try {
+    return {
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || null,
+      // Capped: a handful is all the instruction needs, and an unbounded list
+      // from a hostile client should not reach a prompt.
+      languages: Array.from(navigator.languages ?? []).slice(0, 6),
+    };
+  } catch {
+    return { timezone: null, languages: [] };
+  }
+}
+
 async function mintClientSecret(): Promise<string> {
   let token = getAccessToken();
-  let res = await fetch(`${API_BASE_URL}/realtime/session`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const signals = localeSignals();
+  const post = (bearer: string | null) =>
+    fetch(`${API_BASE_URL}/realtime/session`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${bearer}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(signals),
+    });
+
+  let res = await post(token);
 
   if (res.status === 401) {
     token = await refreshAccessToken();
     if (!token) throw new Error("Your session expired. Sign in again to start a call.");
-    res = await fetch(`${API_BASE_URL}/realtime/session`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    res = await post(token);
   }
 
   if (!res.ok) {

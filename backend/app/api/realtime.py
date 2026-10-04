@@ -16,9 +16,11 @@ implying a rigour the call is not doing.
 """
 
 import logging
+import re
 
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel, Field
 
 from app.api.deps import get_current_user
 from app.core.config import settings
@@ -49,9 +51,86 @@ _CALL_INSTRUCTIONS = (
     "- If they interrupt you, stop and listen."
 )
 
+# BCP-47 and IANA zone names, loosely: letters, digits, hyphens, underscores
+# and slashes. Anything else is not a locale and is not going into a prompt.
+_TAG = re.compile(r"^[A-Za-z0-9_/+-]{2,64}$")
+
+
+class CallContext(BaseModel):
+    """What the browser knows about where it is. All optional - a call must
+    start without it."""
+
+    timezone: str | None = Field(default=None, max_length=64)
+    languages: list[str] = Field(default_factory=list, max_length=6)
+
+
+def _clean(values: list[str]) -> list[str]:
+    out: list[str] = []
+    for value in values:
+        tag = (value or "").strip()
+        if _TAG.match(tag) and tag not in out:
+            out.append(tag)
+    return out
+
+
+def _accent_instructions(user: User, context: CallContext) -> str | None:
+    """Tell the voice where it is speaking from.
+
+    The realtime voices are trained overwhelmingly on American English, and
+    left alone they carry that accent into every other language - which is
+    why Clardentity speaking Malayalam sounded like an American speaking
+    Malayalam rather than like someone from Kerala. The model will follow an
+    instruction about accent; it just has to be given one.
+
+    Three signals, best first. What the device says, because that is the
+    user's own setting and names the language and the region together
+    ("ml-IN"). Then its timezone. Then the place we inferred from the address
+    they signed in from, which is stored already and is the weakest of the
+    three - a VPN or a mobile carrier makes it confidently wrong.
+    """
+    languages = _clean(context.languages)
+    timezone = context.timezone if context.timezone and _TAG.match(context.timezone) else None
+    # The IP-derived location, from the same background refresh the chat uses.
+    place = user.location_label
+    zone = timezone or user.location_timezone
+
+    facts: list[str] = []
+    if languages:
+        facts.append(
+            "their device is set to these languages, most preferred first: "
+            + ", ".join(languages)
+        )
+    if place:
+        facts.append(f"they appear to be in {place}")
+    if zone:
+        facts.append(f"their clock is on {zone}")
+    if not facts:
+        return None
+
+    return (
+        "\n\nWhere they are, and how to sound:\n"
+        f"- As far as we can tell, {'; '.join(facts)}. Every part of that is "
+        "inferred and may be wrong - never assert it back to them, and drop it "
+        "the moment they say otherwise.\n"
+        "- Speak with the accent of that place. If they speak to you in a "
+        "regional language, answer in it the way someone from that region "
+        "speaks it - their rhythm, their stress, their vowels, the words they "
+        "would actually use - not with an American or British accent laid over "
+        "it. The same goes for English: use the local variety of it rather than "
+        "a neutral American one.\n"
+        "- Follow them if they switch language or mix two together mid-sentence, "
+        "which is normal in most of the world. Match what they are doing rather "
+        "than correcting it.\n"
+        "- This is about accent and wording only. It must not change what you "
+        "think is true, what you are willing to say, or how carefully you hedge."
+    )
+
 
 @router.post("/session", status_code=status.HTTP_201_CREATED)
-async def create_realtime_session(current_user: User = Depends(get_current_user)) -> dict:
+async def create_realtime_session(
+    context: CallContext | None = None,
+    current_user: User = Depends(get_current_user),
+) -> dict:
     """A single-use client secret for one call.
 
     Rate limited per user rather than per IP: this is the expensive endpoint in
@@ -62,11 +141,13 @@ async def create_realtime_session(current_user: User = Depends(get_current_user)
         f"realtime:session:{current_user.id}", max_requests=20, window_seconds=3600
     )
 
+    accent = _accent_instructions(current_user, context or CallContext())
+
     payload = {
         "session": {
             "type": "realtime",
             "model": settings.openai_realtime_model,
-            "instructions": _CALL_INSTRUCTIONS,
+            "instructions": _CALL_INSTRUCTIONS + (accent or ""),
             "output_modalities": ["audio"],
             "audio": {
                 "input": {
