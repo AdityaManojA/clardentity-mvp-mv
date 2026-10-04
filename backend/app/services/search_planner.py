@@ -50,6 +50,10 @@ _INSTRUCTIONS = (
     "subject in a few words, for the document store.\n"
     "- TODAY's date is given; a query about current prices, plans or events "
     "carries the current year, not a remembered one.\n"
+    "- Set news true when the question is about events - what happened, what "
+    "was announced, what is going on somewhere, anything dated to the last few "
+    "weeks. Leave it false for prices, reference facts, how-to and opinion, "
+    "which live on pages rather than in a news feed.\n"
     "- Also return retrieval_query: the question rewritten as one standalone "
     "sentence with every pronoun and reference resolved, for searching the "
     "user's own documents. Unchanged if it already stands alone.\n"
@@ -62,8 +66,9 @@ _SCHEMA = {
         "retrieval_query": {"type": "string"},
         # No maxItems: this API's structured output rejects it; capped in code.
         "queries": {"type": "array", "items": {"type": "string"}},
+        "news": {"type": "boolean"},
     },
-    "required": ["retrieval_query", "queries"],
+    "required": ["retrieval_query", "queries", "news"],
     "additionalProperties": False,
 }
 
@@ -95,6 +100,10 @@ def needs_live_data(message: str) -> bool:
 class SearchPlan:
     retrieval_query: str
     queries: list[str] = field(default_factory=list)
+    #: Search the news index and the last fortnight rather than the web at
+    #: large. A question about events answered from the general index comes
+    #: back with the section front pages of four newspapers, undated.
+    news: bool = False
 
 
 async def plan_searches(history: list[Message], message: str) -> SearchPlan:
@@ -133,4 +142,8 @@ async def plan_searches(history: list[Message], message: str) -> SearchPlan:
             queries.append(text[:200])
     if not queries:
         queries = [message]
-    return SearchPlan(retrieval_query=retrieval_query, queries=queries[:MAX_QUERIES])
+    return SearchPlan(
+        retrieval_query=retrieval_query,
+        queries=queries[:MAX_QUERIES],
+        news=bool(parsed.get("news")),
+    )

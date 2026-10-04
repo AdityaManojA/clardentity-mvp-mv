@@ -101,7 +101,13 @@ from app.services.storage import upload_file
 from app.services.router import InvalidModeError, InvalidReasoningLensError, validate_mode, validate_reasoning_lens
 from app.services.taxonomy import describe_bias
 from app.services.verification_agent import reconcile_gray_area, verify_claim
-from app.services.web_research import WebSource, gather_context, research_claim, tavily_available
+from app.services.web_research import (
+    WebSource,
+    country_name,
+    gather_context,
+    research_claim,
+    tavily_available,
+)
 from app.workers.rebuild_memory import rebuild_memory_task
 from app.workers.rebuild_profile import rebuild_profile_task
 
@@ -891,7 +897,18 @@ async def send_message(
         mark("plan-ready")
         query = plan.retrieval_query
         web_task = (
-            asyncio.create_task(gather_context(plan.queries))
+            asyncio.create_task(
+                # Biased to where they are and, for a question about events,
+                # to the news index: a local price or rule is a local
+                # question, and "what happened this week" answered from the
+                # general web index returns newspaper front pages rather than
+                # stories.
+                gather_context(
+                    plan.queries,
+                    country=country_name(current_user.location_country),
+                    news=plan.news,
+                )
+            )
             if web_enabled and plan.queries
             else None
         )

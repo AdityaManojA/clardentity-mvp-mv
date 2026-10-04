@@ -83,6 +83,14 @@ _SUPERVISOR_INSTRUCTIONS = (
     "Score each source 0.0-1.0 where 1.0 is a primary source whose passage "
     "states the claim outright, and anything below 0.5 should not be shown to "
     "a user as evidence.\n\n"
+    "One correction to 'prefer the primary source', because it was costing "
+    "good citations: for some facts the primary source does not publish the "
+    "fact. Local on-road vehicle prices, retail availability, listings and "
+    "fares are published by marketplaces and price aggregators, and the "
+    "manufacturer or operator states nothing of the kind. Where that is the "
+    "case, a well-known marketplace IS the publisher of record - judge it on "
+    "whether the figure is specific, attributed and dated, not on its genre. "
+    "A content farm restating someone else is still a content farm.\n\n"
     "Then decide the round:\n"
     "  verdict 'accept'  - at least one source genuinely supports the claim\n"
     "  verdict 'retry'   - the claim is probably checkable but these sources "
@@ -223,13 +231,48 @@ def tavily_available() -> bool:
     return bool(settings.tavily_api_key)
 
 
+# Tavily takes a country *name*, and the user record stores a two-letter
+# code. Only the places the product actually has users in - an unknown code
+# simply means no bias, which is what every search did before this.
+_COUNTRY_NAMES = {
+    "in": "india", "us": "united states", "gb": "united kingdom", "ae": "united arab emirates",
+    "sg": "singapore", "au": "australia", "ca": "canada", "de": "germany", "fr": "france",
+    "nl": "netherlands", "ie": "ireland", "nz": "new zealand", "za": "south africa",
+    "my": "malaysia", "lk": "sri lanka", "qa": "qatar", "sa": "saudi arabia", "kw": "kuwait",
+    "om": "oman", "bh": "bahrain", "np": "nepal", "bd": "bangladesh", "pk": "pakistan",
+}
+
+
+def country_name(code: str | None) -> str | None:
+    """A Tavily country name for a stored two-letter code, or None."""
+    return _COUNTRY_NAMES.get((code or "").strip().lower()) or None
+
+
 async def _tavily_search(
-    query: str, *, depth: str = "basic", max_results: int = 5
+    query: str,
+    *,
+    depth: str = "basic",
+    max_results: int = 5,
+    country: str | None = None,
+    news: bool = False,
 ) -> list[WebSource]:
     """One Tavily query. Empty on any failure - the caller has other queries
     in flight and a fallback tool; a search that fails must not fail the
     turn. `depth` "advanced" reads pages for better excerpts (two credits,
-    ~3s); "basic" is one credit and ~2s."""
+    ~3s); "basic" is one credit and ~2s.
+
+    `country` biases the ranking to where the user is. Measured on "Bevco
+    Kerala liquor price list": without it, half the results were global
+    coverage of the topic; with it, the corporation's own pages came first.
+    A local question is the common case for local prices, rules and shops.
+
+    `news` switches Tavily to its news index and the last fortnight. The
+    general index answers "Kerala news this week" with the section *front
+    pages* of four newspapers - true, undated, and not a story - while the
+    news index returns dated articles. The dates matter twice over: the
+    supervisor is asked to judge whether a source is current, and on a
+    general search every result arrives with no date at all for it to judge.
+    """
     key = settings.tavily_api_key
     if not key:
         return []
@@ -241,6 +284,13 @@ async def _tavily_search(
         "include_raw_content": False,
         "exclude_domains": _EXCLUDED_DOMAINS,
     }
+    if country:
+        body["country"] = country
+    if news:
+        body["topic"] = "news"
+        # Long enough to cover "this week" and a slow-moving story, short
+        # enough that last year's version of the same event stays out.
+        body["days"] = 14
     if depth == "advanced":
         # Several passages per page rather than one: the line with the
         # price or the forecast is rarely the first relevant paragraph.
@@ -414,7 +464,13 @@ async def _supervise(claim: str, sources: list[WebSource]) -> dict:
         return {}
 
 
-async def gather_context(queries: list[str], depth: str = "basic") -> list[WebSource]:
+async def gather_context(
+    queries: list[str],
+    depth: str = "basic",
+    *,
+    country: str | None = None,
+    news: bool = False,
+) -> list[WebSource]:
     """One search round, scored, for use as *context* before generating.
 
     Runs speculatively, alongside document retrieval, and is thrown away if
@@ -439,7 +495,10 @@ async def gather_context(queries: list[str], depth: str = "basic") -> list[WebSo
         # afterwards uses advanced depth for whatever the draft could not
         # cite.
         batches = await asyncio.gather(
-            *(_tavily_search(q, depth=depth, max_results=5) for q in queries[:4]),
+            *(
+                _tavily_search(q, depth=depth, max_results=5, country=country, news=news)
+                for q in queries[:4]
+            ),
             return_exceptions=True,
         )
         return _merge_sources([b for b in batches if isinstance(b, list)], set(), cap=8)
