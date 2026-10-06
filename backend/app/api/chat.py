@@ -50,6 +50,8 @@ from app.services.geolocation import location_prompt_line
 from app.services.decision_review import review_decisions
 from app.services.thinking_review import review_thinking
 from app.services.guidance import MAX_CONTEXT_ROUNDS, propose_guidance
+from app.services.image_generation import generate as generate_image
+from app.services.image_generation import wanted_image
 from app.services.output_cleanup import clean_output
 from app.services.confidence_scoring import (
     ScoredClaim,
@@ -318,6 +320,7 @@ def _serialize_message(
         guidance=message.guidance,
         decision_review=message.decision_review,
         thinking_review=message.thinking_review,
+        generated_image=message.generated_image,
         feedback=message.feedback,
         parent_id=message.parent_id,
         sibling_index=sibling_index,
@@ -1329,6 +1332,23 @@ async def send_message(
             if not data.startswith("data:"):
                 data = f"data:{attachment.mime_type};base64,{data}"
             input_images.append(data)
+    # Co-Creative only: a picture, if that is what was asked for. Started
+    # here and collected while the answer streams, because generating one
+    # takes ten to twenty seconds - long enough that doing it first would
+    # leave the user watching an empty bubble for the whole of it. The
+    # intent check in front of it is cheap; the generation behind it only
+    # runs when that check says yes.
+    image_task: asyncio.Task[dict | None] | None = None
+    if mode == "creative":
+
+        async def _make_image() -> dict | None:
+            prompt = await wanted_image(effective_content)
+            if not prompt:
+                return None
+            return await generate_image(prompt, current_user.id)
+
+        image_task = asyncio.create_task(_make_image())
+
     gen_model = admin_settings.get("openai_model")
     # Which model writes the answer, by mode (an explicit admin override still
     # wins): the smallest for the quick answer, the fast one for the modes
@@ -1356,6 +1376,27 @@ async def send_message(
         # before the first token and between tokens, so it goes out ahead
         # of the gist when it can (it usually can: ~3s against ~5s).
         review_sent = False
+
+        # The picture, on the same contract: sent once, whenever it lands,
+        # which is usually after the answer has finished streaming.
+        generated_image: dict | None = None
+        image_sent = False
+
+        def image_event() -> dict | None:
+            nonlocal generated_image, image_sent
+            if image_sent or image_task is None or not image_task.done():
+                return None
+            image_sent = True
+            try:
+                generated_image = image_task.result()
+            except Exception:  # noqa: BLE001 - a failed picture never fails the answer
+                logger.warning("image task failed", exc_info=True)
+                generated_image = None
+            if not generated_image:
+                return None
+            # The same dict that is stored on the message, so the live event
+            # and a reload render from identical data.
+            return {"event": "image", "data": json.dumps(generated_image)}
 
         def review_event() -> dict | None:
             nonlocal review_sent
@@ -1456,6 +1497,10 @@ async def send_message(
                     if late:
                         mark("review")
                         yield late
+                    picture = image_event()
+                    if picture:
+                        mark("image")
+                        yield picture
                     full_text += event["text"]
                     # The leading one-sentence crux goes out as its own event
                     # the moment it closes, and never as body text - the
@@ -1923,6 +1968,17 @@ async def send_message(
                 assistant_message.counterfactual_content = clean_output(counterfactual_text)
             assistant_message.decision_review = decision_review
             assistant_message.thinking_review = thinking_review
+            # The picture, if one was still being made when the answer
+            # finished. Awaited here rather than abandoned: the bytes are
+            # already paid for, and a row without the pointer would lose an
+            # image that exists.
+            if image_task is not None and not image_sent:
+                try:
+                    generated_image = await image_task
+                except Exception:  # noqa: BLE001
+                    logger.warning("image task failed", exc_info=True)
+                    generated_image = None
+            assistant_message.generated_image = generated_image
             await gen_db.flush()
 
             # One `citations` row per unique marker actually cited anywhere

@@ -7,6 +7,7 @@ import type {
   Evidence,
   Guidance,
   DecisionReviewData,
+  GeneratedImage,
   ThinkingReviewData,
 } from "@/lib/sse";
 import { ConfidenceBadge } from "@/components/chat/ConfidenceBadge";
@@ -20,6 +21,7 @@ import { ThinkingIndicator } from "@/components/chat/ThinkingIndicator";
 import { ClarifierCard } from "@/components/chat/ClarifierCard";
 import { GuidanceCard } from "@/components/chat/GuidanceCard";
 import { DecisionReview } from "@/components/chat/DecisionReview";
+import { GeneratedImageCard } from "@/components/chat/GeneratedImageCard";
 import { ThinkingReview } from "@/components/chat/ThinkingReview";
 import { FeedbackWidget } from "@/components/chat/FeedbackWidget";
 import { ExportFileMenu } from "@/components/chat/ExportFileMenu";
@@ -37,6 +39,9 @@ export type StreamingMessage = {
   /** The verdict box, when its event has landed - normally before the gist. */
   decisionReview?: DecisionReviewData | null;
   thinkingReview?: ThinkingReviewData | null;
+  /** Co-Creative: the picture, once it has finished. Usually lands after the
+   *  answer has streamed - generating one takes ten to twenty seconds. */
+  generatedImage?: GeneratedImage | null;
 };
 
 export function MessageList({
@@ -170,6 +175,7 @@ export function MessageList({
           clarifier={m.clarifier}
           guidance={m.guidance}
           decisionReview={m.decision_review}
+          generatedImage={m.generated_image}
           thinkingReview={m.thinking_review}
           feedback={m.feedback}
           siblingIndex={m.sibling_index}
@@ -224,6 +230,7 @@ export function MessageList({
           claims={[]}
           crux={streaming.crux ?? null}
           decisionReview={streaming.decisionReview ?? null}
+          generatedImage={streaming.generatedImage ?? null}
           thinkingReview={streaming.thinkingReview ?? null}
           isStreaming
         />
@@ -474,6 +481,7 @@ function MessageBubble({
   guidance,
   decisionReview,
   thinkingReview,
+  generatedImage,
   feedback,
   siblingIndex,
   siblingCount,
@@ -511,6 +519,7 @@ function MessageBubble({
   guidance?: Guidance | null;
   decisionReview?: DecisionReviewData | null;
   thinkingReview?: ThinkingReviewData | null;
+  generatedImage?: GeneratedImage | null;
   feedback?: { rating: "up" | "down" | null; comment: string | null } | null;
   /** This message's position among its siblings, and how many there are -
    *  1 sibling means there's nothing to switch between. */
@@ -687,6 +696,9 @@ function MessageBubble({
             disabled={busy}
           />
         )}
+        {/* The picture leads, when there is one: it is the answer to "draw
+            me a logo", not an illustration of a paragraph. */}
+        {!isUser && generatedImage && <GeneratedImageCard image={generatedImage} />}
         {/* The reasoning-contrast / decision-verdict box is the analysis
             itself, not detail to hide behind a click - it leads, above the
             gist (the client's order: verdict box, then the one-line answer,

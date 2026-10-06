@@ -103,6 +103,8 @@ export type ChatMessage = {
   guidance: Guidance | null;
   decision_review: DecisionReviewData | null;
   thinking_review: ThinkingReviewData | null;
+  /** Co-Creative only, and only when the turn asked for a picture. */
+  generated_image: GeneratedImage | null;
   /** The user's own reaction to this answer - null until they tap something. */
   feedback: { rating: "up" | "down" | null; comment: string | null } | null;
   /** Null for the very first message(s) of a conversation. */
@@ -161,6 +163,11 @@ export type ClarifyingOptionsSuggestion = {
 };
 
 /** Named phase of the work in progress, for the waiting indicator. */
+/** A picture made during a Co-Creative turn. The bytes are served by id;
+ *  this is the pointer, and `prompt` is what was actually asked of the
+ *  image model - which is not always what the user typed. */
+export type GeneratedImage = { id: string; owner: string; prompt: string };
+
 export type ChatStatus = { phase: string; label: string };
 
 export type ChatStreamHandlers = {
@@ -171,6 +178,10 @@ export type ChatStreamHandlers = {
   /** The verdict box (Decision: the decisions judged; Thought coach: how to
    *  think about it), sent as soon as it's ready - usually before the gist -
    *  so it leads the bubble from the first moment. */
+  /** A picture finished. Usually arrives after the answer has streamed -
+   *  generating one takes ten to twenty seconds - so it is also carried on
+   *  the message itself for reloads. */
+  onImage?: (image: GeneratedImage) => void;
   onReview?: (review: {
     decision_review?: DecisionReviewData | null;
     thinking_review?: ThinkingReviewData | null;
@@ -421,6 +432,7 @@ function handleRawEvent(raw: string, handlers: ChatStreamHandlers) {
     if (eventType === "delta") handlers.onDelta(parsed.text);
     else if (eventType === "crux") handlers.onCrux?.(parsed.text);
     else if (eventType === "review") handlers.onReview?.(parsed);
+    else if (eventType === "image") handlers.onImage?.(parsed);
     else if (eventType === "answer") handlers.onAnswer(parsed.message, parsed.user_message);
     else if (eventType === "status") handlers.onStatus?.(parsed);
     else if (eventType === "final") handlers.onFinal(parsed);

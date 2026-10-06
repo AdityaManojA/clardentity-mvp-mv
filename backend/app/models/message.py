@@ -111,6 +111,10 @@ class Message(Base):
     # str|None}. Assistant messages only; set once and overwritten on a
     # change of mind rather than accumulated, since it's one person's verdict
     # on one answer, not a discussion.
+    # Co-Creative only: {"id": "...", "prompt": "..."} for a picture made
+    # during this turn. Stored so it survives a reload - the image itself
+    # lives in object storage and is served by id; this is the pointer.
+    generated_image: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     feedback: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     token_usage: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

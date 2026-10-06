@@ -200,6 +200,8 @@ class MessageOut(BaseModel):
     #: Thinking mode only. Sound vs biased ways of reasoning about the
     #: question, shown instead of claims and evidence.
     thinking_review: dict | None = None
+    # Co-Creative only: {"id", "prompt"} for a picture made on this turn.
+    generated_image: dict | None = None
     #: {"rating": "up"|"down"|None, "comment": str|None}. Null until the user
     #: reacts to this answer - see FeedbackIn.
     feedback: dict | None = None

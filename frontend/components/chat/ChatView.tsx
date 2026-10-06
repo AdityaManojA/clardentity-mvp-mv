@@ -9,6 +9,7 @@ import {
   type RefinedQuestionSuggestion,
   type ClarifyingOptionsSuggestion,
   type DecisionReviewData,
+  type GeneratedImage,
   type ThinkingReviewData,
 } from "@/lib/sse";
 import { ModeSelector, type CognitiveMode } from "@/components/chat/ModeSelector";
@@ -139,6 +140,10 @@ export function ChatView({ conversationId }: { conversationId: string }) {
     decision_review?: DecisionReviewData | null;
     thinking_review?: ThinkingReviewData | null;
   } | null>(null);
+  // Same story as the review above: a picture that arrived while the answer
+  // was still streaming is not on the row the "answer" event carries, and
+  // would vanish until "final" without this.
+  const earlyImageRef = useRef<GeneratedImage | null>(null);
   const [streaming, setStreaming] = useState<StreamingMessage | null>(null);
   const [sending, setSending] = useState(false);
   // The message whose claims are still being verified. It is already on
@@ -301,6 +306,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
           guidance: null,
           decision_review: null,
           thinking_review: null,
+          generated_image: null,
           feedback: null,
           parent_id: fork?.parentId ?? null,
           sibling_index: 0,
@@ -312,6 +318,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
     setStreaming({ mode_used: sendMode, content: "" });
     lastSendRef.current = { content, attachments, mode: sendMode };
     earlyReviewRef.current = null;
+    earlyImageRef.current = null;
     setSlowHint(false);
 
     hasAnsweredRef.current = false;
@@ -372,6 +379,10 @@ export function ChatView({ conversationId }: { conversationId: string }) {
               : prev,
           );
         },
+        onImage: (image) => {
+          earlyImageRef.current = image;
+          setStreaming((prev) => (prev ? { ...prev, generatedImage: image } : prev));
+        },
         onCrux: (text) => {
           track("gist_shown", { mode: sendMode, after: durationBucket(Date.now() - askedAtMs) });
           setSlowHint(false);
@@ -406,13 +417,16 @@ export function ChatView({ conversationId }: { conversationId: string }) {
                 ? prev.map((m) => (m.id === userMessage.id ? realUserMessage : m))
                 : prev;
             const early = earlyReviewRef.current;
-            const carried = early
-              ? {
-                  ...message,
-                  decision_review: message.decision_review ?? early.decision_review ?? null,
-                  thinking_review: message.thinking_review ?? early.thinking_review ?? null,
-                }
-              : message;
+            const earlyImage = earlyImageRef.current;
+            const carried =
+              early || earlyImage
+                ? {
+                    ...message,
+                    decision_review: message.decision_review ?? early?.decision_review ?? null,
+                    thinking_review: message.thinking_review ?? early?.thinking_review ?? null,
+                    generated_image: message.generated_image ?? earlyImage ?? null,
+                  }
+                : message;
             return [...withRealUser, carried];
           });
           setStreaming(null);
