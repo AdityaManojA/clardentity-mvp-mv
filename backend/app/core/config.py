@@ -87,6 +87,19 @@ class Settings(BaseSettings):
     admin_bootstrap_email: str = "admin@clardentity.ai"
     admin_bootstrap_password: str = ""
     preview_modes: str = "mentoring,therapy,creative,legal"
+
+    #: The landing page's try-it-here box, which anyone can use without an
+    #: account. The per-visitor allowance is the product rule (5,000 tokens,
+    #: in services/guest_demo.py); this is the cost ceiling underneath it.
+    #:
+    #: It exists because the per-visitor and per-address counters are both
+    #: keyed on things the caller controls - a browser-generated session id
+    #: and an X-Forwarded-For header - so neither survives someone who means
+    #: it. This one is keyed on nothing: it is the total the demo may spend
+    #: in a day, across every visitor, after which it says "come back
+    #: tomorrow" instead of generating. Raise it when the landing page is
+    #: converting and the bill is understood.
+    guest_daily_token_budget: int = 2_000_000
     preview_daily_messages: int = 25
     # Depth and spend per call. "low" preserves the latency posture the
     # previous provider was tuned to; blank leaves the model's own default.

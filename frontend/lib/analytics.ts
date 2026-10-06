@@ -57,6 +57,11 @@ export type AnalyticsEvent =
   | "voice_recorded"
   | "call_started"
   | "completion_accepted"
+  // The landing page's try-it-here box
+  | "guest_demo_opened"
+  | "guest_demo_asked"
+  | "guest_demo_limit"
+  | "guest_demo_signup_clicked"
   // Where they stop
   | "gate_shown"
   | "gate_answered"

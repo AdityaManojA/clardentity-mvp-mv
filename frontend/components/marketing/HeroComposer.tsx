@@ -22,7 +22,7 @@ import { usePrefersReducedMotion } from "@/lib/useReducedMotion";
  * them.
  */
 
-type HeroMode = { name: string; heroIcon: string };
+type HeroMode = { name: string; value: string; heroIcon: string };
 
 /* One question per mode, chosen so that the pairing is self-evident - the
  * point is for someone to read the question, see which pill is lit, and
@@ -60,7 +60,17 @@ function shuffle(items: number[]): number[] {
   return out;
 }
 
-export function HeroComposer({ modes, accent }: { modes: readonly HeroMode[]; accent: string }) {
+export function HeroComposer({
+  modes,
+  accent,
+  onOpen,
+}: {
+  modes: readonly HeroMode[];
+  accent: string;
+  /** Clicking the box hands over whichever companion was lit at that moment,
+   *  so the demo opens in the mode the visitor was actually watching. */
+  onOpen?: (mode: HeroMode) => void;
+}) {
   const reducedMotion = usePrefersReducedMotion();
 
   /* Which mode sits in each slot of the current pass, and how far through it
@@ -133,8 +143,14 @@ export function HeroComposer({ modes, accent }: { modes: readonly HeroMode[]; ac
 
   return (
     <div className="flex flex-col" style={{ gap: 11.732 }}>
-      <div
-        className="relative w-full overflow-hidden rounded-[18.05px] border"
+      {/* A button, not a picture of one. The box has been typing questions
+          at the visitor; the least surprising thing it can do when clicked
+          is let them type their own. */}
+      <button
+        type="button"
+        onClick={() => onOpen?.(modes[active])}
+        aria-label={`Try Clardentity in ${modes[active]?.name ?? "Finder"} mode`}
+        className="group relative w-full cursor-text overflow-hidden rounded-[18.05px] border text-left transition-colors hover:border-white/40"
         style={{
           height: 111.91,
           background: "rgba(255,255,255,0.1)",
@@ -172,7 +188,7 @@ export function HeroComposer({ modes, accent }: { modes: readonly HeroMode[]; ac
             style={{ width: 18.05, height: 18.05 }}
           />
         </span>
-      </div>
+      </button>
 
       <div className="flex items-center justify-between" style={{ gap: 3.61 }}>
         {modes.map((mode, i) => {

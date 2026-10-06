@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { MaskIcon } from "@/components/ui/MaskIcon";
 import { CurtainShimmer } from "@/components/marketing/CurtainShimmer";
+import { GuestDemo } from "@/components/marketing/GuestDemo";
 import { HeroComposer } from "@/components/marketing/HeroComposer";
 import { Reveal } from "@/components/marketing/Reveal";
+import { track } from "@/lib/analytics";
 
 /* The landing page, built from the Figma design (file mTefBk432edigQvPwag6mK,
  * node 69:7). Every measurement, colour and asset here came from the design
@@ -71,6 +73,9 @@ const CURTAIN_BLUR =
 
 type Mode = {
   name: string;
+  /** What the backend calls this mode. Not derivable from the label - the
+   *  pill says "Thought Coach" and the API says `thinking`. */
+  value: string;
   blurb: string;
   icon: string;
   /** The white-on-dark variant used inside the hero composer. */
@@ -92,6 +97,7 @@ type Mode = {
 const MODES: Mode[] = [
   {
     name: "Finder",
+    value: "knowing",
     blurb: "Facts, sources, fast.",
     icon: "/landing/icon-card-finder.svg",
     heroIcon: "/landing/icon-hero-finder.svg",
@@ -100,6 +106,7 @@ const MODES: Mode[] = [
   },
   {
     name: "Decision-making",
+    value: "decision",
     blurb: "Weigh options against what matters to you.",
     icon: "/landing/icon-card-decision.svg",
     heroIcon: "/landing/icon-hero-decision.svg",
@@ -108,6 +115,7 @@ const MODES: Mode[] = [
   },
   {
     name: "Thought Coach",
+    value: "thinking",
     blurb: "Sort out a half-formed idea.",
     icon: "/landing/icon-card-thought.svg",
     heroIcon: "/landing/icon-hero-thought.svg",
@@ -116,6 +124,7 @@ const MODES: Mode[] = [
   },
   {
     name: "Learning",
+    value: "learning",
     blurb: "Learn it from the ground up.",
     icon: "/landing/icon-card-learning.svg",
     heroIcon: "/landing/icon-hero-learning.svg",
@@ -124,6 +133,7 @@ const MODES: Mode[] = [
   },
   {
     name: "Co-Creative",
+    value: "creative",
     blurb: "Make something together, draft by draft.",
     icon: "/landing/icon-card-cocreative.svg",
     heroIcon: "/landing/icon-hero-cocreative.svg",
@@ -132,6 +142,7 @@ const MODES: Mode[] = [
   },
   {
     name: "Mentoring",
+    value: "mentoring",
     blurb: "Guidance on a skill or a career.",
     icon: "/landing/icon-card-mentoring.svg",
     heroIcon: "/landing/icon-hero-mentoring.svg",
@@ -140,6 +151,7 @@ const MODES: Mode[] = [
   },
   {
     name: "Reflect & Relieve",
+    value: "therapy",
     blurb: "A calm place to think through how you feel.",
     icon: "/landing/icon-card-reflect.svg",
     heroIcon: "/landing/icon-hero-reflect.svg",
@@ -148,6 +160,7 @@ const MODES: Mode[] = [
   },
   {
     name: "Legal",
+    value: "legal",
     blurb: "Plain-language help with legal questions.",
     icon: "/landing/icon-card-legal.svg",
     heroIcon: "/landing/icon-hero-legal.svg",
@@ -230,6 +243,15 @@ const PAGE_WORDMARK = "clamp(20px, 2vw, 28.88px)";
 export function LandingPage({ signedIn }: { signedIn: boolean }) {
   const enter = signedIn ? "/start" : "/register";
 
+  /* The try-it-here demo, and the rectangle it grows out of. Held here
+     rather than inside the composer because the panel covers the page, not
+     the stage - it is a sibling of the whole layout, mounted only while it
+     is open so none of its state outlives a close. */
+  const stageRef = useRef<HTMLDivElement>(null);
+  const [demo, setDemo] = useState<{ mode: string; label: string; origin: DOMRect | null } | null>(
+    null,
+  );
+
   /* The page is light by design, whatever theme the browser is in. The
      element below paints its own canvas, but the document behind it does
      not - so an overscroll bounce, or the browser chrome on a phone, showed
@@ -295,6 +317,7 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
               width rather than the viewport's. */}
           <div className="mt-[14.44px] w-full overflow-hidden rounded-[14.44px]">
             <div
+              ref={stageRef}
               className="relative w-full"
               // aspect-ratio and containerType in a style object: see the
               // note on the crop below for why fractional values do not go
@@ -357,7 +380,18 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
                   transform: "translate(-50%, -50%) scale(calc(100cqi / 1032.46px))",
                 }}
               >
-                <HeroComposer modes={MODES} accent={PLUM} />
+                <HeroComposer
+                  modes={MODES}
+                  accent={PLUM}
+                  onOpen={(mode) => {
+                    track("guest_demo_opened", { mode: mode.value });
+                    setDemo({
+                      mode: mode.value,
+                      label: mode.name,
+                      origin: stageRef.current?.getBoundingClientRect() ?? null,
+                    });
+                  }}
+                />
               </div>
             </div>
           </div>
@@ -588,6 +622,15 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
           <Wordmark size={PAGE_WORDMARK} tone={MUTED} mark={MUTED} />
         </Reveal>
       </section>
+
+      {demo && (
+        <GuestDemo
+          origin={demo.origin}
+          modes={MODES}
+          initialMode={demo.mode}
+          onClose={() => setDemo(null)}
+        />
+      )}
 
       {/* The legal pages are a requirement of the terms people accept at
           sign-up, so they need a route from the public page. Not in the

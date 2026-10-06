@@ -12,6 +12,7 @@ from app.api.auth import router as auth_router
 from app.api.biases import router as biases_router
 from app.api.chat import router as chat_router
 from app.api.documents import router as documents_router
+from app.api.guest import router as guest_router
 from app.api.images import router as images_router
 from app.api.health import router as health_router
 from app.api.history import router as history_router
@@ -66,6 +67,7 @@ app.include_router(workspaces_router, prefix=API_PREFIX)
 app.include_router(chat_router, prefix=API_PREFIX)
 app.include_router(documents_router, prefix=API_PREFIX)
 app.include_router(images_router, prefix=API_PREFIX)
+app.include_router(guest_router, prefix=API_PREFIX)
 app.include_router(history_router, prefix=API_PREFIX)
 app.include_router(biases_router, prefix=API_PREFIX)
 app.include_router(profile_router, prefix=API_PREFIX)

@@ -1,0 +1,139 @@
+"""The allowance behind the landing page's try-it-here box.
+
+Someone who has not signed up can hold a short conversation on the stage,
+and is asked to sign up once it has cost 5,000 tokens. Everything here is
+about making that affordable rather than about being precise: nothing bills
+off these counters, and losing them costs at most one extra free
+conversation.
+
+Two counters, not one, because they stop different things.
+
+The per-session budget is the product rule: one visitor, one taste of it.
+The session id comes from the browser, so it is trivially rotated - clearing
+storage or opening a private window buys another 5,000 - and that is fine,
+because the point is a demo rather than a paywall.
+
+The per-address budget is the cost rule, and it is the one that matters. It
+is what stops a script from rotating session ids in a loop and spending the
+answer budget for the month in an afternoon. It is deliberately much larger
+than one session, so a household, an office or a university behind one
+address can all try it, and deliberately finite.
+
+Both expire. A counter that never resets turns a demo into a one-time offer
+for anyone whose address is shared.
+"""
+
+import logging
+from datetime import UTC, datetime
+
+import redis.asyncio as redis
+
+from app.core.config import settings
+
+logger = logging.getLogger("clardentity.guest")
+
+_redis = redis.from_url(settings.redis_url)
+
+#: What one visitor gets before being asked to sign up.
+SESSION_BUDGET = 5_000
+
+#: What one network address gets in a day, across however many sessions it
+#: invents. Five conversations' worth: generous for a shared address, small
+#: enough that a loop hits it quickly.
+ADDRESS_BUDGET = 25_000
+
+_DAY = 24 * 60 * 60
+
+#: Longest single question, and longest history carried back, in characters.
+#: The history arrives from the browser and is pasted into the prompt, so
+#: without a ceiling one request could carry a megabyte of context.
+MAX_MESSAGE_CHARS = 2_000
+MAX_HISTORY_CHARS = 12_000
+MAX_HISTORY_TURNS = 20
+
+
+def _session_key(session_id: str) -> str:
+    return f"guest:session:{session_id}"
+
+
+def _address_key(address: str) -> str:
+    return f"guest:address:{address}"
+
+
+def _global_key() -> str:
+    return f"guest:global:{datetime.now(UTC):%Y-%m-%d}"
+
+
+async def _get(key: str) -> int:
+    try:
+        value = await _redis.get(key)
+    except redis.RedisError:
+        # A counter that cannot be read must not refuse the request: the
+        # failure mode of the demo is "slightly too generous", never "the
+        # landing page is broken".
+        logger.warning("guest counter unavailable on read", exc_info=True)
+        return 0
+    return int(value or 0)
+
+
+async def spent(session_id: str, address: str) -> tuple[int, int]:
+    """Tokens already spent by this session, and by this address today."""
+    return await _get(_session_key(session_id)), await _get(_address_key(address))
+
+
+async def over_global_budget() -> bool:
+    """Whether the demo has spent its whole allowance for today.
+
+    The backstop under the other two. Both of those are keyed on something
+    the caller controls - a session id the browser invents, an address read
+    from a header a proxy sets - so neither survives someone determined. This
+    one is keyed on the date, and nothing else, which is what makes the worst
+    case a number rather than a question.
+    """
+    return await _get(_global_key()) >= settings.guest_daily_token_budget
+
+
+async def exhausted(session_id: str, address: str) -> bool:
+    session_spent, address_spent = await spent(session_id, address)
+    return session_spent >= SESSION_BUDGET or address_spent >= ADDRESS_BUDGET
+
+
+async def charge(session_id: str, address: str, tokens: int) -> int:
+    """Add one turn's tokens to both counters. Returns the session total.
+
+    Charged after the answer rather than reserved before it: a turn that has
+    already been generated has already been paid for, and refusing to count
+    it would be the one way to actually lose money here.
+    """
+    if tokens <= 0:
+        return await _get(_session_key(session_id))
+    total = await _get(_session_key(session_id))
+    try:
+        pipe = _redis.pipeline()
+        pipe.incrby(_session_key(session_id), tokens)
+        pipe.expire(_session_key(session_id), _DAY)
+        pipe.incrby(_address_key(address), tokens)
+        pipe.expire(_address_key(address), _DAY)
+        pipe.incrby(_global_key(), tokens)
+        pipe.expire(_global_key(), _DAY)
+        results = await pipe.execute()
+        total = int(results[0])
+    except redis.RedisError:
+        logger.warning("guest counter unavailable on write", exc_info=True)
+    return total
+
+
+def trim_history(history: list[dict]) -> list[dict]:
+    """The conversation so far, cut to something that cannot be abused.
+
+    Oldest turns go first: the recent ones are what the next answer needs.
+    """
+    turns = [
+        {"role": h.get("role"), "content": (h.get("content") or "")[:MAX_MESSAGE_CHARS]}
+        for h in history
+        if h.get("role") in {"user", "assistant"} and (h.get("content") or "").strip()
+    ][-MAX_HISTORY_TURNS:]
+
+    while turns and sum(len(t["content"]) for t in turns) > MAX_HISTORY_CHARS:
+        turns.pop(0)
+    return turns
