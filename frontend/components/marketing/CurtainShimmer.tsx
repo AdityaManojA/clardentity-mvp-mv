@@ -6,12 +6,20 @@ import { usePrefersReducedMotion } from "@/lib/useReducedMotion";
 /* The curtain catches the light - and the wind - where the cursor is.
  *
  * The effect is built out of the asset's own measurements. A column-
- * brightness profile of the band the design actually shows, autocorrelated,
- * has its strongest repeat at 1.709% of the image's width: that is one fold
- * to the next, about fifty pleats across the stage. The colour is the mean of
- * every lit-fabric pixel in the same band, #a72341, with #d74564 for the edge
- * of a fold turned toward the light. So the bands land on the real folds and
- * wear the curtain's own burgundy.
+ * brightness profile of the stage image, autocorrelated, has its strongest
+ * repeat at 1.9906% of its width: that is one fold to the next, about fifty
+ * pleats across the stage. The colour is the mean of every lit-fabric pixel
+ * in the same band, #a72341, with #d74564 for the edge of a fold turned
+ * toward the light. So the bands land on the real folds and wear the
+ * curtain's own burgundy.
+ *
+ * The spacing was 1.709% while the stage was a window onto the 4096px master
+ * and this element was the whole photograph, overflowing the frame. The
+ * design now supplies the band pre-cropped, so the element and the stage are
+ * the same box: the folds did not move, but they are a larger share of a
+ * narrower picture - the stage was always showing 85.66% of the master's
+ * width, and 1.709 / 0.8566 is 1.995, which is what re-measuring the new
+ * asset independently found.
  *
  * Each pleat is its own element rather than one repeating-gradient mask,
  * because a gradient can only be slid as a whole and wind has to move each
@@ -23,7 +31,7 @@ import { usePrefersReducedMotion } from "@/lib/useReducedMotion";
  * Nothing here runs under prefers-reduced-motion.
  */
 
-const PLEAT = 1.709; // % of the curtain's width, one fold to the next
+const PLEAT = 1.9906; // % of the stage's width, one fold to the next
 const LIT = 0.62; // how much of a pleat catches the light
 const COUNT = Math.ceil(100 / PLEAT) + 1;
 
@@ -37,6 +45,10 @@ const REACH = 12; // % of the width it spans either side of the cursor
  * field of the slice the design shows puts the bright arch at 50% across and
  * 38% down, half-strength from 30% to 70% horizontally and fading to nothing
  * below two thirds of the height - the bottom of the frame is black fabric.
+ * Re-measured on the pre-cropped asset: 49.8% across, 35.0% down, half
+ * strength from 26% to 73%, gone by 63%. The same numbers, which is the
+ * point - these were always in the coordinates of the slice, and the slice
+ * is now the element they are applied to rather than a window onto it.
  *
  * Without this the light was flat top to bottom and flooded the corners the
  * photograph keeps dark, which read as a coloured overlay rather than as the

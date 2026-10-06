@@ -13,7 +13,7 @@ import { TypedQuestions } from "@/components/marketing/TypedQuestions";
  * over the Figma connector rather than from a screenshot, so the layout is
  * the design's own numbers.
  *
- * Two things about how it is built:
+ * Three things about how it is built:
  *
  * The design is a fixed 1728px canvas. Rather than reproduce that with
  * absolute positioning - which would be pixel-perfect at exactly one width
@@ -22,6 +22,13 @@ import { TypedQuestions } from "@/components/marketing/TypedQuestions";
  * below it, the content scales down through `clamp` on the display type and
  * the grids reflow. Nothing about the design is lost, and it survives a
  * phone.
+ *
+ * The revision this is built from took the whole page down to 90.25% - every
+ * box, to the digit: the content column from 1110 to 1001.775, the mode
+ * cards from 300x400 to 270.75x361, the stage from 1144 to 1032.46 - so the
+ * page sits in more of its own margin. The nav is the exception; it was
+ * added at full size, and keeps the 32px wordmark the rest of the page has
+ * stepped down from.
  *
  * The palette reads through to the app's tokens rather than being written out
  * here. The hexes these used to hold were the burgundy's, to the digit - but
@@ -36,26 +43,31 @@ const INK_BODY = "var(--text-secondary)"; // body copy under a heading
 const MUTED = "var(--text-muted)"; // captions, eyebrow text, footer wordmark
 const PLUM = "var(--brand)"; // accent: send button, "Ask./Check./See.", emphasis
 const CANVAS = "var(--surface-muted)";
+const HAIRLINE = "var(--border-strong)"; // card borders
+const OUTLINE = "var(--text-nav)"; // the nav pill
 
-/* A twenty-pixel-wide copy of the curtain, from the design file's own
- * downscaled version of it, as the blur-up placeholder. The stage is the
- * first thing on the page and its source image is a 4096px master: without
- * this the hero is an empty dark box until that arrives. 800 bytes inline
- * costs less than one round trip. */
-/* Where the curtain sits inside the stage - the design's numbers, shared by
- * the base image and the shimmer copy laid over it so the two can never
- * drift apart. */
+/* Where the curtain sits inside the stage, shared by the base image and the
+ * shimmer copy laid over it so the two can never drift apart.
+ *
+ * This used to be a window onto a 4096px master - 116.8% wide at -8.4%,
+ * 150.96% tall at -50.96% - because the asset was the whole photograph and
+ * the stage showed a band of it. The design now supplies that band already
+ * cropped, so the picture simply fills the frame; the 0.04% of overscan is
+ * the design's own, and keeps a subpixel seam off the edges. */
 const CURTAIN_GEOMETRY: React.CSSProperties = {
-  left: "-8.4%",
-  top: "-50.96%",
-  width: "116.8%",
-  height: "150.96%",
+  left: "-0.02%",
+  top: 0,
+  width: "100.04%",
+  height: "100%",
   maxWidth: "none",
 };
 
-const CURTAIN_BLUR = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4QBMRXhpZgAATU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAFKADAAQAAAABAAAACwAAAAD/wAARCAALABQDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9sAQwAEBAQEBAQIBAQICwgICAsPCwsLCw8SDw8PDw8SFhISEhISEhYWFhYWFhYWGxsbGxsbHx8fHx8jIyMjIyMjIyMj/9sAQwEFBgYJCAkPCAgPJBkUGSQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQk/90ABAAC/9oADAMBAAIRAxEAPwD4p014r8W2jztsQzMzH6gD+laV/Y21tZnUBA1rJDMFVWOd49ee4/KuNHXNSSzzTY812bHTJzVOOp6sMZFU3Gcbvo/lp92+nzLN9cfa7yW5/wCejlvzNVKjoqrHnzk5Scn1P//Z";
-const HAIRLINE = "var(--border-strong)"; // card borders
-const OUTLINE = "var(--text-nav)"; // the Login pill
+/* A twenty-pixel-wide copy of the curtain as the blur-up placeholder. The
+ * stage is the first thing on the page: without this the hero is an empty
+ * dark box until the image arrives. 450 bytes inline costs less than one
+ * round trip. */
+const CURTAIN_BLUR =
+  "data:image/jpeg;base64,/9j/2wBDAA4KCw0LCQ4NDA0QDw4RFiQXFhQUFiwgIRokNC43NjMuMjI6QVNGOj1OPjIySGJJTlZYXV5dOEVmbWVabFNbXVn/2wBDAQ8QEBYTFioXFypZOzI7WVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVn/wAARCAAJABQDASIAAhEBAxEB/8QAFwAAAwEAAAAAAAAAAAAAAAAAAAEFBv/EAB4QAAEEAgMBAAAAAAAAAAAAAAEAAgQRAxIFQVGx/8QAFgEBAQEAAAAAAAAAAAAAAAAABAAB/8QAGREAAgMBAAAAAAAAAAAAAAAAAAIBBBFB/9oADAMBAAIRAxEAPwDAw87cUgOyXrrrfio8hNiujFmADZzQ0gfVFQrBKWXRJSOjJJq+hSEkLQ+n/9k=";
 
 type Mode = {
   name: string;
@@ -65,7 +77,7 @@ type Mode = {
   heroIcon: string;
   /** The design gives every blurb its own text box rather than a shared
    *  column, and the wrapping is part of the look - "Facts, sources," breaks
-   *  before "fast." because its box is 90px wide, not 252px. Carried here so
+   *  before "fast." because its box is 81px wide, not 227px. Carried here so
    *  the cards read exactly as drawn. */
   blurbWidth: number;
   /** Where that box starts. Two-line blurbs sit lower than three-line ones so
@@ -83,64 +95,64 @@ const MODES: Mode[] = [
     blurb: "Facts, sources, fast.",
     icon: "/landing/icon-card-finder.svg",
     heroIcon: "/landing/icon-hero-finder.svg",
-     blurbWidth: 89.947,
-    blurbTop: 286.41,
+    blurbWidth: 81.177,
+    blurbTop: 258.48,
   },
   {
     name: "Decision-making",
     blurb: "Weigh options against what matters to you.",
     icon: "/landing/icon-card-decision.svg",
     heroIcon: "/landing/icon-hero-decision.svg",
-     blurbWidth: 231.416,
-    blurbTop: 286.41,
+    blurbWidth: 208.853,
+    blurbTop: 258.48,
   },
   {
     name: "Thought Coach",
     blurb: "Sort out a half-formed idea.",
     icon: "/landing/icon-card-thought.svg",
     heroIcon: "/landing/icon-hero-thought.svg",
-     blurbWidth: 245.239,
-    blurbTop: 316.41,
+    blurbWidth: 221.329,
+    blurbTop: 285.56,
   },
   {
     name: "Learning",
     blurb: "Learn it from the ground up.",
     icon: "/landing/icon-card-learning.svg",
     heroIcon: "/landing/icon-hero-learning.svg",
-     blurbWidth: 245.239,
-    blurbTop: 316.41,
+    blurbWidth: 221.329,
+    blurbTop: 285.56,
   },
   {
     name: "Co-Creative",
     blurb: "Make something together, draft by draft.",
     icon: "/landing/icon-card-cocreative.svg",
     heroIcon: "/landing/icon-hero-cocreative.svg",
-     blurbWidth: 245.239,
-    blurbTop: 286.41,
+    blurbWidth: 221.329,
+    blurbTop: 258.48,
   },
   {
     name: "Mentoring",
     blurb: "Guidance on a skill or a career.",
     icon: "/landing/icon-card-mentoring.svg",
     heroIcon: "/landing/icon-hero-mentoring.svg",
-     blurbWidth: 158.947,
-    blurbTop: 286.41,
+    blurbWidth: 143.449,
+    blurbTop: 258.48,
   },
   {
     name: "Reflect & Relieve",
     blurb: "A calm place to think through how you feel.",
     icon: "/landing/icon-card-reflect.svg",
     heroIcon: "/landing/icon-hero-reflect.svg",
-     blurbWidth: 181.826,
-    blurbTop: 286.41,
+    blurbWidth: 164.098,
+    blurbTop: 258.48,
   },
   {
     name: "Legal",
     blurb: "Plain-language help with legal questions.",
     icon: "/landing/icon-card-legal.svg",
     heroIcon: "/landing/icon-hero-legal.svg",
-     blurbWidth: 179.244,
-    blurbTop: 286.41,
+    blurbWidth: 161.768,
+    blurbTop: 258.48,
   },
 ];
 
@@ -148,45 +160,71 @@ const STEPS = [
   {
     word: "Ask.",
     blurb: "Your question goes to the models best suited for it.",
-    blurbWidth: 306.808,
+    blurbWidth: 256,
+    blurbLeft: 25.68,
   },
   {
     word: "Check.",
     blurb: "The answer is split into claims & checked against sources.",
-    blurbWidth: 306.808,
+    blurbWidth: 276.894,
+    blurbLeft: 25.27,
   },
   // Narrower in the design, which is what breaks it after "audit,".
-  { word: "See.", blurb: "You get the answer and the audit, side by side.", blurbWidth: 266.631 },
+  {
+    word: "See.",
+    blurb: "You get the answer and the audit, side by side.",
+    blurbWidth: 240.634,
+    blurbLeft: 25.27,
+  },
 ];
 
 /* One mark, painted. There used to be four copies of this file with four
  * different fills baked in, which meant the mark was the one part of the page
  * that could not follow an accent - and three of the four were the same shape
- * in a different colour anyway. */
+ * in a different colour anyway.
+ *
+ * The whole lockup is driven by one number. The design draws it twice - 32px
+ * with a 33.083 x 32 mark and a 12px gap in the nav, 28.88px with a 29.857 x
+ * 28.88 mark and a 10.83px gap everywhere else - and those are the same
+ * shape: 1.0338 and 0.375 of the type size, both times. Sizing the mark and
+ * the gap in `em` says that once, and it is what lets the size be a clamp:
+ * the nav's 32px is most of a phone's width, and the mark has to come down
+ * with the word rather than sit beside a smaller one. */
 function Wordmark({
   size,
   tone,
   mark,
 }: {
-  size: number;
+  /** Any CSS length - a number of px, or a clamp() for the ones that have to
+   *  survive a narrow screen. */
+  size: string | number;
   tone: string;
   /** The dots, which are not always the colour of the word beside them. */
   mark: string;
 }) {
   return (
-    <span className="flex shrink-0 items-center gap-[12px]">
+    <span
+      className="flex shrink-0 items-center"
+      style={{ fontSize: size, gap: "0.375em" }}
+    >
       <span style={{ color: mark }} className="flex">
-        <MaskIcon src="/landing/logo-dots.svg" className="h-[32px] w-[33.083px]" />
+        <MaskIcon
+          src="/landing/logo-dots.svg"
+          style={{ width: "1.0338em", height: "1em" }}
+        />
       </span>
-      <span
-        className="whitespace-nowrap font-normal leading-none"
-        style={{ fontSize: size, color: tone }}
-      >
+      <span className="whitespace-nowrap font-normal leading-none" style={{ color: tone }}>
         Clardentity
       </span>
     </span>
   );
 }
+
+/* The nav was added at full size; the rest of the page stepped down to
+ * 90.25%. Both hold their design size on a wide screen and give way on a
+ * narrow one. */
+const NAV_WORDMARK = "clamp(22px, 2.2vw, 32px)";
+const PAGE_WORDMARK = "clamp(20px, 2vw, 28.88px)";
 
 export function LandingPage({ signedIn }: { signedIn: boolean }) {
   const enter = signedIn ? "/start" : "/register";
@@ -218,49 +256,50 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
       {/* ---------------------------------------------------------------- */}
       {/* Hero (69:8) */}
       {/* ---------------------------------------------------------------- */}
-      <section className="relative mx-auto w-full max-w-[1728px] px-4 pb-[40px] pt-[70px] sm:px-8">
-        <div className="flex items-center justify-center">
-          <Wordmark size={32} tone={INK} mark={PLUM} />
-        </div>
-
-        {/* Absolute at the design's width, in flow below it on narrow screens,
-            where a right-pinned button would sit on top of the wordmark. */}
-        <div className="mt-6 flex justify-center xl:mt-0 xl:block">
+      <section className="relative mx-auto w-full max-w-[1728px] px-4 pb-[40px] pt-[48px] sm:px-8 sm:pb-[80px] sm:pt-[82px]">
+        {/* The nav (116:1908). The wordmark used to be centred over the page
+            with the way in pinned to the right of it, which left the two
+            halves of the bar unrelated to each other. They are now the ends
+            of one row: the name on the left, the door on the right. */}
+        <nav className="mx-auto flex w-full max-w-[1351px] flex-wrap items-center justify-between gap-4">
+          <Link href="/" aria-label="Clardentity">
+            <Wordmark size={NAV_WORDMARK} tone={INK} mark={PLUM} />
+          </Link>
           <Link
             // Someone who is already signed in and lands here - which is
             // where Back from the app now goes - must not be offered a login
             // button. It reads as having been signed out, which is the same
-            // confusion the back button used to cause outright.
-            href={signedIn ? enter : "/login"}
-            className="inline-flex items-center rounded-[37px] border px-[12px] py-[4px] text-2xl transition-colors hover:bg-black/[0.03] xl:absolute xl:right-[160px] xl:top-[79px]"
-            style={{ borderColor: OUTLINE, color: OUTLINE }}
+            // confusion the back button used to cause outright. The design's
+            // wording is the way out of that: "Start exploring" is true of
+            // both, and goes wherever that person's next step actually is.
+            href={enter}
+            className="inline-flex items-center rounded-[37px] border px-[12px] py-[4px] transition-colors hover:bg-black/[0.03]"
+            style={{ borderColor: OUTLINE, color: OUTLINE, fontSize: "clamp(16px, 1.65vw, 24px)" }}
           >
-            {signedIn ? "Open" : "Login"}
+            Start exploring
           </Link>
-        </div>
+        </nav>
 
-        <div className="mx-auto mt-[80px] flex w-full max-w-[1144px] flex-col items-center gap-[16px] sm:mt-[113px]">
+        <div className="mx-auto mt-[96px] flex w-full max-w-[1032.46px] flex-col items-center sm:mt-[171px]">
           <h1
             className="w-full text-center font-normal"
-            style={{ fontSize: "clamp(22px, 2.6vw, 32px)", color: INK }}
+            style={{ fontSize: "clamp(20px, 2.35vw, 28px)", color: INK }}
           >
             Every answer, checked claim by claim.
           </h1>
 
-          {/* The stage. 1144 x 494 in the design; the ratio is kept so the
-              curtain never crops differently from the frame, and the box is a
-              container so everything inside can be sized against its width
-              rather than the viewport's. */}
-          <div className="relative w-full overflow-hidden rounded-[16px]">
+          {/* The stage. 1032.46 x 445.835 in the design; the ratio is kept so
+              the curtain never crops differently from the frame, and the box
+              is a container so everything inside can be sized against its
+              width rather than the viewport's. */}
+          <div className="mt-[14.44px] w-full overflow-hidden rounded-[14.44px]">
             <div
-              className="relative aspect-[1144/494] w-full"
-              style={{ containerType: "inline-size" }}
+              className="relative w-full"
+              // aspect-ratio and containerType in a style object: see the
+              // note on the crop below for why fractional values do not go
+              // through Tailwind's arbitrary-value syntax on this page.
+              style={{ aspectRatio: "1032.46 / 445.835", containerType: "inline-size" }}
             >
-              {/* The design does not centre-crop this: it places the image at
-                  116.8% x 150.96%, offset left -8.4% and top -50.96%, which
-                  shows the lower half of the curtain and puts the bright arch
-                  where it sits in the frame. object-cover would have centred
-                  it and shown a different part of the picture. */}
               {/* Geometry in a style object, not Tailwind arbitrary values:
                   negative percentage insets and fractional percentage sizes
                   are the class shapes this project has repeatedly found are
@@ -268,19 +307,18 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
                   the element carries the class and lays out as though it
                   did not. Inline leaves nothing to chance. */}
               <Image
-                src="/landing/curtain.png"
+                src="/landing/curtain-stage.webp"
                 alt=""
-                width={4096}
-                height={2286}
+                width={1909}
+                height={824}
                 priority
                 placeholder="blur"
                 blurDataURL={CURTAIN_BLUR}
-                sizes="(max-width: 1200px) 140vw, 1400px"
+                sizes="(max-width: 1200px) 100vw, 1100px"
                 className="absolute"
-                // maxWidth is explicit in CURTAIN_GEOMETRY for the same
-                // reason the rest is: the base stylesheet caps every img at
-                // 100% of its container, which would shrink this back to the
-                // frame and undo the crop.
+                // maxWidth is explicit in CURTAIN_GEOMETRY because the base
+                // stylesheet caps every img at 100% of its container, which
+                // would undo the overscan.
                 style={CURTAIN_GEOMETRY}
               />
               {/* Under the design's own darkening gradient, so the light
@@ -297,67 +335,92 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
               />
 
               {/* The composer, sunk into the lower half of the stage exactly
-                  as the design places it (centre + 95.5px).
+                  as the design places it (centre + 86.19px of a 445.835px
+                  stage, which is 19.332% and so travels with it).
 
-                  Drawn at its true size - 925px wide, the design's number -
-                  and then scaled by however much the stage itself has been
-                  scaled. Everything inside therefore keeps its exact
-                  proportions at any width: at 1144px the scale is 1 and this
-                  is the design pixel for pixel; on a phone the whole
+                  Drawn at its true size - 834.813px wide, the design's
+                  number - and then scaled by however much the stage itself
+                  has been scaled. Everything inside therefore keeps its exact
+                  proportions at any width: at 1032.46px the scale is 1 and
+                  this is the design pixel for pixel; on a phone the whole
                   composer shrinks together rather than the eight mode pills
                   overflowing a box that got narrower while they did not. */}
               <div
-                className="absolute left-1/2 top-[calc(50%+8.6%)]"
+                className="absolute left-1/2"
                 style={{
-                  width: 925,
+                  width: 834.813,
+                  top: "calc(50% + 19.332%)",
                   // Divided by a *length*, so the result is the unitless
-                  // ratio scale() needs - dividing by the bare number 1144
-                  // yields a length, which scale() rejects silently.
-                  transform: "translate(-50%, -50%) scale(calc(100cqi / 1144px))",
+                  // ratio scale() needs - dividing by the bare number
+                  // 1032.46 yields a length, which scale() rejects silently.
+                  transform: "translate(-50%, -50%) scale(calc(100cqi / 1032.46px))",
                 }}
               >
-                <div className="flex flex-col gap-[13px]">
+                <div className="flex flex-col" style={{ gap: 11.732 }}>
                   <div
-                    className="relative h-[124px] w-full overflow-hidden rounded-[20px] border"
-                    style={{ background: "rgba(255,255,255,0.1)", borderColor: "var(--border)" }}
+                    className="relative w-full overflow-hidden rounded-[18.05px] border"
+                    style={{
+                      height: 111.91,
+                      background: "rgba(255,255,255,0.1)",
+                      borderColor: "var(--border)",
+                    }}
                   >
                     <p
-                      className="absolute left-[26px] top-[24.74px] whitespace-nowrap font-normal text-white"
-                      style={{ fontSize: 20 }}
+                      className="absolute whitespace-nowrap font-normal text-white"
+                      style={{ left: 23.47, top: 22.33, fontSize: 18.05 }}
                     >
                       <TypedQuestions />
                     </p>
                     <span
-                      className="absolute bottom-[15.25px] right-[22px] flex size-[32px] items-center justify-center rounded-[22px]"
-                      style={{ background: PLUM }}
+                      className="absolute flex items-center justify-center rounded-[19.855px]"
+                      style={{
+                        bottom: 13.76,
+                        right: 19.86,
+                        width: 28.88,
+                        height: 28.88,
+                        background: PLUM,
+                      }}
                     >
                       <Image
                         src="/landing/arrow-up.svg"
                         alt=""
-                        width={20}
-                        height={20}
-                        className="block size-[20px]"
+                        width={18}
+                        height={18}
+                        className="block"
+                        style={{ width: 18.05, height: 18.05 }}
                       />
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between gap-[4px]">
+                  <div
+                    className="flex items-center justify-between"
+                    style={{ gap: 3.61 }}
+                  >
                     {MODES.map((mode) => (
                       <span
                         key={mode.name}
-                        className="flex shrink-0 flex-col items-center justify-center gap-[4px] rounded-[8px] border px-[12px] py-[4px]"
-                        style={{ background: "rgba(255,255,255,0.1)", borderColor: "var(--border)" }}
+                        className="flex shrink-0 flex-col items-center justify-center rounded-[7.22px] border"
+                        style={{
+                          gap: 3.61,
+                          paddingLeft: 10.83,
+                          paddingRight: 10.83,
+                          paddingTop: 3.61,
+                          paddingBottom: 3.61,
+                          background: "rgba(255,255,255,0.1)",
+                          borderColor: "var(--border)",
+                        }}
                       >
                         <Image
                           src={mode.heroIcon}
                           alt=""
-                          width={20}
-                          height={20}
-                          className="block size-[20px]"
+                          width={18}
+                          height={18}
+                          className="block"
+                          style={{ width: 18.05, height: 18.05 }}
                         />
                         <span
                           className="whitespace-nowrap font-normal text-white"
-                          style={{ fontSize: 16 }}
+                          style={{ fontSize: 14.44 }}
                         >
                           {mode.name}
                         </span>
@@ -370,7 +433,7 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
           </div>
 
           <p
-            className="mt-[16px] w-full text-center font-semibold uppercase"
+            className="mt-[36px] w-full text-center font-semibold uppercase"
             style={{ fontSize: "clamp(14px, 1.2vw, 20px)", color: MUTED }}
           >
             <Link href={enter} className="transition-colors hover:text-brand">
@@ -385,39 +448,107 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
       </section>
 
       {/* ---------------------------------------------------------------- */}
+      {/* How it works (69:132) */}
+      {/* ---------------------------------------------------------------- */}
+      {/* Second now, not fourth. The design stacks it directly under the
+          hero, which is also where the hero's own "See how it works" has
+          always pointed - the link used to jump the reader over two sections
+          to reach it. */}
+      <section
+        id="how-it-works"
+        className="mx-auto w-full max-w-[1728px] scroll-mt-8 px-4 py-[72px] sm:px-8 sm:py-[126px]"
+      >
+        <div className="mx-auto flex w-full max-w-[1059.23px] flex-col items-center gap-[26.371px]">
+          <Reveal as="h2" className="text-center font-normal capitalize">
+            <span style={{ fontSize: "clamp(25px, 2.8vw, 35.161px)", color: INK }}>
+              How it works
+            </span>
+          </Reveal>
+
+          <div className="grid w-full grid-cols-1 justify-items-center gap-[35.161px] md:grid-cols-3">
+            {STEPS.map((step, i) => (
+              <Reveal
+                as="article"
+                key={step.word}
+                // Ask, then Check, then See - in that order, which is the
+                // point the three cards are making.
+                delay={i * 110}
+                className="landing-card relative h-[439.515px] w-full max-w-[329.636px] overflow-hidden rounded-[13.185px]"
+              >
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 rounded-[13.185px]"
+                  // Fractional border width inline for the same reason as the
+                  // hero crop: the arbitrary-value class rounds to 1px
+                  // because the rule is never generated.
+                  style={{ border: `1.099px solid ${HAIRLINE}` }}
+                />
+                <p
+                  className="absolute font-normal"
+                  style={{
+                    left: step.blurbLeft,
+                    top: 28.94,
+                    width: step.blurbWidth,
+                    fontSize: 24,
+                    color: MUTED,
+                  }}
+                >
+                  {step.blurb}
+                </p>
+                <div
+                  className="absolute left-1/2 flex -translate-x-1/2 items-center justify-between"
+                  style={{ bottom: 24.72, width: 276.894 }}
+                >
+                  <span
+                    className="whitespace-nowrap font-semibold"
+                    style={{ fontSize: 36, color: PLUM }}
+                  >
+                    {step.word}
+                  </span>
+                  <span style={{ color: HAIRLINE }} className="flex">
+                    <MaskIcon
+                      src="/landing/logo-dots.svg"
+                      className="h-[35.161px] w-[36.351px]"
+                    />
+                  </span>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+
+          <Reveal as="p" delay={160} className="text-right font-normal uppercase">
+            <span style={{ fontSize: "clamp(14px, 1.25vw, 20px)", color: MUTED }}>
+              Clardentity uses multiple AI models, not just one.
+            </span>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ---------------------------------------------------------------- */}
       {/* The audit (69:66) */}
       {/* ---------------------------------------------------------------- */}
-      <section className="mx-auto flex w-full max-w-[1728px] items-center px-4 py-[140px] sm:px-8">
-        <div className="mx-auto w-full max-w-[1110px]">
+      <section className="mx-auto flex w-full max-w-[1728px] items-center px-4 py-[72px] sm:px-8 sm:py-[126px]">
+        <div className="mx-auto w-full max-w-[1001.775px]">
           <Reveal className="flex items-center justify-between">
-            <Wordmark size={32} tone={INK} mark={PLUM} />
+            <Wordmark size={PAGE_WORDMARK} tone={INK} mark={PLUM} />
             <p
               className="whitespace-nowrap text-center font-semibold uppercase"
-              style={{ fontSize: "clamp(14px, 1.2vw, 20px)", color: MUTED }}
+              style={{ fontSize: "clamp(13px, 1.1vw, 18px)", color: MUTED }}
             >
               The audit
             </p>
           </Reveal>
 
-          <Reveal
-            as="h2"
-            delay={90}
-            className="mt-[4px] text-center font-normal"
-          >
-            <span style={{ fontSize: "clamp(40px, 5.6vw, 96px)", color: INK }}>
+          <Reveal as="h2" delay={90} className="mt-[3.61px] text-center font-normal">
+            <span style={{ fontSize: "clamp(36px, 5vw, 86px)", color: INK }}>
               An answer is many claims.
             </span>
           </Reveal>
-          <Reveal
-            delay={180}
-            className="mt-[4px] max-w-[852.553px] font-normal"
-          >
-          <div
-            style={{ fontSize: "clamp(18px, 1.9vw, 32px)", color: INK_BODY }}
-          >
-            <p>Clardentity splits every answer into individual claims.</p>
-            <p>Each one is checked against sources. You see what holds up and what doesn&apos;t.</p>
-          </div>
+          <Reveal delay={180} className="mt-[3.61px] max-w-[769.429px] font-normal">
+            <div style={{ fontSize: "clamp(16px, 1.7vw, 28px)", color: INK_BODY }}>
+              <p>Clardentity splits every answer into individual claims.</p>
+              <p>Each one is checked against sources. You see what holds up and what doesn&apos;t.</p>
+            </div>
           </Reveal>
         </div>
       </section>
@@ -425,19 +556,19 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
       {/* ---------------------------------------------------------------- */}
       {/* Modes (69:77) */}
       {/* ---------------------------------------------------------------- */}
-      <section className="mx-auto w-full max-w-[1728px] px-4 py-[67px] sm:px-8">
-        <div className="mx-auto flex w-full max-w-[1299px] flex-col items-end gap-[16px]">
-          <Reveal as="h2" className="w-full max-w-[366px] text-right font-normal capitalize">
-            <span style={{ fontSize: "clamp(22px, 2.6vw, 32px)", color: INK }}>
+      <section className="mx-auto w-full max-w-[1728px] px-4 py-[60px] sm:px-8">
+        <div className="mx-auto flex w-full max-w-[1172.35px] flex-col items-end gap-[16px]">
+          <Reveal as="h2" className="w-full max-w-[330.315px] text-right font-normal capitalize">
+            <span style={{ fontSize: "clamp(20px, 2.35vw, 28px)", color: INK }}>
               <span style={{ color: PLUM }}>Different questions</span> need{" "}
               <span style={{ color: PLUM }}>different thinking.</span>
             </span>
           </Reveal>
 
           {/* Four across at the design's width, reflowing below it. The cards
-              keep their 300 x 400 shape, so the wall of them reads the same
-              at every breakpoint. */}
-          <div className="grid w-full grid-cols-1 justify-items-center gap-[32px] sm:grid-cols-2 lg:grid-cols-4">
+              keep their 270.75 x 361 shape, so the wall of them reads the
+              same at every breakpoint. */}
+          <div className="grid w-full grid-cols-1 justify-items-center gap-x-[28.88px] gap-y-[36.1px] sm:grid-cols-2 lg:grid-cols-4">
             {MODES.map((mode, i) => (
               <Reveal
                 as="article"
@@ -445,34 +576,39 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
                 // Staggered across the row, capped so the second row does not
                 // wait most of a second behind the first.
                 delay={(i % 4) * 70}
-                className="landing-card relative h-[400px] w-full max-w-[300px] overflow-hidden rounded-[12px] border"
+                className="landing-card relative h-[361px] w-full max-w-[270.75px] overflow-hidden rounded-[10.83px]"
               >
                 <span
                   aria-hidden="true"
-                  className="pointer-events-none absolute inset-0 rounded-[12px] border"
-                  style={{ borderColor: HAIRLINE }}
+                  className="pointer-events-none absolute inset-0 rounded-[10.83px]"
+                  style={{ border: `0.902px solid ${HAIRLINE}` }}
                 />
-                <div className="absolute left-[23px] top-[26px] flex w-[252px] items-center justify-between">
+                <div
+                  className="absolute flex items-center justify-between"
+                  style={{ left: 20.76, top: 23.47, width: 227.43 }}
+                >
                   <h3
                     className="whitespace-nowrap font-semibold"
-                    style={{ fontSize: 20, color: INK }}
+                    style={{ fontSize: 18, color: INK }}
                   >
                     {mode.name}
                   </h3>
                   <Image
                     src={mode.icon}
                     alt=""
-                    width={32}
-                    height={32}
-                    className="block size-[32px]"
+                    width={29}
+                    height={29}
+                    className="block"
+                    style={{ width: 28.88, height: 28.88 }}
                   />
                 </div>
                 <p
-                  className="absolute left-[23px] font-normal"
+                  className="absolute font-normal"
                   style={{
+                    left: 20.76,
                     top: mode.blurbTop,
                     width: mode.blurbWidth,
-                    fontSize: 24,
+                    fontSize: 21.66,
                     color: MUTED,
                   }}
                 >
@@ -483,72 +619,8 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
           </div>
 
           <Reveal as="p" delay={120} className="w-full text-right font-semibold uppercase">
-            <span style={{ fontSize: "clamp(14px, 1.2vw, 20px)", color: MUTED }}>
+            <span style={{ fontSize: "clamp(13px, 1.1vw, 18px)", color: MUTED }}>
               Switch modes yourself, or let Clardentity pick.
-            </span>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ---------------------------------------------------------------- */}
-      {/* How it works (69:132) */}
-      {/* ---------------------------------------------------------------- */}
-      <section
-        id="how-it-works"
-        className="mx-auto w-full max-w-[1728px] scroll-mt-8 px-4 py-[140px] sm:px-8"
-      >
-        <div className="mx-auto flex w-full max-w-[1174px] flex-col items-center gap-[29.22px]">
-          <Reveal as="h2" className="text-center font-normal capitalize">
-            <span style={{ fontSize: "clamp(28px, 3.1vw, 38.96px)", color: INK }}>
-              How it works
-            </span>
-          </Reveal>
-
-          <div className="grid w-full grid-cols-1 justify-items-center gap-[38.96px] md:grid-cols-3">
-            {STEPS.map((step, i) => (
-              <Reveal
-                as="article"
-                key={step.word}
-                // Ask, then Check, then See - in that order, which is the
-                // point the three cards are making.
-                delay={i * 110}
-                className="landing-card relative h-[486.997px] w-full max-w-[365.248px] overflow-hidden rounded-[14.61px]"
-              >
-                <span
-                  aria-hidden="true"
-                  className="pointer-events-none absolute inset-0 rounded-[14.61px]"
-                  // Fractional border width inline for the same reason as the
-                  // hero crop: the arbitrary-value class rounds to 1px
-                  // because the rule is never generated.
-                  style={{ border: `1.217px solid ${HAIRLINE}` }}
-                />
-                <p
-                  className="absolute left-[28px] font-normal"
-                  style={{ top: 32.26, width: step.blurbWidth, fontSize: 28, color: MUTED }}
-                >
-                  {step.blurb}
-                </p>
-                <div className="absolute bottom-[27.39px] left-1/2 flex w-[306.808px] -translate-x-1/2 items-center justify-between">
-                  <span
-                    className="whitespace-nowrap font-semibold"
-                    style={{ fontSize: 40, color: PLUM }}
-                  >
-                    {step.word}
-                  </span>
-                  <span style={{ color: HAIRLINE }} className="flex">
-                    <MaskIcon
-                      src="/landing/logo-dots.svg"
-                      className="h-[38.96px] w-[40.278px]"
-                    />
-                  </span>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-
-          <Reveal as="p" delay={160} className="text-right font-normal uppercase">
-            <span style={{ fontSize: "clamp(16px, 1.4vw, 24px)", color: MUTED }}>
-              Clardentity uses multiple AI models, not just one.
             </span>
           </Reveal>
         </div>
@@ -557,32 +629,33 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
       {/* ---------------------------------------------------------------- */}
       {/* Closing call to action (69:153) */}
       {/* ---------------------------------------------------------------- */}
-      <section className="mx-auto w-full max-w-[1728px] px-4 pb-[99px] pt-[100px] sm:px-8 xl:px-[160px]">
+      <section className="mx-auto w-full max-w-[1728px] px-4 pb-[90px] pt-[90px] sm:px-8 xl:px-[160px]">
         <Reveal className="flex flex-col items-start justify-between gap-10 xl:flex-row xl:items-center">
-          <div className="flex w-full max-w-[1110px] flex-col gap-[12px]">
+          <div className="flex w-full max-w-[1001.775px] flex-col gap-[10.83px]">
             <h2
               className="font-semibold"
-              style={{ fontSize: "clamp(40px, 5.6vw, 96px)", color: INK }}
+              style={{ fontSize: "clamp(36px, 5vw, 86.64px)", color: INK }}
             >
               See what holds up.
             </h2>
             <Link href={enter} className="group flex items-start self-start">
               <span
                 className="whitespace-nowrap font-medium uppercase underline decoration-dotted transition-colors group-hover:text-brand"
-                style={{ fontSize: "clamp(20px, 2vw, 32px)", color: MUTED }}
+                style={{ fontSize: "clamp(18px, 1.8vw, 28.88px)", color: MUTED }}
               >
                 Start asking
               </span>
               <Image
                 src="/landing/arrow-up-right.svg"
                 alt=""
-                width={40}
-                height={40}
-                className="block size-[40px]"
+                width={36}
+                height={36}
+                className="block"
+                style={{ width: 36.1, height: 36.1 }}
               />
             </Link>
           </div>
-          <Wordmark size={32} tone={MUTED} mark={MUTED} />
+          <Wordmark size={PAGE_WORDMARK} tone={MUTED} mark={MUTED} />
         </Reveal>
       </section>
 

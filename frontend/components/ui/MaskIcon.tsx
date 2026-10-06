@@ -16,13 +16,18 @@ export function MaskIcon({
   src,
   className,
   size,
+  style,
 }: {
   src: string;
   className?: string;
   /** Drawn size in px; the mask is scaled to fit it. Leave it out and give
-   *  the box its size in `className` instead - which is the only way to draw
-   *  one of these that isn't square. */
+   *  the box its size in `className` or `style` instead - which is the only
+   *  way to draw one of these that isn't square. */
   size?: number;
+  /** For a box that is neither square nor a fixed number of pixels - the
+   *  landing page's mark is sized in `em` so it scales with the word next to
+   *  it. Merged under the paint, which is not negotiable. */
+  style?: React.CSSProperties;
 }) {
   const mask = `url(${src}) center / contain no-repeat`;
   return (
@@ -34,6 +39,7 @@ export function MaskIcon({
       // icon nobody can see.
       style={{
         ...(size === undefined ? null : { width: size, height: size }),
+        ...style,
         backgroundColor: "currentColor",
         mask,
         WebkitMask: mask,
