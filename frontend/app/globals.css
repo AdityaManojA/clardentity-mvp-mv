@@ -573,6 +573,33 @@ textarea[data-tour="composer-input"]:focus-visible {
   outline: none;
 }
 
+/* The account menu, growing out of the card that opened it rather than
+   fading in on the spot: anchored at its bottom-left, because that is the
+   corner it is pinned to, so the motion reads as the card opening rather
+   than a panel arriving from nowhere. Short, and eased out - a menu you
+   have to wait for is a menu that feels slow on the second use. */
+.account-menu {
+  animation: account-menu-in 140ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
+  transform-origin: bottom left;
+}
+
+@keyframes account-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .account-menu {
+    animation: none;
+  }
+}
+
 /* Each rotating "thinking" verb fades in rather than snapping, so a change of
    word reads as the same process continuing, not a new one starting. */
 @keyframes fade-in {

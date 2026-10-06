@@ -17,6 +17,7 @@ import { ChatRowMenu } from "@/components/chat/ChatRowMenu";
 import { rememberWorkspace } from "@/lib/lastWorkspace";
 import { startTour, type TourId } from "@/lib/tour";
 import { MaskIcon } from "@/components/ui/MaskIcon";
+import { AccountMenu } from "@/components/system/AccountMenu";
 import { cx } from "@/components/ui/primitives";
 
 /* Sidebar collapse lives in a tiny external store read through
@@ -83,7 +84,6 @@ const icons = {
   settings: <><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.14.35.44.62.79.75H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></>,
   plus: <><path d="M12 5v14M5 12h14" /></>,
   chevron: <><path d="m6 9 6 6 6-6" /></>,
-  logout: <><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><path d="m16 17 5-5-5-5M21 12H9" /></>,
   profile: <><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></>,
   menu: <><path d="M3 6h18M3 12h18M3 18h18" /></>,
   panelLeft: <><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M9 3v18" /></>,
@@ -360,7 +360,7 @@ function WorkspaceSwitcher({
 /* --------------------------------------------------------------- shell -- */
 
 export function AppShell({ children }: { children: ReactNode }) {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
   const pathname = usePathname() ?? "";
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
@@ -592,45 +592,11 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   const account = (
     <div className="border-t border-hairline p-3">
-      {/* The card is the way into the profile now that the rail has no row
-          for it - which is what the design intends by giving the foot of the
-          sidebar a name, a plan and nothing else. The initials sit in the
-          brand colour, as drawn. */}
-      <div className="flex items-center gap-2.5 rounded-lg px-1 py-1">
-        <Link
-          href="/profile"
-          onClick={close}
-          data-tour="nav-profile"
-          className="flex min-w-0 flex-1 items-center gap-2.5 rounded-lg p-1 transition-colors hover:bg-surface-hover"
-        >
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand text-sm font-medium text-white">
-            {(user?.display_name || user?.email || "?").slice(0, 1).toUpperCase()}
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="block truncate text-sm text-ink">
-              {user?.display_name || "Signed in"}
-            </span>
-            <span className="block truncate text-xs text-ink-muted">
-              {user?.email}
-            </span>
-          </span>
-        </Link>
-        <button
-          type="button"
-          title="Log out"
-          aria-label="Log out"
-          onClick={() => {
-            logout();
-            // replace, so Back after signing out does not return to the app
-            // shell with no session behind it - which only bounces straight
-            // here again.
-            router.replace("/login");
-          }}
-          className="rounded-md p-1.5 text-ink-muted transition-colors hover:bg-surface-hover hover:text-ink"
-        >
-          <Icon path={icons.logout} />
-        </button>
-      </div>
+      {/* The card is the way into everything the account can do. It used to
+          be a link to the profile with a log-out icon bolted to its right -
+          a door-with-an-arrow that only means "exit" to someone who already
+          knows it does. The verbs are words in a menu now. */}
+      <AccountMenu key={pathname} onNavigate={close} />
     </div>
   );
 
@@ -821,6 +787,7 @@ function Breadcrumbs({
     workspace: "Workspaces",
     chat: "Conversation",
     profile: "Your profile",
+    settings: "Settings",
     start: "Opening a chat",
   };
 

@@ -3,11 +3,6 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/apiClient";
 import { ImportHistory } from "@/components/profile/ImportHistory";
-import { Appearance } from "@/components/profile/Appearance";
-import { CompanionNames } from "@/components/profile/CompanionNames";
-import { DeleteAccount } from "@/components/profile/DeleteAccount";
-import { InstallAppButton } from "@/components/system/InstallAppButton";
-import { UpgradeDialog } from "@/components/chat/UpgradeDialog";
 import { authErrorMessage } from "@/lib/auth";
 import { AspectList, type Aspect } from "@/components/profile/AspectList";
 import { Badge, Spinner } from "@/components/ui/primitives";
@@ -48,7 +43,6 @@ function sinceLabel(iso: string | null): string {
 
 export function ProfileView() {
   const { user } = useAuth();
-  const [plansOpen, setPlansOpen] = useState(false);
   // The add form lives inside the facts list; the button that opens it is in
   // that section's header, where the design puts it.
   const [addingAspect, setAddingAspect] = useState(false);
@@ -170,12 +164,12 @@ export function ProfileView() {
             learned anything, and the two things you can do to it. */}
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex min-w-0 items-center gap-2">
-            <span className="flex size-[60px] shrink-0 items-center justify-center rounded-full bg-brand text-2xl font-medium text-white">
+            <span className="flex size-[60px] shrink-0 items-center justify-center rounded-full bg-brand text-xl font-medium text-white">
               {initials}
             </span>
             <div className="min-w-0">
-              <p className="truncate text-4xl font-medium leading-[normal] text-ink">{name}</p>
-              <p className="text-xl leading-[normal] text-ink-secondary">
+              <p className="truncate text-2xl font-medium leading-[normal] text-ink">{name}</p>
+              <p className="text-sm leading-[normal] text-ink-secondary">
                 {sinceLabel(profile?.updated_at ?? null)}
               </p>
             </div>
@@ -229,20 +223,6 @@ export function ProfileView() {
           </ProfileSection>
 
           <ProfileSection
-            title="Appearance"
-            description="The colour the app is drawn in, and whether it runs light or dark. The marketing page follows your colour too, once you are signed in."
-          >
-            <Appearance />
-          </ProfileSection>
-
-          <ProfileSection
-            title="Companion Naming"
-            description="Provide distinct identifiers for each model personality. Leave a field blank to keep its system label."
-          >
-            <CompanionNames />
-          </ProfileSection>
-
-          <ProfileSection
             title="Learned Profile Facts"
             description="Autonomous deductions based on interaction history. Each fact can be removed independently."
             action={
@@ -282,13 +262,14 @@ export function ProfileView() {
           <ProfileSection
             title="Occupational Roles"
             description="The positions you appear to occupy, and what suggested each one."
+            className="border-b-0"
           >
             {roles.length > 0 ? (
               <ul className="space-y-5">
                 {roles.map((r) => (
                   <li key={r.role_id}>
                     <div className="flex items-start gap-3">
-                      <span className="flex flex-wrap items-center gap-2 text-xl font-medium leading-[normal] text-ink">
+                      <span className="flex flex-wrap items-center gap-2 text-sm font-medium leading-[normal] text-ink">
                         {r.label}
                         {Object.values(r.qualifiers)
                           .flat()
@@ -300,7 +281,7 @@ export function ProfileView() {
                       </span>
                     </div>
                     {r.evidence && (
-                      <p className="mt-1 text-xl leading-[normal] text-ink-secondary">
+                      <p className="mt-1 text-sm leading-[normal] text-ink-secondary">
                         {r.evidence}
                       </p>
                     )}
@@ -308,42 +289,14 @@ export function ProfileView() {
                 ))}
               </ul>
             ) : (
-              <p className="text-xl leading-[normal] text-ink-secondary">
+              <p className="text-sm leading-[normal] text-ink-secondary">
                 No roles inferred yet - nothing in your history clearly indicated one.
               </p>
             )}
           </ProfileSection>
 
-          {/* Plans live here now. The design's sidebar has no Upgrade row -
-              it ends at the account card - so the surface moved to the page
-              that card opens rather than being dropped. Install sits beside
-              it for the same reason. */}
-          <ProfileSection
-            title="Your Plan"
-            description="See what each plan opens, or install Clardentity as an app."
-            action={
-              <>
-                <InstallAppButton className="flex h-[42px] items-center rounded-[34px] border border-hairline-strong px-[21px] text-xl leading-[normal] text-ink transition-colors hover:bg-surface-hover" />
-                <button
-                  type="button"
-                  onClick={() => setPlansOpen(true)}
-                  className="flex h-[42px] items-center rounded-[34px] bg-brand px-[21px] text-xl leading-[normal] text-white transition-colors hover:bg-brand-dark"
-                >
-                  See plans
-                </button>
-              </>
-            }
-          />
-
-          <ProfileSection
-            title="Account Termination"
-            description="Permanent deletion of every workspace, chat, attachment, and learned profile fact."
-            action={<DeleteAccount />}
-            className="border-b-0"
-          />
         </div>
 
-        <UpgradeDialog open={plansOpen} onClose={() => setPlansOpen(false)} />
       </div>
     </div>
   );
