@@ -430,21 +430,14 @@ export function MessageInput({
               aria-label="Start a live call"
               className="flex size-8 shrink-0 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-surface-hover hover:text-brand disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {/* A waveform, not a telephone handset. The receiver is a
-                  picture of a thing most people asking for this have never
-                  held, and it reads as "phone call" rather than "talk to
-                  it" - which is what this actually opens. */}
-              <svg
-                viewBox="0 0 20 20"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                aria-hidden="true"
-                className="block size-5"
-              >
-                <path d="M3 8.6v2.8M6.5 5.6v8.8M10 3.2v13.6M13.5 6.4v7.2M17 8.6v2.8" />
-              </svg>
+              {/* The dialpad. It was drawn for the composer's empty send
+                  button, where a grid of keys next to a text box meant
+                  nothing - but a keypad is what you press to place a call,
+                  and this is the button that places one. The waveform it
+                  replaces said "audio" without saying what would happen.
+                  (The handset before that was worse: a picture of an object
+                  most people asking for this have never held.) */}
+              <MaskIcon src="/ui/composer-dialpad.svg" className="size-5" />
             </button>
 
             <AudioRecorder
@@ -472,15 +465,21 @@ export function MessageInput({
                 "-mr-[5px] flex size-8 shrink-0 items-center justify-center rounded-full transition-colors disabled:cursor-not-allowed",
                 isGenerating
                   ? "bg-surface-sunken text-ink hover:bg-surface-hover"
-                  : "bg-brand text-white hover:bg-brand-dark disabled:hover:bg-brand",
+                  : // Grey while there is nothing to send. It was a full
+                    // burgundy disc whether or not it would do anything,
+                    // so the one control that is supposed to say "ready"
+                    // looked identical when it was not.
+                    "bg-brand text-white hover:bg-brand-dark disabled:bg-surface-sunken disabled:text-ink-muted disabled:hover:bg-surface-sunken",
               )}
             >
               {isGenerating ? (
                 <StopIcon />
-              ) : value.trim() ? (
-                // The design draws two faces of this button: the keypad while
-                // the box is empty, and an arrow the moment there is something
-                // to send. The arrow is the one that means "ask this".
+              ) : (
+                // One face now. The design drew two - a keypad while the box
+                // was empty, an arrow once it wasn't - but the keypad has
+                // gone to the call button, where it means something. An
+                // arrow that greys out says the same thing the swap did,
+                // without the glyph changing under the reader's eye.
                 <svg
                   viewBox="0 0 20 20"
                   fill="none"
@@ -493,8 +492,6 @@ export function MessageInput({
                 >
                   <path d="M10 16V4.5M4.6 9.9 10 4.5l5.4 5.4" />
                 </svg>
-              ) : (
-                <MaskIcon src="/ui/composer-send.svg" className="size-5" />
               )}
             </button>
           </div>

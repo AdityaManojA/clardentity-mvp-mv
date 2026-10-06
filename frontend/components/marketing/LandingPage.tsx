@@ -5,8 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { MaskIcon } from "@/components/ui/MaskIcon";
 import { CurtainShimmer } from "@/components/marketing/CurtainShimmer";
+import { HeroComposer } from "@/components/marketing/HeroComposer";
 import { Reveal } from "@/components/marketing/Reveal";
-import { TypedQuestions } from "@/components/marketing/TypedQuestions";
 
 /* The landing page, built from the Figma design (file mTefBk432edigQvPwag6mK,
  * node 69:7). Every measurement, colour and asset here came from the design
@@ -169,10 +169,11 @@ const STEPS = [
     blurbWidth: 276.894,
     blurbLeft: 25.27,
   },
-  // Narrower in the design, which is what breaks it after "audit,".
+  // Narrower in the design than the other two, which is what gives this one
+  // its own line break rather than the shared column's.
   {
     word: "See.",
-    blurb: "You get the answer and the audit, side by side.",
+    blurb: "You get the answer and the facts audited.",
     blurbWidth: 240.634,
     blurbLeft: 25.27,
   },
@@ -356,78 +357,7 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
                   transform: "translate(-50%, -50%) scale(calc(100cqi / 1032.46px))",
                 }}
               >
-                <div className="flex flex-col" style={{ gap: 11.732 }}>
-                  <div
-                    className="relative w-full overflow-hidden rounded-[18.05px] border"
-                    style={{
-                      height: 111.91,
-                      background: "rgba(255,255,255,0.1)",
-                      borderColor: "var(--border)",
-                    }}
-                  >
-                    <p
-                      className="absolute whitespace-nowrap font-normal text-white"
-                      style={{ left: 23.47, top: 22.33, fontSize: 18.05 }}
-                    >
-                      <TypedQuestions />
-                    </p>
-                    <span
-                      className="absolute flex items-center justify-center rounded-[19.855px]"
-                      style={{
-                        bottom: 13.76,
-                        right: 19.86,
-                        width: 28.88,
-                        height: 28.88,
-                        background: PLUM,
-                      }}
-                    >
-                      <Image
-                        src="/landing/arrow-up.svg"
-                        alt=""
-                        width={18}
-                        height={18}
-                        className="block"
-                        style={{ width: 18.05, height: 18.05 }}
-                      />
-                    </span>
-                  </div>
-
-                  <div
-                    className="flex items-center justify-between"
-                    style={{ gap: 3.61 }}
-                  >
-                    {MODES.map((mode) => (
-                      <span
-                        key={mode.name}
-                        className="flex shrink-0 flex-col items-center justify-center rounded-[7.22px] border"
-                        style={{
-                          gap: 3.61,
-                          paddingLeft: 10.83,
-                          paddingRight: 10.83,
-                          paddingTop: 3.61,
-                          paddingBottom: 3.61,
-                          background: "rgba(255,255,255,0.1)",
-                          borderColor: "var(--border)",
-                        }}
-                      >
-                        <Image
-                          src={mode.heroIcon}
-                          alt=""
-                          width={18}
-                          height={18}
-                          className="block"
-                          style={{ width: 18.05, height: 18.05 }}
-                        />
-                        <span
-                          className="whitespace-nowrap font-normal text-white"
-                          style={{ fontSize: 14.44 }}
-                        >
-                          {mode.name}
-                        </span>
-                      </span>
-                    ))}
-                  </div>
-                </div>
+                <HeroComposer modes={MODES} accent={PLUM} />
               </div>
             </div>
           </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { MaskIcon } from "@/components/ui/MaskIcon";
 import { renderInline } from "@/lib/markdown";
 import { cleanMessageText } from "@/lib/text";
 
@@ -18,16 +19,19 @@ export function CruxCard({ text }: { text: string }) {
             - see globals.css. */}
         <span aria-hidden="true" className="gist-sheen" />
         <div className="flex items-start gap-2.5">
-          <svg
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            aria-hidden="true"
-            className="mt-[3px] h-4 w-4 shrink-0 text-brand"
-          >
-            {/* Four-point spark: the "here's the point" mark. */}
-            <path d="M12 2c.4 4.8 3.2 7.6 8 8-4.8.4-7.6 3.2-8 8-.4-4.8-3.2-7.6-8-8 4.8-.4 7.6-3.2 8-8z" />
-            <path d="M19 15c.2 2 1.3 3.1 3.3 3.3-2 .2-3.1 1.3-3.3 3.3-.2-2-1.3-3.1-3.3-3.3 2-.2 3.1-1.3 3.3-3.3z" opacity="0.6" />
-          </svg>
+          {/* The mark, not a spark. A four-point sparkle is the glyph every
+              other assistant puts next to generated text, so on the one line
+              of an answer most people actually read it said "an AI wrote
+              this" in someone else's handwriting. The five dots say whose
+              this is. Painted through a mask so it follows the accent. */}
+          <span className="mt-[3px] flex shrink-0 text-brand">
+            <MaskIcon
+              src="/ui/logo-dots.svg"
+              // 23.0292 x 22.2755 in the file; height drives it and the width
+              // keeps that ratio, since the mark is not square.
+              style={{ height: 16, width: 16.54 }}
+            />
+          </span>
           <p className="text-xl font-semibold leading-snug tracking-[-0.01em] text-ink">
             {renderInline(cleanMessageText(text), "crux")}
           </p>
