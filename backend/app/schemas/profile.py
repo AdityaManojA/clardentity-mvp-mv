@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
@@ -48,6 +49,8 @@ class ProfileOut(BaseModel):
     roles: list[ProfileRoleOut] = []
     # True once the user has edited it: inference stops overwriting from then on.
     user_edited: bool = False
+    # None until the first time they open Learning mode and answer.
+    learning_role: str | None = None
     updated_at: datetime | None = None
 
 
@@ -69,3 +72,14 @@ class ProfileUpdate(BaseModel):
     companion_names: dict[str, str] | None = None
     # Omit to leave roles untouched; send [] to clear them.
     roles: list[ProfileRoleOut] | None = None
+
+
+class LearningRoleRequest(BaseModel):
+    """Who the user is when they are learning.
+
+    A closed set, because it steers the prompt: anything outside it would be
+    user text reaching the system instructions, and the whole point of the
+    three options is that the answer is a setting rather than a sentence.
+    """
+
+    role: Literal["student", "teacher", "visiting"]

@@ -51,6 +51,18 @@ class UserProfile(Base):
     aspects: Mapped[list | None] = mapped_column(JSONB, nullable=True)
     # [{"role_id": "sibling", "qualifiers": {"gender": ["brother"]}, "evidence": "..."}]
     roles: Mapped[list | None] = mapped_column(JSONB, nullable=True)
+    # "student" | "teacher" | "visiting", asked once the first time this user
+    # opens Learning mode and never again. Learning is the one mode where the
+    # same question wants a different answer depending on who is asking: a
+    # student wants to be taught it, a teacher wants to teach it to someone
+    # else, and someone just looking wants neither pitched at them. Inference
+    # could eventually guess this, but not on the first message, which is
+    # exactly when it matters most.
+    #
+    # Null means not yet asked, which is what the prompt below is told to
+    # treat as "no assumption" rather than as any particular answer.
+    learning_role: Mapped[str | None] = mapped_column(String(16), nullable=True)
+
     # Set when the user edits the profile by hand: inference then stops
     # overwriting it, so a correction isn't silently undone on the next rebuild.
     user_edited: Mapped[bool] = mapped_column(

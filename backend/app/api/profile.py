@@ -8,6 +8,7 @@ from app.api.deps import get_current_user
 from app.db.session import get_db
 from app.models import User, UserProfile
 from app.schemas.profile import (
+    LearningRoleRequest,
     OnboardingRequest,
     ProfileAspectIn,
     ProfileAspectOut,
@@ -62,6 +63,7 @@ def _serialize(profile: UserProfile | None, companion_names: dict | None = None)
         ],
         roles=roles,
         user_edited=profile.user_edited,
+        learning_role=profile.learning_role,
         updated_at=profile.updated_at,
     )
 
@@ -72,6 +74,35 @@ async def read_profile(
     db: AsyncSession = Depends(get_db),
 ) -> ProfileOut:
     return _serialize(await get_profile(db, current_user.id), current_user.companion_names)
+
+
+@router.put("/learning-role", response_model=ProfileOut)
+async def set_learning_role(
+    payload: LearningRoleRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> ProfileOut:
+    """Record whether this user learns as a student, a teacher, or neither.
+
+    Asked once, the first time they open Learning mode. Written straight to
+    the profile rather than inferred, because the answer is needed on the
+    very first learning question - before there is anything to infer from -
+    and because a student and a teacher asking the identical question want
+    genuinely different answers.
+
+    Idempotent: answering again overwrites, which is what someone changing
+    their mind in Settings would expect. It does not set `user_edited` - that
+    flag freezes inference against the rest of the profile, and this is one
+    stored preference, not a correction to the generated picture.
+    """
+    profile = await get_profile(db, current_user.id)
+    if profile is None:
+        profile = UserProfile(user_id=current_user.id)
+        db.add(profile)
+    profile.learning_role = payload.role
+    await db.commit()
+    await db.refresh(profile)
+    return _serialize(profile, current_user.companion_names)
 
 
 @router.get("/roles", response_model=list[RoleOut])

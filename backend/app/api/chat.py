@@ -1295,7 +1295,8 @@ async def send_message(
     # The proactive watch-list is Decision mode's job; other modes still get
     # domain-scoped screening, they just aren't told to editorialise about it.
     bias_guidance = build_bias_guidance(decision) if mode == "decision" else None
-    profile_block = profile_prompt_block(await get_profile(db, current_user.id))
+    profile = await get_profile(db, current_user.id)
+    profile_block = profile_prompt_block(profile)
     # Appended rather than folded into the profile: the profile is inferred
     # from what the user wrote, this is inferred from where they connected
     # from, and the two deserve different amounts of trust.
@@ -1310,6 +1311,11 @@ async def send_message(
         bias_guidance,
         profile_block,
         companion_name=name_for(current_user.companion_names, mode),
+        # Read straight off the profile rather than inferred: it is needed on
+        # the very first learning question, before there is anything to infer
+        # from. None until they have been asked, which the builder treats as
+        # "assume nothing".
+        learning_role=profile.learning_role if profile else None,
     )
     scoring_weights = ScoringWeights.from_settings(admin_settings["scoring_weights"])
     gesture_map = admin_settings["avatar_gesture_map"]

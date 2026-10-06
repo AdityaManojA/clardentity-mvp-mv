@@ -260,12 +260,37 @@ _RAPID_FORMATTING_RULES = (
 )
 
 
+_LEARNING_ROLE_INSTRUCTIONS = {
+    "student": (
+        "This user learns as a student. Teach them the material itself: build from "
+        "what they already have, define terms as you use them, and work through "
+        "examples rather than summarising that examples exist. Check nothing - the "
+        "understanding check is handled outside your answer - but do pitch the depth "
+        "at someone who has to be able to reproduce this, not merely recognise it."
+    ),
+    "teacher": (
+        "This user learns as a teacher: they are usually preparing to explain this to "
+        "someone else, not meeting it for the first time. Assume competence in the "
+        "subject and spend the answer on teaching it - the order ideas are best "
+        "introduced in, the analogies that land, the misconceptions students reliably "
+        "arrive with, and where the standard explanation tends to lose people. Do not "
+        "re-teach them the basics unless they ask."
+    ),
+    "visiting": (
+        "This user is not studying or teaching this - they want to understand it for "
+        "its own sake. Favour the shape of the idea and why it matters over notation, "
+        "derivations and exam-ready detail. Keep it short enough to finish."
+    ),
+}
+
+
 def build_system_instructions(
     mode: str,
     reasoning_lens: str | None = None,
     bias_guidance: str | None = None,
     profile_block: str | None = None,
     companion_name: str | None = None,
+    learning_role: str | None = None,
 ) -> list[dict]:
     """Returns Anthropic content blocks, not a string - the split is the
     point. Everything in `stable_parts` is byte-identical for every user who
@@ -305,6 +330,14 @@ def build_system_instructions(
     # Accumulated across sessions so the companion knows who it is talking to.
     if profile_block:
         variable_parts.append(profile_block)
+
+    # Learning only: who is on the other side of the explanation. A student
+    # and a teacher asking the same question want genuinely different answers
+    # - one wants to understand it, the other wants to put it across - and
+    # neither wants what someone browsing wants. Variable, not stable: it
+    # differs per user.
+    if mode == "learning" and learning_role in _LEARNING_ROLE_INSTRUCTIONS:
+        variable_parts.append(_LEARNING_ROLE_INSTRUCTIONS[learning_role])
 
     if mode == "thinking":
         if reasoning_lens and REASONING_LENS_INSTRUCTIONS.get(reasoning_lens):

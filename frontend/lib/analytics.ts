@@ -45,6 +45,8 @@ export type AnalyticsEvent =
   | "answer_failed"
   // What people reach for
   | "mode_picked"
+  // Asked once, the first time Learning mode is opened.
+  | "learning_role_set"
   // What the app is drawn in
   | "accent_picked"
   | "theme_picked"

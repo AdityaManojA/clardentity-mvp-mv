@@ -22,6 +22,7 @@ import { usePreviewAccess } from "@/lib/previewAccess";
 import { durationBucket, track } from "@/lib/analytics";
 import { setSmartSwitching, useSmartSwitching } from "@/lib/modeSwitching";
 import { ContextQuestionCard } from "@/components/chat/ContextQuestionCard";
+import { LearningRoleCard } from "@/components/chat/LearningRoleCard";
 import { ModeSwitchToast } from "@/components/chat/ModeSwitchToast";
 import { RefinedQuestionCard } from "@/components/chat/RefinedQuestionCard";
 import { ClarifyingOptionsCard } from "@/components/chat/ClarifyingOptionsCard";
@@ -1226,6 +1227,10 @@ export function ChatView({ conversationId }: { conversationId: string }) {
             </div>
 
           </div>
+          {/* Learning only, and only until it has been answered once - the
+              card returns null when the profile already carries a role, so
+              this is a mount rather than a condition on the answer. */}
+          {mode === "learning" && <LearningRoleCard />}
           {switchedFrom && !switchToast && mode === switchedFrom.to && (
             <div className="flex flex-wrap items-center gap-2 rounded-lg border border-brand-border bg-brand-soft px-3 py-1.5 text-xs text-ink-secondary">
               <span>
