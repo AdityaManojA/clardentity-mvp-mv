@@ -39,3 +39,6 @@ backend/uploads/
 # Evals
 evals/.eval_creds.json
 evals/reports/
+
+# Deploy secrets (Render deploy hook). Never commit.
+.secrets/
