@@ -20,12 +20,15 @@ import re
 
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel, Field
 
 from app.api.deps import get_current_user
 from app.core.config import settings
 from app.core.rate_limit import check_rate_limit
+from app.db.session import get_db
 from app.models import User
+from app.services.profile_service import get_profile, profile_prompt_block
 from app.services.prompt_builder import IDENTITY
 
 logger = logging.getLogger(__name__)
@@ -130,6 +133,7 @@ def _accent_instructions(user: User, context: CallContext) -> str | None:
 async def create_realtime_session(
     context: CallContext | None = None,
     current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
 ) -> dict:
     """A single-use client secret for one call.
 
@@ -143,11 +147,19 @@ async def create_realtime_session(
 
     accent = _accent_instructions(current_user, context or CallContext())
 
+    # Who it is talking to. The call used to carry the mode instructions and
+    # the accent and nothing else, so a companion that knew where someone
+    # lived in text had never heard of them on the phone - the one surface
+    # where "do you remember me?" is the obvious first question.
+    profile = profile_prompt_block(await get_profile(db, current_user.id))
+
     payload = {
         "session": {
             "type": "realtime",
             "model": settings.openai_realtime_model,
-            "instructions": _CALL_INSTRUCTIONS + (accent or ""),
+            "instructions": _CALL_INSTRUCTIONS
+            + (accent or "")
+            + (f"\n\n{profile}" if profile else ""),
             "output_modalities": ["audio"],
             "audio": {
                 "input": {

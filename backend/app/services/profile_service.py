@@ -1,4 +1,3 @@
-import uuid
 """Long-lived user profile: an evolving personality.md plus the 25-role
 classification behind it.
 
@@ -19,6 +18,9 @@ Two rules the rest of the code depends on:
     reach the profile.
 """
 
+import logging
+import uuid
+
 import re
 import uuid
 from dataclasses import dataclass
@@ -27,7 +29,9 @@ from sqlalchemy import desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import Conversation, Document, Message, UserProfile, WorkspaceMember
-from app.services import taxonomy
+from app.services import stated_facts, taxonomy
+
+logger = logging.getLogger("clardentity.profile")
 from app.services.anthropic_client import cached, generate_structured
 from app.services.output_cleanup import clean_output
 
@@ -284,7 +288,11 @@ async def rebuild_profile(db: AsyncSession, user_id: uuid.UUID) -> UserProfile |
     # inference replaces only what inference produced. That is the whole
     # reason aspects exist: the old all-or-nothing `user_edited` latch meant
     # one correction froze the entire profile forever.
-    kept = [a for a in (profile.aspects or []) if a.get("source") == "user"]
+    # Survives a rebuild: what they typed into the editor, and what they said
+    # outright in a conversation. Inference replaces only what inference
+    # produced - a sentence like "I'm from Thrissur" is not a guess waiting to
+    # be improved on.
+    kept = [a for a in (profile.aspects or []) if a.get("source") in {"user", "stated"}]
     profile.aspects = kept + inferred.aspects
     profile.roles = inferred.roles
     profile.messages_at_last_build = total
@@ -300,15 +308,46 @@ def profile_prompt_block(profile: UserProfile | None) -> str | None:
     adapts tone and framing to the person without treating inferences about
     them as established fact.
     """
-    if profile is None or not profile.personality_md:
+    if profile is None:
         return None
 
     lines = [
         "ABOUT THIS USER (accumulated from earlier sessions; background only - it may "
         "be incomplete or out of date, so never assert it back to them as fact and "
-        "never let it override what they say now):",
-        profile.personality_md.strip()[:1500],
+        "never let it override what they say now):"
     ]
+
+    if profile.personality_md:
+        lines.append(profile.personality_md.strip()[:1500])
+
+    # The separate facts, which until now were stored and shown in the profile
+    # editor and then never sent anywhere. That made "Add Aspect" a button that
+    # wrote to a column nothing read, and it meant anything captured as a fact
+    # only reached an answer if it happened to survive into the generated prose
+    # on the next rebuild - which is up to eight messages away.
+    #
+    # The ones the user wrote themselves lead and are marked as such: an
+    # inference may be wrong, but something they typed about themselves is the
+    # best evidence there is, and the model should weigh it that way.
+    aspects = [
+        a
+        for a in (profile.aspects or [])
+        if str(a.get("label") or "").strip() and str(a.get("value") or "").strip()
+    ]
+    firsthand = {"user", "stated"}
+    stated = [a for a in aspects if a.get("source") in firsthand]
+    inferred = [a for a in aspects if a.get("source") not in firsthand]
+    if stated:
+        lines.append(
+            "Things they have told you about themselves (their own words - treat as "
+            "correct unless they say otherwise):\n"
+            + "\n".join(f"- {a['label']}: {a['value']}" for a in stated[:40])
+        )
+    if inferred:
+        lines.append(
+            "Things inferred about them (lower confidence):\n"
+            + "\n".join(f"- {a['label']}: {a['value']}" for a in inferred[:40])
+        )
 
     labels = []
     for entry in profile.roles or []:
@@ -320,4 +359,34 @@ def profile_prompt_block(profile: UserProfile | None) -> str | None:
     if labels:
         lines.append("Life roles they appear to occupy: " + "; ".join(labels))
 
-    return "\n".join(lines)
+    # Nothing but the heading means nothing worth sending.
+    if len(lines) == 1:
+        return None
+    return "\n\n".join(lines)
+
+
+async def capture_stated_facts(db: AsyncSession, user_id: uuid.UUID, message: str) -> list[dict]:
+    """Fold anything the user just said about themselves into their profile.
+
+    Called once per turn, after the answer has gone out, so the cost is a
+    small model call on a request nobody is waiting on. The periodic rebuild
+    still does the heavier inference; this exists so that "I'm from Thrissur"
+    is known in the next conversation rather than eight messages later.
+
+    Never raises: a fact missed is a fact learned next time, and no part of
+    this is worth failing a turn over.
+    """
+    try:
+        facts = await stated_facts.extract(message)
+        if not facts:
+            return []
+        profile = await get_profile(db, user_id)
+        if profile is None:
+            profile = UserProfile(user_id=user_id)
+            db.add(profile)
+        profile.aspects = stated_facts.merge(profile.aspects, facts)
+        await db.commit()
+        return facts
+    except Exception:  # noqa: BLE001
+        logger.warning("could not capture stated facts", exc_info=True)
+        return []

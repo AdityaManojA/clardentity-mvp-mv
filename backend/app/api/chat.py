@@ -91,6 +91,7 @@ from app.services.prompt_builder import (
 from app.services.profile_service import (
     get_profile,
     profile_prompt_block,
+    capture_stated_facts,
     should_rebuild as should_rebuild_profile,
 )
 from app.services.query_optimizer import optimize_query
@@ -1642,6 +1643,11 @@ async def send_message(
             if should_rebuild_memory(total_messages or 0):
                 rebuild_memory_task.delay(str(conversation_id))
             async with AsyncSessionLocal() as profile_db:
+                # Anything they just said about themselves, captured now
+                # rather than at the next rebuild. This runs after the answer
+                # has gone out, so the small model call behind it is on a
+                # request nobody is waiting on.
+                await capture_stated_facts(profile_db, current_user.id, effective_content)
                 if await should_rebuild_profile(profile_db, current_user.id):
                     rebuild_profile_task.delay(str(current_user.id))
             new_title = await _settle_title(
@@ -2070,6 +2076,7 @@ async def send_message(
         # its own cadence rather than per-conversation. Checked in the
         # generation session because `db` is closed by this point.
         async with AsyncSessionLocal() as profile_db:
+            await capture_stated_facts(profile_db, current_user.id, effective_content)
             if await should_rebuild_profile(profile_db, current_user.id):
                 rebuild_profile_task.delay(str(current_user.id))
 
