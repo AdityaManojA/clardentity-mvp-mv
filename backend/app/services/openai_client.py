@@ -199,11 +199,13 @@ async def stream_generation(
     open at all (see anthropic_client.stream_generation) - never mid-stream,
     since a generation already in flight cannot be handed to a second
     provider without duplicating text the user has already seen."""
-    stream = await _resilient_call(
-        _create_response,
-        **_generation_kwargs(model, instructions, input_text, input_images),
-        stream=True,
-    )
+    # Held in a local rather than splatted inline: the completion handler
+    # below needs to know which model actually ran, and referencing a
+    # `kwargs` that only ever existed inside _generation_kwargs raised
+    # NameError the moment a stream finished - so this path has never
+    # completed a generation since it was written.
+    generation_kwargs = _generation_kwargs(model, instructions, input_text, input_images)
+    stream = await _resilient_call(_create_response, **generation_kwargs, stream=True)
 
     async for event in stream:
         if event.type == "response.output_text.delta":
@@ -211,7 +213,7 @@ async def stream_generation(
         elif event.type == "response.completed":
             response = event.response
             usage = response.usage
-            _meter(response, kwargs.get("model"))
+            _meter(response, generation_kwargs.get("model"))
             yield {
                 "type": "done",
                 "full_text": response.output_text,

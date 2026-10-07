@@ -257,7 +257,7 @@ def _exit_fallback() -> None:
     _provider_state.on_fallback = False
 
 
-def _flatten_instructions(instructions: str | list[dict]) -> str:
+def flatten_instructions(instructions: str | list[dict]) -> str:
     """The fallback provider's Responses API takes a plain string; Claude's
     cache_control content blocks collapse to their text, in order."""
     if isinstance(instructions, str):
@@ -425,7 +425,7 @@ async def stream_generation(
             _enter_fallback(exc)
 
     async for event in _fallback.stream_generation(
-        instructions=_flatten_instructions(instructions),
+        instructions=flatten_instructions(instructions),
         input_text=input_text,
         input_images=input_images,
     ):
@@ -479,7 +479,7 @@ async def generate_text(
             _enter_fallback(exc)
 
     return await _fallback.generate_text(
-        instructions=_flatten_instructions(instructions), input_text=input_text, fast=fast
+        instructions=flatten_instructions(instructions), input_text=input_text, fast=fast
     )
 
 
@@ -607,7 +607,7 @@ async def generate_structured(
 
     try:
         return await _fallback.generate_structured(
-            instructions=_flatten_instructions(instructions),
+            instructions=flatten_instructions(instructions),
             input_text=input_text,
             schema=schema,
             schema_name=schema_name,

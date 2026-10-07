@@ -239,6 +239,9 @@ export type SendMessageBody = {
   content: string;
   mode: string;
   reasoning_lens?: string | null;
+  /** Learning and Co-Creative only: a model the user picked by name.
+   *  Ignored by the server in every other mode. */
+  model?: string | null;
   attachments?: SendMessageAttachment[];
   audio_duration_seconds?: number | null;
   /** Set when re-sending after a mode suggestion, either way the user

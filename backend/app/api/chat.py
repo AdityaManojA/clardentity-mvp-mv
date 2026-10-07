@@ -49,6 +49,8 @@ from app.services.document_ingestion import build_chunks, file_type_of, unsuppor
 from app.services.geolocation import location_prompt_line
 from app.services.decision_review import review_decisions
 from app.services.thinking_review import review_thinking
+from app.services import model_catalog
+from app.services.model_router import stream_for as stream_for_model
 from app.services.guidance import MAX_CONTEXT_ROUNDS, propose_guidance
 from app.services.image_generation import generate as generate_image
 from app.services.image_generation import wanted_image
@@ -359,6 +361,33 @@ def _conversation_out(conversation: Conversation, last_activity=None) -> Convers
             "last_activity_at": last_activity,
         }
     )
+
+
+@router.get("/models")
+async def list_models(
+    mode: str | None = None,
+    current_user: User = Depends(get_current_user),
+) -> dict:
+    """The models a user may pick from in this mode.
+
+    Empty in every mode but Learning and Co-Creative, where the choice is
+    theirs - the client uses that emptiness to decide whether to show a
+    picker at all, so the rule lives on the server rather than being
+    duplicated in the UI.
+    """
+    if mode is not None and not model_catalog.allows_picking(mode):
+        return {"models": []}
+    return {
+        "models": [
+            {
+                "id": m.id,
+                "label": m.label,
+                "vendor": m.vendor,
+                "blurb": m.blurb,
+            }
+            for m in model_catalog.available()
+        ]
+    }
 
 
 @router.get("/conversations", response_model=list[ConversationOut])
@@ -1309,11 +1338,18 @@ async def send_message(
     )
     if location_line:
         profile_block = f"{profile_block}\n\n{location_line}" if profile_block else location_line
+    # Learning and Co-Creative let the user pick the model by name. Resolved
+    # against what this deployment can actually route to, so a stale id from
+    # an old tab falls back to the normal routing instead of failing.
+    chosen_model = (
+        model_catalog.get(payload.model) if model_catalog.allows_picking(mode) else None
+    )
     instructions = build_system_instructions(
         mode,
         reasoning_lens,
         bias_guidance,
         profile_block,
+        named_model=(chosen_model.label, chosen_model.vendor) if chosen_model else None,
         companion_name=name_for(current_user.companion_names, mode),
         # Read straight off the profile rather than inferred: it is needed on
         # the very first learning question, before there is anything to infer
@@ -1486,13 +1522,26 @@ async def send_message(
             yield early
 
         try:
-            async for event in stream_generation(
-                instructions=instructions,
-                input_text=input_text,
-                model=gen_model,
-                temperature=gen_temperature,
-                input_images=input_images,
-            ):
+            # A picked model goes to its own provider with no fallback: if
+            # somebody asked for Grok, quietly answering as Claude would be
+            # worse than saying it is unavailable.
+            generation = (
+                stream_for_model(
+                    chosen_model,
+                    instructions=instructions,
+                    input_text=input_text,
+                    input_images=input_images,
+                )
+                if chosen_model and chosen_model.provider != "anthropic"
+                else stream_generation(
+                    instructions=instructions,
+                    input_text=input_text,
+                    model=chosen_model.model_id if chosen_model else gen_model,
+                    temperature=gen_temperature,
+                    input_images=input_images,
+                )
+            )
+            async for event in generation:
                 if event["type"] == "delta":
                     late = review_event()
                     if late:

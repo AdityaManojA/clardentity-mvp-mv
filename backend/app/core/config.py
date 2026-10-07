@@ -100,6 +100,20 @@ class Settings(BaseSettings):
     #: tomorrow" instead of generating. Raise it when the landing page is
     #: converting and the bill is understood.
     guest_daily_token_budget: int = 2_000_000
+
+    #: Extra providers for the model picker in Learning and Co-Creative. Both
+    #: are optional: a model whose provider has no key is hidden from the
+    #: picker rather than offered and then failing when chosen.
+    google_api_key: str = ""
+    xai_api_key: str = ""
+    #: The vendor ids behind the picker's Google and xAI entries. Settings
+    #: rather than constants because these two were wired up before their keys
+    #: existed - if a name is wrong, it is an env var rather than a deploy.
+    google_model: str = "gemini-3-pro"
+    google_fast_model: str = "gemini-3-flash"
+    xai_model: str = "grok-4.7"
+    #: xAI speaks the OpenAI wire format, so it rides the same SDK.
+    xai_base_url: str = "https://api.x.ai/v1"
     preview_daily_messages: int = 25
     # Depth and spend per call. "low" preserves the latency posture the
     # previous provider was tuned to; blank leaves the model's own default.

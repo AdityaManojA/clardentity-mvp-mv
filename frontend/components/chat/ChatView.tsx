@@ -22,6 +22,7 @@ import { DEFAULT_MODE, MODE_BY_VALUE, type PickableMode } from "@/lib/modes";
 import { usePreviewAccess } from "@/lib/previewAccess";
 import { durationBucket, track } from "@/lib/analytics";
 import { setSmartSwitching, useSmartSwitching } from "@/lib/modeSwitching";
+import { getChoice as getModelChoice, PICKABLE_MODES } from "@/lib/pickableModels";
 import { ContextQuestionCard } from "@/components/chat/ContextQuestionCard";
 import { LearningRoleCard } from "@/components/chat/LearningRoleCard";
 import { ModeSwitchToast } from "@/components/chat/ModeSwitchToast";
@@ -340,6 +341,10 @@ export function ChatView({ conversationId }: { conversationId: string }) {
       {
         content,
         mode: sendMode,
+        // Only where the picker exists. Sending it elsewhere would be
+        // harmless - the server ignores it outside those modes - but saying
+        // nothing is clearer about where the choice applies.
+        model: PICKABLE_MODES.has(sendMode) ? getModelChoice(sendMode) : null,
         attachments: attachments.map((item) => ({
           type: item.kind,
           data: item.data,
@@ -1307,6 +1312,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
             onStartCall={mode ? () => setCallOpen(true) : undefined}
             isGenerating={sending}
             onStop={handleStop}
+            mode={mode}
             trailing={
               mode ? (
                 // Not drawn in the design, and not droppable either: smart

@@ -84,6 +84,10 @@ class MessageCreate(BaseModel):
     mode: str | None = None
     # §7.5: optional, Thinking mode only, entirely user-driven - never inferred.
     reasoning_lens: str | None = None
+    # Learning and Co-Creative only: a model the user picked by name. Ignored
+    # in every other mode, and an unknown or unavailable id falls back to the
+    # normal routing rather than failing the turn.
+    model: str | None = None
     attachments: list[MessageAttachment] = []
     # §12.1: set when `content` came from /audio/transcribe, so the turn can
     # still be linked to an audio_transcripts row.

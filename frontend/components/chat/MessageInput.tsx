@@ -12,6 +12,8 @@ import { autocorrectSupported, fixAtBoundary, loadSpeller, type Fix, type Spelle
 import { apiFetch } from "@/lib/apiClient";
 import { AudioRecorder } from "@/components/upload/AudioRecorder";
 import { ModelPicker } from "@/components/chat/ModelPicker";
+import { VendorModelPicker } from "@/components/chat/VendorModelPicker";
+import { PICKABLE_MODES } from "@/lib/pickableModels";
 import { MaskIcon } from "@/components/ui/MaskIcon";
 import { cx } from "@/components/ui/primitives";
 import { useTouchKeyboard } from "@/lib/useTouchKeyboard";
@@ -86,6 +88,7 @@ export function MessageInput({
   textareaRef,
   onStartCall,
   trailing,
+  mode,
   isGenerating,
   onStop,
 }: {
@@ -103,6 +106,10 @@ export function MessageInput({
    *  the controls that describe *how* the answer is produced there, which is
    *  where switching belongs now that the rail spans the full width. */
   trailing?: ReactNode;
+  /** Which companion is selected. Only used to decide which model
+   *  picker belongs here - the real names in Learning and Co-Creative,
+   *  the capability tiers everywhere else. */
+  mode?: string | null;
   /** True while an answer is being generated - swaps the send button for a
    *  stop control instead of just greying it out, so cutting a slow or
    *  unwanted answer off doesn't mean waiting it out. */
@@ -413,7 +420,14 @@ export function MessageInput({
           />
 
           <div className="ml-auto flex min-w-0 items-center gap-1">
-            <ModelPicker disabled={disabled} />
+            {mode && PICKABLE_MODES.has(mode) ? (
+              // The two modes where the user picks the model by name. Shown
+              // instead of the tier picker rather than beside it: two
+              // controls both called "model" is worse than either.
+              <VendorModelPicker mode={mode} disabled={disabled} />
+            ) : (
+              <ModelPicker disabled={disabled} />
+            )}
             {trailing}
 
             {/* Next to the mic, because they are the same intention at two

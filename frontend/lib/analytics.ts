@@ -45,6 +45,8 @@ export type AnalyticsEvent =
   | "answer_failed"
   // What people reach for
   | "mode_picked"
+  // Learning and Co-Creative, where the model is the user's choice.
+  | "model_picked"
   // Asked once, the first time Learning mode is opened.
   | "learning_role_set"
   // What the app is drawn in
