@@ -20,7 +20,16 @@ class TestStorageKey:
         key = storage_key(owner, image)
         assert str(owner) in key
         assert str(image) in key
-        assert key.endswith(".png")
+        # WebP by default: the same picture is a tenth of the PNG's size, and
+        # the PNG's 2.4MB was most of why a working image read as a missing
+        # one.
+        assert key.endswith(".webp")
+
+    def test_png_is_still_addressable(self):
+        # Images written before the switch are still stored, and the serving
+        # route falls back to them.
+        owner, image = uuid.uuid4(), uuid.uuid4()
+        assert storage_key(owner, image, "png").endswith(".png")
 
     def test_two_owners_never_collide_on_one_image_id(self):
         image = uuid.uuid4()

@@ -366,6 +366,12 @@ export function ChatView({ conversationId }: { conversationId: string }) {
           // that this answer will be a long one. Every other label stays
           // under the hood (the rabbit only ever says Thinking).
           if (status.phase === "slow" && sendMode !== "rapid") setSlowHint(true);
+          // Co-Creative: hold a square for the picture from the moment we
+          // know one is being made, so the answer does not read as finished
+          // while it is still coming.
+          if (status.phase === "image") {
+            setStreaming((prev) => (prev ? { ...prev, makingImage: true } : prev));
+          }
         },
         onReview: (review) => {
           // Kept aside as well: the "answer" event's message carries no
@@ -387,6 +393,23 @@ export function ChatView({ conversationId }: { conversationId: string }) {
         onImage: (image) => {
           earlyImageRef.current = image;
           setStreaming((prev) => (prev ? { ...prev, generatedImage: image } : prev));
+          // By the time a picture is ready the streaming bubble has usually
+          // been replaced by the saved message - generating one takes longer
+          // than writing the answer beside it - so the image has to be able
+          // to land on that message rather than only on a bubble that has
+          // gone. Without this it waited for "final", which is another
+          // twenty seconds of verification away.
+          setMessages((prev) => {
+            for (let i = prev.length - 1; i >= 0; i--) {
+              if (prev[i].role === "assistant") {
+                if (prev[i].generated_image) return prev;
+                const next = [...prev];
+                next[i] = { ...next[i], generated_image: image };
+                return next;
+              }
+            }
+            return prev;
+          });
         },
         onCrux: (text) => {
           track("gist_shown", { mode: sendMode, after: durationBucket(Date.now() - askedAtMs) });

@@ -292,6 +292,7 @@ def build_system_instructions(
     companion_name: str | None = None,
     learning_role: str | None = None,
     named_model: tuple[str, str] | None = None,
+    making_image: bool = False,
 ) -> list[dict]:
     """Returns Anthropic content blocks, not a string - the split is the
     point. Everything in `stable_parts` is byte-identical for every user who
@@ -331,6 +332,24 @@ def build_system_instructions(
     # Accumulated across sessions so the companion knows who it is talking to.
     if profile_block:
         variable_parts.append(profile_block)
+
+    # Co-Creative: a picture is already being generated for this turn, in
+    # parallel with this answer, and will be attached above it.
+    #
+    # Without this the model writes "I can't generate images directly, but
+    # here's a prompt you could use" - which was printed directly above the
+    # image it had just made. It is not wrong about itself in general; it
+    # simply has no way to know, so it has to be told.
+    if making_image:
+        variable_parts.append(
+            "An image is being generated for this message right now and will be "
+            "shown above your answer. Do not say you cannot produce images, do not "
+            "offer a prompt for the user to paste into some other tool, and do not "
+            "describe what the image 'would' contain as though it does not exist. "
+            "Write the words that belong beside a picture that is already there: "
+            "what it shows and the choices behind it, briefly. If they asked only "
+            "for the image, a sentence or two is the whole answer."
+        )
 
     # Learning and Co-Creative only, and only when the user picked the model
     # themselves. In those two the interface names it - "write this with

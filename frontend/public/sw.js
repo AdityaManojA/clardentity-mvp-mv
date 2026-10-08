@@ -13,7 +13,14 @@
 
 // Bumping this name is how a deploy drops everything the last one cached:
 // `activate` deletes every cache that isn't this one.
-const CACHE = "clardentity-shell-v3";
+//
+// v4: the Co-Creative image card shipped and did not reach anyone who had
+// the app open before it - the static chunks are served cache-first, so a
+// browser holding v3 kept running a bundle with no card in it and the
+// feature read as broken while the server was generating pictures
+// perfectly well. Bump this whenever a shipped fix has to reach an existing
+// tab, not just a new one.
+const CACHE = "clardentity-shell-v4";
 
 // Only things that are content-addressed or genuinely static. HTML is not
 // here on purpose - a stale shell is how a deployed fix fails to reach

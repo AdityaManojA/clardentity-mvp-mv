@@ -23,17 +23,23 @@ from app.services.storage import download_file
 router = APIRouter(prefix="/images", tags=["images"])
 
 
-@router.get("/{owner_id}/{image_id}.png")
+@router.get("/{owner_id}/{image_id}.webp")
 async def read_generated_image(owner_id: uuid.UUID, image_id: uuid.UUID) -> Response:
-    try:
-        data = download_file(storage_key(owner_id, image_id))
-    except Exception as exc:  # noqa: BLE001 - any storage miss is a 404
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Image not found"
-        ) from exc
+    # WebP first, PNG second. New images are stored as WebP; the handful
+    # written before that are still PNG, and a stored picture should not stop
+    # existing because the encoder changed.
+    for ext, media_type in (("webp", "image/webp"), ("png", "image/png")):
+        try:
+            data = download_file(storage_key(owner_id, image_id, ext))
+        except Exception:  # noqa: BLE001 - a miss here means try the next one
+            continue
+        break
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Image not found")
+
     return Response(
         content=data,
-        media_type="image/png",
+        media_type=media_type,
         headers={
             # The bytes behind a given id never change, so this can be cached
             # hard. `private` keeps it out of shared caches.

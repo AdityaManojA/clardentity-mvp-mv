@@ -17,10 +17,12 @@ return "model does not exist".
 """
 
 import base64
+import io
 import logging
 import uuid
 
 import httpx
+from PIL import Image
 
 from app.core.config import settings
 from app.services.anthropic_client import generate_structured
@@ -115,8 +117,9 @@ async def generate(prompt: str, user_id: uuid.UUID) -> dict | None:
         return None
 
     image_id = uuid.uuid4()
+    body, ext, media_type = _to_webp(data)
     try:
-        upload_file(storage_key(user_id, image_id), data, "image/png")
+        upload_file(storage_key(user_id, image_id, ext), body, media_type)
     except Exception:  # noqa: BLE001
         logger.warning("generated image could not be stored", exc_info=True)
         return None
@@ -124,11 +127,33 @@ async def generate(prompt: str, user_id: uuid.UUID) -> dict | None:
     return {"id": str(image_id), "owner": str(user_id), "prompt": prompt}
 
 
-def storage_key(user_id: uuid.UUID | str, image_id: uuid.UUID | str) -> str:
+def storage_key(user_id: uuid.UUID | str, image_id: uuid.UUID | str, ext: str = "webp") -> str:
     """Where one generated image lives.
 
     The owner is part of the key, so the serving route can prove ownership by
     construction rather than by looking anything up - there is no table of
     generated images and no query that could return someone else's.
     """
-    return f"generated/{user_id}/{image_id}.png"
+    return f"generated/{user_id}/{image_id}.{ext}"
+
+
+def _to_webp(png_bytes: bytes) -> tuple[bytes, str, str]:
+    """The picture, ten times smaller.
+
+    gpt-image-1 hands back a 1024x1024 PNG, which is around 2.4MB. Served
+    from Render to a browser that has just been told an image is coming,
+    that is several seconds of blank square - long enough that the first
+    report of this feature was "it didn't make an image", when it had.
+    The same picture as WebP is about 250KB.
+
+    Falls back to the PNG if the conversion fails for any reason: a slightly
+    slow image beats no image.
+    """
+    try:
+        with Image.open(io.BytesIO(png_bytes)) as image:
+            buffer = io.BytesIO()
+            image.convert("RGB").save(buffer, "WEBP", quality=82, method=6)
+        return buffer.getvalue(), "webp", "image/webp"
+    except Exception:  # noqa: BLE001
+        logger.warning("could not convert the image to webp; storing the png", exc_info=True)
+        return png_bytes, "png", "image/png"

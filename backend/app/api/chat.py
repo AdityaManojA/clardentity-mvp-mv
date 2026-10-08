@@ -1344,12 +1344,32 @@ async def send_message(
     chosen_model = (
         model_catalog.get(payload.model) if model_catalog.allows_picking(mode) else None
     )
+    # Co-Creative only: is this a request for a picture, and if so what of?
+    #
+    # Decided *before* the instructions are built, and that ordering is the
+    # whole point. When it was decided afterwards the model writing the
+    # answer had no idea a picture was being made, so it opened with "I
+    # can't generate images directly, but here's a prompt you could use" -
+    # printed directly above the image it had just generated. The answer has
+    # to be written by a model that knows.
+    #
+    # The intent check is a small-model call on creative turns only. It is
+    # awaited here rather than raced, because nothing downstream can start
+    # without the instructions it changes.
+    image_prompt = await wanted_image(effective_content) if mode == "creative" else None
+    image_task: asyncio.Task[dict | None] | None = (
+        asyncio.create_task(generate_image(image_prompt, current_user.id))
+        if image_prompt
+        else None
+    )
+
     instructions = build_system_instructions(
         mode,
         reasoning_lens,
         bias_guidance,
         profile_block,
         named_model=(chosen_model.label, chosen_model.vendor) if chosen_model else None,
+        making_image=bool(image_prompt),
         companion_name=name_for(current_user.companion_names, mode),
         # Read straight off the profile rather than inferred: it is needed on
         # the very first learning question, before there is anything to infer
@@ -1375,17 +1395,6 @@ async def send_message(
     # leave the user watching an empty bubble for the whole of it. The
     # intent check in front of it is cheap; the generation behind it only
     # runs when that check says yes.
-    image_task: asyncio.Task[dict | None] | None = None
-    if mode == "creative":
-
-        async def _make_image() -> dict | None:
-            prompt = await wanted_image(effective_content)
-            if not prompt:
-                return None
-            return await generate_image(prompt, current_user.id)
-
-        image_task = asyncio.create_task(_make_image())
-
     gen_model = admin_settings.get("openai_model")
     # Which model writes the answer, by mode (an explicit admin override still
     # wins): the smallest for the quick answer, the fast one for the modes
@@ -1418,6 +1427,22 @@ async def send_message(
         # which is usually after the answer has finished streaming.
         generated_image: dict | None = None
         image_sent = False
+        image_announced = False
+
+        def image_status_event() -> dict | None:
+            """Said once, at the top of the stream: a picture is being made.
+
+            Known before the first token now, rather than a few seconds in,
+            because the intent check runs before the instructions are built.
+            """
+            nonlocal image_announced
+            if image_announced or image_task is None:
+                return None
+            image_announced = True
+            return {
+                "event": "status",
+                "data": json.dumps({"phase": "image", "label": "Making the image"}),
+            }
 
         def image_event() -> dict | None:
             nonlocal generated_image, image_sent
@@ -1547,6 +1572,9 @@ async def send_message(
                     if late:
                         mark("review")
                         yield late
+                    announcement = image_status_event()
+                    if announcement:
+                        yield announcement
                     picture = image_event()
                     if picture:
                         mark("image")
@@ -1803,6 +1831,16 @@ async def send_message(
             )
         )
 
+        # Claim verification is the long pole after the answer - it is also
+        # the window in which the picture usually finishes. Checking here
+        # sends it as soon as it exists rather than holding it to the end of
+        # the pipeline, which was another twenty seconds of a placeholder
+        # sitting there with nothing to show.
+        picture = image_event()
+        if picture:
+            mark("image")
+            yield picture
+
         evidence_by_claim = [
             build_scored_evidence(markers, chunks, v.evidence, live_sources)
             for markers, v in zip(claim_marker_lists, verifications)
@@ -2033,6 +2071,21 @@ async def send_message(
                 except Exception:  # noqa: BLE001
                     logger.warning("image task failed", exc_info=True)
                     generated_image = None
+                image_sent = True
+                if generated_image:
+                    # Its own event, not just the final payload: this is the
+                    # usual case rather than the exception - the answer is
+                    # written in ten seconds and the picture takes twenty -
+                    # and the client should be able to drop it into the
+                    # bubble the moment it exists.
+                    pending_image_event = {
+                        "event": "image",
+                        "data": json.dumps(generated_image),
+                    }
+                else:
+                    pending_image_event = None
+            else:
+                pending_image_event = None
             assistant_message.generated_image = generated_image
             await gen_db.flush()
 
@@ -2181,6 +2234,9 @@ async def send_message(
         }
         mark("final")
         logger.info("turn timing mode=%s claims=%d %s", mode, len(scored_claims), " ".join(marks))
+        if pending_image_event:
+            mark("image")
+            yield pending_image_event
         yield {"event": "final", "data": json.dumps(final_payload)}
 
     # The meter is opened inside the generator and has to be closed when the

@@ -21,7 +21,10 @@ import { ThinkingIndicator } from "@/components/chat/ThinkingIndicator";
 import { ClarifierCard } from "@/components/chat/ClarifierCard";
 import { GuidanceCard } from "@/components/chat/GuidanceCard";
 import { DecisionReview } from "@/components/chat/DecisionReview";
-import { GeneratedImageCard } from "@/components/chat/GeneratedImageCard";
+import {
+  GeneratedImageCard,
+  GeneratedImagePlaceholder,
+} from "@/components/chat/GeneratedImageCard";
 import { ThinkingReview } from "@/components/chat/ThinkingReview";
 import { FeedbackWidget } from "@/components/chat/FeedbackWidget";
 import { ExportFileMenu } from "@/components/chat/ExportFileMenu";
@@ -42,6 +45,8 @@ export type StreamingMessage = {
   /** Co-Creative: the picture, once it has finished. Usually lands after the
    *  answer has streamed - generating one takes ten to twenty seconds. */
   generatedImage?: GeneratedImage | null;
+  /** True between "a picture is being made" and the picture arriving. */
+  makingImage?: boolean;
 };
 
 export function MessageList({
@@ -231,6 +236,7 @@ export function MessageList({
           crux={streaming.crux ?? null}
           decisionReview={streaming.decisionReview ?? null}
           generatedImage={streaming.generatedImage ?? null}
+          makingImage={streaming.makingImage ?? false}
           thinkingReview={streaming.thinkingReview ?? null}
           isStreaming
         />
@@ -482,6 +488,7 @@ function MessageBubble({
   decisionReview,
   thinkingReview,
   generatedImage,
+  makingImage,
   feedback,
   siblingIndex,
   siblingCount,
@@ -520,6 +527,7 @@ function MessageBubble({
   decisionReview?: DecisionReviewData | null;
   thinkingReview?: ThinkingReviewData | null;
   generatedImage?: GeneratedImage | null;
+  makingImage?: boolean;
   feedback?: { rating: "up" | "down" | null; comment: string | null } | null;
   /** This message's position among its siblings, and how many there are -
    *  1 sibling means there's nothing to switch between. */
@@ -699,6 +707,7 @@ function MessageBubble({
         {/* The picture leads, when there is one: it is the answer to "draw
             me a logo", not an illustration of a paragraph. */}
         {!isUser && generatedImage && <GeneratedImageCard image={generatedImage} />}
+        {!isUser && !generatedImage && makingImage && <GeneratedImagePlaceholder />}
         {/* The reasoning-contrast / decision-verdict box is the analysis
             itself, not detail to hide behind a click - it leads, above the
             gist (the client's order: verdict box, then the one-line answer,

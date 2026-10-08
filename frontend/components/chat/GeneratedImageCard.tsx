@@ -17,7 +17,9 @@ import type { GeneratedImage } from "@/lib/sse";
 export function GeneratedImageCard({ image }: { image: GeneratedImage }) {
   // Served by id straight from the API: an <img> cannot carry an
   // Authorization header, so the uuid in the path is the capability.
-  const src = `${API_BASE_URL}/images/${image.owner}/${image.id}.png`;
+  // WebP, because the PNG the model returns is 2.4MB and spent several
+  // seconds as a blank square - long enough to read as no image at all.
+  const src = `${API_BASE_URL}/images/${image.owner}/${image.id}.webp`;
 
   return (
     <figure className="mb-2.5 overflow-hidden rounded-xl border border-hairline bg-surface">
@@ -36,13 +38,33 @@ export function GeneratedImageCard({ image }: { image: GeneratedImage }) {
           alt={image.prompt}
           width={1024}
           height={1024}
-          loading="lazy"
+          loading="eager"
           className="block aspect-square w-full max-w-[420px] object-cover"
         />
       </a>
       <figcaption className="px-3.5 py-2 text-xs leading-relaxed text-ink-muted">
         {image.prompt}
       </figcaption>
+    </figure>
+  );
+}
+
+/** The square the picture will land in, held while it is being made.
+ *
+ *  Generating one takes fifteen to twenty seconds, which is longer than the
+ *  answer beside it takes to write - so without this the reply looks
+ *  finished, and the image arriving afterwards looks like it was never
+ *  coming. Reserving the space also stops the answer jumping when it lands.
+ */
+export function GeneratedImagePlaceholder() {
+  return (
+    <figure className="mb-2.5 overflow-hidden rounded-xl border border-hairline bg-surface">
+      <div className="flex aspect-square w-full max-w-[420px] items-center justify-center bg-surface-muted">
+        <span className="flex items-center gap-2 text-sm text-ink-muted">
+          <span className="size-2 animate-pulse rounded-full bg-brand" />
+          Making the image…
+        </span>
+      </div>
     </figure>
   );
 }
