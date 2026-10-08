@@ -56,10 +56,17 @@ async def stream_google(
         f"https://generativelanguage.googleapis.com/v1beta/models/{model}"
         ":streamGenerateContent?alt=sse"
     )
-    body = {
+    body: dict = {
         "contents": [{"role": "user", "parts": [{"text": input_text}]}],
         "systemInstruction": {"parts": [{"text": instructions}]},
     }
+    # Left alone, Flash spent 654 thought tokens on a three-sentence answer
+    # and 13s before the first one. Note "thinkingLevel" is accepted and then
+    # silently ignored on this model - the budget is the field that bites.
+    if settings.google_thinking_budget > 0:
+        body["generationConfig"] = {
+            "thinkingConfig": {"thinkingBudget": settings.google_thinking_budget}
+        }
     full, prompt_tokens, output_tokens = "", 0, 0
 
     async with httpx.AsyncClient(timeout=_TIMEOUT) as client:
@@ -107,7 +114,7 @@ async def stream_xai(*, instructions: str, input_text: str, model: str) -> Async
     """Grok. xAI speaks the OpenAI chat-completions wire format, so this is
     that shape pointed at a different host - not the Responses API the
     OpenAI client here uses, which xAI does not implement."""
-    body = {
+    body: dict = {
         "model": model,
         "stream": True,
         # Without this xAI streams no usage block at all, so every Grok turn
@@ -118,6 +125,9 @@ async def stream_xai(*, instructions: str, input_text: str, model: str) -> Async
             {"role": "user", "content": input_text},
         ],
     }
+    # 93s to the first token without this, which is not a chat experience.
+    if settings.xai_reasoning_effort:
+        body["reasoning_effort"] = settings.xai_reasoning_effort
     full, prompt_tokens, output_tokens = "", 0, 0
 
     async with httpx.AsyncClient(timeout=_TIMEOUT) as client:

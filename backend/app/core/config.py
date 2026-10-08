@@ -153,6 +153,17 @@ class Settings(BaseSettings):
     xai_model: str = "grok-4.7"
     #: xAI speaks the OpenAI wire format, so it rides the same SDK.
     xai_base_url: str = "https://api.x.ai/v1"
+    #: How hard the two thinking providers are allowed to think before they
+    #: say anything. Both default to barely, for the same reason
+    #: openai_reasoning_effort does: a companion that streams nothing for a
+    #: minute and a half reads as broken, however good the eventual answer.
+    #:
+    #: Measured on the same question, one sample each. Grok 4.7 went from
+    #: 105s to 3.1s (522 reasoning tokens down to 87). Gemini 3.5 Flash went
+    #: from 13.0s to 3.3s. Blank or non-positive sends nothing and restores
+    #: each vendor's default.
+    xai_reasoning_effort: str = "low"
+    google_thinking_budget: int = 128
     preview_daily_messages: int = 25
     # Depth and spend per call. "low" preserves the latency posture the
     # previous provider was tuned to; blank leaves the model's own default.
