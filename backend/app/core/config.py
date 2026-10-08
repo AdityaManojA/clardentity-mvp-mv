@@ -131,16 +131,13 @@ class Settings(BaseSettings):
     #: gemini-{pro,flash}-latest, and the 2.5 family. Guessing a vendor id is
     #: a coin flip; `GET /v1beta/models` costs nothing.
     #:
-    #: Blank on purpose, which hides the Gemini Pro entry from the picker.
-    #: The id below is correct and the integration works; the account is the
-    #: problem. This key is still on Google's free tier, where every pro
-    #: model is capped at nothing at all - the 429 reads "Quota exceeded for
-    #: metric: ...free_tier_requests, limit: 0, model: gemini-3.1-pro" - and
-    #: gemini-2.5-pro now 404s as "no longer available to new users". So
-    #: there is no reachable pro model until billing is enabled on the
-    #: Google project. When it is, this becomes a one-line env var:
-    #: GOOGLE_MODEL=gemini-3.1-pro-preview, no deploy.
-    google_model: str = ""
+    #: This sat blank for a few hours, which is how `available()` learned to
+    #: hide an entry whose vendor id is empty. The first Google key was on
+    #: the free tier, where every pro model is capped at "limit: 0" and
+    #: gemini-2.5-pro 404s as "no longer available to new users" - so the
+    #: picker offered a Gemini Pro that could only ever answer 429. A key on
+    #: a billed project reaches it in 8.5s, so it is back.
+    google_model: str = "gemini-3.1-pro-preview"
     #: 3.8 is newer, but on this key 3.8 and 3.7 answered with 503 "high
     #: demand" or timed out while 3.5 answered every time. That is a free-tier
     #: symptom rather than a property of the model, so this is worth
