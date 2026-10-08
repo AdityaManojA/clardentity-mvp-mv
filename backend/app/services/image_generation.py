@@ -11,9 +11,11 @@ getting it wrong costs a sentence. Actually generating one takes ten to
 twenty seconds and real money, so it happens only after that judgement says
 yes, and never in any other mode.
 
-`gpt-image-1` is the model: measured against this account, it is the only
-one of the image models that answers at all - dall-e-2 and dall-e-3 both
-return "model does not exist".
+Which model does the drawing is a setting. The first version of this
+shipped on `gpt-image-1` because that name was guessed and then tested,
+rather than the account being asked what it had - it had six newer ones,
+and the one in use was the slowest and weakest of them. Listing beats
+guessing: `GET /v1/models` and filter for "image".
 """
 
 import base64
@@ -31,8 +33,6 @@ from app.services.storage import upload_file
 
 logger = logging.getLogger("clardentity.images")
 
-_MODEL = "gpt-image-1"
-_SIZE = "1024x1024"
 _TIMEOUT = 180.0
 
 @dataclass(frozen=True)
@@ -126,7 +126,12 @@ async def generate(prompt: str, user_id: uuid.UUID) -> dict | None:
             response = await client.post(
                 "https://api.openai.com/v1/images/generations",
                 headers={"Authorization": f"Bearer {settings.openai_api_key}"},
-                json={"model": _MODEL, "prompt": prompt, "size": _SIZE, "n": 1},
+                json={
+                    "model": settings.image_model,
+                    "prompt": prompt,
+                    "size": settings.image_size,
+                    "n": 1,
+                },
             )
         if response.status_code != 200:
             logger.warning("image generation refused: %s %s", response.status_code, response.text[:300])
@@ -164,11 +169,11 @@ def storage_key(user_id: uuid.UUID | str, image_id: uuid.UUID | str, ext: str = 
 def _to_webp(png_bytes: bytes) -> tuple[bytes, str, str]:
     """The picture, ten times smaller.
 
-    gpt-image-1 hands back a 1024x1024 PNG, which is around 2.4MB. Served
-    from Render to a browser that has just been told an image is coming,
-    that is several seconds of blank square - long enough that the first
-    report of this feature was "it didn't make an image", when it had.
-    The same picture as WebP is about 250KB.
+    The image models hand back a PNG, which at 1024x1024 is a couple of
+    megabytes. Served from Render to a browser that has just been told an
+    image is coming, that is several seconds of blank square - long enough
+    that the first report of this feature was "it didn't make an image",
+    when it had. The same picture as WebP is about 250KB.
 
     Falls back to the PNG if the conversion fails for any reason: a slightly
     slow image beats no image.

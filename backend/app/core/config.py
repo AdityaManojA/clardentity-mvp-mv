@@ -101,6 +101,20 @@ class Settings(BaseSettings):
     #: converting and the bill is understood.
     guest_daily_token_budget: int = 2_000_000
 
+    #: Co-Creative's image model. Settings rather than constants because the
+    #: catalogue moves: the first version of this feature shipped on
+    #: gpt-image-1 because that name was guessed rather than looked up, and
+    #: the account already had six newer ones - the current default is both
+    #: better and roughly five times faster (12s against 59s).
+    #:
+    #: `gpt-image-2.5-flare` is the same generation and ~4s quicker at
+    #: marginally less detail; swap the env var to try it.
+    image_model: str = "gpt-image-2.5-sunburst"
+    #: Square, so the space reserved while it generates matches what lands in
+    #: it. "1536x1024" gives a nicer landscape for scenes but needs the card's
+    #: aspect ratio changed to match or the answer jumps when it arrives.
+    image_size: str = "1024x1024"
+
     #: Extra providers for the model picker in Learning and Co-Creative. Both
     #: are optional: a model whose provider has no key is hidden from the
     #: picker rather than offered and then failing when chosen.
