@@ -145,8 +145,17 @@ def _has_key(provider: str) -> bool:
 
 
 def available() -> list[SelectableModel]:
-    """Everything this deployment can actually route to, in picker order."""
-    return [m for m in _catalog() if _has_key(m.provider)]
+    """Everything this deployment can actually route to, in picker order.
+
+    Two ways to be unroutable, and both hide the entry rather than letting
+    somebody pick it and watch it fail. No key for the provider is the
+    obvious one. The other is an entry whose vendor id has been blanked,
+    which is how a model the account cannot reach gets taken out of the
+    picker without deleting it from the catalog - Gemini Pro is there now,
+    because this Google key is on a free tier that caps every pro model at
+    zero requests. Putting it back is then an env var rather than a deploy.
+    """
+    return [m for m in _catalog() if _has_key(m.provider) and m.model_id]
 
 
 def get(model_id: str | None) -> SelectableModel | None:
