@@ -9,10 +9,11 @@ import type { GeneratedImage } from "@/lib/sse";
  * the answer - "draw me a logo" was not a request for a paragraph with a
  * file clipped to it.
  *
- * The prompt underneath is not decoration. What reaches the image model is
- * rewritten from the conversation, not copied from the message, so the only
- * way to know why you got this picture rather than another one is to see the
- * sentence it was actually drawn from. It doubles as the alt text.
+ * No caption. When someone asks for a picture they get a picture - the
+ * essay that used to come with it was the thing being complained about, and
+ * a line of prose under the frame is the same answer in miniature. The
+ * prompt is still there as the alt text and on hover, so the question "why
+ * this picture?" is one pointer away and screen readers are unaffected.
  */
 export function GeneratedImageCard({ image }: { image: GeneratedImage }) {
   // Served by id straight from the API: an <img> cannot carry an
@@ -22,7 +23,7 @@ export function GeneratedImageCard({ image }: { image: GeneratedImage }) {
   const src = `${API_BASE_URL}/images/${image.owner}/${image.id}.webp`;
 
   return (
-    <figure className="mb-2.5 overflow-hidden rounded-xl border border-hairline bg-surface">
+    <figure className="mb-2.5 w-fit overflow-hidden rounded-xl border border-hairline bg-surface">
       <a href={src} target="_blank" rel="noreferrer" className="block">
         {/* Square by construction - the model is asked for 1024x1024 - so the
             box can reserve its space before the bytes land and the answer
@@ -36,15 +37,13 @@ export function GeneratedImageCard({ image }: { image: GeneratedImage }) {
         <img
           src={src}
           alt={image.prompt}
+          title={image.prompt}
           width={1024}
           height={1024}
           loading="eager"
           className="block aspect-square w-full max-w-[420px] object-cover"
         />
       </a>
-      <figcaption className="px-3.5 py-2 text-xs leading-relaxed text-ink-muted">
-        {image.prompt}
-      </figcaption>
     </figure>
   );
 }

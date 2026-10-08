@@ -798,6 +798,14 @@ async def _store_title(conversation_id: uuid.UUID, pending: "asyncio.Task[str]",
             await db.commit()
 
 
+async def _no_text() -> AsyncIterator[dict]:
+    """A generation that produces nothing, for a turn whose answer is a
+    picture. Shaped like a real one so every consumer downstream - the crux
+    splitter, the claim parser, the persistence - works unchanged on an
+    empty string rather than needing to know about this case."""
+    yield {"type": "done", "full_text": ""}
+
+
 async def _settle_title(
     conversation_id: uuid.UUID,
     pending: "asyncio.Task[str] | None",
@@ -1356,12 +1364,17 @@ async def send_message(
     # The intent check is a small-model call on creative turns only. It is
     # awaited here rather than raced, because nothing downstream can start
     # without the instructions it changes.
-    image_prompt = await wanted_image(effective_content) if mode == "creative" else None
+    image_request = await wanted_image(effective_content) if mode == "creative" else None
     image_task: asyncio.Task[dict | None] | None = (
-        asyncio.create_task(generate_image(image_prompt, current_user.id))
-        if image_prompt
+        asyncio.create_task(generate_image(image_request.prompt, current_user.id))
+        if image_request
         else None
     )
+    # When the picture is the whole request, it is the whole answer: no prose
+    # beside it, no gist, no claims to check. Asking for a village and being
+    # handed a village is the expected outcome; the essay that used to come
+    # with it was the thing being complained about.
+    image_only = bool(image_request and image_request.only)
 
     instructions = build_system_instructions(
         mode,
@@ -1369,7 +1382,7 @@ async def send_message(
         bias_guidance,
         profile_block,
         named_model=(chosen_model.label, chosen_model.vendor) if chosen_model else None,
-        making_image=bool(image_prompt),
+        making_image=bool(image_request),
         companion_name=name_for(current_user.companion_names, mode),
         # Read straight off the profile rather than inferred: it is needed on
         # the very first learning question, before there is anything to infer
@@ -1546,26 +1559,43 @@ async def send_message(
             mark("review")
             yield early
 
+        # Before the first token rather than on it: when the picture is the
+        # whole answer there are no tokens, so a status that waited for one
+        # would never be sent.
+        announcement = image_status_event()
+        if announcement:
+            yield announcement
+
         try:
             # A picked model goes to its own provider with no fallback: if
             # somebody asked for Grok, quietly answering as Claude would be
             # worse than saying it is unavailable.
-            generation = (
-                stream_for_model(
+            if image_only:
+                # Nothing to write. Substituted rather than branched around,
+                # so the rest of the turn is unchanged: the message is
+                # persisted, the branch pointer moves, the title is derived
+                # and the events fire exactly as they always do - there is
+                # simply no prose in the middle of it, and therefore no gist
+                # and no claims to verify.
+                generation = _no_text()
+            elif chosen_model and chosen_model.provider != "anthropic":
+                # A picked model goes to its own provider with no fallback:
+                # if somebody asked for Grok, quietly answering as Claude
+                # would be worse than saying it is unavailable.
+                generation = stream_for_model(
                     chosen_model,
                     instructions=instructions,
                     input_text=input_text,
                     input_images=input_images,
                 )
-                if chosen_model and chosen_model.provider != "anthropic"
-                else stream_generation(
+            else:
+                generation = stream_generation(
                     instructions=instructions,
                     input_text=input_text,
                     model=chosen_model.model_id if chosen_model else gen_model,
                     temperature=gen_temperature,
                     input_images=input_images,
                 )
-            )
             async for event in generation:
                 if event["type"] == "delta":
                     late = review_event()
@@ -1640,7 +1670,10 @@ async def send_message(
             # gist card and no fold, and the answer lands as a wall of text
             # in an order nobody asked for.
             crux_text, full_text = split_leading_sentence(full_text)
-            if crux_text is None:
+            if crux_text is None and not image_only:
+                # Expected when the picture is the answer - there is no prose
+                # to take a gist from, and that is the point rather than a
+                # degraded answer worth warning about.
                 logger.warning("no gist could be derived; answer opens with: %r", full_text[:160])
         draft_display_text = clean_output(strip_claim_tags(full_text))
 
