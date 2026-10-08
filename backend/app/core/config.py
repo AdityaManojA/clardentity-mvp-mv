@@ -123,8 +123,23 @@ class Settings(BaseSettings):
     #: The vendor ids behind the picker's Google and xAI entries. Settings
     #: rather than constants because these two were wired up before their keys
     #: existed - if a name is wrong, it is an env var rather than a deploy.
-    google_model: str = "gemini-3-pro"
-    google_fast_model: str = "gemini-3-flash"
+    #:
+    #: Both Google ids were wrong, which is the whole reason for that design.
+    #: Listed against the real account on 2026-10-08: "gemini-3-pro" and
+    #: "gemini-3-flash" are both 404 - neither has ever existed. The account
+    #: has gemini-3.1-pro-preview, gemini-3.5-flash through 3.8-flash,
+    #: gemini-{pro,flash}-latest, and the 2.5 family. Guessing a vendor id is
+    #: a coin flip; `GET /v1beta/models` costs nothing.
+    google_model: str = "gemini-3.1-pro-preview"
+    #: 3.8 is newer, but on this key 3.8 and 3.7 answered with 503 "high
+    #: demand" or timed out while 3.5 answered every time. That is a free-tier
+    #: symptom rather than a property of the model, so this is worth
+    #: re-measuring once the account is on paid credit - the newest flash is
+    #: the one we want if it is actually reachable.
+    google_fast_model: str = "gemini-3.5-flash"
+    #: UNVERIFIED. xAI answers permission-denied to every call, /v1/models
+    #: included, while the team is out of credit, so there is no way yet to
+    #: ask what this account can call. Check it the moment credit lands.
     xai_model: str = "grok-4.7"
     #: xAI speaks the OpenAI wire format, so it rides the same SDK.
     xai_base_url: str = "https://api.x.ai/v1"

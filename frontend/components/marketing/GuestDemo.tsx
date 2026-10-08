@@ -210,7 +210,7 @@ export function GuestDemo({
         <div className="flex w-full max-w-[760px] flex-1 flex-col overflow-hidden">
           {phase === "inviting" ? (
             <div className="flex flex-1 flex-col items-center justify-center text-center">
-              <p className="text-2xl font-medium text-white sm:text-3xl">Ask it something.</p>
+              <p className="text-2xl font-medium text-white sm:text-3xl">Ask me something.</p>
               <p className="mt-2 text-sm text-white/70">
                 No account. You&apos;re in {modeLabel}.
               </p>

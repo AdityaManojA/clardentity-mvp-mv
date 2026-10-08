@@ -16,6 +16,10 @@ names it is not protecting anything; it is just contradicting itself.
 Availability is by key. A model whose provider has no API key configured is
 not listed, so the picker never offers something that fails when chosen -
 which is how Google and xAI sat here before their keys arrived.
+
+That rule earned itself on the day the keys did arrive: both Gemini ids in
+settings turned out to be 404s that had been sitting in the catalog for a
+week. Nobody saw them, because nobody could pick them.
 """
 
 from dataclasses import dataclass
@@ -98,9 +102,13 @@ def _catalog() -> list[SelectableModel]:
             model_id="gpt-5.4-mini",
             blurb="Light and fast, for drafting and iteration.",
         ),
+        # Our `id` is deliberately version-free - it is stored on every
+        # message, so baking "3.1" into it would turn next year's model bump
+        # into a data migration. The label carries the version instead, and
+        # has to be changed alongside the setting it describes.
         SelectableModel(
             id="gemini-pro",
-            label="Gemini 3 Pro",
+            label="Gemini 3.1 Pro",
             vendor="Google",
             provider="google",
             model_id=settings.google_model,
@@ -108,7 +116,7 @@ def _catalog() -> list[SelectableModel]:
         ),
         SelectableModel(
             id="gemini-flash",
-            label="Gemini 3 Flash",
+            label="Gemini 3.5 Flash",
             vendor="Google",
             provider="google",
             model_id=settings.google_fast_model,
