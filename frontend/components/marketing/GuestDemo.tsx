@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { askGuest, guestSessionId, type GuestTurn } from "@/lib/guestDemo";
+import { stashGuestTranscript } from "@/lib/guestHandoff";
 import { track } from "@/lib/analytics";
 import { cx } from "@/components/ui/primitives";
 import { MessageInput } from "@/components/chat/MessageInput";
@@ -209,6 +210,13 @@ export function GuestDemo({
             if (done.limit_reached) {
               setPhase("spent");
               track("guest_demo_limit");
+              // Stashed at the wall, not at the click on "create an
+              // account": by then this component is unmounting and the
+              // transcript it holds is the only copy there has ever been.
+              setTurns((prev) => {
+                stashGuestTranscript(mode, prev);
+                return prev;
+              });
             }
           },
           onError: (detail) => {
@@ -363,18 +371,26 @@ export function GuestDemo({
 
           {phase === "spent" ? (
             <div className="mt-6 rounded-2xl border border-white/15 bg-white/[0.07] p-5 text-center">
-              <p className="text-lg font-medium text-white">That&apos;s the preview.</p>
-              <p className="mx-auto mt-1 max-w-[46ch] text-sm leading-relaxed text-white/70">
-                Keep this conversation going, in any of the eight companions, with every
-                claim checked against its source.
+              <p className="text-lg font-medium text-white">
+                That&apos;s the preview. Don&apos;t lose it.
+              </p>
+              <p className="mx-auto mt-1 max-w-[48ch] text-sm leading-relaxed text-white/70">
+                Create a free account and this conversation comes with you - every
+                message, in your own workspace. Then keep going in any of the eight
+                companions, with each claim checked against its source.
               </p>
               <Link
                 href="/register"
-                onClick={() => track("guest_demo_signup_clicked")}
+                onClick={() => track("guest_demo_signup_clicked", { from: "limit" })}
                 className="mt-4 inline-flex h-11 items-center rounded-full bg-white px-6 text-sm font-medium text-[#1a0710] transition-opacity hover:opacity-90"
               >
-                Create a free account
+                Save it to a free account
               </Link>
+              {/* Said plainly, because the promise above is about their
+                  words and the honest version of it has a condition. */}
+              <p className="mt-2 text-xs text-white/50">
+                Saved when you sign up on this browser.
+              </p>
             </div>
           ) : (
             <div className="mt-4 space-y-3">

@@ -109,7 +109,7 @@ export default function WelcomePage() {
           <div className="space-y-1">
             <p className="text-xs font-semibold uppercase tracking-wide text-brand">
               {page === 0
-                ? `Welcome${firstName ? `, ${firstName}` : ""}`
+                ? `Welcome to Clardentity${firstName ? `, ${firstName}` : ""}`
                 : `Question ${page + 1} of ${QUESTIONS.length}`}
             </p>
             <h1 className="text-xl font-semibold text-ink">{q.title}</h1>

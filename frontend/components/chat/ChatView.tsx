@@ -13,6 +13,7 @@ import {
   type ThinkingReviewData,
 } from "@/lib/sse";
 import { ModeSelector, type CognitiveMode } from "@/components/chat/ModeSelector";
+import { ChatGreeting } from "@/components/chat/ChatGreeting";
 import { MessageList, type StreamingMessage } from "@/components/chat/MessageList";
 import { ModeCarousel, groupByMode } from "@/components/chat/ModeCarousel";
 import { MessageInput, type PendingAttachment } from "@/components/chat/MessageInput";
@@ -940,6 +941,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
       // answer; this sets up the next question.
       onUseMode={(next) => setMode(next as CognitiveMode)}
       onAskRefined={(question) => handleSend(question, [])}
+      emptyState={<ChatGreeting />}
       emptyStateAvatar={
         <AvatarPanel
           state={avatarState}

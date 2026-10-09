@@ -66,6 +66,7 @@ export function MessageList({
   onAskRefined,
   loading,
   onSubmitEdit,
+  emptyState,
 }: {
   conversationId: string;
   messages: ChatMessage[];
@@ -95,6 +96,10 @@ export function MessageList({
    *  "Start a chat" before its messages arrived. */
   loading?: boolean;
   onSubmitEdit?: (messageId: string, content: string) => void;
+  /** Shown in the middle of a chat with nothing in it yet. Passed in rather
+   *  than built here because this list is also the landing page's guest
+   *  demo, which has no account and must not greet anybody by name. */
+  emptyState?: ReactNode;
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   /* Whether to follow new content down.
@@ -148,11 +153,16 @@ export function MessageList({
       // min-h-0 + overflow so this gives way, on a short screen, to a gate
       // card and the composer beneath it rather than pushing them off the
       // bottom - the same reason the thread itself scrolls.
-      // Empty, deliberately. The design puts nothing above the composer on a
-      // new chat - the rail and the box are the whole invitation, and a
-      // paragraph explaining them is a paragraph nobody reads twice. The
-      // space is kept so the composer below sits on the centre line.
-      <div className="min-h-0 flex-1" />
+      //
+      // This was deliberately empty: the design puts nothing above the
+      // composer on a new chat, on the grounds that a paragraph explaining
+      // the rail and the box is a paragraph nobody reads twice. Still true
+      // of a paragraph. A greeting is not a paragraph, it is the room
+      // acknowledging you walked in, and it was asked for by name. The
+      // space is kept either way so the composer sits on the centre line.
+      <div className="flex min-h-0 flex-1 items-center justify-center px-4">
+        {emptyState}
+      </div>
     );
   }
 

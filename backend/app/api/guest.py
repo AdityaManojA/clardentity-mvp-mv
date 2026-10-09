@@ -7,9 +7,16 @@ are asked to sign up.
 Deliberately a much smaller thing than `/chat`. No account, no conversation
 row, no documents, no retrieval, no web research, no claim parsing, no
 verification, no profile - the history is held by the browser and posted
-back each turn, and nothing is written to the database at all. That is
-partly cost, and partly that a demo which quietly stored strangers'
-conversations would be a worse product than one that does not.
+back each turn, and the demo writes nothing to the database. That is partly
+cost, and partly that a demo which quietly stored strangers' conversations
+would be a worse product than one that does not.
+
+`/guest/import` is the single exception, and it is the opposite case: the
+visitor has read "sign up and we'll keep this", made an account, and is now
+asking for their own transcript back. It is authenticated, it writes to the
+account that calls it, and the transcript it writes was posted up from that
+browser rather than retained here - which is only possible *because*
+nothing was stored, and is why the handoff goes through the client.
 
 What it keeps is the mode. The whole point of the box is that the question
 picks the companion, so a guest asking in Decision-making gets Decision
@@ -21,15 +28,22 @@ import json
 import logging
 import uuid
 from collections.abc import AsyncIterator
+from typing import Literal
 
-from fastapi import APIRouter, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel, Field
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from sse_starlette.sse import EventSourceResponse
 
+from app.api.deps import get_current_user
 from app.core.config import settings
 from app.core.rate_limit import check_rate_limit
+from app.db.session import get_db
+from app.models import Conversation, Message, User, Workspace, WorkspaceMember
 from app.services.anthropic_client import stream_generation
 from app.services.claim_parser import ClaimTagStripper, extract_crux
+from app.services.conversation_title import name_conversation
 from app.services.guest_demo import (
     MAX_MESSAGE_CHARS,
     SESSION_BUDGET,
@@ -180,3 +194,123 @@ async def _limit_reached() -> AsyncIterator[dict]:
             {"text": "", "used": SESSION_BUDGET, "budget": SESSION_BUDGET, "limit_reached": True}
         ),
     }
+
+
+#: What a demo conversation can be at the outside. The session budget is
+#: 5,000 tokens, so a real one is far below both of these - they are here so
+#: a hand-rolled request cannot post a novel into somebody's workspace.
+_MAX_IMPORT_TURNS = 40
+_MAX_IMPORT_CHARS = 60_000
+
+
+class ImportTurn(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str = Field(min_length=1, max_length=MAX_MESSAGE_CHARS * 8)
+
+
+class ImportRequest(BaseModel):
+    mode: str
+    turns: list[ImportTurn] = Field(min_length=1, max_length=_MAX_IMPORT_TURNS)
+
+
+class ImportResult(BaseModel):
+    conversation_id: uuid.UUID
+    workspace_id: uuid.UUID
+    message_count: int
+
+
+@router.post("/import", response_model=ImportResult, status_code=status.HTTP_201_CREATED)
+async def import_guest_conversation(
+    payload: ImportRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> ImportResult:
+    """Keep the demo conversation, now that there is an account to keep it in.
+
+    The transcript comes from the browser because that is the only place it
+    ever existed - see the module docstring. So this endpoint trusts the
+    caller about what was said, which is fine: they are writing into their
+    own workspace, and the worst they can do is author their own history.
+    The caps above are the real guard, and they are generous enough that a
+    genuine demo never meets them.
+
+    Saved unscored, like a call transcript: these answers were produced by
+    the demo, which runs without retrieval or verification, so there are no
+    claims, no citations and no confidence to record. Inventing any here
+    would put a verification badge on the one conversation in the account
+    that was never verified.
+    """
+    if payload.mode not in MODE_INSTRUCTIONS or payload.mode == "rapid":
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Unknown mode"
+        )
+
+    total = sum(len(t.content) for t in payload.turns)
+    if total > _MAX_IMPORT_CHARS:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail="That conversation is too long to import.",
+        )
+
+    # Their first workspace - registration makes one, so there is normally
+    # exactly this. Ordered rather than "any", so an account with several
+    # gets the one it started with instead of whichever the planner returned.
+    workspace_id = (
+        await db.execute(
+            select(Workspace.id)
+            .join(WorkspaceMember, WorkspaceMember.workspace_id == Workspace.id)
+            .where(WorkspaceMember.user_id == current_user.id)
+            .order_by(Workspace.created_at)
+            .limit(1)
+        )
+    ).scalar_one_or_none()
+    if workspace_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="This account has no workspace to import into.",
+        )
+
+    first_question = next((t.content for t in payload.turns if t.role == "user"), "")
+    first_answer = next((t.content for t in payload.turns if t.role == "assistant"), None)
+    fallback = (first_question[:60] or "Saved from the demo").strip()
+
+    conversation = Conversation(
+        workspace_id=workspace_id,
+        title=await name_conversation(first_question, first_answer, fallback),
+        default_mode=payload.mode,
+    )
+    db.add(conversation)
+    await db.flush()
+
+    # Chained, not just ordered. The thread is a tree and every reader of it
+    # walks parent links - a flat set of rows with no parents renders as a
+    # conversation of one message, which is the whole import lost in the one
+    # place it is supposed to have landed.
+    parent_id: uuid.UUID | None = None
+    saved: list[Message] = []
+    for turn in payload.turns:
+        message = Message(
+            conversation_id=conversation.id,
+            parent_id=parent_id,
+            role=turn.role,
+            content=clean_output(turn.content),
+            mode_used=payload.mode,
+        )
+        db.add(message)
+        await db.flush()
+        parent_id = message.id
+        saved.append(message)
+
+    conversation.active_leaf_id = saved[-1].id
+    await db.commit()
+
+    logger.info(
+        "imported a guest conversation of %d messages for user %s",
+        len(saved),
+        current_user.id,
+    )
+    return ImportResult(
+        conversation_id=conversation.id,
+        workspace_id=workspace_id,
+        message_count=len(saved),
+    )

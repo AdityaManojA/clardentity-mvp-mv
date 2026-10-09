@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { AppNotices } from "@/components/system/AppNotices";
 import { usePathname, useRouter } from "next/navigation";
 import {
   useCallback,
@@ -607,6 +608,10 @@ export function AppShell({ children }: { children: ReactNode }) {
     // unbounded shell the list's overflow-y-auto never engages and the page
     // grows past the viewport instead.
     <div className="flex h-[calc(var(--app-vh)*100)] overflow-hidden">
+      {/* Greeting on arrival, and the demo conversation if one followed the
+          user in. Here rather than on any one page: both are about opening
+          the app, not about where you landed. */}
+      <AppNotices />
       {/* Desktop sidebar. Slides out of view rather than unmounting, so
           collapsing and re-opening doesn't refetch the workspace list or lose
           the switcher's open/closed state. */}

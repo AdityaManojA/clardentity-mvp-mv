@@ -25,7 +25,12 @@
 // message list and two of the stores all changed to do it. Verifying any of
 // that against a v4 cache measured the old bundle - twice in one sitting,
 // which is the same hour lost as last time.
-const CACHE = "clardentity-shell-v5";
+//
+// v6: the greetings and the demo-to-account handoff. The handoff reads a
+// transcript left in localStorage by a *previous* build of the landing
+// page, so a browser running v5 chunks against a v6 deploy is exactly the
+// case this has to survive.
+const CACHE = "clardentity-shell-v6";
 
 // Only things that are content-addressed or genuinely static. HTML is not
 // here on purpose - a stale shell is how a deployed fix fails to reach
