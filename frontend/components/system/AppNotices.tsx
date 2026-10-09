@@ -5,8 +5,8 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import { useAuth } from "@/lib/auth";
 import { welcomeBackFor } from "@/lib/greeting";
 import {
-  hasStashedTranscript,
   importStashedTranscript,
+  markImportAnnounced,
   type ImportedConversation,
 } from "@/lib/guestHandoff";
 
@@ -122,10 +122,16 @@ function SavedFromDemo() {
   const [saved, setSaved] = useState<ImportedConversation | null>(null);
 
   useEffect(() => {
-    if (!user || !hasStashedTranscript()) return;
+    // Not gated on there being a stash: by the time a remount runs this,
+    // the import has usually finished and cleared it, and what is waiting
+    // is the result nobody has shown yet. The call is cheap in both cases.
+    if (!user) return;
     let cancelled = false;
     void importStashedTranscript().then((result) => {
-      if (!cancelled && result) setSaved(result);
+      if (cancelled || !result) return;
+      setSaved(result);
+      // Claimed, so a later mount does not announce the same import again.
+      markImportAnnounced();
     });
     return () => {
       cancelled = true;

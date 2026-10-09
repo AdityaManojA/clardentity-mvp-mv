@@ -86,21 +86,11 @@ export function clearStashedTranscript(): void {
   }
 }
 
-/** True when there is something waiting, without parsing or importing it -
- *  cheap enough to call on every render of a signed-in page. */
-export function hasStashedTranscript(): boolean {
-  try {
-    return window.localStorage.getItem(KEY) !== null;
-  } catch {
-    return false;
-  }
-}
-
 /* One import per page load, however many times it is asked for.
  *
  * The stash can only be cleared once the server has accepted it, so between
- * the request going out and the response coming back `hasStashedTranscript()`
- * is still true - and the caller is an effect, which React re-runs whenever
+ * the request going out and the response coming back the stash is still
+ * sitting there - and the caller is an effect, which React re-runs whenever
  * the user object changes identity and twice over in development. Four
  * copies of the same conversation appeared in the sidebar the first time
  * this was tested, which is a worse outcome than not importing at all.
@@ -111,6 +101,28 @@ export function hasStashedTranscript(): boolean {
 let inFlight: Promise<ImportedConversation | null> | null = null;
 let completed = false;
 
+/* What was imported, held until somebody has actually told the user.
+ *
+ * The import finishes during the hop from /welcome to the first chat, so
+ * the component that started it is unmounted before the promise resolves
+ * and its replacement asks a module that has already marked itself done.
+ * On the first production run that meant the conversation was imported
+ * perfectly and nobody was told - the one outcome worse than a visible
+ * failure, because the user has no reason to go looking.
+ *
+ * So the result outlives the component, and is handed to whichever mount
+ * asks next. `announced` stops it being handed out twice.
+ */
+let lastResult: ImportedConversation | null = null;
+let announced = false;
+
+/** Called by whoever puts the result on screen, so the next mount does not
+ *  show it again. */
+export function markImportAnnounced(): void {
+  announced = true;
+  lastResult = null;
+}
+
 /** Write the waiting transcript into the signed-in account.
  *
  *  Returns what was created, or null when there was nothing to do. Never
@@ -118,7 +130,8 @@ let completed = false;
  *  a failed import must not be the reason their app does not load.
  */
 export function importStashedTranscript(): Promise<ImportedConversation | null> {
-  if (completed) return Promise.resolve(null);
+  // Already done, but possibly not yet seen - see `lastResult`.
+  if (completed) return Promise.resolve(announced ? null : lastResult);
   if (inFlight) return inFlight;
   inFlight = runImport().finally(() => {
     inFlight = null;
@@ -137,6 +150,7 @@ async function runImport(): Promise<ImportedConversation | null> {
       body: { mode: stashed.mode, turns: stashed.turns },
     });
     completed = true;
+    lastResult = result;
     clearStashedTranscript();
     return result;
   } catch (error) {
