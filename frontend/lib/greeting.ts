@@ -25,6 +25,13 @@ export function firstNameOf(displayName: string | null | undefined): string | nu
   return first;
 }
 
+export type GreetingOptions = {
+  /** The clock to read. Injectable so the bands can be tested. */
+  now?: Date;
+  /** True when this is the account's very first visit - see isFirstRun. */
+  firstRun?: boolean;
+};
+
 export type Greeting = {
   /** "Good morning, Joe" - the whole line, ready to render. */
   text: string;
@@ -40,7 +47,7 @@ export type Greeting = {
  */
 export function greetingFor(
   displayName: string | null | undefined,
-  now: Date = new Date(),
+  { now = new Date(), firstRun = false }: GreetingOptions = {},
 ): Greeting {
   const name = firstNameOf(displayName);
   const hour = now.getHours();
@@ -58,11 +65,49 @@ export function greetingFor(
   // it - "night owl Joe" is not a thing anybody says - and this is the one
   // hour of the day when a greeting can be a small kindness rather than
   // furniture.
-  return { text: "Welcome back, night owl", band: "night" };
+  //
+  // "Welcome back" only to someone who has been here before. This is the
+  // single band whose wording makes a claim about the past, so it is the
+  // single band that has to know whether the claim is true.
+  return {
+    text: firstRun ? "Hello, night owl" : "Welcome back, night owl",
+    band: "night",
+  };
 }
 
 /** "Welcome back, Joe" - no clock, for the notice shown when the app opens. */
 export function welcomeBackFor(displayName: string | null | undefined): string {
   const name = firstNameOf(displayName);
   return name ? `Welcome back, ${name}` : "Welcome back";
+}
+
+/** How long after finishing the first-run welcome an account still counts
+ *  as new. Long enough to cover reading the welcome screen and walking the
+ *  coachmark tour, short enough that it has lapsed by the next visit.
+ */
+const FIRST_RUN_MINUTES = 20;
+
+/** Whether this account has only just arrived.
+ *
+ *  Nothing reads as assembled-from-parts quite like being told "welcome
+ *  back" fifteen seconds after signing up, which is exactly what a sign-up
+ *  after ten at night used to get - twice, once in the notice and once in
+ *  the empty chat.
+ *
+ *  The onboarding timestamp is the only thing already on the client that
+ *  dates an account: null means the welcome questions have not been
+ *  answered yet, and a timestamp from a minute ago means they were answered
+ *  a minute ago. No new field, no extra request.
+ */
+export function isFirstRun(
+  onboardingCompletedAt: string | null | undefined,
+  now: Date = new Date(),
+): boolean {
+  if (!onboardingCompletedAt) return true;
+  const finished = Date.parse(onboardingCompletedAt);
+  // An unreadable timestamp is not evidence of newness. Fall back to
+  // treating the account as established, which is the wrong guess that
+  // nobody notices.
+  if (Number.isNaN(finished)) return false;
+  return now.getTime() - finished < FIRST_RUN_MINUTES * 60_000;
 }

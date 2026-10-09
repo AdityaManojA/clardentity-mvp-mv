@@ -2,7 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import { useAuth } from "@/lib/auth";
-import { greetingFor } from "@/lib/greeting";
+import { greetingFor, isFirstRun } from "@/lib/greeting";
 
 /* What an empty chat says.
  *
@@ -32,11 +32,14 @@ function subscribe(): () => void {
 export function ChatGreeting() {
   const { user } = useAuth();
   const name = user?.display_name ?? null;
+  // Someone who signed up a minute ago is not coming back, and the night
+  // band is the one that would tell them they were.
+  const firstRun = isFirstRun(user?.onboarding_completed_at);
   const text = useSyncExternalStore(
     subscribe,
     // Object.is on two equal strings is true, so recomputing here is free
     // and never retriggers a render.
-    () => greetingFor(name).text,
+    () => greetingFor(name, { firstRun }).text,
     () => null,
   );
 
