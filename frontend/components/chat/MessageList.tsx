@@ -142,6 +142,10 @@ export function MessageList({
     if (!stickToBottom.current) return;
     const el = scrollRef.current;
     if (!el) return;
+    // Already there: no scroll will happen, so no scroll event would ever
+    // release the flag below - and a reader scrolling up in the next 800ms
+    // would be ignored, then yanked down by the next message.
+    if (el.scrollHeight - el.scrollTop - el.clientHeight < 2) return;
     autoScrolling.current = true;
     el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
     // Released when the scroll reaches the bottom (handleScroll), or after
@@ -208,6 +212,9 @@ export function MessageList({
       ref={scrollRef}
       data-testid="message-list"
       onScroll={handleScroll}
+      // A finger or a wheel is the reader, never our own smooth scroll.
+      onTouchStart={() => (autoScrolling.current = false)}
+      onWheel={() => (autoScrolling.current = false)}
       // max-sm:pb-20: room for the companion, which floats over the end of
       // the thread on a phone (ChatView), so the last line can scroll clear.
       className="scroll-slim min-h-0 flex-1 animate-[fade-in_0.35s_ease] space-y-5 overflow-y-auto px-1 py-5 max-sm:pb-20"

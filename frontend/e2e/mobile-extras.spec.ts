@@ -4,7 +4,7 @@
 import http from "node:http";
 import type { AddressInfo } from "node:net";
 import type { Page } from "@playwright/test";
-import { test, expect, sel, signIn, mockApi, seedStorage, hideDevOverlay, press, thread, sseBody, horizontalOverflow, tapArea, API, KEYS } from "./fixtures";
+import { test, expect, sel, signIn, mockApi, seedStorage, hideDevOverlay, press, thread, sseBody, horizontalOverflow, tapArea, expectTappable, API, KEYS } from "./fixtures";
 
 test.describe.configure({ timeout: 60_000 });
 
@@ -191,8 +191,22 @@ test.describe("checklist items", () => {
   });
 
   test("M42 chat icon buttons have a 44px tap area on touch @M42", async ({ page }) => {
-    await signIn(page, { messages: thread(1) });
+    const messages = thread(1);
+    // one sentence of the answer tagged as opinion: its marker sits inside the text
+    messages[1].claims = [{
+      claim_index: 0, claim_text: "Answer 1.", claim_score: null, entailment_label: "opinion",
+      distortion_flag: null, distortion_explanation: null, bias_name: null, bias_definition: null,
+      bias_category: null, bias_category_name: null, reconciliation_note: null, dynamic: false, evidence: [],
+    }] as never;
+    messages[1].content = "Answer 1. Some supporting detail follows here.";
+    await signIn(page, { messages });
     await openChat(page);
+    // the inline opinion marker keeps the text's line: not grown into a 44px box
+    const marker = page.getByRole("button", { name: /Stated as an opinion/ });
+    await expect(marker).toBeVisible();
+    const mb = (await marker.boundingBox())!;
+    expect(mb.height, "inline marker height").toBeLessThan(30);
+    await expectTappable(marker, "opinion marker");
     const small: string[] = [];
     for (const name of ["Attach a file or image", "Record a voice message", "Regenerate this answer", "Mark this answer helpful", "Mark this answer not helpful"]) {
       const el = page.getByRole("button", { name }).first();

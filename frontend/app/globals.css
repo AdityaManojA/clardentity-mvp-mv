@@ -593,14 +593,15 @@ body {
    helpful/not, the version arrows - are drawn at 16-24px. On a touch phone
    each gets a 44px box (screen pixels), icon unchanged and centred in it;
    the rows space out a little. Only min sizes: display is left alone, so
-   anything a utility hides stays hidden. */
+   anything a utility hides stays hidden. Buttons that sit inside the text
+   (data-inline: the opinion marker) keep their size and use tap-area. */
 @media (pointer: coarse) and (max-width: 1023.98px) {
-  [data-testid="message"] button[aria-label],
+  [data-testid="message"] button[aria-label]:not([data-inline]),
   [data-composer] button[aria-label] {
     min-width: calc(44px / var(--ui-zoom));
     min-height: calc(44px / var(--ui-zoom));
   }
-  [data-testid="message"] button[aria-label] > svg,
+  [data-testid="message"] button[aria-label]:not([data-inline]) > svg,
   [data-composer] button[aria-label] > svg {
     margin-inline: auto;
   }

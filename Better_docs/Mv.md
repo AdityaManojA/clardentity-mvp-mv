@@ -64,6 +64,10 @@ Status key: ✅ Done · 🔄 Built, waiting on a setup step · 🔍 Built, needs
 | ✅ | M37–M44: Menu holds the page still, draft kept, named progress, no field zoom, phone edges, chat icon tap sizes, paid limit, feedback |
 | ✅ | M45–M47: Welcome questions, Privacy and Terms pages, cookie banner on a first visit |
 | ✅ | Whole mobile suite: 125 passed on both phone profiles (1 skipped by design) |
+| ✅ | Stress run: the whole mobile suite repeated 10× on a production build with 6 parallel browsers and no retries - every repeat-flake traced and fixed (1,248 passed, then the last one fixed and re-checked 40/40) |
+| ✅ | Load test: 500 phones at once on the production build - 0 errors, every page a 200 |
+| ✅ | Fixed from stress testing: scrolling up just as an answer finished could be ignored, then the next message yanked you to the bottom |
+| ✅ | Fixed from code review: the inline "opinion" tag in answers was being blown up to a 44px box mid-sentence on phones; it keeps its size with an invisible 44px tap area |
 | 🔄 | Live tests against the real backend: built and skipping cleanly; waiting on the test accounts and secrets |
 | 🔄 | Screenshot comparison of 5 key screens: built; waiting on the first baseline run in CI |
 | ✅ | M24: "Did you mean" card: ask it reworded or keep your wording; never asked twice |

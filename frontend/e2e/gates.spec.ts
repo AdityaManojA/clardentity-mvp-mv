@@ -209,13 +209,11 @@ test.describe("mode suggestion", () => {
     expect(bodies[1]).toMatchObject({ mode: "thinking", mode_confirmed: true });
     const toast = page.getByRole("status").filter({ hasText: "Switched to Thought coach" });
     await expect(toast).toBeVisible();
-    const t = (await toast.boundingBox())!;
-    expect.soft(t.x + t.width, "toast wider than the screen").toBeLessThanOrEqual(376);
     await expect(page.locator(sel.modeRail).getByRole("radio", { name: "Thought coach" })).toHaveAttribute("aria-checked", "true");
 
-    const stay = page.getByRole("button", { name: "Stay in Finder" });
-    await expectTappable(stay, "Stay in Finder");
-    await stay.tap();
+    // The toast leaves after 4s by design, so tap straight away; its size and
+    // tap area are measured in M27b, where nothing races the countdown.
+    await page.getByRole("button", { name: "Stay in Finder" }).tap();
     await expect.poll(() => bodies.length).toBe(3);
     expect(bodies[2]).toMatchObject({ mode: "knowing", mode_confirmed: true, content: "why do I keep procrastinating?" });
     await expect(page.locator(sel.modeRail).getByRole("radio", { name: "Finder" })).toHaveAttribute("aria-checked", "true");
@@ -227,6 +225,9 @@ test.describe("mode suggestion", () => {
     await ask(page, "rent or buy?");
     const toast = page.getByRole("status").filter({ hasText: "Switched to Decision-making" });
     await expect(toast).toBeVisible();
+    const t = (await toast.boundingBox())!;
+    expect.soft(t.x + t.width, "toast wider than the screen").toBeLessThanOrEqual(376);
+    await expectTappable(page.getByRole("button", { name: "Stay in Finder" }), "Stay in Finder");
     await expect(toast).toHaveCount(0, { timeout: 7_000 });
     expect(bodies).toHaveLength(2);
     expect(bodies[1]).toMatchObject({ mode: "decision", mode_confirmed: true });
