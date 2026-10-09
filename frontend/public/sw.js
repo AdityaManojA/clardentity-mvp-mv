@@ -30,7 +30,12 @@
 // transcript left in localStorage by a *previous* build of the landing
 // page, so a browser running v5 chunks against a v6 deploy is exactly the
 // case this has to survive.
-const CACHE = "clardentity-shell-v6";
+//
+// v7: the tracker batch - a Log in link in the landing nav, and the entry
+// route now calling /bootstrap instead of three endpoints in a row. An old
+// bundle would keep making the three calls against a backend that has the
+// one, which works but is the slowness we just removed.
+const CACHE = "clardentity-shell-v7";
 
 // Only things that are content-addressed or genuinely static. HTML is not
 // here on purpose - a stale shell is how a deployed fix fails to reach
