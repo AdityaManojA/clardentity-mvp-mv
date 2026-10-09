@@ -1546,7 +1546,7 @@ class TestPicturesGoRoundTheGates:
 
         wants_picture = {"value": False}
 
-        async def fake_wanted_image(message):
+        async def fake_wanted_image(message, history=None):
             return ImageRequest(prompt="a minimal fox logo", only=True) if wants_picture["value"] else None
 
         drawn: list[str] = []

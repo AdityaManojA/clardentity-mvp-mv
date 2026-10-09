@@ -1131,7 +1131,9 @@ async def send_message(
         # the "(Attached: ...)" note appended further down, which is not
         # part of what the user asked for.
         if mode == "creative":
-            image_request = await wanted_image(effective_content)
+            image_request = await wanted_image(
+                effective_content, [(m.role, m.content or "") for m in history]
+            )
         image_checked = True
 
         # Sharpening the phrasing comes before either of the checks below -
@@ -1397,7 +1399,9 @@ async def send_message(
     # picture is not stopped and asked about its wording; only the
     # regenerate path arrives here without an answer.
     if not image_checked and mode == "creative":
-        image_request = await wanted_image(effective_content)
+        image_request = await wanted_image(
+            effective_content, [(m.role, m.content or "") for m in history]
+        )
     image_task: asyncio.Task[dict | None] | None = (
         asyncio.create_task(generate_image(image_request.prompt, current_user.id))
         if image_request

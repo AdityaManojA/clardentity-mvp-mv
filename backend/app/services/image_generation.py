@@ -79,8 +79,44 @@ def _schema() -> dict:
     }
 
 
-async def wanted_image(message: str) -> ImageRequest | None:
+#: Enough to resolve a "that" or a "one of those" without paying for the
+#: whole thread on a call whose entire job is a yes or a no.
+_HISTORY_TURNS = 6
+_HISTORY_CHARS = 700
+
+
+def _with_history(message: str, history: list[tuple[str, str]] | None) -> str:
+    """The message, with just enough of what came before it to read a
+    follow-up as one."""
+    if not history:
+        return message
+    lines = []
+    for role, content in history[-_HISTORY_TURNS:]:
+        text = (content or "").strip()
+        if not text:
+            continue
+        who = "User" if role == "user" else "Assistant"
+        lines.append(f"{who}: {text[:_HISTORY_CHARS]}")
+    if not lines:
+        return message
+    return (
+        "Earlier in this conversation:\n"
+        + "\n".join(lines)
+        + f"\n\nThe message to judge:\n{message}"
+    )
+
+
+async def wanted_image(
+    message: str, history: list[tuple[str, str]] | None = None
+) -> ImageRequest | None:
     """What picture this message is asking for, or None if it is not.
+
+    `history` is the recent turns as (role, content) pairs, oldest first.
+    The instructions have always told this to resolve "anything the
+    conversation makes clear" and it was never given a conversation, so
+    "now make it a picture" or "one of those, but at night" was judged as
+    if it were the first thing anybody had said. The gates learned this
+    same lesson already - see propose_guidance.
 
     Never raises: an image step that cannot make up its mind degrades to "no
     image", which is exactly what the mode did before this existed.
@@ -90,7 +126,7 @@ async def wanted_image(message: str) -> ImageRequest | None:
     try:
         result = await generate_structured(
             instructions=_INTENT_INSTRUCTIONS,
-            input_text=message,
+            input_text=_with_history(message, history),
             schema=_schema(),
             schema_name="image_request",
             fast=True,
