@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { useAuth } from "@/lib/auth";
-import { welcomeBackFor } from "@/lib/greeting";
+import { isFirstRun, welcomeBackFor } from "@/lib/greeting";
 import {
   importStashedTranscript,
   importedServerSnapshot,
@@ -82,7 +82,12 @@ function WelcomeBack() {
   // A brand-new account is being welcomed properly on /welcome; saying
   // "welcome back" to someone who has never been here is the kind of detail
   // that makes an app feel automated.
-  const eligible = !!user && user.onboarding_completed_at !== null;
+  //
+  // "Has finished onboarding" was the wrong test for that, because finishing
+  // onboarding is the last thing a brand-new account does before arriving
+  // here - the gate was open for precisely the person it was meant to stop.
+  // How long ago it finished is the test that works.
+  const eligible = !!user && !isFirstRun(user.onboarding_completed_at);
   const show = useSyncExternalStore(
     subscribe,
     () => eligible && claimTheGreeting(),

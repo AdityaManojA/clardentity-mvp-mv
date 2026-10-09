@@ -70,6 +70,9 @@ export type AnalyticsEvent =
   // useful number the demo produces: it says what people came to the
   // product wanting, rather than what they settled for typing.
   | "guest_demo_gated"
+  // How often the demo moves a question to a better companion, which is the
+  // number that says whether smart switching is worth what it costs there.
+  | "guest_demo_mode_switched"
   // Where they stop
   | "gate_shown"
   | "gate_answered"

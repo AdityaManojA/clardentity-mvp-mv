@@ -629,9 +629,12 @@ export function MessageInput({
           autoCorrect="on"
           autoCapitalize="sentences"
           placeholder={
-            disabled
-              ? disabledReason ?? "Select a mode to start typing"
-              : "Ask a question…"
+            // The fallback is deliberately neutral. It used to be "Select a
+            // mode to start typing", which is true of exactly one of the
+            // reasons this box gets disabled and actively wrong about the
+            // others - a caller that disabled it mid-answer got an
+            // instruction the user had already followed.
+            disabled ? disabledReason ?? "One moment…" : "Ask a question…"
           }
           title={
             touchKeyboard

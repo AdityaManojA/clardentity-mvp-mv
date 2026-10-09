@@ -1719,3 +1719,102 @@ class TestBootstrapIsOneRoundTrip:
         async with client() as c:
             res = await c.post(f"{API}/bootstrap", json={})
             assert res.status_code in (401, 403), res.text
+
+
+class TestASavedCallIsReachable:
+    """A call that saved but cannot be read is a call that vanished.
+
+    The endpoint's whole purpose is that the call survives hanging up. It
+    wrote its rows with no parent and never moved the conversation's leaf,
+    so the thread - which is a tree every reader walks from that leaf -
+    rendered empty. Caught end to end: the POST answered 201 with two
+    messages and GET /messages answered with none. Needs a database.
+    """
+
+    async def test_the_turns_chain_onto_the_thread_and_move_the_leaf(self):
+        from app.models import Conversation, Message
+
+        email = f"calltx-{uuid.uuid4().hex[:8]}@example.com"
+        password = "call-password-123"
+        async with client() as c:
+            reg = await c.post(
+                f"{API}/auth/register",
+                json={"email": email, "password": password,
+                      "display_name": "Caller", "accepted_terms": True},
+            )
+            if reg.status_code >= 500:
+                pytest.skip("no database available")
+            headers = {"Authorization": f"Bearer {reg.json()['access_token']}"}
+            ws = (await c.get(f"{API}/workspaces", headers=headers)).json()[0]
+            convo = (await c.post(f"{API}/chat/conversations",
+                                  json={"workspace_id": ws["id"]}, headers=headers)).json()
+
+            turns = [
+                {"role": "user", "content": "What is the boiling point of water?"},
+                {"role": "assistant", "content": "At sea level it is 100 degrees Celsius."},
+                {"role": "user", "content": "And at altitude?"},
+                {"role": "assistant", "content": "Lower, because the air presses less."},
+            ]
+            res = await c.post(f"{API}/chat/{convo['id']}/call-transcript",
+                               json={"mode": "knowing", "turns": turns}, headers=headers)
+            assert res.status_code == 201, res.text
+            assert len(res.json()) == 4
+
+            # The part that was broken: reading it back.
+            got = await c.get(f"{API}/chat/{convo['id']}/messages", headers=headers)
+            assert got.status_code == 200
+            rows = got.json()
+            rows = rows if isinstance(rows, list) else rows.get("items", [])
+            assert [m["content"] for m in rows] == [t["content"] for t in turns], (
+                "the saved call is not reachable from the conversation"
+            )
+
+            async with AsyncSessionLocal() as db:
+                saved = (await db.execute(
+                    select(Message).where(Message.conversation_id == uuid.UUID(convo["id"]))
+                    .order_by(Message.created_at)
+                )).scalars().all()
+                conv = (await db.execute(
+                    select(Conversation).where(Conversation.id == uuid.UUID(convo["id"]))
+                )).scalar_one()
+                # Chained, and the thread points at the end of the chain.
+                assert saved[0].parent_id is None
+                for earlier, later in zip(saved, saved[1:]):
+                    assert later.parent_id == earlier.id
+                assert conv.active_leaf_id == saved[-1].id
+                # Unscored, as a call must be.
+                assert all(m.confidence_band is None for m in saved)
+
+            await c.delete(f"{API}/auth/me", headers=headers)
+
+    async def test_a_second_call_continues_the_thread(self):
+        from app.models import Conversation, Message
+
+        email = f"calltx2-{uuid.uuid4().hex[:8]}@example.com"
+        async with client() as c:
+            reg = await c.post(
+                f"{API}/auth/register",
+                json={"email": email, "password": "call-password-123",
+                      "display_name": "Caller", "accepted_terms": True},
+            )
+            if reg.status_code >= 500:
+                pytest.skip("no database available")
+            headers = {"Authorization": f"Bearer {reg.json()['access_token']}"}
+            ws = (await c.get(f"{API}/workspaces", headers=headers)).json()[0]
+            convo = (await c.post(f"{API}/chat/conversations",
+                                  json={"workspace_id": ws["id"]}, headers=headers)).json()
+
+            for text in ("first call", "second call"):
+                r = await c.post(f"{API}/chat/{convo['id']}/call-transcript",
+                                 json={"mode": "knowing",
+                                       "turns": [{"role": "user", "content": text}]},
+                                 headers=headers)
+                assert r.status_code == 201
+
+            rows = (await c.get(f"{API}/chat/{convo['id']}/messages", headers=headers)).json()
+            rows = rows if isinstance(rows, list) else rows.get("items", [])
+            # Both calls on one thread, in order - not two orphan branches
+            # with only the newest visible.
+            assert [m["content"] for m in rows] == ["first call", "second call"]
+
+            await c.delete(f"{API}/auth/me", headers=headers)

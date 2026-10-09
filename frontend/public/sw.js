@@ -35,7 +35,15 @@
 // route now calling /bootstrap instead of three endpoints in a row. An old
 // bundle would keep making the three calls against a backend that has the
 // one, which works but is the slowness we just removed.
-const CACHE = "clardentity-shell-v7";
+//
+// v8: the end-to-end pass. "Skip for now" on the welcome questions was
+// discarding answers already typed - a bundle still doing that would keep
+// throwing away the one thing a new account tells us about itself.
+//
+// v9: smart switching in the demo and the new welcome copy. The demo's
+// client now sends smart_switching and reads a "switched" event; an old
+// bundle would send neither and show neither.
+const CACHE = "clardentity-shell-v10";
 
 // Only things that are content-addressed or genuinely static. HTML is not
 // here on purpose - a stale shell is how a deployed fix fails to reach

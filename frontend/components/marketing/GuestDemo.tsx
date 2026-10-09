@@ -71,6 +71,14 @@ const GATE_COPY: Record<string, { title: string; body: string }> = {
   },
 };
 
+/** A companion's display name, for the switch banner. */
+function labelOf(
+  modes: readonly { name: string; value: string }[],
+  value: string,
+): string {
+  return modes.find((m) => m.value === value)?.name ?? value;
+}
+
 /** One guest turn, shaped as the message the real list renders.
  *
  *  Everything the app knows and the demo does not is null, which the list
@@ -137,6 +145,12 @@ export function GuestDemo({
   const [phase, setPhase] = useState<Phase>("inviting");
   const [grown, setGrown] = useState(false);
   const [gate, setGate] = useState<string | null>(null);
+  /* Smart switching, as in the app and on by default. The demo used to have
+     neither the control nor anything behind it: a visitor who asked Finder
+     something that belonged in Reflect & Relieve got it answered in Finder,
+     where a signed-in user would have been moved. */
+  const [smartSwitching, setSmartSwitching] = useState(true);
+  const [switchedFrom, setSwitchedFrom] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -191,6 +205,7 @@ export function GuestDemo({
       const history = turns;
       setTurns([...history, { role: "user", content: message }]);
       setStreamingText("");
+      setSwitchedFrom(null);
       track("guest_demo_asked", { mode });
 
       const controller = new AbortController();
@@ -198,11 +213,18 @@ export function GuestDemo({
       let text = "";
 
       await askGuest(
-        { sessionId: guestSessionId(), mode, message, history },
+        { sessionId: guestSessionId(), mode, message, history, smartSwitching },
         {
           onDelta: (chunk) => {
             text += chunk;
             setStreamingText(text);
+          },
+          onSwitched: (from, to) => {
+            // Before any text, so the banner is up while the answer is
+            // being written rather than appearing under a finished one.
+            setSwitchedFrom(from);
+            setMode(to);
+            track("guest_demo_mode_switched", { from, to });
           },
           onDone: (done) => {
             setStreamingText(null);
@@ -227,7 +249,7 @@ export function GuestDemo({
         controller.signal,
       );
     },
-    [streamingText, turns, mode],
+    [streamingText, turns, mode, smartSwitching],
   );
 
   useEffect(() => {
@@ -341,10 +363,14 @@ export function GuestDemo({
         <div className="flex w-full max-w-[760px] flex-1 flex-col overflow-hidden">
           {phase === "inviting" && turns.length === 0 ? (
             <div className="flex flex-1 flex-col items-center justify-center text-center">
-              <p className="text-2xl font-medium text-white sm:text-3xl">Ask me something.</p>
-              <p className="mt-2 text-sm text-white/70">
-                No account. You&apos;re in {modeLabel}.
+              <p className="text-2xl font-medium text-white sm:text-3xl">
+                Hi, Welcome to Clardentity.
               </p>
+              {/* Which companion is listening, and nothing about not having
+                  an account - the way in is already on the screen, and
+                  leading with what the visitor lacks is a strange way to
+                  open. */}
+              <p className="mt-2 text-sm text-white/70">You&apos;re in {modeLabel}.</p>
             </div>
           ) : (
             <div ref={scrollRef} className="flex-1 overflow-y-auto pr-1">
@@ -424,6 +450,29 @@ export function GuestDemo({
                 </div>
               )}
 
+              {/* What just happened, and the way back. The app says this
+                  too: a switch the user cannot see or undo is the product
+                  deciding something on their behalf and not mentioning it. */}
+              {switchedFrom && (
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-xl border border-white/15 bg-white/[0.07] px-3 py-2 text-sm text-white/80">
+                  <span>
+                    Switched to {labelOf(modes, mode)} - it suits this question better.
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const back = switchedFrom;
+                      setSwitchedFrom(null);
+                      setMode(back);
+                      setSmartSwitching(false);
+                    }}
+                    className="font-medium text-white underline-offset-4 hover:underline"
+                  >
+                    Stay in {labelOf(modes, switchedFrom)}
+                  </button>
+                </div>
+              )}
+
               {/* The app's mode picker, not a row of pills that looks like
                   it. Nothing is locked here: the demo's whole argument is
                   that all eight are a question away. */}
@@ -458,6 +507,25 @@ export function GuestDemo({
                   track("guest_demo_gated", { feature });
                   setGate(feature);
                 }}
+                trailing={
+                  // Same control, same place as the app: beside the model
+                  // chip, with the other thing that describes how an answer
+                  // gets made.
+                  <button
+                    type="button"
+                    onClick={() => setSmartSwitching((on) => !on)}
+                    disabled={streamingText !== null}
+                    title={
+                      smartSwitching
+                        ? "A question that suits another companion is answered there, with a way back"
+                        : "Questions stay in the companion you picked"
+                    }
+                    className="flex h-8 shrink-0 items-center rounded-lg px-1.5 text-sm leading-[normal] text-ink-secondary transition-colors hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <span className="hidden sm:inline">Switching:&nbsp;</span>
+                    <span className="text-ink">{smartSwitching ? "Smart" : "Off"}</span>
+                  </button>
+                }
               />
             </div>
           )}

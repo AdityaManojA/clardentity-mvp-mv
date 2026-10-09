@@ -47,11 +47,21 @@ export type GuestHandlers = {
   onDelta: (text: string) => void;
   onDone: (done: GuestDone) => void;
   onError: (message: string) => void;
+  /** The question was answered in a better-suited companion than the one
+   *  selected. Fires before any text, so the banner is up while the answer
+   *  is still being written rather than appearing under a finished one. */
+  onSwitched?: (from: string, to: string) => void;
 };
 
 /** Ask one question. Resolves when the stream is finished. */
 export async function askGuest(
-  body: { sessionId: string; mode: string; message: string; history: GuestTurn[] },
+  body: {
+    sessionId: string;
+    mode: string;
+    message: string;
+    history: GuestTurn[];
+    smartSwitching?: boolean;
+  },
   handlers: GuestHandlers,
   signal?: AbortSignal,
 ): Promise<void> {
@@ -65,6 +75,7 @@ export async function askGuest(
         mode: body.mode,
         message: body.message,
         history: body.history,
+        smart_switching: body.smartSwitching ?? true,
       }),
       signal,
     });
@@ -110,7 +121,10 @@ export async function askGuest(
     }
     if (event === "delta") handlers.onDelta((parsed as { text: string }).text);
     else if (event === "done") handlers.onDone(parsed as GuestDone);
-    else if (event === "error") handlers.onError((parsed as { detail: string }).detail);
+    else if (event === "switched") {
+      const { from, to } = parsed as { from: string; to: string };
+      handlers.onSwitched?.(from, to);
+    } else if (event === "error") handlers.onError((parsed as { detail: string }).detail);
   };
 
   try {
