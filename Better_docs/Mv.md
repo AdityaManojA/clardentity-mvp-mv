@@ -62,7 +62,11 @@ Status key: ✅ Done · 🔄 Built, waiting on a setup step · 🔍 Built, needs
 | ✅ | Failed runs keep the report, screenshots, videos and traces for 14 days, with a summary of what failed |
 | 🔄 | Live tests against the real backend: built and skipping cleanly; waiting on the test accounts and secrets |
 | 🔄 | Screenshot comparison of 5 key screens: built; waiting on the first baseline run in CI |
-| ⬜ | Mobile tests for the chat's question cards (refined question, clarifying options, mode suggestion) |
+| ✅ | M24: "Did you mean" card: ask it reworded or keep your wording; never asked twice |
+| ✅ | M25: Clarifying options: tap an option, type your own (keyboard up), or skip; 7 long options all reachable |
+| ✅ | M26: "Why do you ask?" card: answer with the keyboard up, a fresh second round, skip |
+| ✅ | M27: Automatic companion switch: "Switched to…" notice, "Stay in…" undo, auto-dismiss, paid-companion upgrade |
+| 🔍 | With many options and the keyboard open, the "Something else" box may sit below the fold until scrolled (Aditya testing on a device) |
 
 ## 3. App improvements (mobile)
 
@@ -75,7 +79,7 @@ Status key: ✅ Done · 🔄 Built, waiting on a setup step · 🔍 Built, needs
 | ✅ | Phone Back button closes the menu instead of leaving the page |
 | ✅ | Chat box grows as you type (up to about five lines) instead of staying one line tall |
 | ✅ | The chat keeps following a new answer as it finishes loading, instead of stopping short of the end |
-| ✅ | iPhone: fixed the "Unchecked - caveats removed" label showing mirrored through every answer |
+| ✅ | Fixed the "Unchecked - caveats removed" label showing mirrored through every answer (now hidden outright, works in every browser; a test checks it) |
 | ✅ | Admin page no longer scrolls sideways on phones |
 | ✅ | Documents: the delete button is visible on phones (it only appeared on mouse hover) |
 | ✅ | Easier-to-tap buttons across sign-up, password reset, profile, settings, documents, search and admin (same look) |
@@ -87,6 +91,7 @@ Status key: ✅ Done · 🔄 Built, waiting on a setup step · 🔍 Built, needs
 | ✅ | Swipe left to close the menu on phones (follows the finger; short drags spring back). No swipe-to-open, so it never clashes with the iPhone Back gesture |
 | ✅ | Logging out on desktop could leave a spinner instead of the login page (a double redirect); fixed |
 | ✅ | Recent chats in the menu: rows and the ⋮ button 36px on phones (were 27px and 24px); desktop unchanged |
+| ✅ | Question cards: easier-to-tap buttons (same look), answer options 36px rows, upgrade dialog close button |
 | ⬜ | Fix an outdated code comment about phone scaling |
 
 ## 4. Mobile production readiness
@@ -207,6 +212,10 @@ Status key: ✅ Done · 🔄 Built, waiting on a setup step · 🔍 Built, needs
 | M20 | Documents | Upload; delete visible + tappable on touch; upload error; attachment search incl. special characters | T07 | Yes |
 | M21 | History search | Result links to its chat; empty state; special characters reach the server intact | T05 | No |
 | M22 | Admin | Admin sees dashboard + menu link; ordinary user refused, no link | T13 | Yes |
+| M24 | Refined question | Card replaces the answer; nothing written; resend reworded or original with `refined_confirmed` | T03 | Yes |
+| M25 | Clarifying options | Option / typed / skip resend with `clarifying_confirmed`; 36px option rows; 44px buttons | T03 | Yes |
+| M26 | Context question | Autofocus; Send blocked empty; round counted; fresh second round; skip sets `context_acknowledged` | T03 | Yes |
+| M27 | Mode suggestion | Resent in suggested mode with `mode_confirmed`; toast + undo; auto-dismiss; paid → upgrade dialog | T03 | Yes |
 | M23 | Offline after load | Notice; content kept; action fails with a message; recovers without refresh; chat draft kept | T12 | Yes |
 | A11Y-1..3 | Accessibility | No serious/critical WCAG A/AA violations on login, workspaces, open menu | — | No |
 | V1..V5 | Screenshots | Login, workspaces, menu, chat, settings within 1% of baseline | — | No |

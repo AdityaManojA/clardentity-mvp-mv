@@ -329,7 +329,9 @@ export async function smallTargets(page: Page, scope: string) {
  *  centre with elementFromPoint until something else is on top. Counts
  *  pseudo-element hit areas, and stops at a neighbour that overlaps. */
 export async function tapArea(loc: Locator) {
-  await loc.scrollIntoViewIfNeeded();
+  // centred, as a reader would have it - "if needed" parks the element on a
+  // scroll box's edge, where its reach is clipped by the scroller
+  await loc.evaluate((el) => el.scrollIntoView({ block: "center", inline: "nearest" }));
   return loc.evaluate((el) => {
     const r = el.getBoundingClientRect();
     const cx = r.left + r.width / 2;
@@ -347,9 +349,10 @@ export async function tapArea(loc: Locator) {
   });
 }
 
-export async function expectTappable(loc: Locator, what: string) {
+/** min 44 by default; 36 for rows stacked edge to edge (recents, answer options) */
+export async function expectTappable(loc: Locator, what: string, min = 44) {
   const a = await tapArea(loc);
-  expect.soft(Math.min(a.w, a.h), `${what}: tap area ${a.w}x${a.h}`).toBeGreaterThanOrEqual(44);
+  expect.soft(Math.min(a.w, a.h), `${what}: tap area ${a.w}x${a.h}`).toBeGreaterThanOrEqual(min);
 }
 
 /** A horizontal finger drag on the carousel, as the pointer events the

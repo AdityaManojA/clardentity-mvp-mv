@@ -47,7 +47,10 @@ export function ClarifyingOptionsCard({
               disabled={busy}
               onClick={() => onAnswer(option)}
               className={cx(
-                "flex w-full items-center gap-2.5 px-3.5 py-2 text-left text-sm transition-colors",
+                // 36px rows on a touch screen (screen pixels, hence the zoom
+                // divide): stacked edge to edge, so a hit area can't reach
+                // past the row without landing on the next answer.
+                "flex w-full items-center gap-2.5 px-3.5 py-2 text-left text-sm transition-colors pointer-coarse:min-h-[calc(36px/var(--ui-zoom))]",
                 "hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-50",
               )}
             >
@@ -62,7 +65,9 @@ export function ClarifyingOptionsCard({
 
       {customOpen ? (
         <form
-          className="flex items-center gap-2 border-t border-hairline px-3.5 py-2"
+          // Roomier on a touch screen: the card clips at its edge, and the
+          // buttons' tap areas reach past them into this padding.
+          className="flex items-center gap-2 border-t border-hairline px-3.5 py-2 pointer-coarse:py-3.5"
           onSubmit={(event) => {
             event.preventDefault();
             const trimmed = custom.trim();
@@ -81,18 +86,18 @@ export function ClarifyingOptionsCard({
           <button
             type="submit"
             disabled={busy || !custom.trim()}
-            className="shrink-0 rounded-full bg-brand px-3 py-1 text-xs font-medium text-white transition-colors hover:bg-brand-dark disabled:opacity-40"
+            className="tap-area shrink-0 rounded-full bg-brand px-3 py-1 text-xs font-medium text-white transition-colors hover:bg-brand-dark disabled:opacity-40"
           >
             {busy ? "Asking…" : "Send"}
           </button>
         </form>
       ) : (
-        <div className="flex items-center gap-2 border-t border-hairline px-3.5 py-2">
+        <div className="flex items-center gap-2 border-t border-hairline px-3.5 py-2 pointer-coarse:py-3.5">
           <button
             type="button"
             onClick={() => setCustomOpen(true)}
             disabled={busy}
-            className="rounded-full px-2.5 py-1 text-xs text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink disabled:opacity-60"
+            className="tap-area rounded-full px-2.5 py-1 text-xs text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink disabled:opacity-60"
           >
             Something else
           </button>
@@ -100,7 +105,7 @@ export function ClarifyingOptionsCard({
             type="button"
             onClick={onSkip}
             disabled={busy}
-            className="ml-auto rounded-full px-2.5 py-1 text-xs text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink disabled:opacity-60"
+            className="tap-area ml-auto rounded-full px-2.5 py-1 text-xs text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink disabled:opacity-60"
           >
             Answer without this
           </button>

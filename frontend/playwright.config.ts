@@ -21,7 +21,7 @@ const PORT = Number(process.env.E2E_PORT ?? 3100);
 const BASE_URL = process.env.E2E_BASE_URL ?? `http://localhost:${PORT}`;
 const LIVE_URL = process.env.E2E_LIVE_BASE_URL;
 const PHONE = { width: 375, height: 812 };
-const MOBILE_SPECS = /(mobile|chat|screens|a11y|offline|visual)\.spec\.ts/;
+const MOBILE_SPECS = /(mobile|chat|gates|screens|a11y|offline|visual)\.spec\.ts/;
 const skipTags = process.env.E2E_VISUAL === "1" ? /@live/ : /@live|@visual/;
 
 export default defineConfig({

@@ -195,3 +195,26 @@ test.describe("modes", () => {
     }
   });
 });
+
+test("M14b answer card: the unchecked side stays hidden until flipped, in every engine @M14", async ({ page }) => {
+  const t = thread(1);
+  t[1].counterfactual_content = "The case against, with the caveats taken out.";
+  await signIn(page, {
+    messages: t,
+    handlers: { "POST /chat/c1/messages/ta0/devils-advocate": () => ({ body: { counterfactual_content: t[1].counterfactual_content } }) },
+  });
+  await page.goto("/chat/c1");
+  await expect(page.locator(sel.composer)).toBeEditable({ timeout: 30_000 });
+  const label = page.getByText("Unchecked - caveats removed");
+  const front = page.locator(`${sel.message}[data-role="assistant"]`).getByText("Answer 1.");
+  // was painted, mirrored, through the front of every answer in WebKit
+  await expect(label).toBeHidden();
+  await expect(front).toBeVisible();
+
+  await page.getByRole("button", { name: "Flip to the unchecked version" }).tap();
+  await expect(label).toBeVisible();
+  await expect(front).toBeHidden();
+  await page.getByRole("button", { name: "Show the checked answer" }).tap();
+  await expect(label).toBeHidden();
+  await expect(front).toBeVisible();
+});

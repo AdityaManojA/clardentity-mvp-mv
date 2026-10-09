@@ -64,7 +64,7 @@ export function ContextQuestionCard({
           onClick={() => onAnswer(value.trim())}
           disabled={busy || !answered}
           className={cx(
-            "rounded-full bg-brand px-3.5 py-1.5 text-xs font-medium text-white",
+            "tap-area rounded-full bg-brand px-3.5 py-1.5 text-xs font-medium text-white",
             "transition-colors hover:bg-brand-dark disabled:opacity-40",
           )}
         >
@@ -74,7 +74,7 @@ export function ContextQuestionCard({
           type="button"
           onClick={onSkip}
           disabled={busy}
-          className="rounded-full px-3 py-1.5 text-xs text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink disabled:opacity-60"
+          className="tap-area rounded-full px-3 py-1.5 text-xs text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink disabled:opacity-60"
         >
           Answer without this
         </button>
