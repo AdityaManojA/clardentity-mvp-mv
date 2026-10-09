@@ -147,7 +147,10 @@ export function WorkspaceList() {
           <Spinner className="text-ink-muted" />
         </div>
       ) : (
-        <ul className="mt-12 grid gap-4 lg:grid-cols-2">
+        // grid-cols-1, not the implicit track: an implicit column is sized to
+        // its widest card, so one long name pushed every card past a phone's
+        // edge and the truncate never engaged.
+        <ul className="mt-12 grid grid-cols-1 gap-4 lg:grid-cols-2">
           {composing && (
             <li>
               <form

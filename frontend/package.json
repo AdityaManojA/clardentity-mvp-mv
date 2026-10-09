@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:e2e": "playwright test",
+    "test:e2e:mobile": "playwright test --project=mobile",
+    "test:e2e:regress": "playwright test -g \"@critical|@T01|@T03|@T05|@T07|@T09|@T12|@T13\""
   },
   "dependencies": {
     "dictionary-en": "^4.0.0",
@@ -18,6 +21,7 @@
     "react-dom": "19.2.4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

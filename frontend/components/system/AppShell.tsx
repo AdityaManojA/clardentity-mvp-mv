@@ -472,7 +472,91 @@ export function AppShell({ children }: { children: ReactNode }) {
   // Bumped after a conversation is created or deleted here, so the recents
   // list refetches without the sidebar owning the list itself.
   const [recentsKey, setRecentsKey] = useState(0);
-  const close = () => setMobileOpen(false);
+
+  /* The drawer is a modal on a phone, so it behaves like one: it owns focus
+     while open, Escape closes it, and the phone's Back button closes it
+     rather than leaving the page under it. Back needs a history entry to
+     consume, so opening pushes one (same URL, the router's own state copied
+     so it restores the page untouched). */
+  const drawerRef = useRef<HTMLElement>(null);
+  const openNavRef = useRef<HTMLButtonElement>(null);
+  const drawerEntry = useRef(false);
+
+  // Closed by navigating somewhere from inside it: the link pushes on top of
+  // the drawer's entry, which is skipped on the way back (below).
+  const close = () => {
+    drawerEntry.current = false;
+    setMobileOpen(false);
+  };
+  // Closed in place (X, backdrop, Escape): spend the entry, and let the
+  // popstate close it, so Back afterwards goes where it would have anyway.
+  const dismiss = useCallback(() => {
+    if (drawerEntry.current) window.history.back();
+    else setMobileOpen(false);
+  }, []);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    if (!drawerEntry.current) {
+      window.history.pushState({ ...window.history.state, clardentityDrawer: true }, "");
+      drawerEntry.current = true;
+    }
+    function onPop() {
+      drawerEntry.current = false;
+      setMobileOpen(false);
+    }
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, [mobileOpen]);
+
+  // An entry left behind by a drawer that closed by navigating is the same
+  // page twice; Back steps over it instead of appearing to do nothing.
+  useEffect(() => {
+    function onPop() {
+      if (window.history.state?.clardentityDrawer && !drawerEntry.current) window.history.back();
+    }
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const drawer = drawerRef.current;
+    const opener = openNavRef.current;
+    drawer?.querySelector<HTMLElement>('button[aria-label="Close navigation"]')?.focus();
+    function onKey(e: KeyboardEvent) {
+      if (!drawer) return;
+      if (e.key === "Escape") {
+        // An open menu inside the drawer (workspaces, account) closes first.
+        if (drawer.querySelector('[aria-expanded="true"]')) return;
+        e.preventDefault();
+        dismiss();
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const items = [
+        ...drawer.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      ].filter((el) => el.offsetParent !== null);
+      if (items.length === 0) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      const inside = drawer.contains(document.activeElement);
+      if (e.shiftKey && (!inside || document.activeElement === first)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (!inside || document.activeElement === last)) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      opener?.focus();
+    };
+  }, [mobileOpen, dismiss]);
 
   // A chat names itself after its first answer (see ChatView's final
   // handler): refresh the recents list and, if it's the one in view, the
@@ -657,16 +741,23 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="fixed inset-0 z-40 lg:hidden">
           <button
             aria-label="Close navigation"
-            onClick={close}
+            tabIndex={-1}
+            onClick={dismiss}
             className="absolute inset-0 bg-black/40"
           />
-          <aside className="absolute inset-y-0 left-0 flex w-[var(--sidebar-width)] flex-col border-r border-hairline bg-surface-muted">
+          <aside
+            ref={drawerRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Navigation"
+            className="absolute inset-y-0 left-0 flex w-[var(--sidebar-width)] flex-col border-r border-hairline bg-surface-muted"
+          >
             <div className="flex h-[var(--topbar-height)] items-center justify-between border-b border-hairline px-4">
               <span className="text-sm font-semibold tracking-tight text-ink">
                 Clardentity
               </span>
               <button
-                onClick={close}
+                onClick={dismiss}
                 aria-label="Close navigation"
                 className="rounded-md p-1.5 text-ink-muted hover:bg-surface-hover"
               >
@@ -691,8 +782,10 @@ export function AppShell({ children }: { children: ReactNode }) {
               controls, and inferring which one to run from a JS media query
               means the first render can pick wrong. */}
           <button
+            ref={openNavRef}
             onClick={() => setMobileOpen(true)}
             aria-label="Open navigation"
+            aria-expanded={mobileOpen}
             className="rounded-md p-1.5 text-ink-secondary hover:bg-surface-hover lg:hidden"
           >
             <Icon path={icons.menu} />
