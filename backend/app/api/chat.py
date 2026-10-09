@@ -2350,16 +2350,32 @@ async def save_call_transcript(
     except InvalidModeError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
+    # Chained onto the thread, not dropped beside it. A conversation is a
+    # tree and every reader of it walks parent links from the conversation's
+    # leaf, so rows written with no parent and no leaf pointer are
+    # unreachable: the call saved perfectly and the thread rendered empty,
+    # which is the exact outcome the docstring above says this endpoint
+    # exists to prevent. Found end-to-end - the POST returned two messages
+    # and GET /messages returned none.
+    parent_id = conversation.active_leaf_id
     saved: list[Message] = []
     for turn in payload.turns:
         message = Message(
             conversation_id=conversation.id,
+            parent_id=parent_id,
             role=turn.role,
             content=clean_output(turn.content),
             mode_used=mode,
         )
         db.add(message)
+        await db.flush()
+        parent_id = message.id
         saved.append(message)
+
+    if saved:
+        # A call appended to an existing conversation continues it; the leaf
+        # has to move or the next ordinary message forks off the old one.
+        conversation.active_leaf_id = saved[-1].id
 
     await db.commit()
     for message in saved:
