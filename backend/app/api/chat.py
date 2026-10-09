@@ -52,6 +52,7 @@ from app.services.thinking_review import review_thinking
 from app.services import model_catalog
 from app.services.model_router import stream_for as stream_for_model
 from app.services.guidance import MAX_CONTEXT_ROUNDS, propose_guidance
+from app.services.image_generation import ImageRequest
 from app.services.image_generation import generate as generate_image
 from app.services.image_generation import wanted_image
 from app.services.output_cleanup import clean_output
@@ -977,6 +978,13 @@ async def send_message(
         else:
             prefetch.cancel()
 
+    # Whether this turn is asking for a picture, and whether that has been
+    # decided yet. A new message decides it before the gates (so a drawing
+    # request is not stopped and asked about its wording); a regenerate
+    # skips the gates entirely and decides it further down.
+    image_request: ImageRequest | None = None
+    image_checked = False
+
     if payload.regenerate_of is not None:
         # An alternate answer to a question already asked and settled - never
         # a new question, so none of the pre-answer gates apply a second
@@ -1111,6 +1119,21 @@ async def send_message(
         # follow, and only once (mode_confirmed).
         answered_a_gate = "(Clardentity asked:" in effective_content
 
+        # Whether this is a request for a picture, decided *before* the
+        # gates rather than after them. All four gates below are about the
+        # wording or the framing of a question, and a drawing request has
+        # neither problem: asked for a logo, the product would reply "did
+        # you mean..." and stop, having drawn nothing. The gate is right
+        # about prose and wrong about pictures, so pictures go round it.
+        #
+        # Computed here and reused later rather than run twice - it is a
+        # small-model call. The only difference from the later position is
+        # the "(Attached: ...)" note appended further down, which is not
+        # part of what the user asked for.
+        if mode == "creative":
+            image_request = await wanted_image(effective_content)
+        image_checked = True
+
         # Sharpening the phrasing comes before either of the checks below -
         # judging whether more context or a different mode is needed against
         # a question that's still genuinely unclear is itself unreliable, so
@@ -1119,6 +1142,7 @@ async def send_message(
         if (
             not payload.refined_confirmed
             and not answered_a_gate
+            and image_request is None
             and guidance
             and guidance.get("refined_question")
         ):
@@ -1142,6 +1166,7 @@ async def send_message(
         if (
             not payload.clarifying_confirmed
             and not answered_a_gate
+            and image_request is None
             and guidance
             and guidance.get("clarifying_options")
         ):
@@ -1173,6 +1198,7 @@ async def send_message(
         if (
             not payload.context_acknowledged
             and not answered_a_gate
+            and image_request is None
             and payload.context_rounds < MAX_CONTEXT_ROUNDS
             and guidance
             and guidance.get("context_question")
@@ -1187,7 +1213,12 @@ async def send_message(
             _abandon(prefetch_task)
             return EventSourceResponse(context_gate())
 
-        if not payload.mode_confirmed and guidance and guidance.get("suggested_mode"):
+        if (
+            not payload.mode_confirmed
+            and image_request is None
+            and guidance
+            and guidance.get("suggested_mode")
+        ):
             # Nothing is persisted on this path. The user message is not
             # saved, no answer is generated, and the turn is exactly where it
             # was - so picking "stay" costs one round trip and picking
@@ -1361,10 +1392,12 @@ async def send_message(
     # printed directly above the image it had just generated. The answer has
     # to be written by a model that knows.
     #
-    # The intent check is a small-model call on creative turns only. It is
-    # awaited here rather than raced, because nothing downstream can start
-    # without the instructions it changes.
-    image_request = await wanted_image(effective_content) if mode == "creative" else None
+    # The intent check is a small-model call on creative turns only. A new
+    # message has already had it, before the gates, so that a request for a
+    # picture is not stopped and asked about its wording; only the
+    # regenerate path arrives here without an answer.
+    if not image_checked and mode == "creative":
+        image_request = await wanted_image(effective_content)
     image_task: asyncio.Task[dict | None] | None = (
         asyncio.create_task(generate_image(image_request.prompt, current_user.id))
         if image_request

@@ -1,4 +1,4 @@
-"""Long-lived user profile: an evolving personality.md plus the 25-role
+"""Long-lived user profile: an evolving personality.md plus the role
 classification behind it.
 
 Built by inference from the user's own conversations and uploaded documents,
@@ -174,7 +174,7 @@ _SCHEMA = {
         },
         "roles": {
             "type": "array",
-            "description": "Roles from the 25-role taxonomy that this person occupies.",
+            "description": "Roles from the role taxonomy that this person occupies.",
             "items": {
                 "type": "object",
                 "properties": {
@@ -219,7 +219,7 @@ async def infer_profile(evidence: str) -> InferredProfile | None:
             continue
         role_id = entry.get("role_id")
         role = taxonomy.get_role(role_id)
-        # Anything outside the 25-role taxonomy is dropped rather than stored.
+        # Anything outside the taxonomy is dropped rather than stored.
         if role is None or role.id in seen:
             continue
         seen.add(role.id)

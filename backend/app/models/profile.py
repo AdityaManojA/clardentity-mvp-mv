@@ -15,7 +15,7 @@ class UserProfile(Base):
     few open-ended things they chose to tell us at first run (see
     `onboarding_answers`) - those are evidence like any other message, not a
     form that fills fields directly. `personality_md` is the human-readable
-    artifact the user can read and edit; `roles` is the structured 25-role
+    artifact the user can read and edit; `roles` is the structured role
     classification behind it.
     """
 

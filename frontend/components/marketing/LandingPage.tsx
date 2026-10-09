@@ -288,19 +288,37 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
           <Link href="/" aria-label="Clardentity">
             <Wordmark size={NAV_WORDMARK} tone={INK} mark={PLUM} />
           </Link>
-          <Link
-            // Someone who is already signed in and lands here - which is
-            // where Back from the app now goes - must not be offered a login
-            // button. It reads as having been signed out, which is the same
-            // confusion the back button used to cause outright. The design's
-            // wording is the way out of that: "Start exploring" is true of
-            // both, and goes wherever that person's next step actually is.
-            href={enter}
-            className="inline-flex items-center rounded-[37px] border px-[12px] py-[4px] transition-colors hover:bg-black/[0.03]"
-            style={{ borderColor: OUTLINE, color: OUTLINE, fontSize: "clamp(16px, 1.65vw, 24px)" }}
-          >
-            Start exploring
-          </Link>
+          <span className="flex items-center gap-4 sm:gap-5">
+            {/* The way back, for someone who already has an account. Only
+                when they are signed out: offering "Log in" to a signed-in
+                visitor reads as having been signed out, which is the
+                confusion the Back button used to cause outright. Quiet, and
+                to the left, because the page is addressed to people who
+                have not signed up yet - this is for the minority who have,
+                and who were previously told only to start exploring. */}
+            {!signedIn && (
+              <Link
+                href="/login"
+                className="transition-opacity hover:opacity-70"
+                style={{ color: OUTLINE, fontSize: "clamp(15px, 1.5vw, 20px)" }}
+              >
+                Log in
+              </Link>
+            )}
+            <Link
+              // Someone who is already signed in and lands here - which is
+              // where Back from the app now goes - must not be offered a login
+              // button. It reads as having been signed out, which is the same
+              // confusion the back button used to cause outright. The design's
+              // wording is the way out of that: "Start exploring" is true of
+              // both, and goes wherever that person's next step actually is.
+              href={enter}
+              className="inline-flex items-center rounded-[37px] border px-[12px] py-[4px] transition-colors hover:bg-black/[0.03]"
+              style={{ borderColor: OUTLINE, color: OUTLINE, fontSize: "clamp(16px, 1.65vw, 24px)" }}
+            >
+              Start exploring
+            </Link>
+          </span>
         </nav>
 
         <div className="mx-auto mt-[96px] flex w-full max-w-[1032.46px] flex-col items-center sm:mt-[171px]">

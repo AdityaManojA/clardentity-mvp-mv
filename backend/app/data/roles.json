@@ -1,5 +1,5 @@
 {
-  "_source": "Clardentity 25-role user psyche classification (client diagrams, 2026-08-05). Each role is a standing relationship or position a person occupies. Qualifiers marked exclusive:true admit exactly one value; the rest may take several.",
+  "_source": "Clardentity role classification for the user psyche (client diagrams, 2026-08-05), plus 'teacher' (2026-10-09), which the original 25 omitted while including 'student'. Each role is a standing relationship or position a person occupies. Qualifiers marked exclusive:true admit exactly one value; the rest may take several.",
   "roles": [
     {
       "id": "family_member",
@@ -20,7 +20,13 @@
           "id": "parent_tie",
           "label": "Parent relationship",
           "exclusive": false,
-          "options": ["biological", "step", "adopted", "foster", "in-law"]
+          "options": [
+            "biological",
+            "step",
+            "adopted",
+            "foster",
+            "in-law"
+          ]
         }
       ]
     },
@@ -35,19 +41,30 @@
           "id": "gender",
           "label": "Brother or sister",
           "exclusive": true,
-          "options": ["brother", "sister"]
+          "options": [
+            "brother",
+            "sister"
+          ]
         },
         {
           "id": "seniority",
           "label": "Younger or elder",
           "exclusive": true,
-          "options": ["younger", "elder"]
+          "options": [
+            "younger",
+            "elder"
+          ]
         },
         {
           "id": "tie",
           "label": "Kind of sibling",
           "exclusive": false,
-          "options": ["full", "half", "step", "adoptive"]
+          "options": [
+            "full",
+            "half",
+            "step",
+            "adoptive"
+          ]
         }
       ]
     },
@@ -62,19 +79,29 @@
           "id": "gender",
           "label": "Brother or sister",
           "exclusive": true,
-          "options": ["brother", "sister"]
+          "options": [
+            "brother",
+            "sister"
+          ]
         },
         {
           "id": "seniority",
           "label": "Younger or elder",
           "exclusive": true,
-          "options": ["younger", "elder"]
+          "options": [
+            "younger",
+            "elder"
+          ]
         },
         {
           "id": "lineage",
           "label": "Lineage",
           "exclusive": false,
-          "options": ["maternal", "paternal", "adoptive"]
+          "options": [
+            "maternal",
+            "paternal",
+            "adoptive"
+          ]
         }
       ]
     },
@@ -89,19 +116,29 @@
           "id": "gender",
           "label": "Niece or nephew",
           "exclusive": true,
-          "options": ["niece", "nephew"]
+          "options": [
+            "niece",
+            "nephew"
+          ]
         },
         {
           "id": "seniority",
           "label": "Younger or elder",
           "exclusive": true,
-          "options": ["younger", "elder"]
+          "options": [
+            "younger",
+            "elder"
+          ]
         },
         {
           "id": "lineage",
           "label": "Lineage",
           "exclusive": false,
-          "options": ["maternal", "paternal", "adoptive"]
+          "options": [
+            "maternal",
+            "paternal",
+            "adoptive"
+          ]
         }
       ]
     },
@@ -116,13 +153,20 @@
           "id": "gender",
           "label": "Aunt or uncle",
           "exclusive": true,
-          "options": ["aunt", "uncle"]
+          "options": [
+            "aunt",
+            "uncle"
+          ]
         },
         {
           "id": "lineage",
           "label": "Lineage",
           "exclusive": false,
-          "options": ["maternal", "paternal", "adoptive"]
+          "options": [
+            "maternal",
+            "paternal",
+            "adoptive"
+          ]
         }
       ]
     },
@@ -165,6 +209,27 @@
       "description": "As a student.",
       "group": "education",
       "qualifiers": []
+    },
+    {
+      "id": "teacher",
+      "index": 26,
+      "label": "Teacher",
+      "description": "As someone who teaches others - in a school, a college or university, a training room, privately, or on the job.",
+      "group": "education",
+      "qualifiers": [
+        {
+          "id": "setting",
+          "label": "Where they teach",
+          "exclusive": false,
+          "options": [
+            "school",
+            "college or university",
+            "vocational or training",
+            "private tuition",
+            "workplace"
+          ]
+        }
+      ]
     },
     {
       "id": "dependent",
@@ -214,13 +279,22 @@
           "id": "sector",
           "label": "Sector",
           "exclusive": false,
-          "options": ["government", "private", "corporate", "NGO", "semi-government"]
+          "options": [
+            "government",
+            "private",
+            "corporate",
+            "NGO",
+            "semi-government"
+          ]
         },
         {
           "id": "responsibility",
           "label": "Responsibility",
           "exclusive": true,
-          "options": ["independent contributor", "team leader"]
+          "options": [
+            "independent contributor",
+            "team leader"
+          ]
         }
       ]
     },
@@ -284,7 +358,14 @@
           "id": "relation",
           "label": "In-law relation",
           "exclusive": false,
-          "options": ["parent", "child", "sibling", "cousin", "nibling", "pibling"]
+          "options": [
+            "parent",
+            "child",
+            "sibling",
+            "cousin",
+            "nibling",
+            "pibling"
+          ]
         }
       ]
     },
@@ -299,7 +380,14 @@
           "id": "relation",
           "label": "Former in-law relation",
           "exclusive": false,
-          "options": ["parent", "child", "sibling", "cousin", "nibling", "pibling"]
+          "options": [
+            "parent",
+            "child",
+            "sibling",
+            "cousin",
+            "nibling",
+            "pibling"
+          ]
         }
       ]
     },

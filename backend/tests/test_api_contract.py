@@ -1471,3 +1471,160 @@ class TestPreviewAccess:
                 await db.execute(delete(Workspace).where(Workspace.owner_id == user_id))
                 await db.execute(delete(User).where(User.id == user_id))
                 await db.commit()
+
+
+class TestPicturesGoRoundTheGates:
+    """Asking for a picture must produce a picture, not a question about the
+    wording of the request.
+
+    All four pre-answer gates are about prose: sharpen the phrasing, pick an
+    option, add context, try another companion. None of them has anything
+    useful to say about "draw me a logo", and the one that fires stops the
+    turn and draws nothing - which is what Co-Creative did. The intent check
+    therefore runs before the gates, and the gates stand down for it.
+
+    Both halves live in one test on purpose. The drawing request runs a turn
+    to completion, and a completed turn leaves pooled connections bound to
+    this test's event loop; as a separate test the second half then failed
+    with "Event loop is closed" - in the wrong place, for the wrong reason.
+    Needs a database.
+    """
+
+    async def _fixture(self):
+        from datetime import UTC, datetime
+
+        from app.models import Conversation
+
+        email = f"imggate-{uuid.uuid4().hex[:8]}@example.com"
+        password = "gate-password-123"
+        async with AsyncSessionLocal() as db:
+            # Co-Creative is a preview companion, so an account that has not
+            # opened the preview is refused at 402 long before any gate.
+            user = User(
+                email=email,
+                password_hash=hash_password(password),
+                preview_unlocked_at=datetime.now(UTC),
+            )
+            db.add(user)
+            await db.flush()
+            ws = Workspace(owner_id=user.id, name="t")
+            db.add(ws)
+            await db.flush()
+            db.add(WorkspaceMember(workspace_id=ws.id, user_id=user.id, role="owner"))
+            prose = Conversation(workspace_id=ws.id, title="t")
+            drawing = Conversation(workspace_id=ws.id, title="t")
+            db.add(prose)
+            db.add(drawing)
+            await db.commit()
+            return email, password, user.id, prose.id, drawing.id
+
+    async def test_pictures_skip_the_gates_and_prose_does_not(self, monkeypatch):
+        from app.api import chat as chat_api
+        from app.models import Message
+        from app.services.image_generation import ImageRequest
+
+        try:
+            email, password, user_id, prose_id, drawing_id = await self._fixture()
+        except Exception as exc:  # noqa: BLE001
+            if "connect" not in str(exc).lower() and "database" not in str(exc).lower():
+                raise
+            pytest.skip("no database available")
+
+        # Guidance with something to say on every gate at once - the worst
+        # case, and the one that decides whether "before the gates" really
+        # means before all of them.
+        async def fake_guidance(question, mode, history=None):
+            return {
+                "context_question": "What is the logo for?",
+                "suggested_mode": "knowing",
+                "mode_reason": "This looks factual.",
+                "refined_question": "Did you mean a wordmark?",
+                "refinement_reason": "Ambiguous.",
+                "clarifying_question": "Which style?",
+                "clarifying_options": ["Flat", "Hand-drawn"],
+            }
+
+        wants_picture = {"value": False}
+
+        async def fake_wanted_image(message):
+            return ImageRequest(prompt="a minimal fox logo", only=True) if wants_picture["value"] else None
+
+        drawn: list[str] = []
+
+        async def fake_generate(prompt, user_id_):
+            drawn.append(prompt)
+            return {
+                "id": "00000000-0000-0000-0000-000000000001",
+                "owner": str(user_id_),
+                "prompt": prompt,
+            }
+
+        async def fake_title(question, gist, fallback):
+            return fallback or "t"
+
+        async def fake_facts(db, user_id_, message):
+            return None
+
+        monkeypatch.setattr(chat_api, "propose_guidance", fake_guidance)
+        monkeypatch.setattr(chat_api, "wanted_image", fake_wanted_image)
+        monkeypatch.setattr(chat_api, "generate_image", fake_generate)
+        monkeypatch.setattr(chat_api, "name_conversation", fake_title)
+        monkeypatch.setattr(chat_api, "capture_stated_facts", fake_facts)
+
+        try:
+            async with client() as c:
+                login = await c.post(
+                    f"{API}/auth/login", json={"email": email, "password": password}
+                )
+                if login.status_code != 200:
+                    pytest.skip("login unavailable")
+                headers = {"Authorization": f"Bearer {login.json()['access_token']}"}
+
+                # Prose in the same companion still meets the gates, so the
+                # fix is "pictures go round them" rather than "Co-Creative
+                # no longer has any".
+                prose = await c.post(
+                    f"{API}/chat/{prose_id}/messages",
+                    json={"content": "Help me write a short bio", "mode": "creative"},
+                    headers=headers,
+                )
+                # Whichever gate is first in the order - the point is that
+                # one of them still stops a prose turn in this companion.
+                assert any(
+                    gate in prose.text
+                    for gate in (
+                        "refined_question",
+                        "clarifying_options",
+                        "context_question",
+                        "mode_suggestion",
+                    )
+                ), prose.text[:200]
+                assert drawn == [], "nothing was asked for, so nothing should be drawn"
+
+                wants_picture["value"] = True
+                drawing = await c.post(
+                    f"{API}/chat/{drawing_id}/messages",
+                    json={"content": "Draw me a minimal fox logo", "mode": "creative"},
+                    headers=headers,
+                )
+                body = drawing.text
+
+            for gate in (
+                "context_question",
+                "mode_suggestion",
+                "refined_question",
+                "clarifying_options",
+            ):
+                assert gate not in body, f"a drawing request was stopped by the {gate} gate"
+            assert drawn == ["a minimal fox logo"], "the picture was never started"
+        finally:
+            from app.models import Conversation as _Conversation
+
+            async with AsyncSessionLocal() as db:
+                for cid in (prose_id, drawing_id):
+                    await db.execute(delete(Message).where(Message.conversation_id == cid))
+                    await db.execute(delete(_Conversation).where(_Conversation.id == cid))
+                await db.execute(delete(WorkspaceMember).where(WorkspaceMember.user_id == user_id))
+                await db.execute(delete(Workspace).where(Workspace.owner_id == user_id))
+                await db.execute(delete(User).where(User.id == user_id))
+                await db.commit()

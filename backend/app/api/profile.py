@@ -107,7 +107,7 @@ async def set_learning_role(
 
 @router.get("/roles", response_model=list[RoleOut])
 async def list_roles(current_user: User = Depends(get_current_user)) -> list[RoleOut]:
-    """The 25-role framework, for rendering the profile editor."""
+    """The role framework, for rendering the profile editor."""
     return [
         RoleOut(
             id=r.id,
