@@ -39,6 +39,7 @@ type Overview = {
   users: UserRow[];
   by_day: Bucket[];
   by_mode: Bucket[];
+  by_model: Bucket[];
 };
 
 type QueryResult = {
@@ -189,6 +190,15 @@ export function AdminDashboard() {
           <Card title="Tokens by mode" subtitle="Which companions cost what">
             <BarChart slices={data.by_mode.filter((b) => b.tokens > 0).map((b) => ({ label: b.label, value: b.tokens }))} />
           </Card>
+          {/* The breakdown that maps to money. "By mode" cannot see it: the
+              same mode answered on the cheapest and the dearest model is
+              the same bar, and the two differ by more than an order of
+              magnitude now that the picker offers both. */}
+          {data.by_model?.length > 0 && (
+            <Card title="Tokens by model" subtitle="Every call, under the model that served it">
+              <BarChart slices={data.by_model.filter((b) => b.tokens > 0).map((b) => ({ label: b.label, value: b.tokens }))} />
+            </Card>
+          )}
           <Card title={`Daily usage · last ${data.window_days} days`}>
             <LineChart points={data.by_day.map((b) => ({ label: b.label.slice(5), value: b.tokens }))} />
           </Card>

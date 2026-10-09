@@ -8,17 +8,19 @@ import { lastWorkspaceId, rememberWorkspace } from "@/lib/lastWorkspace";
 import { ThinkingIndicator } from "@/components/chat/ThinkingIndicator";
 import { Button } from "@/components/ui/primitives";
 
-type Workspace = { id: string; name: string };
-type Conversation = { id: string; title: string | null };
+type Bootstrap = {
+  active_workspace_id: string;
+  conversation_id: string;
+};
 
 /** The way in after signing in or finishing the welcome questions: straight
  *  to a chat, in a mode, ready to type. Nobody is asked to make a workspace
- *  first (one is made for them if they have none, and the sign-in path
- *  already guarantees that) or to pick a mode before the box unlocks.
+ *  first or to pick a mode before the box unlocks.
  *
- *  An empty chat left over from last time is reused rather than stacking
- *  another "Untitled chat" on the list every sign-in; a chat with anything in
- *  it is left alone and a fresh one is opened. */
+ *  Both of those rules - make a workspace if there is none, reuse an empty
+ *  chat rather than stacking another "Untitled chat" at every sign-in - now
+ *  live in the /bootstrap endpoint, because they were three round trips
+ *  here and are one query there. */
 export function StartChat() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -36,48 +38,24 @@ export function StartChat() {
 
     async function go() {
       try {
-        /* Three round trips in a row is what this used to be, and on a
-           connection to a sleeping server it is the whole of the wait
-           between signing in and seeing a chat. Two of them only ever
-           needed to be in order because the second needs a workspace id -
-           and we already remember one. So when there is a remembered
-           workspace, ask for its chats at the same time as the list that
-           confirms it still exists, and throw the guess away in the rare
-           case it is wrong. */
-        const remembered = lastWorkspaceId();
-        const listPromise = apiFetch<Workspace[]>("/workspaces");
-        const guessedChats = remembered
-          ? apiFetch<Conversation[]>(`/chat/conversations?workspace_id=${remembered}`)
-              .catch(() => null)
-          : null;
+        /* One round trip. This used to be three in a row - the workspace
+           list, that workspace's chats, and sometimes a chat to create -
+           each waiting on an id from the one before it, each about 783ms
+           against a container that may have been asleep. A speculative
+           fetch using the remembered workspace cut it to two on a good day
+           and three on a bad one.
 
-        let workspaces = await listPromise;
-        if (workspaces.length === 0) {
-          const made = await apiFetch<Workspace>("/workspaces", {
-            method: "POST",
-            body: { name: "My workspace" },
-          });
-          workspaces = [made];
-        }
-        const workspace = workspaces.find((w) => w.id === remembered) ?? workspaces[0];
-        rememberWorkspace(workspace.id);
-
-        const conversations =
-          (workspace.id === remembered ? await guessedChats : null) ??
-          (await apiFetch<Conversation[]>(
-            `/chat/conversations?workspace_id=${workspace.id}`,
-          ));
-        // Most recently active first from the server; a null title means
-        // nothing has been asked in it yet (the title is derived from the
-        // first question), wherever it sits in the list.
-        const empty = conversations.find((c) => c.title === null) ?? null;
-        const target =
-          empty ??
-          (await apiFetch<Conversation>("/chat/conversations", {
-            method: "POST",
-            body: { workspace_id: workspace.id, default_mode: null },
-          }));
-        router.replace(`/chat/${target.id}`);
+           None of it was sequential because it had to be; it was sequential
+           because the ids lived on the client. /bootstrap does the same
+           chain server-side, where they are already in hand, and answers
+           with the chat to open. The remembered workspace is still sent,
+           now as a hint the server honours or ignores. */
+        const entry = await apiFetch<Bootstrap>("/bootstrap", {
+          method: "POST",
+          body: { workspace_id: lastWorkspaceId() },
+        });
+        rememberWorkspace(entry.active_workspace_id);
+        router.replace(`/chat/${entry.conversation_id}`);
       } catch (err) {
         setError(authErrorMessage(err));
       }

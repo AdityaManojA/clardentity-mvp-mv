@@ -1628,3 +1628,94 @@ class TestPicturesGoRoundTheGates:
                 await db.execute(delete(Workspace).where(Workspace.owner_id == user_id))
                 await db.execute(delete(User).where(User.id == user_id))
                 await db.commit()
+
+
+class TestBootstrapIsOneRoundTrip:
+    """Signing in used to be three sequential calls before a chat appeared.
+
+    What matters is not that the endpoint exists but that it answers with
+    everything the chain used to fetch, and that it keeps the two rules the
+    client was enforcing: an account with no workspace gets one, and an
+    empty chat is reused rather than stacked. Needs a database.
+    """
+
+    API = API
+
+    async def test_it_answers_with_the_whole_entry_and_reuses_an_empty_chat(self):
+        from app.models import Conversation
+
+        email = f"boot-{uuid.uuid4().hex[:8]}@example.com"
+        password = "boot-password-123"
+        async with client() as c:
+            reg = await c.post(
+                f"{API}/auth/register",
+                json={
+                    "email": email,
+                    "password": password,
+                    "display_name": "Booter",
+                    "accepted_terms": True,
+                },
+            )
+            if reg.status_code >= 500:
+                pytest.skip("no database available")
+            assert reg.status_code == 201, reg.text
+            headers = {"Authorization": f"Bearer {reg.json()['access_token']}"}
+
+            first = await c.post(f"{API}/bootstrap", json={}, headers=headers)
+            assert first.status_code == 200, first.text
+            body = first.json()
+
+            # Everything the three calls used to return, in one answer.
+            assert body["user"]["email"] == email
+            assert "onboarding_completed_at" in body["user"], "the client routes /welcome on this"
+            assert "is_admin" in body["user"], "computed on the way out, not read off the row"
+            assert len(body["workspaces"]) == 1, "registration makes exactly one"
+            assert body["active_workspace_id"] == body["workspaces"][0]["id"]
+            assert body["conversation_created"] is True, "a new account has no chat to reuse"
+            opened = body["conversation_id"]
+
+            # Called again - as a second sign-in would - it must land in the
+            # same empty chat rather than stacking another "Untitled chat".
+            second = await c.post(
+                f"{API}/bootstrap",
+                json={"workspace_id": body["active_workspace_id"]},
+                headers=headers,
+            )
+            assert second.status_code == 200, second.text
+            assert second.json()["conversation_id"] == opened
+            assert second.json()["conversation_created"] is False
+
+            # A workspace id that is not theirs is a hint, not an
+            # instruction: ignored, rather than honoured or refused.
+            stranger = await c.post(
+                f"{API}/bootstrap",
+                json={"workspace_id": str(uuid.uuid4())},
+                headers=headers,
+            )
+            assert stranger.status_code == 200, stranger.text
+            assert stranger.json()["active_workspace_id"] == body["active_workspace_id"]
+
+            # Once the chat has been used, the next entry gets a fresh one.
+            async with AsyncSessionLocal() as db:
+                convo = (
+                    await db.execute(
+                        select(Conversation).where(Conversation.id == uuid.UUID(opened))
+                    )
+                ).scalar_one()
+                convo.title = "Something was asked here"
+                await db.commit()
+
+            third = await c.post(
+                f"{API}/bootstrap",
+                json={"workspace_id": body["active_workspace_id"]},
+                headers=headers,
+            )
+            assert third.json()["conversation_id"] != opened
+            assert third.json()["conversation_created"] is True
+
+            await c.delete(f"{API}/auth/me", headers=headers)
+
+    async def test_it_needs_an_account(self):
+        async with client() as c:
+            res = await c.post(f"{API}/bootstrap", json={})
+            assert res.status_code in (401, 403), res.text

@@ -40,6 +40,33 @@ async def require_admin(current_user: User = Depends(get_current_user)) -> User:
     return current_user
 
 
+def add_model_spend(per_model: dict[str, int], usage: dict | None) -> None:
+    """Fold one turn's per-model split into a running total.
+
+    This is the meter's own breakdown, so the small model that planned the
+    searches is counted separately from the flagship that wrote the answer -
+    which is the point of having it. It does not sum to the turn totals for
+    anything recorded before the meter kept a split; those turns simply
+    contribute nothing here rather than being guessed at and smeared across
+    whichever model is currently popular.
+
+    Defensive about the shape because this is JSON off a row that several
+    versions of the code have written.
+    """
+    by_model = (usage or {}).get("by_model")
+    if not isinstance(by_model, dict):
+        return
+    for name, split in by_model.items():
+        if not isinstance(name, str) or not isinstance(split, dict):
+            continue
+        try:
+            spent = int(split.get("input_tokens") or 0) + int(split.get("output_tokens") or 0)
+        except (TypeError, ValueError):
+            continue
+        if spent:
+            per_model[name] = per_model.get(name, 0) + spent
+
+
 def _tokens(usage: dict | None) -> tuple[int, int]:
     if not usage:
         return 0, 0
@@ -84,6 +111,7 @@ async def overview(
     per_user: dict[uuid.UUID, dict] = {}
     per_day: dict[str, int] = {}
     per_mode: dict[str, int] = {}
+    per_model: dict[str, int] = {}
     total_in = total_out = 0
     unmetered = 0
 
@@ -102,6 +130,7 @@ async def overview(
             per_day[day] = per_day.get(day, 0) + tin + tout
         if mode:
             per_mode[mode] = per_mode.get(mode, 0) + tin + tout
+        add_model_spend(per_model, usage)
 
     # Questions asked, counted separately so a user with no answers yet still
     # shows their activity.
@@ -167,6 +196,10 @@ async def overview(
         by_mode=[
             UsageBucket(label=m, tokens=t)
             for m, t in sorted(per_mode.items(), key=lambda kv: -kv[1])
+        ],
+        by_model=[
+            UsageBucket(label=m, tokens=t)
+            for m, t in sorted(per_model.items(), key=lambda kv: -kv[1])
         ],
     )
 

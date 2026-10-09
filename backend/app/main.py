@@ -16,6 +16,7 @@ from app.api.guest import router as guest_router
 from app.api.images import router as images_router
 from app.api.health import router as health_router
 from app.api.history import router as history_router
+from app.api.bootstrap import router as bootstrap_router
 from app.api.pro import router as pro_router
 from app.api.profile import router as profile_router
 from app.api.realtime import router as realtime_router
@@ -78,3 +79,4 @@ app.include_router(audio_router, prefix=API_PREFIX)
 app.include_router(compose_router, prefix=API_PREFIX)
 app.include_router(realtime_router, prefix=API_PREFIX)
 app.include_router(pro_router, prefix=API_PREFIX)
+app.include_router(bootstrap_router, prefix=API_PREFIX)

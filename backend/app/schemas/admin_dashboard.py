@@ -43,6 +43,13 @@ class AdminOverview(BaseModel):
     users: list[AdminUserRow]
     by_day: list[UsageBucket]
     by_mode: list[UsageBucket]
+    #: Per model, which is the breakdown that maps to money. The turn meter
+    #: has always recorded it - every call a turn makes, under the model
+    #: that served it - and nothing read it back until the picker made the
+    #: spread matter: a turn on the cheapest model and the same turn on the
+    #: dearest differ by more than an order of magnitude, and by_mode cannot
+    #: see that because both are the same mode.
+    by_model: list[UsageBucket]
 
 
 class DynamicQueryRequest(BaseModel):
