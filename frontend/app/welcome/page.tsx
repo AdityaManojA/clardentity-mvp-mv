@@ -52,16 +52,24 @@ export default function WelcomePage() {
     else if (user.onboarding_completed_at !== null) router.replace("/start");
   }, [loading, user, router]);
 
-  async function finish(skipAll: boolean) {
+  async function finish() {
     setError(null);
     setSubmitting(true);
     try {
       await apiFetch("/profile/onboarding", {
         method: "POST",
         body: {
+          // Whatever they actually typed, on both paths. "Skip for now"
+          // used to send an empty answer for every question, including the
+          // ones already filled in - so someone who answered the first and
+          // skipped the rest had what they wrote silently thrown away, and
+          // the profile started empty despite them having told it who they
+          // were. Skip means skip the remaining questions, not discard the
+          // answered ones; a question nobody answered is an empty string
+          // either way.
           answers: QUESTIONS.map((q, i) => ({
             question: q.title,
-            answer: skipAll ? "" : answers[i].trim(),
+            answer: answers[i].trim(),
           })),
         },
       });
@@ -101,7 +109,7 @@ export default function WelcomePage() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            if (isLast) void finish(false);
+            if (isLast) void finish();
             else setPage((p) => p + 1);
           }}
           className="space-y-5 rounded-xl border border-hairline bg-surface p-6"
@@ -153,7 +161,7 @@ export default function WelcomePage() {
           <div className="flex items-center justify-between gap-3">
             <button
               type="button"
-              onClick={() => void finish(true)}
+              onClick={() => void finish()}
               disabled={submitting}
               className="text-xs text-ink-muted transition-colors hover:text-ink disabled:opacity-50"
             >

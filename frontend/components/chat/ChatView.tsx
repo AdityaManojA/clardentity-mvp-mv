@@ -1327,7 +1327,16 @@ export function ChatView({ conversationId }: { conversationId: string }) {
           <MessageInput
             disabled={!mode || sending}
             disabledReason={
-              !mode ? "Select a cognitive mode above to start typing" : undefined
+              !mode
+                ? "Select a cognitive mode above to start typing"
+                : // The box is also disabled while an answer is being
+                  // written, and saying nothing here left it showing the
+                  // "select a mode" placeholder - telling the user to do
+                  // something they had plainly already done, with the mode
+                  // lit three inches below it.
+                  sending
+                  ? "Writing the answer…"
+                  : undefined
             }
             value={draft}
             onChange={setDraft}
