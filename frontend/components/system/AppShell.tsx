@@ -171,8 +171,8 @@ function RecentConversations({
         Recents
       </p>
       <ul className="scroll-slim min-h-0 flex-1 overflow-y-auto">
-        {items.map((c) => (
-          <li key={c.id} className="group/recent flex items-center">
+        {items.map((c, i) => (
+          <li key={c.id} className="phone-rise group/recent flex items-center" style={{ "--i": i } as React.CSSProperties}>
             {/* 32px row, 9px radius, a 12px ring and a 20px title - the
                 design's shape. The ring is what gives the list its rhythm
                 against the 48px rows above it. */}

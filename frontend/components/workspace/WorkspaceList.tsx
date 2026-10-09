@@ -208,8 +208,8 @@ export function WorkspaceList() {
             </li>
           )}
 
-          {workspaces.map((ws) => (
-            <li key={ws.id}>
+          {workspaces.map((ws, i) => (
+            <li key={ws.id} className="phone-rise" style={{ "--i": i } as React.CSSProperties}>
               <Link
                 href={`/workspace/${ws.id}`}
                 className="flex h-[113px] items-start gap-6 rounded-[12px] border border-hairline-strong p-[9px] transition-colors hover:border-brand-border hover:bg-surface-hover"

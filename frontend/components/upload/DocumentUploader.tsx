@@ -175,14 +175,15 @@ export function DocumentUploader({
         // of a document can actually say: what kind of file it is, what it
         // is called, and whether it has been read yet.
         <ul className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {documents.map((doc) => (
+          {documents.map((doc, i) => (
             <li
+              style={{ "--i": i } as React.CSSProperties}
               key={doc.id}
               // The design's tiles are a shade off the canvas with no border.
               // surface-sunken is the canvas itself in this palette, so they
               // were invisible; the hover wash is the one fill in the system
               // that is a step away from the background in both themes.
-              className="group/tile relative flex h-[145px] flex-col justify-between rounded-[12px] bg-surface-hover p-4 transition-shadow hover:ring-1 hover:ring-hairline-strong"
+              className="phone-rise group/tile relative flex h-[145px] flex-col justify-between rounded-[12px] bg-surface-hover p-4 transition-shadow hover:ring-1 hover:ring-hairline-strong"
             >
               <span className="text-xs font-medium uppercase tracking-wide text-ink-muted">
                 {extensionOf(doc.filename) || doc.file_type || "file"}

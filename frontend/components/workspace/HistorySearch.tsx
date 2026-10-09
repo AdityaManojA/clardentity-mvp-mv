@@ -121,8 +121,8 @@ export function HistorySearch({ workspaceId }: { workspaceId: string }) {
           </p>
         ) : (
           <ul className="mt-3">
-            {results.map((r) => (
-              <li key={r.message_id}>
+            {results.map((r, i) => (
+              <li key={r.message_id} className="phone-rise" style={{ "--i": i } as React.CSSProperties}>
                 <Link
                   href={`/chat/${r.conversation_id}`}
                   className="block border-b border-hairline px-[17px] py-[14px] transition-colors hover:bg-surface-hover"

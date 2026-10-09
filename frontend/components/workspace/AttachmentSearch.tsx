@@ -109,10 +109,11 @@ export function AttachmentSearch({
             {result.total} passage{result.total === 1 ? "" : "s"}
           </p>
           <ul className="space-y-2">
-            {result.hits.map((hit) => (
+            {result.hits.map((hit, i) => (
               <li
                 key={`${hit.document_id}-${hit.chunk_index}`}
-                className="rounded-lg border border-hairline bg-surface p-3"
+                style={{ "--i": i } as React.CSSProperties}
+                className="phone-rise rounded-lg border border-hairline bg-surface p-3"
               >
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                   <span className="text-xs font-medium text-ink">{hit.filename}</span>

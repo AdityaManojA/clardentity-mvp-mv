@@ -543,6 +543,40 @@ body {
   transform: none;
 }
 
+/* Phone layout: slower and longer, so the motion is seen rather than
+   finished before the eye arrives. On a phone a section is fully on screen
+   almost as soon as it enters, and the desktop timing played out as a blink.
+   Further to rise, a beat more between siblings, and (Reveal.tsx) a later
+   trigger. Reduced motion keeps the block at the bottom of this section. */
+@media (max-width: 1023.98px) and (prefers-reduced-motion: no-preference) {
+  .landing-reveal {
+    transform: translateY(36px);
+    transition-duration: 1.1s;
+    transition-delay: calc(var(--reveal-delay, 0ms) * 1.6 + 80ms);
+  }
+}
+
+/* Lists on the phone layout (workspaces, recent chats, search results,
+   attachments) rise in one after another instead of all landing at once:
+   --i is the item's index, 80ms apart, capped so a long list doesn't make
+   the tenth row wait. */
+@keyframes phone-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (max-width: 1023.98px) and (prefers-reduced-motion: no-preference) {
+  .phone-rise {
+    animation: phone-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(min(var(--i, 0), 10) * 80ms);
+  }
+}
+
 /* Cards lift on hover. 6px and a shadow that matches the plum in the
    palette rather than a generic black, so the raise reads as part of this
    page and not a default. */
