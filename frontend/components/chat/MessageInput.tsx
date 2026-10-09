@@ -91,6 +91,7 @@ export function MessageInput({
   mode,
   isGenerating,
   onStop,
+  gated,
 }: {
   disabled: boolean;
   disabledReason?: string;
@@ -115,6 +116,14 @@ export function MessageInput({
    *  unwanted answer off doesn't mean waiting it out. */
   isGenerating?: boolean;
   onStop?: () => void;
+  /** Set only by the landing page's guest demo, which shows this composer to
+   *  someone who has no account. Attaching a file, dictating and choosing a
+   *  model all need one, so each control stays exactly where it is and calls
+   *  this instead of doing its job - the row is the product's own, and the
+   *  answer to pressing one is an invitation rather than a dead button. The
+   *  call button needs nothing here: it already does whatever `onStartCall`
+   *  says, and the demo passes an invitation. */
+  gated?: (feature: "attach" | "voice" | "model") => void;
 }) {
   const touchKeyboard = useTouchKeyboard();
   const [attachments, setAttachments] = useState<PendingAttachment[]>([]);
@@ -153,6 +162,10 @@ export function MessageInput({
     if (
       disabled ||
       isGenerating ||
+      // The completion endpoint needs an account, so for a guest this is a
+      // 401 every time they pause typing - on a public landing page, from a
+      // feature that could never show them anything.
+      gated ||
       !caretAtEnd ||
       trimmed.split(/\s+/).filter(Boolean).length < 3 ||
       value.length > 1500
@@ -175,7 +188,7 @@ export function MessageInput({
       }
     }, 650);
     return () => clearTimeout(timer);
-  }, [value, disabled, isGenerating, taRef, ghost]);
+  }, [value, disabled, isGenerating, gated, taRef, ghost]);
 
   // What is still left to show: the suggestion minus whatever of it has
   // since been typed. Null once the text diverges from it.
@@ -402,7 +415,7 @@ export function MessageInput({
           <button
             type="button"
             data-tour="attach-image"
-            onClick={() => fileInputRef.current?.click()}
+            onClick={() => (gated ? gated("attach") : fileInputRef.current?.click())}
             disabled={disabled}
             title="Attach a file or image"
             aria-label="Attach a file or image"
@@ -420,7 +433,23 @@ export function MessageInput({
           />
 
           <div className="ml-auto flex min-w-0 items-center gap-1">
-            {mode && PICKABLE_MODES.has(mode) ? (
+            {gated ? (
+              // The chip, without the menu behind it. Same shape and the same
+              // place, so the foot of the card reads as it does in the app.
+              <button
+                type="button"
+                onClick={() => gated("model")}
+                title="Model: Auto"
+                aria-label="Model: Auto. Change model."
+                className="flex h-8 shrink-0 items-center gap-0.5 rounded-lg px-1.5 text-sm leading-[normal] transition-colors hover:bg-surface-hover"
+              >
+                <span className="text-ink">Auto</span>
+                <span aria-hidden="true" className="hidden size-3 items-center justify-center sm:flex">
+                  <span className="size-1 rounded-full bg-ink-muted" />
+                </span>
+                <span className="hidden text-ink-muted sm:inline">Free</span>
+              </button>
+            ) : mode && PICKABLE_MODES.has(mode) ? (
               // The two modes where the user picks the model by name. Shown
               // instead of the tier picker rather than beside it: two
               // controls both called "model" is worse than either.
@@ -454,13 +483,41 @@ export function MessageInput({
               <MaskIcon src="/ui/composer-dialpad.svg" className="size-5" />
             </button>
 
-            <AudioRecorder
-              disabled={disabled}
-              onTranscribed={(text) => {
-                track("voice_recorded", { words: text.trim().split(/\s+/).length });
-                handleChange((value ? value + " " : "") + text);
-              }}
-            />
+            {gated ? (
+              // The recorder's idle face, button for button. It never starts
+              // a recording, so it never asks for the microphone either -
+              // a permission prompt for a feature that cannot run would be
+              // the rudest possible way to ask someone to sign up.
+              <button
+                type="button"
+                onClick={() => gated("voice")}
+                title="Record a voice message"
+                aria-label="Record a voice message"
+                className="flex size-8 shrink-0 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-surface-hover hover:text-brand"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                  className="h-5 w-5"
+                >
+                  <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" />
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3" />
+                </svg>
+              </button>
+            ) : (
+              <AudioRecorder
+                disabled={disabled}
+                onTranscribed={(text) => {
+                  track("voice_recorded", { words: text.trim().split(/\s+/).length });
+                  handleChange((value ? value + " " : "") + text);
+                }}
+              />
+            )}
 
             {/* While generating this becomes a stop control rather than a
                 disabled "Ask" - the answer might be slow, wrong-mode, or just

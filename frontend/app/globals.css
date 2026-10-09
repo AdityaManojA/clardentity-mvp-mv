@@ -121,8 +121,16 @@
 /* Keyed off an attribute rather than `prefers-color-scheme` so the in-app
    toggle can override the OS in both directions. An inline script in <head>
    stamps data-theme before first paint (from localStorage, falling back to the
-   OS preference), so there is no flash and no duplicated token block. */
-:root[data-theme="dark"] {
+   OS preference), so there is no flash and no duplicated token block.
+
+   Matched on any element, not only :root, because custom properties cascade:
+   stamping data-theme="dark" on one container themes everything inside it
+   and nothing outside. The landing page's guest demo needs exactly that -
+   it shows the real chat UI over the curtain while the page around it stays
+   light - and it is the only caller, since the app's own toggle still
+   stamps :root. */
+:root[data-theme="dark"],
+[data-theme="dark"] {
   /* Layered, not black.
      The first dark palette put the page, the sidebar and the insets all on
      #000 and asked a hairline to carry every edge. On an OLED panel that is a

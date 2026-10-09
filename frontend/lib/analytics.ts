@@ -64,6 +64,12 @@ export type AnalyticsEvent =
   | "guest_demo_asked"
   | "guest_demo_limit"
   | "guest_demo_signup_clicked"
+  | "guest_demo_new_chat"
+  | "guest_demo_mode_picked"
+  // Which control a guest reached for that needs an account. The most
+  // useful number the demo produces: it says what people came to the
+  // product wanting, rather than what they settled for typing.
+  | "guest_demo_gated"
   // Where they stop
   | "gate_shown"
   | "gate_answered"

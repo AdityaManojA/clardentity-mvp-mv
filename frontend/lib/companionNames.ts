@@ -2,6 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import { apiFetch } from "@/lib/apiClient";
+import { getAccessToken } from "@/lib/auth";
 
 /* What the user calls their companion in each mode.
  *
@@ -28,7 +29,16 @@ function emit() {
 
 function subscribe(onChange: () => void) {
   listeners.add(onChange);
-  if (!loaded && !inFlight) {
+  // Nobody signed in means no nicknames, and /profile would answer 401 -
+  // which apiFetch then follows with a refresh attempt that also 401s. Two
+  // guaranteed failures to learn something already known. The landing
+  // page's guest demo is the first caller to mount this signed out.
+  //
+  // Deliberately not marked loaded: someone who signs up from the demo
+  // subscribes again with a token moments later, and a store that had
+  // written itself off as loaded would keep the empty answer for the rest
+  // of the session. Skipping is free, so it can skip as often as it likes.
+  if (!loaded && !inFlight && getAccessToken()) {
     inFlight = apiFetch<{ companion_names?: Names }>("/profile")
       .then((p) => {
         snapshot = p.companion_names ?? {};

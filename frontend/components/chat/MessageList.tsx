@@ -644,7 +644,11 @@ function MessageBubble({
               <span className="truncate">{modeLabel(modeUsed)}</span>
             </div>
             <div className="flex items-center gap-1.5">
-              {!isStreaming && content && (
+              {/* Only when there is a back to turn to: either one already
+                  generated with the answer, or a conversation the fetch can
+                  ask. Without both - the landing page's guest demo - the
+                  button flipped the card to a blank face. */}
+              {!isStreaming && content && (counterfactual || conversationId) && (
                 <FlipButton
                   flipped={devil.flipped}
                   onClick={() => {

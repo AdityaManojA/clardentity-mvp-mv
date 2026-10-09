@@ -2,6 +2,7 @@
 
 import { useEffect, useSyncExternalStore } from "react";
 import { apiFetch } from "@/lib/apiClient";
+import { getAccessToken } from "@/lib/auth";
 import type { PickableMode } from "@/lib/modes";
 
 /* Which companions this account can start.
@@ -76,6 +77,13 @@ function put(wire: Wire) {
 export function loadPreviewAccess(force = false): Promise<void> {
   if (loaded && !force) return Promise.resolve();
   if (inFlight) return inFlight;
+  // Signed out, so the answer is LOCKED and already the snapshot. Asking
+  // anyway costs a 401 plus the refresh attempt apiFetch makes after it.
+  //
+  // Not marked loaded, so the first call made with a token still fetches:
+  // someone signing up from the landing page's guest demo would otherwise
+  // carry "everything is locked" into their new account.
+  if (!getAccessToken()) return Promise.resolve();
   inFlight = apiFetch<Wire>("/pro/preview")
     .then(put)
     .catch(() => {

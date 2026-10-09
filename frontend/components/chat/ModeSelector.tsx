@@ -23,6 +23,7 @@ export function ModeSelector({
   onChange,
   disabled,
   onLocked,
+  lockedModes: lockedOverride,
 }: {
   value: CognitiveMode | null;
   onChange: (mode: CognitiveMode) => void;
@@ -31,11 +32,18 @@ export function ModeSelector({
    *  respond - opening the plans dialog - rather than being dead buttons that
    *  give no hint of what would unlock them. */
   onLocked?: (mode: CognitiveMode) => void;
+  /** Overrides the account's own locks. The landing page's guest demo passes
+   *  an empty list, because the lock is a fact about an account and a guest
+   *  does not have one: /guest/chat answers in any of the eight, so locking
+   *  four of them there would refuse a companion the server is willing to
+   *  be. */
+  lockedModes?: readonly CognitiveMode[];
 }) {
   const names = useCompanionNames();
   // Which companions are locked is an account fact, not a constant: "Skip
   // for now" in the plans dialog opens them for testing.
-  const lockedModes = useLockedModes();
+  const accountLocks = useLockedModes();
+  const lockedModes = lockedOverride ?? accountLocks;
   const stripRef = useRef<HTMLDivElement>(null);
   const selectedRef = useRef<HTMLButtonElement>(null);
 

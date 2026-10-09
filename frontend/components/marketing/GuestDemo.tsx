@@ -2,10 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { askGuest, guestSessionId, type GuestTurn } from "@/lib/guestDemo";
 import { track } from "@/lib/analytics";
 import { cx } from "@/components/ui/primitives";
+import { MessageInput } from "@/components/chat/MessageInput";
+import { MessageList, type StreamingMessage } from "@/components/chat/MessageList";
+import { ModeSelector, type CognitiveMode } from "@/components/chat/ModeSelector";
+import type { ChatMessage } from "@/lib/sse";
 
 /* Try it here, without signing up.
  *
@@ -14,6 +18,20 @@ import { cx } from "@/components/ui/primitives";
  * was clicked rather than appearing over it - the curtain is the same
  * curtain, in the same place, and only the frame around it changes - because
  * the thing being demonstrated is that the box you were watching is real.
+ *
+ * Which is why this now renders the app's own components rather than a
+ * sketch of them. It used to be a textarea and two paragraph styles that
+ * resembled the product; the first thing anyone asked for was the actual
+ * interface - "all input options like call, mic and text icons, new chat" -
+ * and the honest way to show those is to mount the real composer and the
+ * real message list. They are prop-driven, so this costs almost nothing and
+ * cannot drift: a change to the composer lands here the same day it lands in
+ * the app, because it is the same file.
+ *
+ * The theme is how the curtain survives that. `data-theme="dark"` is stamped
+ * on this panel rather than on :root, so the app's dark tokens apply to
+ * everything inside it and nothing outside it - the page behind stays light,
+ * and the chat surfaces sit on the photograph the way the design intends.
  *
  * Then the lights go down. While it is still an invitation the curtain is
  * lit, as on the page; once a question has been asked it is a conversation,
@@ -29,6 +47,62 @@ import { cx } from "@/components/ui/primitives";
 const DARK = "#1a0710"; // the house burgundy, with the lights down
 
 type Phase = "inviting" | "talking" | "spent";
+
+/** What a guest pressed that needs an account. The copy is per-control
+ *  because "sign up to continue" under a microphone tells someone nothing
+ *  about what they would get. */
+const GATE_COPY: Record<string, { title: string; body: string }> = {
+  call: {
+    title: "Live calls need an account",
+    body: "Talk to any companion out loud, interrupt it mid-sentence, and keep the transcript in the conversation afterwards.",
+  },
+  voice: {
+    title: "Dictation needs an account",
+    body: "Speak a question instead of typing it. It lands in the box as text, so you can read it back before you ask.",
+  },
+  attach: {
+    title: "Attachments need an account",
+    body: "Put a PDF, spreadsheet, slide deck or image in front of a companion, and ask about it for as long as the workspace lives.",
+  },
+  model: {
+    title: "Choosing a model needs an account",
+    body: "Pick the model by name in Learning and Co-Creative, or let Clardentity route each question to whichever tier suits it.",
+  },
+};
+
+/** One guest turn, shaped as the message the real list renders.
+ *
+ *  Everything the app knows and the demo does not is null, which the list
+ *  already handles - those fields are null on plenty of real messages too
+ *  (anything generated before a given feature shipped), so this is an
+ *  ordinary message rather than a special case the list has to learn. */
+function asMessage(turn: GuestTurn, index: number, mode: string): ChatMessage {
+  return {
+    id: `guest-${index}`,
+    role: turn.role,
+    content: turn.content,
+    mode_used: mode,
+    reasoning_lens: null,
+    confidence_score: null,
+    confidence_band: null,
+    avatar_expression: null,
+    avatar_gesture: null,
+    created_at: new Date().toISOString(),
+    counterfactual_content: null,
+    crux_text: null,
+    clarifier: null,
+    guidance: null,
+    decision_review: null,
+    thinking_review: null,
+    generated_image: null,
+    feedback: null,
+    parent_id: null,
+    sibling_index: 0,
+    sibling_count: 1,
+    sibling_ids: [`guest-${index}`],
+    claims: [],
+  };
+}
 
 /** Mounted only while it is open: the parent renders it conditionally, so
  *  every piece of state here - the conversation, the growth, the lights -
@@ -57,10 +131,11 @@ export function GuestDemo({
   const modeLabel = modes.find((m) => m.value === mode)?.name ?? "Finder";
   const [turns, setTurns] = useState<GuestTurn[]>([]);
   const [draft, setDraft] = useState("");
-  const [streaming, setStreaming] = useState<string | null>(null);
+  const [streamingText, setStreamingText] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [phase, setPhase] = useState<Phase>("inviting");
   const [grown, setGrown] = useState(false);
+  const [gate, setGate] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -95,7 +170,7 @@ export function GuestDemo({
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
-  }, [turns, streaming]);
+  }, [turns, streamingText]);
 
   useEffect(() => {
     // After the growth, not during it - focusing mid-transition scrolls the
@@ -104,49 +179,74 @@ export function GuestDemo({
     return () => clearTimeout(t);
   }, []);
 
-  const send = useCallback(async () => {
-    const message = draft.trim();
-    if (!message || streaming !== null) return;
+  const send = useCallback(
+    async (content: string) => {
+      const message = content.trim();
+      if (!message || streamingText !== null) return;
 
-    setDraft("");
-    setError(null);
-    setPhase((p) => (p === "inviting" ? "talking" : p));
-    const history = turns;
-    setTurns([...history, { role: "user", content: message }]);
-    setStreaming("");
-    track("guest_demo_asked", { mode });
+      setDraft("");
+      setError(null);
+      setPhase((p) => (p === "inviting" ? "talking" : p));
+      const history = turns;
+      setTurns([...history, { role: "user", content: message }]);
+      setStreamingText("");
+      track("guest_demo_asked", { mode });
 
-    const controller = new AbortController();
-    abortRef.current = controller;
-    let text = "";
+      const controller = new AbortController();
+      abortRef.current = controller;
+      let text = "";
 
-    await askGuest(
-      { sessionId: guestSessionId(), mode, message, history },
-      {
-        onDelta: (chunk) => {
-          text += chunk;
-          setStreaming(text);
+      await askGuest(
+        { sessionId: guestSessionId(), mode, message, history },
+        {
+          onDelta: (chunk) => {
+            text += chunk;
+            setStreamingText(text);
+          },
+          onDone: (done) => {
+            setStreamingText(null);
+            if (done.text) setTurns((prev) => [...prev, { role: "assistant", content: done.text }]);
+            if (done.limit_reached) {
+              setPhase("spent");
+              track("guest_demo_limit");
+            }
+          },
+          onError: (detail) => {
+            setStreamingText(null);
+            setError(detail);
+          },
         },
-        onDone: (done) => {
-          setStreaming(null);
-          if (done.text) setTurns((prev) => [...prev, { role: "assistant", content: done.text }]);
-          if (done.limit_reached) {
-            setPhase("spent");
-            track("guest_demo_limit");
-          }
-        },
-        onError: (detail) => {
-          setStreaming(null);
-          setError(detail);
-        },
-      },
-      controller.signal,
-    );
-  }, [draft, streaming, turns, mode]);
+        controller.signal,
+      );
+    },
+    [streamingText, turns, mode],
+  );
 
   useEffect(() => {
     return () => abortRef.current?.abort();
   }, []);
+
+  /* Start again. The budget is the server's and survives this, which is the
+     point of showing it: a new chat is free, the allowance is not, and
+     finding that out here is better than finding it out after signing up. */
+  const newChat = useCallback(() => {
+    abortRef.current?.abort();
+    setTurns([]);
+    setStreamingText(null);
+    setDraft("");
+    setError(null);
+    setGate(null);
+    setPhase((p) => (p === "spent" ? p : "inviting"));
+    track("guest_demo_new_chat");
+    setTimeout(() => inputRef.current?.focus(), 0);
+  }, []);
+
+  const messages = useMemo(
+    () => turns.map((turn, i) => asMessage(turn, i, mode)),
+    [turns, mode],
+  );
+  const streaming: StreamingMessage | null =
+    streamingText === null ? null : { mode_used: mode, content: streamingText };
 
   const zoom = typeof window === "undefined" ? 1 : Number(getComputedStyle(document.documentElement).zoom) || 1;
   const start: React.CSSProperties =
@@ -161,12 +261,17 @@ export function GuestDemo({
       : { top: 0, left: 0, width: "100%", height: "100%", borderRadius: 0 };
 
   const lightsDown = phase !== "inviting";
+  const gateCopy = gate ? GATE_COPY[gate] : null;
 
   return (
     <div
       role="dialog"
       aria-modal="true"
       aria-label={`Try Clardentity in ${modeLabel} mode`}
+      /* The app's dark tokens, scoped to this panel. Everything below is the
+         product's own component in the product's own theme; the page behind
+         this one stays light. */
+      data-theme="dark"
       className="fixed z-50 overflow-hidden transition-all duration-[460ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
       style={{ ...start, background: DARK }}
     >
@@ -194,21 +299,39 @@ export function GuestDemo({
         }}
       />
 
-      <button
-        type="button"
-        onClick={onClose}
-        aria-label="Close the demo"
-        className="absolute right-4 top-4 z-10 flex size-9 items-center justify-center rounded-full bg-white/10 text-white/80 transition-colors hover:bg-white/20 hover:text-white"
-      >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
-          strokeLinecap="round" aria-hidden="true" className="size-5">
-          <path d="M18 6 6 18M6 6l12 12" />
-        </svg>
-      </button>
+      {/* The chrome the app puts at the top of a thread, in the order it puts
+          it: start again on the left, close on the right. */}
+      <div className="absolute right-4 top-4 z-10 flex items-center gap-2">
+        <button
+          type="button"
+          onClick={newChat}
+          disabled={streamingText !== null || turns.length === 0}
+          aria-label="New chat"
+          title="New chat"
+          className="flex h-9 items-center gap-1.5 rounded-full bg-white/10 px-3 text-sm text-white/80 transition-colors hover:bg-white/20 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
+            strokeLinecap="round" aria-hidden="true" className="size-4">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+          New chat
+        </button>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close the demo"
+          className="flex size-9 items-center justify-center rounded-full bg-white/10 text-white/80 transition-colors hover:bg-white/20 hover:text-white"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
+            strokeLinecap="round" aria-hidden="true" className="size-5">
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
 
       <div className="relative flex h-full w-full flex-col items-center px-4 pb-6 pt-16 sm:px-8">
         <div className="flex w-full max-w-[760px] flex-1 flex-col overflow-hidden">
-          {phase === "inviting" ? (
+          {phase === "inviting" && turns.length === 0 ? (
             <div className="flex flex-1 flex-col items-center justify-center text-center">
               <p className="text-2xl font-medium text-white sm:text-3xl">Ask me something.</p>
               <p className="mt-2 text-sm text-white/70">
@@ -216,53 +339,25 @@ export function GuestDemo({
               </p>
             </div>
           ) : (
-            <div ref={scrollRef} className="flex-1 space-y-5 overflow-y-auto pr-1">
-              {turns.map((turn, i) =>
-                turn.role === "user" ? (
-                  <p
-                    key={i}
-                    className="ml-auto w-fit max-w-[80%] rounded-2xl bg-white/15 px-4 py-2.5 text-left text-base text-white"
-                  >
-                    {turn.content}
-                  </p>
-                ) : (
-                  <p
-                    key={i}
-                    className="whitespace-pre-wrap text-base leading-relaxed text-white/90"
-                  >
-                    {turn.content}
-                  </p>
-                ),
-              )}
-              {streaming !== null && (
-                <p className="whitespace-pre-wrap text-base leading-relaxed text-white/90">
-                  {streaming}
-                  <span className="landing-caret" data-blinking="true" />
-                </p>
-              )}
-              {error && <p className="text-sm text-[#ff9db4]">{error}</p>}
-            </div>
-          )}
+            <div ref={scrollRef} className="flex-1 overflow-y-auto pr-1">
+              {/* The app's own list. Every callback it takes is optional and
+                  none are passed: regenerating, branching, editing and
+                  deleting all write to a conversation that does not exist
+                  for a guest, so those controls are simply absent rather
+                  than present and broken.
 
-          {phase !== "spent" && (
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-1.5">
-              {modes.map((m) => (
-                <button
-                  key={m.value}
-                  type="button"
-                  onClick={() => setMode(m.value)}
-                  disabled={streaming !== null}
-                  className={cx(
-                    "flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs transition-colors disabled:cursor-not-allowed",
-                    m.value === mode
-                      ? "border-white/60 bg-white/20 text-white"
-                      : "border-white/15 bg-white/[0.06] text-white/55 hover:bg-white/10 hover:text-white/80",
-                  )}
-                >
-                  <Image src={m.heroIcon} alt="" width={14} height={14} className="block size-3.5" />
-                  {m.name}
-                </button>
-              ))}
+                  The empty conversation id is the same statement, and the
+                  list already reads it that way - it is what the rating
+                  widget, the export menu and the Devil's Draft fetch are
+                  each guarded on. A guest has no conversation to rate a
+                  message in, and "guest-demo" put all three on screen
+                  pointed at a row that does not exist. */}
+              <MessageList
+                conversationId=""
+                messages={messages}
+                streaming={streaming}
+              />
+              {error && <p className="mt-4 text-sm text-[#ff9db4]">{error}</p>}
             </div>
           )}
 
@@ -282,40 +377,72 @@ export function GuestDemo({
               </Link>
             </div>
           ) : (
-            <div className="mt-6 rounded-2xl border border-white/20 bg-white/10 p-2.5 backdrop-blur-sm">
-              <textarea
-                ref={inputRef}
-                value={draft}
-                onChange={(e) => setDraft(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    void send();
-                  }
+            <div className="mt-4 space-y-3">
+              {/* What a guest pressed, and what it would have done. Above the
+                  composer rather than over it, so the control they reached
+                  for is still visible under their own hand. */}
+              {gateCopy && (
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl border border-white/15 bg-white/[0.07] px-4 py-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-white">{gateCopy.title}</p>
+                    <p className="mt-0.5 text-sm leading-relaxed text-white/70">{gateCopy.body}</p>
+                  </div>
+                  <Link
+                    href="/register"
+                    onClick={() => track("guest_demo_signup_clicked", { from: gate })}
+                    className="inline-flex h-9 shrink-0 items-center rounded-full bg-white px-4 text-sm font-medium text-[#1a0710] transition-opacity hover:opacity-90"
+                  >
+                    Create a free account
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => setGate(null)}
+                    aria-label="Dismiss"
+                    className="flex size-7 shrink-0 items-center justify-center rounded-full text-white/60 transition-colors hover:bg-white/10 hover:text-white"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
+                      strokeLinecap="round" aria-hidden="true" className="size-4">
+                      <path d="M18 6 6 18M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              )}
+
+              {/* The app's mode picker, not a row of pills that looks like
+                  it. Nothing is locked here: the demo's whole argument is
+                  that all eight are a question away. */}
+              <ModeSelector
+                value={mode as CognitiveMode}
+                onChange={(next) => {
+                  track("guest_demo_mode_picked", { mode: next });
+                  setMode(next);
                 }}
-                rows={2}
-                maxLength={2000}
-                disabled={streaming !== null}
-                placeholder="Ask anything…"
-                className="w-full resize-none bg-transparent px-3 py-2 text-base text-white placeholder:text-white/45 focus:outline-none disabled:opacity-60"
+                disabled={streamingText !== null}
+                lockedModes={[]}
               />
-              <div className="flex items-center justify-between px-2 pb-1">
-                <span className="text-xs text-white/45">
-                  Enter to ask &middot; {modeLabel}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => void send()}
-                  disabled={!draft.trim() || streaming !== null}
-                  aria-label="Ask"
-                  className="flex size-8 items-center justify-center rounded-full bg-brand text-white transition-colors hover:bg-brand-dark disabled:bg-white/15 disabled:text-white/40"
-                >
-                  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6"
-                    strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="size-5">
-                    <path d="M10 16V4.5M4.6 9.9 10 4.5l5.4 5.4" />
-                  </svg>
-                </button>
-              </div>
+
+              {/* The product's composer, whole. */}
+              <MessageInput
+                disabled={false}
+                value={draft}
+                onChange={setDraft}
+                onSend={(content) => void send(content)}
+                textareaRef={inputRef}
+                mode={mode}
+                isGenerating={streamingText !== null}
+                onStop={() => {
+                  abortRef.current?.abort();
+                  setStreamingText(null);
+                }}
+                onStartCall={() => {
+                  track("guest_demo_gated", { feature: "call" });
+                  setGate("call");
+                }}
+                gated={(feature) => {
+                  track("guest_demo_gated", { feature });
+                  setGate(feature);
+                }}
+              />
             </div>
           )}
         </div>

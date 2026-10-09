@@ -20,7 +20,12 @@
 // feature read as broken while the server was generating pictures
 // perfectly well. Bump this whenever a shipped fix has to reach an existing
 // tab, not just a new one.
-const CACHE = "clardentity-shell-v4";
+//
+// v5: the landing demo became the real chat UI, and the composer, the
+// message list and two of the stores all changed to do it. Verifying any of
+// that against a v4 cache measured the old bundle - twice in one sitting,
+// which is the same hour lost as last time.
+const CACHE = "clardentity-shell-v5";
 
 // Only things that are content-addressed or genuinely static. HTML is not
 // here on purpose - a stale shell is how a deployed fix fails to reach
