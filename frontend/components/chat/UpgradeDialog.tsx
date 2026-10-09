@@ -172,7 +172,7 @@ export function UpgradeDialog({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="shrink-0 rounded-md p-1.5 text-ink-muted transition-colors hover:bg-surface-hover hover:text-ink"
+            className="tap-area shrink-0 rounded-md p-1.5 text-ink-muted transition-colors hover:bg-surface-hover hover:text-ink"
           >
             <svg
               viewBox="0 0 24 24"

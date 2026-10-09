@@ -1,0 +1,3 @@
+/* Applied only while a visual snapshot is taken (visual.spec.ts). */
+/* Next's dev indicator: a shadow root that page masks can't reach. */
+nextjs-portal { display: none !important; }

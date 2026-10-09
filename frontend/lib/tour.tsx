@@ -12,6 +12,9 @@ export type TourStep = {
   target: string;
   title: string;
   body: string;
+  /** Said instead of `body` on a touch screen, where what the step describes
+   *  works differently - the keyboard, for one. */
+  touchBody?: string;
   /** The target lives in the sidebar, which on a phone is a closed drawer.
    *  The overlay asks the shell to open it when this step can't find its
    *  target, rather than falling straight back to an anchorless callout. */
@@ -109,6 +112,9 @@ export const TOURS: Record<TourId, TourStep[]> = {
       target: "composer-input",
       title: "Ask here",
       body: "Type your question. Enter sends it, Shift+Enter starts a new line. Spelling is checked as you type.",
+      // On a phone Enter is the new-line key (lib/useTouchKeyboard.ts), and
+      // there is no Shift to hold - the arrow is how a question goes.
+      touchBody: "Type your question. Return starts a new line; tap the arrow to send it. Spelling is checked as you type.",
     },
     {
       id: "model-picker",

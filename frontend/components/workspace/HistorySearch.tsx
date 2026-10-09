@@ -86,7 +86,7 @@ export function HistorySearch({ workspaceId }: { workspaceId: string }) {
           type="submit"
           disabled={loading || !query.trim()}
           aria-label="Search"
-          className="ml-2 flex size-8 shrink-0 items-center justify-center rounded-full bg-brand text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:hover:bg-brand"
+          className="tap-area ml-2 flex size-8 shrink-0 items-center justify-center rounded-full bg-brand text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:hover:bg-brand"
         >
           {loading ? (
             <Spinner className="text-white" />
@@ -121,8 +121,8 @@ export function HistorySearch({ workspaceId }: { workspaceId: string }) {
           </p>
         ) : (
           <ul className="mt-3">
-            {results.map((r) => (
-              <li key={r.message_id}>
+            {results.map((r, i) => (
+              <li key={r.message_id} className="phone-rise" style={{ "--i": i } as React.CSSProperties}>
                 <Link
                   href={`/chat/${r.conversation_id}`}
                   className="block border-b border-hairline px-[17px] py-[14px] transition-colors hover:bg-surface-hover"

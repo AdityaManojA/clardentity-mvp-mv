@@ -88,7 +88,7 @@ export function Button({
   return (
     <button
       className={cx(
-        "inline-flex items-center justify-center rounded-lg font-medium transition-colors",
+        "tap-area inline-flex items-center justify-center rounded-lg font-medium transition-colors",
         "disabled:cursor-not-allowed disabled:opacity-50",
         BUTTON_VARIANTS[variant],
         BUTTON_SIZES[size],

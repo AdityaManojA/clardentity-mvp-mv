@@ -2,6 +2,7 @@
 
 import {
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   type KeyboardEvent,
@@ -17,7 +18,11 @@ import { PICKABLE_MODES } from "@/lib/pickableModels";
 import { MaskIcon } from "@/components/ui/MaskIcon";
 import { cx } from "@/components/ui/primitives";
 import { useTouchKeyboard } from "@/lib/useTouchKeyboard";
+import { usePhoneLayout } from "@/lib/usePhoneLayout";
 import { track } from "@/lib/analytics";
+
+/** Tallest the composer's textarea grows before it scrolls: about five lines. */
+const COMPOSER_MAX_HEIGHT = 120;
 
 /** Something the next message carries. An image goes to the model as
  *  vision context; a document is read on the server and its text put in
@@ -225,6 +230,26 @@ export function MessageInput({
       el.removeEventListener("focus", warm);
     };
   }, [taRef]);
+
+  // Phone layout only: grows with what's typed, up to about five lines, then
+  // scrolls inside. Desktop keeps the drawn one-row box.
+  // It used to stay one row tall whatever the length: a paragraph on a phone
+  // was read through a one-line slot. Measured before paint so the box never
+  // flashes at the old height; the cap keeps the thread above in view.
+  const phoneLayout = usePhoneLayout();
+  useLayoutEffect(() => {
+    const el = taRef.current;
+    if (!el) return;
+    if (!phoneLayout) {
+      el.style.height = "";
+      el.style.overflowY = "";
+      return;
+    }
+    el.style.height = "auto";
+    const capped = Math.min(el.scrollHeight, COMPOSER_MAX_HEIGHT);
+    el.style.height = `${capped}px`;
+    el.style.overflowY = el.scrollHeight > COMPOSER_MAX_HEIGHT ? "auto" : "hidden";
+  }, [value, taRef, phoneLayout]);
 
   useEffect(() => {
     const pos = pendingCaretRef.current;

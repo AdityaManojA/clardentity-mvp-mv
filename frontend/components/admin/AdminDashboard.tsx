@@ -145,7 +145,10 @@ export function AdminDashboard() {
   })();
 
   return (
-    <div className="mx-auto max-w-5xl space-y-5 px-4 py-8 sm:px-6">
+    // w-full min-w-0 (phone layout): this is a flex item of the shell's <main>, and without it
+    // the users table's 640px minimum set the page's width - a phone scrolled
+    // the whole dashboard sideways instead of just the table.
+    <div className="mx-auto max-w-5xl space-y-5 px-4 py-8 max-lg:w-full max-lg:min-w-0 sm:px-6">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold tracking-tight text-ink">Admin</h1>
@@ -156,7 +159,7 @@ export function AdminDashboard() {
         <button
           type="button"
           onClick={load}
-          className="rounded-full border border-hairline px-3 py-1.5 text-xs text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink"
+          className="tap-area rounded-full border border-hairline px-3 py-1.5 text-xs text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink"
         >
           Refresh
         </button>
@@ -182,7 +185,7 @@ export function AdminDashboard() {
         </p>
       )}
 
-      <div className="grid gap-3 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
         <Card title="Tokens by user" subtitle="Share of everything spent, biggest first">
           <DonutChart slices={pie} total={data.total_tokens} />
         </Card>

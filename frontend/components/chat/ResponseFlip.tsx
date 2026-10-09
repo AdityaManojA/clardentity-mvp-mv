@@ -114,9 +114,22 @@ export function ResponseFlip({
           transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)",
         }}
       >
+        {/* The face turned away is hidden outright, not left to
+            backface-visibility: browsers without full 3D compositing (WebKit
+            builds, some webviews) ignore that and painted the back face
+            through the front - the "Unchecked - caveats removed" label,
+            mirrored, over every answer. Visibility switches at the half-way
+            point of the 500ms turn, when the card is edge-on, so the motion
+            reads the same. backface-visibility stays as the first line. */}
         <div
           className="col-start-1 row-start-1 min-w-0"
-          style={{ backfaceVisibility: "hidden" }}
+          style={{
+            backfaceVisibility: "hidden",
+            WebkitBackfaceVisibility: "hidden",
+            transform: "rotateY(0deg)",
+            visibility: flipped ? "hidden" : "visible",
+            transition: "visibility 0s linear 250ms",
+          }}
           aria-hidden={flipped}
         >
           {front}
@@ -124,7 +137,13 @@ export function ResponseFlip({
 
         <div
           className="col-start-1 row-start-1 min-w-0"
-          style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
+          style={{
+            backfaceVisibility: "hidden",
+            WebkitBackfaceVisibility: "hidden",
+            transform: "rotateY(180deg)",
+            visibility: flipped ? "visible" : "hidden",
+            transition: "visibility 0s linear 250ms",
+          }}
           aria-hidden={!flipped}
         >
           {/* Deliberately compact. Both faces share a grid cell so the card is

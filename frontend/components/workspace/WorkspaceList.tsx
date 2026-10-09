@@ -147,7 +147,10 @@ export function WorkspaceList() {
           <Spinner className="text-ink-muted" />
         </div>
       ) : (
-        <ul className="mt-12 grid gap-4 lg:grid-cols-2">
+        // grid-cols-1, not the implicit track: an implicit column is sized to
+        // its widest card, so one long name pushed every card past a phone's
+        // edge and the truncate never engaged.
+        <ul className="mt-12 grid grid-cols-1 gap-4 lg:grid-cols-2">
           {composing && (
             <li>
               <form
@@ -205,8 +208,8 @@ export function WorkspaceList() {
             </li>
           )}
 
-          {workspaces.map((ws) => (
-            <li key={ws.id}>
+          {workspaces.map((ws, i) => (
+            <li key={ws.id} className="phone-rise" style={{ "--i": i } as React.CSSProperties}>
               <Link
                 href={`/workspace/${ws.id}`}
                 className="flex h-[113px] items-start gap-6 rounded-[12px] border border-hairline-strong p-[9px] transition-colors hover:border-brand-border hover:bg-surface-hover"

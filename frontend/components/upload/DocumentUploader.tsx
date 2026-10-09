@@ -129,7 +129,7 @@ export function DocumentUploader({
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            className="flex h-[42px] items-center gap-1 rounded-[34px] bg-brand px-3 py-2 text-xl leading-[normal] text-white transition-colors hover:bg-brand-dark disabled:opacity-60"
+            className="tap-area flex h-[42px] items-center gap-1 rounded-[34px] bg-brand px-3 py-2 text-xl leading-[normal] text-white transition-colors hover:bg-brand-dark disabled:opacity-60"
           >
             {uploading ? "Uploading…" : "Upload"}
             <svg
@@ -175,14 +175,15 @@ export function DocumentUploader({
         // of a document can actually say: what kind of file it is, what it
         // is called, and whether it has been read yet.
         <ul className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {documents.map((doc) => (
+          {documents.map((doc, i) => (
             <li
+              style={{ "--i": i } as React.CSSProperties}
               key={doc.id}
               // The design's tiles are a shade off the canvas with no border.
               // surface-sunken is the canvas itself in this palette, so they
               // were invisible; the hover wash is the one fill in the system
               // that is a step away from the background in both themes.
-              className="group/tile relative flex h-[145px] flex-col justify-between rounded-[12px] bg-surface-hover p-4 transition-shadow hover:ring-1 hover:ring-hairline-strong"
+              className="phone-rise group/tile relative flex h-[145px] flex-col justify-between rounded-[12px] bg-surface-hover p-4 transition-shadow hover:ring-1 hover:ring-hairline-strong"
             >
               <span className="text-xs font-medium uppercase tracking-wide text-ink-muted">
                 {extensionOf(doc.filename) || doc.file_type || "file"}
@@ -195,10 +196,13 @@ export function DocumentUploader({
                   <StatusBadge status={doc.status} />
                 </span>
               </span>
+              {/* Hover-revealed for a mouse; always shown on a touch screen,
+                  which has no hover - there it was invisible, and a phone
+                  had no way to know a file could be removed. */}
               <button
                 type="button"
                 onClick={() => handleDelete(doc.id)}
-                className="absolute right-2 top-2 rounded p-1 text-ink-muted opacity-0 transition-opacity hover:text-band-low focus-visible:opacity-100 group-hover/tile:opacity-100"
+                className="tap-target absolute right-2 top-2 inline-flex items-center justify-center rounded p-1 text-ink-muted opacity-0 transition-opacity hover:text-band-low focus-visible:opacity-100 group-hover/tile:opacity-100 phone-touch:opacity-100"
                 aria-label={`Delete ${doc.filename}`}
               >
                 <svg
