@@ -24,6 +24,7 @@ mode's actual instructions - the demo is the product, just without the
 apparatus around it.
 """
 
+import asyncio
 import json
 import logging
 import uuid
@@ -44,6 +45,7 @@ from app.models import Conversation, Message, User, Workspace, WorkspaceMember
 from app.services.anthropic_client import stream_generation
 from app.services.claim_parser import ClaimTagStripper, extract_crux
 from app.services.conversation_title import name_conversation
+from app.services.guidance import propose_guidance
 from app.services.guest_demo import (
     MAX_MESSAGE_CHARS,
     SESSION_BUDGET,
@@ -64,6 +66,11 @@ router = APIRouter(prefix="/guest", tags=["guest"])
 #: The quick path only. A guest answer is a taste, and the flagship model's
 #: deliberation is neither needed for that nor affordable at this price.
 _MODEL = settings.anthropic_fast_model
+
+#: How long the "is this the right companion?" judgement may hold up the
+#: answer. It is a nicety; past this the question is answered where it was
+#: asked rather than kept waiting for an opinion about where it belongs.
+_SWITCH_BUDGET_SECONDS = 6.0
 
 
 def _address(request: Request) -> str:
@@ -92,6 +99,49 @@ class GuestRequest(BaseModel):
     mode: str
     message: str = Field(min_length=1, max_length=MAX_MESSAGE_CHARS)
     history: list[GuestTurn] = Field(default_factory=list)
+    #: Answer in a better-suited companion when the question clearly belongs
+    #: in one, rather than answering badly in the one that happens to be
+    #: selected. On by default, exactly as in the app.
+    smart_switching: bool = True
+
+
+async def _settle_mode(
+    payload: "GuestRequest", history: list[dict]
+) -> tuple[str, str | None]:
+    """Which companion answers, and the one it was switched away from.
+
+    The app offers two behaviours here: stop and ask ("would you like
+    Decision-making for this?"), or just answer in the better companion and
+    say so, with a way back. The demo does only the second. Asking costs a
+    round trip and a second message out of a 5,000-token allowance, and a
+    visitor who has not signed up yet should be shown the product working,
+    not interviewed by it.
+
+    Never raises and never blocks the turn: a judgement that fails, times
+    out, or names something unknown leaves the question in the companion
+    the visitor picked, which is what happened before this existed.
+    """
+    chosen = payload.mode
+    if not payload.smart_switching:
+        return chosen, None
+    try:
+        guidance = await asyncio.wait_for(
+            propose_guidance(payload.message, chosen, [(t["role"], t["content"]) for t in history]),
+            timeout=_SWITCH_BUDGET_SECONDS,
+        )
+    except Exception:  # noqa: BLE001 - an optional judgement is optional
+        logger.info("guest mode suggestion unavailable", exc_info=True)
+        return chosen, None
+
+    suggested = (guidance or {}).get("suggested_mode")
+    if (
+        not isinstance(suggested, str)
+        or suggested == chosen
+        or suggested not in MODE_INSTRUCTIONS
+        or suggested == "rapid"
+    ):
+        return chosen, None
+    return suggested, chosen
 
 
 @router.get("/budget")
@@ -127,7 +177,6 @@ async def guest_chat(payload: GuestRequest, request: Request) -> EventSourceResp
     if await exhausted(session_id, address):
         return EventSourceResponse(_limit_reached())
 
-    instructions = build_system_instructions(payload.mode)
     history = trim_history([t.model_dump() for t in payload.history])
     conversation = "\n\n".join(
         f"{'User' if t['role'] == 'user' else 'You'}: {t['content']}" for t in history
@@ -142,6 +191,17 @@ async def guest_chat(payload: GuestRequest, request: Request) -> EventSourceResp
         # of the product is angle brackets.
         stripper = ClaimTagStripper()
         with meter() as usage:
+            # Which companion actually answers. Inside the meter on purpose:
+            # the judgement is a model call and a guest pays for it out of
+            # the same allowance as the answer, which is the honest
+            # accounting and keeps the ceiling meaningful.
+            mode, switched_from = await _settle_mode(payload, history)
+            instructions = build_system_instructions(mode)
+            if switched_from:
+                yield {
+                    "event": "switched",
+                    "data": json.dumps({"from": switched_from, "to": mode}),
+                }
             try:
                 async for event in stream_generation(
                     instructions=instructions, input_text=input_text, model=_MODEL

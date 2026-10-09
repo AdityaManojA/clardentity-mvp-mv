@@ -224,3 +224,86 @@ def _uuid_of(value):
     import uuid as _uuid
 
     return _uuid.UUID(value)
+
+
+class TestTheDemoMovesAQuestionToTheRightCompanion:
+    """Smart switching, in the demo.
+
+    The demo had neither the control nor anything behind it: a visitor who
+    asked Finder something that belonged in Reflect & Relieve got it
+    answered in Finder, where a signed-in user would have been moved. Only
+    the automatic half exists here - stopping to ask costs a round trip and
+    a second message out of a 5,000-token allowance.
+    """
+
+    class _Payload:
+        def __init__(self, mode, message, smart_switching=True):
+            self.mode = mode
+            self.message = message
+            self.smart_switching = smart_switching
+
+    async def test_it_switches_when_another_companion_fits_better(self, monkeypatch):
+        from app.api import guest as guest_api
+
+        async def suggests(question, mode, history=None):
+            return {"suggested_mode": "therapy", "mode_reason": "This is about how they feel."}
+
+        monkeypatch.setattr(guest_api, "propose_guidance", suggests)
+        mode, switched_from = await guest_api._settle_mode(
+            self._Payload("knowing", "I can't stop replaying the argument"), []
+        )
+        assert (mode, switched_from) == ("therapy", "knowing")
+
+    async def test_the_toggle_really_turns_it_off(self, monkeypatch):
+        from app.api import guest as guest_api
+
+        called = []
+
+        async def suggests(question, mode, history=None):
+            called.append(question)
+            return {"suggested_mode": "therapy"}
+
+        monkeypatch.setattr(guest_api, "propose_guidance", suggests)
+        mode, switched_from = await guest_api._settle_mode(
+            self._Payload("knowing", "anything", smart_switching=False), []
+        )
+        assert (mode, switched_from) == ("knowing", None)
+        # And it does not merely ignore the answer - it never asks, so a
+        # visitor who turned it off is not paying for the judgement.
+        assert called == []
+
+    async def test_a_suggestion_it_cannot_honour_changes_nothing(self, monkeypatch):
+        from app.api import guest as guest_api
+
+        for suggestion in ({"suggested_mode": "knowing"},      # same mode
+                           {"suggested_mode": "rapid"},        # the unpickable path
+                           {"suggested_mode": "nonsense"},     # not a companion
+                           {"suggested_mode": None},
+                           {},
+                           None):
+            async def suggests(question, mode, history=None, s=suggestion):
+                return s
+
+            monkeypatch.setattr(guest_api, "propose_guidance", suggests)
+            mode, switched_from = await guest_api._settle_mode(
+                self._Payload("knowing", "anything"), []
+            )
+            assert (mode, switched_from) == ("knowing", None), suggestion
+
+    async def test_a_judgement_that_fails_or_hangs_never_blocks_the_answer(self, monkeypatch):
+        import asyncio
+
+        from app.api import guest as guest_api
+
+        async def explodes(question, mode, history=None):
+            raise RuntimeError("guidance is down")
+
+        monkeypatch.setattr(guest_api, "propose_guidance", explodes)
+        assert await guest_api._settle_mode(self._Payload("knowing", "x"), []) == ("knowing", None)
+
+        async def hangs(question, mode, history=None):
+            await asyncio.sleep(30)
+
+        monkeypatch.setattr(guest_api, "propose_guidance", hangs)
+        monkeypatch.setattr(guest_api, "_SWITCH_BUDGET_SECONDS", 0.05)
+        assert await guest_api._settle_mode(self._Payload("knowing", "x"), []) == ("knowing", None)

@@ -42,13 +42,21 @@ export function ChatGreeting() {
 
   if (!text) return null;
   return (
-    <p
-      // Large and quiet. It is the only thing on the screen above the
-      // composer, so it can afford the size, and it must not look like a
-      // question waiting to be answered.
-      className="animate-[fade-in_0.4s_ease] text-center text-2xl font-medium text-ink-secondary sm:text-3xl"
-    >
-      {text}
-    </p>
+    <div className="animate-[fade-in_0.4s_ease] text-center">
+      <p
+        // Large and quiet. It is the only thing on the screen above the
+        // composer, so it can afford the size, and it must not look like a
+        // question waiting to be answered.
+        className="text-2xl font-medium text-ink-secondary sm:text-3xl"
+      >
+        {text}
+      </p>
+      {/* The invitation under the greeting. The greeting says the app
+          noticed you; this says what it is for. Quieter and smaller, so the
+          pair reads as one thought rather than two headings. */}
+      <p className="mt-2 text-sm text-ink-muted sm:text-base">
+        Let&apos;s accomplish something today.
+      </p>
+    </div>
   );
 }

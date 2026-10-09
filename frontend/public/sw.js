@@ -39,7 +39,11 @@
 // v8: the end-to-end pass. "Skip for now" on the welcome questions was
 // discarding answers already typed - a bundle still doing that would keep
 // throwing away the one thing a new account tells us about itself.
-const CACHE = "clardentity-shell-v8";
+//
+// v9: smart switching in the demo and the new welcome copy. The demo's
+// client now sends smart_switching and reads a "switched" event; an old
+// bundle would send neither and show neither.
+const CACHE = "clardentity-shell-v9";
 
 // Only things that are content-addressed or genuinely static. HTML is not
 // here on purpose - a stale shell is how a deployed fix fails to reach
