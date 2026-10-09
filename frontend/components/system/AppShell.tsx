@@ -244,7 +244,7 @@ function NavItem({
       onClick={onNavigate}
       aria-current={active ? "page" : undefined}
       className={cx(
-        "flex h-12 items-center gap-3 rounded-[9px] px-4 text-sm transition-colors",
+        "tap-target flex h-12 items-center gap-3 rounded-[9px] px-4 text-sm transition-colors",
         active
           ? "bg-[var(--surface-hover)] font-medium text-ink"
           : "text-[color:var(--text-nav)] hover:bg-surface-hover hover:text-ink",
@@ -296,7 +296,7 @@ function WorkspaceSwitcher({
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="menu"
         aria-expanded={open}
-        className="flex w-full items-center gap-2.5 rounded-lg border border-hairline bg-surface px-2.5 py-2 text-left transition-colors hover:bg-surface-hover"
+        className="tap-target flex w-full items-center gap-2.5 rounded-lg border border-hairline bg-surface px-2.5 py-2 text-left transition-colors hover:bg-surface-hover"
       >
         <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-brand text-xs font-semibold text-white">
           {(active?.name ?? "W").slice(0, 1).toUpperCase()}
@@ -617,7 +617,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           void startConversation();
         }}
         disabled={starting}
-        className="mt-3 flex h-12 items-center gap-3 rounded-[9px] px-4 text-left text-sm text-[color:var(--text-nav)] transition-colors hover:bg-surface-hover hover:text-ink disabled:opacity-50"
+        className="tap-target mt-3 flex h-12 items-center gap-3 rounded-[9px] px-4 text-left text-sm text-[color:var(--text-nav)] transition-colors hover:bg-surface-hover hover:text-ink disabled:opacity-50"
       >
         <MaskIcon src="/ui/nav-newchat.svg" size={24} />
         {starting ? "Starting…" : "New chat"}
@@ -759,7 +759,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <button
                 onClick={dismiss}
                 aria-label="Close navigation"
-                className="rounded-md p-1.5 text-ink-muted hover:bg-surface-hover"
+                className="tap-target inline-flex items-center justify-center rounded-md p-1.5 text-ink-muted hover:bg-surface-hover"
               >
                 <Icon path={icons.close} />
               </button>
@@ -786,7 +786,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             onClick={() => setMobileOpen(true)}
             aria-label="Open navigation"
             aria-expanded={mobileOpen}
-            className="rounded-md p-1.5 text-ink-secondary hover:bg-surface-hover lg:hidden"
+            className="tap-target inline-flex items-center justify-center rounded-md p-1.5 text-ink-secondary hover:bg-surface-hover lg:hidden"
           >
             <Icon path={icons.menu} />
           </button>
@@ -814,7 +814,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             disabled={starting}
             aria-label="New chat"
             title="New chat"
-            className="ml-auto shrink-0 rounded-md p-1.5 text-brand transition-colors hover:bg-surface-hover disabled:opacity-50 lg:hidden"
+            className="tap-target ml-auto inline-flex shrink-0 items-center justify-center rounded-md p-1.5 text-brand transition-colors hover:bg-surface-hover disabled:opacity-50 lg:hidden"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9"
               strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="h-4 w-4">
@@ -833,7 +833,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               onClick={() => startTour(tourHere, { force: true })}
               title="Show me around this page"
               aria-label="Show me around this page"
-              className="shrink-0 rounded-md p-1.5 text-ink-muted transition-colors hover:bg-surface-hover hover:text-ink"
+              className="tap-target inline-flex shrink-0 items-center justify-center rounded-md p-1.5 text-ink-muted transition-colors hover:bg-surface-hover hover:text-ink"
             >
               <svg
                 viewBox="0 0 24 24"

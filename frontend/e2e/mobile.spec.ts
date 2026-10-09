@@ -84,13 +84,18 @@ test.describe("render & layout", () => {
     const check = async (scope: string) => {
       for (const el of await page.locator(`${scope} :is(button, a[href]):visible`).all()) {
         const b = await el.boundingBox();
-        if (b && (b.width < 44 || b.height < 44)) {
+        if (b && (Math.round(b.width) < 44 || Math.round(b.height) < 44)) {
           const name = (await el.getAttribute("aria-label")) ?? (await el.innerText()).trim().slice(0, 24);
           small.push(`${scope} "${name}" ${Math.round(b.width)}x${Math.round(b.height)}`);
         }
       }
     };
     await check("header");
+    // enlarged hit areas must not overlap their neighbours
+    const hdr = (await Promise.all((await page.locator("header button:visible").all()).map((el) => el.boundingBox())))
+      .filter(Boolean)
+      .sort((p, q) => p!.x - q!.x) as { x: number; width: number }[];
+    for (let i = 1; i < hdr.length; i++) expect.soft(hdr[i].x).toBeGreaterThanOrEqual(hdr[i - 1].x + hdr[i - 1].width - 1);
     const drawer = await openDrawer(page);
     await check("div.fixed.inset-0.z-40 aside");
     // nav items must not overlap each other

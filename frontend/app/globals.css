@@ -454,6 +454,18 @@
   }
 }
 
+/* A finger-sized hit area on touch screens, without redrawing the control:
+   the icon and label stay the size the design draws them, and only the box
+   you can tap grows. 44px is measured on the glass, so it is divided by the
+   root zoom - 44 CSS pixels under the 85% zoom would be a 37px target, the
+   same shortfall this exists to fix. Mice and trackpads keep the drawn size. */
+@utility tap-target {
+  @media (pointer: coarse) {
+    min-width: calc(44px / var(--ui-zoom));
+    min-height: calc(44px / var(--ui-zoom));
+  }
+}
+
 body {
   background: var(--canvas);
   color: var(--text);

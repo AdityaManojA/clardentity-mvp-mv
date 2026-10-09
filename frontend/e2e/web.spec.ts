@@ -34,6 +34,9 @@ test("T09 sidebar nav @T09", async ({ signedIn: page }) => {
   await expect(page.locator(sel.openNav)).toBeHidden(); // drawer trigger is mobile-only
   const sidebar = page.locator("aside").first();
   await expect(sidebar).toBeVisible();
+  // mouse: the drawn size, no touch enlargement (48px row x 0.85 zoom)
+  const row = (await sidebar.getByRole("link", { name: "Search" }).boundingBox())!;
+  expect(Math.round(row.height)).toBe(41);
   await sidebar.getByRole("link", { name: "Search" }).click();
   await expect(page).toHaveURL(/\/search|\/workspace/);
 });
