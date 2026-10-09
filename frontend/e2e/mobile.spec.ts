@@ -111,6 +111,7 @@ test.describe("render & layout", () => {
 
 test.describe("navigation", () => {
   test("M03 drawer: open/close, focus trap, back @M03", async ({ signedIn: page }) => {
+    test.slow(); // many navigations; a dev server under parallel load serves each slowly
     await page.goto("/workspace");
     const drawer = await openDrawer(page);
     await press(page, sel.closeNav);
@@ -146,7 +147,7 @@ test.describe("navigation", () => {
     await d.getByRole("link", { name: "Search" }).tap();
     await expect(page).toHaveURL(/\/workspace\/w1\/search$/, { timeout: 15_000 }); // first hit compiles the route in dev
     await page.goBack();
-    await expect(page).toHaveURL(/\/workspace\/w1$/);
+    await expect(page).toHaveURL(/\/workspace\/w1$/, { timeout: 15_000 });
   });
 });
 
@@ -273,7 +274,9 @@ test("M11 logout from drawer clears session @M11 @critical", async ({ signedIn: 
   await openDrawer(page);
   await press(page, `div.fixed.inset-0.z-40 ${sel.accountMenu}`);
   await press(page, sel.logout);
-  await expect(page).toHaveURL(/\/login/);
+  // the redirect is a client navigation; in dev, under parallel load, the
+  // /login payload alone has taken up to ~10s to arrive
+  await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
   await expect(page.locator(sel.email)).toBeVisible();
   const tokens = await page.evaluate((k) => [localStorage.getItem(k.access), localStorage.getItem(k.refresh)], KEYS);
   expect(tokens).toEqual([null, null]);
@@ -412,6 +415,8 @@ test("M29 companion floats over the thread on a phone - no band across the chat 
   await expect(page.locator(sel.composer)).toBeEditable({ timeout: 30_000 });
   const avatar = page.locator('[data-tour="companion"]');
   await expect(avatar).toBeVisible();
+  // the composer is ready before the thread arrives; measure against the thread
+  await expect(page.locator(sel.message).last()).toBeVisible();
   const r = await page.evaluate(() => {
     const a = document.querySelector('[data-tour="companion"]')!;
     const row = a.parentElement!;
@@ -454,9 +459,10 @@ test("M31 home curtain on a phone: lit without hover, sweeps or follows tilt, re
 
   // lit and moving by itself - no pointer, no sensor
   await expect.poll(() => lightAt(page), { timeout: 5_000 }).toBeGreaterThanOrEqual(0);
+  // The sweep is ~18s there and back and lingers at each end, so two samples
+  // a couple of seconds apart can match at a turning point: watch for a move.
   const a = await lightAt(page);
-  await page.waitForTimeout(2_500);
-  expect(await lightAt(page), "the light sweeps on its own").not.toBe(a);
+  await expect.poll(() => lightAt(page), { message: "the light sweeps on its own", timeout: 8_000 }).not.toBe(a);
 
   // tilt steers it (Chromium/Android: no permission prompt in the way)
   if (browserName === "chromium") {
