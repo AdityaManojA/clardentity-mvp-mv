@@ -82,10 +82,11 @@ Status key: ✅ Done · 🔄 Built, waiting on a setup step · 🔍 Built, needs
 | ✅ | Faint grey helper text darkened just enough to meet accessibility contrast (all colour themes, light and dark) |
 | ✅ | "You're offline" notice; the chat box keeps your text and waits until you're back online |
 | ✅ | Stable test hooks (`data-testid`) on the menu, message list and messages |
-| ⬜ | Friendly error page instead of a blank screen if something crashes |
+| 🟨 | Friendly error page instead of a blank screen if something crashes (style to be chosen, see Section 5) |
 | ⬜ | Stop the page behind the open menu from scrolling |
-| ⬜ | Swipe to close the menu |
-| ⬜ | Larger tap area for the ⋮ menu and rows in recent chats |
+| ✅ | Swipe left to close the menu on phones (follows the finger; short drags spring back). No swipe-to-open, so it never clashes with the iPhone Back gesture |
+| ✅ | Logging out on desktop could leave a spinner instead of the login page (a double redirect); fixed |
+| ✅ | Recent chats in the menu: rows and the ⋮ button 36px on phones (were 27px and 24px); desktop unchanged |
 | ⬜ | Fix an outdated code comment about phone scaling |
 
 ## 4. Mobile production readiness
@@ -167,6 +168,7 @@ Status key: ✅ Done · 🔄 Built, waiting on a setup step · 🔍 Built, needs
 |:---:|---|
 | ✅ | **Tap target size.** Decided: enlarge only the tappable area on touch screens; the design stays as drawn |
 | ✅ | **Where work happens.** Decided: mobile-view work lives in `AdityaManojA/clardentity-mvp-mv`; finished, tested changes are merged into the main repo later |
+| 🟨 | **Error page style.** Options: (A) a card inside the app, menu kept; (B) full screen with the companion; (C) only the broken part fails; (D) card plus a reference code and send-report button. Recommended: A for page errors, plus B as the last resort when the whole app fails |
 | 🟨 | **Graph files in git.** The guide asks not to commit generated output; `graphify-out/` is currently committed. Decide whether to remove it from git and ignore it |
 
 ## 6. From the technical guide

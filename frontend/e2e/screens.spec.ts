@@ -3,10 +3,21 @@
  * sideways scroll, primary actions have a 44px tap area, happy path, and at
  * least one error path. Mocked backend; the reset email is never sent - the
  * token is put straight in the URL, as the link in the email would. */
-import type { Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 import { test, expect, sel, signIn, press, horizontalOverflow, expectTappable, CREDS } from "./fixtures";
 
 test.describe.configure({ timeout: 60_000 }); // first visit compiles each route in dev
+
+/** fill(), then make sure the value stuck. Under `next dev`, WebKit sometimes
+ *  re-renders a freshly loaded auth page once more and empties a field that
+ *  was just filled; never seen against the production build (10/10 runs), so
+ *  this guards local runs without hiding an app bug. */
+async function fillStable(loc: Locator, value: string) {
+  await expect(async () => {
+    if ((await loc.inputValue()) !== value) await loc.fill(value);
+    await expect(loc).toHaveValue(value, { timeout: 500 });
+  }).toPass({ timeout: 10_000 });
+}
 
 async function noSideScroll(page: Page) {
   expect(await horizontalOverflow(page), `side-scroll on ${new URL(page.url()).pathname}`).toBeLessThanOrEqual(0);
@@ -49,6 +60,7 @@ test.describe("signed out", () => {
     await expect(send).toBeVisible({ timeout: 30_000 });
     await noSideScroll(page);
     await expectTappable(send, "Send reset link");
+    await expect(page.locator("#email")).toBeFocused(); // hydrated (autoFocus)
     await page.locator("#email").fill(CREDS.email);
     await press(page, 'button:has-text("Send reset link")');
     await expect(page.getByRole("heading", { name: "Check your email" })).toBeVisible();
@@ -60,11 +72,15 @@ test.describe("signed out", () => {
     // expired token -> server error shown
     await page.goto("/reset-password?token=expired");
     const save = page.getByRole("button", { name: "Save and sign in" });
-    await page.locator("#password").fill("new-password-1");
-    await page.locator("#confirm").fill("new-password-2");
+    // autoFocus lands when React hydrates: filling before that typed into
+    // server HTML that hydration then reset (WebKit hydrates later, so it
+    // flaked there - the button stayed disabled over matching passwords)
+    await expect(page.locator("#password")).toBeFocused({ timeout: 30_000 });
+    await fillStable(page.locator("#password"), "new-password-1");
+    await fillStable(page.locator("#confirm"), "new-password-2");
     await expect(page.getByText("These two don't match yet.")).toBeVisible();
     await expect(save).toBeDisabled();
-    await page.locator("#confirm").fill("new-password-1");
+    await fillStable(page.locator("#confirm"), "new-password-1");
     await expect(save).toBeEnabled();
     await expectTappable(save, "Save and sign in");
     await press(page, 'button:has-text("Save and sign in")');
@@ -72,8 +88,9 @@ test.describe("signed out", () => {
 
     // valid token -> signed in
     await page.goto("/reset-password?token=good");
-    await page.locator("#password").fill("new-password-1");
-    await page.locator("#confirm").fill("new-password-1");
+    await expect(page.locator("#password")).toBeFocused({ timeout: 30_000 }); // hydrated
+    await fillStable(page.locator("#password"), "new-password-1");
+    await fillStable(page.locator("#confirm"), "new-password-1");
     await press(page, 'button:has-text("Save and sign in")');
     await page.waitForURL(/\/(start|chat\/)/);
   });

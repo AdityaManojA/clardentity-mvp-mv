@@ -54,7 +54,7 @@ test("T13 logout clears session @T13 @critical", async ({ signedIn: page }) => {
   await page.goto("/workspace");
   await page.click(sel.accountMenu);
   await page.click(sel.logout);
-  await expect(page).toHaveURL(/\/login/);
+  await expect(page).toHaveURL(/\/login/, { timeout: 15_000 }); // first visit compiles /login in dev
   const tokens = await page.evaluate((k) => [localStorage.getItem(k.access), localStorage.getItem(k.refresh)], KEYS);
   expect(tokens).toEqual([null, null]);
 });

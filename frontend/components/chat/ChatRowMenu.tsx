@@ -163,7 +163,8 @@ export function ChatRowMenu({
         aria-label={`Options for "${label}"`}
         // Always visible, never hover-revealed: a hover-only control does not
         // exist on a touch screen, which is where most of these lists are read.
-        className="rounded-md p-1.5 text-ink-muted/80 transition-colors hover:bg-surface-hover hover:text-ink"
+        // 36px square on a touch screen, matching the recents row it sits in.
+        className="inline-flex items-center justify-center rounded-md p-1.5 text-ink-muted/80 transition-colors hover:bg-surface-hover hover:text-ink pointer-coarse:size-[calc(36px/var(--ui-zoom))]"
       >
         <Kebab className="h-4 w-4" />
       </button>

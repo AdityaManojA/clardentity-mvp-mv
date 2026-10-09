@@ -26,6 +26,7 @@ const skipTags = process.env.E2E_VISUAL === "1" ? /@live/ : /@live|@visual/;
 
 export default defineConfig({
   testDir: "./e2e",
+  globalSetup: "./e2e/warmup.ts", // compiles routes up front on local dev runs
   fullyParallel: true,
   // One dev server serves every worker; past ~4 it spends the run compiling
   // routes and page loads time out. Not an app problem, so capped here.

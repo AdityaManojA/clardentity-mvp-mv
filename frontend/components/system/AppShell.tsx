@@ -10,6 +10,7 @@ import {
   useRef,
   useState,
   useSyncExternalStore,
+  type PointerEvent as ReactPointerEvent,
   type ReactNode,
 } from "react";
 import { apiFetch } from "@/lib/apiClient";
@@ -18,6 +19,7 @@ import { ThemeToggle } from "@/components/system/ThemeToggle";
 import { ChatRowMenu } from "@/components/chat/ChatRowMenu";
 import { rememberWorkspace } from "@/lib/lastWorkspace";
 import { startTour, type TourId } from "@/lib/tour";
+import { uiZoom } from "@/lib/uiScale";
 import { MaskIcon } from "@/components/ui/MaskIcon";
 import { AccountMenu } from "@/components/system/AccountMenu";
 import { cx } from "@/components/ui/primitives";
@@ -179,7 +181,10 @@ function RecentConversations({
               onClick={onNavigate}
               aria-current={c.id === activeId ? "page" : undefined}
               className={cx(
-                "flex h-8 min-w-0 flex-1 items-center gap-5 truncate rounded-[9px] pl-4 pr-1.5 text-sm transition-colors",
+                // 36px on a touch screen (measured on the glass, hence the
+                // zoom divide): the drawn 32px row is 27px under the 85% zoom,
+                // half a fingertip, in a list where a miss opens the wrong chat.
+                "flex h-8 min-w-0 flex-1 items-center gap-5 truncate rounded-[9px] pl-4 pr-1.5 text-sm transition-colors pointer-coarse:h-[calc(36px/var(--ui-zoom))]",
                 c.id === activeId
                   ? "bg-[var(--surface-hover)] font-medium text-ink"
                   : "text-[color:var(--text-nav)] hover:bg-surface-hover hover:text-ink",
@@ -385,7 +390,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   // page itself must not be shown behind the drawer.
   useEffect(() => {
     function onOpen() {
-      setMobileOpen(true);
+      openDrawer();
       setSidebarCollapsed(false);
     }
     function onClose() {
@@ -495,6 +500,64 @@ export function AppShell({ children }: { children: ReactNode }) {
     if (drawerEntry.current) window.history.back();
     else setMobileOpen(false);
   }, []);
+
+  /* Swipe to close: the drawer follows a finger dragged left and closes past
+     40% of its width or on a quick flick; anything shorter springs back.
+     Close only - no edge-swipe to open, because a swipe in from the left edge
+     is iOS Safari's own Back gesture and the two would fight. A drag can
+     start anywhere, links included: once it's sideways the pointer is
+     captured, so the link under the finger never receives a click. */
+  const [dragX, setDragX] = useState(0); // layout px, 0 = fully open
+  const [dragWidth, setDragWidth] = useState(1); // drawer width at drag start, layout px
+  const [dragging, setDragging] = useState(false);
+  const drag = useRef<{ x: number; y: number; t: number; axis: "x" | "y" | null } | null>(null);
+  function openDrawer() {
+    setDragX(0); // a swipe-close leaves the drawer parked off-screen
+    setMobileOpen(true);
+  }
+  const drawerWidth = () => (drawerRef.current?.getBoundingClientRect().width ?? 0) / uiZoom();
+
+  function onDrawerPointerDown(e: ReactPointerEvent<HTMLElement>) {
+    if (e.pointerType === "mouse") return; // a mouse has the X and the backdrop
+    drag.current = { x: e.clientX, y: e.clientY, t: e.timeStamp, axis: null };
+  }
+  function onDrawerPointerMove(e: ReactPointerEvent<HTMLElement>) {
+    const d = drag.current;
+    if (!d) return;
+    const mx = e.clientX - d.x;
+    const my = e.clientY - d.y;
+    if (d.axis === null) {
+      if (Math.abs(mx) < 8 && Math.abs(my) < 8) return;
+      // Up/down stays a scroll of the menu; only a sideways start is a swipe.
+      d.axis = Math.abs(mx) > Math.abs(my) ? "x" : "y";
+      if (d.axis === "x") {
+        setDragging(true);
+        setDragWidth(drawerWidth() || 1);
+        try {
+          e.currentTarget.setPointerCapture(e.pointerId);
+        } catch {
+          // a pointer the browser no longer tracks; the drag still works
+        }
+      }
+    }
+    if (d.axis !== "x") return;
+    // clientX is screen pixels; the transform is in the zoomed layout's.
+    setDragX(Math.min(0, mx) / uiZoom());
+  }
+  function onDrawerPointerEnd(e: ReactPointerEvent<HTMLElement>, cancelled = false) {
+    const d = drag.current;
+    drag.current = null;
+    if (!d || d.axis !== "x") return;
+    setDragging(false);
+    const travelled = Math.min(0, e.clientX - d.x) / uiZoom();
+    const speed = travelled / Math.max(1, e.timeStamp - d.t); // layout px per ms
+    if (!cancelled && (-travelled > drawerWidth() * 0.4 || speed < -0.6)) {
+      setDragX(-drawerWidth()); // finish the slide, then close
+      setTimeout(dismiss, 180);
+    } else {
+      setDragX(0);
+    }
+  }
 
   useEffect(() => {
     if (!mobileOpen) return;
@@ -745,7 +808,8 @@ export function AppShell({ children }: { children: ReactNode }) {
             aria-label="Close navigation"
             tabIndex={-1}
             onClick={dismiss}
-            className="absolute inset-0 bg-black/40"
+            className={cx("absolute inset-0 bg-black/40", !dragging && "transition-opacity duration-200")}
+            style={{ opacity: dragX ? Math.max(0, 1 + dragX / dragWidth) : undefined }}
           />
           <aside
             ref={drawerRef}
@@ -753,7 +817,19 @@ export function AppShell({ children }: { children: ReactNode }) {
             role="dialog"
             aria-modal="true"
             aria-label="Navigation"
-            className="absolute inset-y-0 left-0 flex w-[var(--sidebar-width)] flex-col border-r border-hairline bg-surface-muted"
+            onPointerDown={onDrawerPointerDown}
+            onPointerMove={onDrawerPointerMove}
+            onPointerUp={(e) => onDrawerPointerEnd(e)}
+            onPointerCancel={(e) => onDrawerPointerEnd(e, true)}
+            className={cx(
+              // pan-y on every descendant, not just the aside: a scroll box
+              // inside (the recents list) resets touch-action, and there the
+              // browser claimed the sideways drag and cancelled the swipe.
+              "absolute inset-y-0 left-0 flex w-[var(--sidebar-width)] touch-pan-y flex-col border-r border-hairline bg-surface-muted [&_*]:touch-pan-y",
+              !dragging && "transition-transform duration-200 ease-out",
+              dragging && "select-none",
+            )}
+            style={{ transform: dragX ? `translateX(${dragX}px)` : undefined }}
           >
             <div className="flex h-[var(--topbar-height)] items-center justify-between border-b border-hairline px-4">
               <span className="text-sm font-semibold tracking-tight text-ink">
@@ -786,7 +862,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               means the first render can pick wrong. */}
           <button
             ref={openNavRef}
-            onClick={() => setMobileOpen(true)}
+            onClick={() => openDrawer()}
             aria-label="Open navigation"
             aria-expanded={mobileOpen}
             className="tap-target inline-flex items-center justify-center rounded-md p-1.5 text-ink-secondary hover:bg-surface-hover lg:hidden"
