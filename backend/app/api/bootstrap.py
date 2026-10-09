@@ -69,10 +69,12 @@ async def bootstrap(
         for w, role in rows.all()
     ]
 
+    made_workspace = False
     if not workspaces:
         # Registration makes one, so this is a repair rather than the normal
         # path - an account that lost its last workspace still has to be
         # able to open the app.
+        made_workspace = True
         workspace = Workspace(owner_id=current_user.id, name="My workspace")
         db.add(workspace)
         await db.flush()
@@ -119,8 +121,14 @@ async def bootstrap(
         db.add(reusable)
         created = True
 
-    await db.commit()
-    await db.refresh(reusable)
+    # Only when there is something to write. The common entry - an account
+    # with a workspace and an empty chat still lying about - reads and
+    # nothing more, and a commit on that path is a round trip to Postgres
+    # for no reason, on the one request whose whole purpose is to be the
+    # only one.
+    if created or made_workspace:
+        await db.commit()
+        await db.refresh(reusable)
 
     return BootstrapResult(
         # .of rather than model_validate: the admin flag is computed on the
