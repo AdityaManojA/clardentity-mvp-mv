@@ -19,10 +19,10 @@ Status key: ✅ Done · 🔄 Built, waiting on a setup step · 🔍 Built, needs
 | ✅ | Overlapping runs prevented; never runs inside the upstream repo |
 | ✅ | Merge script tested locally against every failure case |
 | ✅ | Setup and testing guide (`.github/SYNC_UPSTREAM.md`) |
-| ⬜ | Enable Actions on the fork and create the `sync-approval` environment with reviewers |
+| ✅ | Actions enabled on the fork; `sync-approval` requires Aditya's approval before any sync |
 | ✅ | The merged result must pass the full test suite before a sync is pushed; a failure pushes nothing |
 | ⬜ | Real-time sync triggered by upstream (needs admin access on the upstream repo) |
-| ⬜ | Open upstream PRs from feature branches so fork-only files stay out of them |
+| ✅ | Upstream PRs go from a feature branch (`mobile-view`), so fork-only files stay out |
 
 ## 2. Mobile testing
 
@@ -60,6 +60,10 @@ Status key: ✅ Done · 🔄 Built, waiting on a setup step · 🔍 Built, needs
 | ✅ | Critical path (login → workspaces → chat send → logout) passes 5 runs in a row on every profile |
 | ✅ | Test suite runs on every pull request; ready to be a required check |
 | ✅ | Failed runs keep the report, screenshots, videos and traces for 14 days, with a summary of what failed |
+| ✅ | M32–M36: Error screens - one broken answer, page, whole app, recent chats, question card |
+| ✅ | M37–M44: Menu holds the page still, draft kept, named progress, no field zoom, phone edges, chat icon tap sizes, paid limit, feedback |
+| ✅ | M45–M47: Welcome questions, Privacy and Terms pages, cookie banner on a first visit |
+| ✅ | Whole mobile suite: 125 passed on both phone profiles (1 skipped by design) |
 | 🔄 | Live tests against the real backend: built and skipping cleanly; waiting on the test accounts and secrets |
 | 🔄 | Screenshot comparison of 5 key screens: built; waiting on the first baseline run in CI |
 | ✅ | M24: "Did you mean" card: ask it reworded or keep your wording; never asked twice |
@@ -86,13 +90,13 @@ Status key: ✅ Done · 🔄 Built, waiting on a setup step · 🔍 Built, needs
 | ✅ | Faint grey helper text darkened just enough to meet accessibility contrast (all colour themes, light and dark) |
 | ✅ | "You're offline" notice; the chat box keeps your text and waits until you're back online |
 | ✅ | Stable test hooks (`data-testid`) on the menu, message list and messages |
-| 🟨 | Friendly error page instead of a blank screen if something crashes (style to be chosen, see Section 5) |
-| ⬜ | Stop the page behind the open menu from scrolling |
+| ✅ | Friendly error screens on phones: the whole app → full-screen companion page; one broken part (an answer, a question card, a chart, recent chats, a page) → a "Try again" box with a small Report link; the reference appears only once a report is sent |
+| ✅ | The page behind the open menu stays still |
 | ✅ | Swipe left to close the menu on phones (follows the finger; short drags spring back). No swipe-to-open, so it never clashes with the iPhone Back gesture |
 | ✅ | Logging out on desktop could leave a spinner instead of the login page (a double redirect); fixed |
 | ✅ | Recent chats in the menu: rows and the ⋮ button 36px on phones (were 27px and 24px); desktop unchanged |
 | ✅ | Question cards: easier-to-tap buttons (same look), answer options 36px rows, upgrade dialog close button |
-| ⬜ | Fix an outdated code comment about phone scaling |
+| ✅ | Outdated code comment about phone scaling fixed |
 
 ## 4. Mobile production readiness
 
@@ -101,23 +105,23 @@ Status key: ✅ Done · 🔄 Built, waiting on a setup step · 🔍 Built, needs
 | Status | Task |
 |:---:|---|
 | 🔍 | Full-height layout that doesn't jump when the browser address bar hides/shows. The app uses a zoom-corrected `--app-vh`; switching to `dvh`/`svh` must keep the 0.85 zoom correction |
-| ⬜ | Safe-area padding for the iPhone notch / Dynamic Island on the top bar (`env(safe-area-inset-top)`). The app sets `statusBarStyle: black-translucent` but has no safe-area handling and no `viewport-fit=cover`, so the installed app may draw under the status bar |
-| ⬜ | Safe-area padding for the iOS home indicator / Android gesture bar under the composer (`env(safe-area-inset-bottom)`) |
+| 🔍 | Safe-area padding for the notch / Dynamic Island on the top bar and menu (built; needs a real iPhone to see) |
+| 🔍 | Safe-area padding for the home indicator / gesture bar under the chat box (built; needs a real phone to see) |
 | ✅ | Mobile menu drawer opens and closes over a dimmed backdrop |
 | ✅ | Tapping the backdrop or a chat in the menu closes it |
-| ⬜ | Page behind the open menu doesn't scroll |
+| ✅ | Page behind the open menu doesn't scroll |
 | ✅ | Browser/status-bar colour matches the app theme (light `#f5f3f4`, dark `#121013`, manifest `#121013`) |
 
 ### 4.2 Composer & on-screen keyboard
 
 | Status | Task |
 |:---:|---|
-| ⬜ | Viewport set to resize with the keyboard (`interactive-widget=resizes-content`) so the composer sits right above it |
+| ✅ | Page resizes with the on-screen keyboard (Android) so the chat box sits right above it |
 | 🔍 | Composer controls never squeezed: on phones the textarea takes the full width and the buttons get their own row |
 | ✅ | Composer grows with text up to a maximum height, then scrolls |
-| 🔍 | No iOS auto-zoom on input focus. Fields are 16px in CSS, but the 0.85 zoom draws them at ~13.6px, which may trigger iOS zoom |
+| ✅ | No iOS auto-zoom on input focus: small fields now draw at 16px on phones |
 | ✅ | Enter adds a new line on phones and sends on a real keyboard |
-| ⬜ | In-progress message is kept if the user switches tabs or refreshes |
+| ✅ | An unsent message is kept if you switch tabs or refresh; cleared once sent |
 
 ### 4.3 Chat feed, citations & question cards
 
@@ -134,9 +138,9 @@ Status key: ✅ Done · 🔄 Built, waiting on a setup step · 🔍 Built, needs
 |:---:|---|
 | ✅ | 44×44px tap areas on touch screens for the top bar and menu (icons look the same; only the tappable area grows) |
 | ✅ | 44×44px tap areas on the main buttons of every other screen |
-| ⬜ | Same 44×44px tap areas for chat controls: mode switcher, audio, attach, delete, regenerate |
-| 🔍 | No 300ms tap delay (`touch-action: manipulation`): set on the companion switcher only so far |
-| ⬜ | No rubber-band bounce of the whole page at the top/bottom of a chat (`overscroll-behavior-y: contain`) |
+| ✅ | 44×44px tap areas for chat controls: attach, mic, call, send, copy, regenerate, delete, helpful / not helpful |
+| ✅ | No 300ms tap delay on anything you can press |
+| ✅ | No rubber-band bounce of the whole page at the top/bottom of a chat |
 
 ### 4.5 Media, audio & uploads
 
@@ -156,7 +160,7 @@ Status key: ✅ Done · 🔄 Built, waiting on a setup step · 🔍 Built, needs
 | 🔍 | Opens full-screen from the home screen, with no browser bars |
 | 🔍 | Locking the phone or switching apps mid-answer recovers cleanly (reload if the answer was saved, otherwise offer retry) |
 | ✅ | "Connection lost" notice, with sending disabled until the connection is back |
-| ⬜ | Bump the service-worker cache version with each mobile release, so installed apps pick up fixes |
+| ✅ | Service-worker cache version bumped (v11) so installed apps pick up the mobile release |
 
 ### 4.7 Browser & device test matrix
 
@@ -173,7 +177,7 @@ Status key: ✅ Done · 🔄 Built, waiting on a setup step · 🔍 Built, needs
 |:---:|---|
 | ✅ | **Tap target size.** Decided: enlarge only the tappable area on touch screens; the design stays as drawn |
 | ✅ | **Where work happens.** Decided: mobile-view work lives in `AdityaManojA/clardentity-mvp-mv`; finished, tested changes are merged into the main repo later |
-| 🟨 | **Error page style.** Options: (A) a card inside the app, menu kept; (B) full screen with the companion; (C) only the broken part fails; (D) card plus a reference code and send-report button. Recommended: A for page errors, plus B as the last resort when the whole app fails |
+| ✅ | **Error page style.** Decided: full-screen companion page when the whole app breaks; "Try again" box with a small Report link for single parts |
 | 🟨 | **Graph files in git.** The guide asks not to commit generated output; `graphify-out/` is currently committed. Decide whether to remove it from git and ignore it |
 
 ## 6. From the technical guide
@@ -183,17 +187,17 @@ Status key: ✅ Done · 🔄 Built, waiting on a setup step · 🔍 Built, needs
 | ✅ | Technical guide reviewed (`docs/TECHNICAL_GUIDE.md`, upstream commit `47a8c2a`) |
 | ✅ | Tests never use the shared `clardentity@test.com` account |
 | ⬜ | Live test runs use a throwaway account registered via the API and deleted afterwards |
-| ⬜ | Show named progress (searching, reading, thinking, validating) instead of a generic "Thinking…". The server already sends it |
+| ✅ | Named progress on phones while an answer is on its way: "Searching the web", "Reading sources", "Checking the claims" |
 | ⬜ | Loading states designed for backend cold starts (several seconds after inactivity) |
-| ⬜ | Handle the paid-preview companions on mobile: unlock prompt and daily-limit message (402 responses) |
-| ⬜ | Bring in the latest upstream changes (fork is two commits behind, including this guide) |
+| ✅ | Paid-preview limit (402) explained in the chat, which stays usable |
+| ✅ | Latest upstream changes merged (one conflict resolved, keeping both fixes) |
 
 ## 7. Code knowledge graph
 
 | Status | Task |
 |:---:|---|
 | ✅ | Knowledge graph of the codebase built (graphify) |
-| ⬜ | Refresh the graph after the latest changes |
+| ✅ | Graph refreshed; used to map which routes and components the mobile tests didn't reach yet |
 | ⬜ | Add project documents and PDFs to the graph |
 
 ## 8. Test matrix (M12 onwards)
@@ -217,6 +221,22 @@ Status key: ✅ Done · 🔄 Built, waiting on a setup step · 🔍 Built, needs
 | M26 | Context question | Autofocus; Send blocked empty; round counted; fresh second round; skip sets `context_acknowledged` | T03 | Yes |
 | M27 | Mode suggestion | Resent in suggested mode with `mode_confirmed`; toast + undo; auto-dismiss; paid → upgrade dialog | T03 | Yes |
 | M23 | Offline after load | Notice; content kept; action fails with a message; recovers without refresh; chat draft kept | T12 | Yes |
+| M32 | Broken answer | Inline box; rest of chat works; Report sheet asks first, reference only after sending | T05 | Yes |
+| M33 | Broken page | Page-level box; menu still works | T05 | Yes |
+| M34 | Whole app broken | Full-screen companion page; Reload; Back to start | T03 | Yes |
+| M35 | Broken recent chats | Only that list gives way; menu works | T09 | No |
+| M36 | Broken question card | Only the card gives way; composer stays | T03 | No |
+| M37 | Menu open | Page behind it can't scroll | T09 | No |
+| M38 | Draft | Survives refresh; cleared after send | T07 | Yes |
+| M39 | Named progress | Real streamed status names shown while waiting | T05 | No |
+| M40 | Field zoom / taps | Small fields render ≥16px; touch-action manipulation | T03 | No |
+| M41 | Phone edges | viewport-fit cover, keyboard resize, safe-area hooks; drawer keeps pan-y | T09 | No |
+| M42 | Chat icons | 44px boxes for attach/mic/regenerate/feedback | T05 | No |
+| M43 | Paid limit | 402 detail shown; chat usable | T12 | Yes |
+| M44 | Feedback | Helpful tap sends rating | T05 | No |
+| M45 | Welcome | Questions, progress, finish → chat | T03 | Yes |
+| M46 | Privacy / Terms | Read on a phone, no sideways scroll | — | No |
+| M47 | Cookie banner | First visit: fits, tappable, remembers | — | No |
 | A11Y-1..3 | Accessibility | No serious/critical WCAG A/AA violations on login, workspaces, open menu | — | No |
 | V1..V5 | Screenshots | Login, workspaces, menu, chat, settings within 1% of baseline | — | No |
 | L1..L3 | Live (@live) | Real answer on a phone; admin dashboard opens; ordinary user refused | T03, T13 | Yes |

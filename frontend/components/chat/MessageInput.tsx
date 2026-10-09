@@ -372,7 +372,7 @@ export function MessageInput({
   }
 
   return (
-    <div className="space-y-1">
+    <div data-composer className="space-y-1">
       {attachments.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {attachments.map((item, i) => (

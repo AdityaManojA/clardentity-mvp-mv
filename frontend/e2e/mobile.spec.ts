@@ -2,7 +2,7 @@
  * Responsive app - same URLs as web; only the drawer controls differ (see sel).
  * Upstream T-deps are in the table at the end of e2e/README.md. */
 import type { Page } from "@playwright/test";
-import { test, expect, sel, login, mockApi, seedStorage, signIn, press, thread, tapArea, KEYS, LIVE } from "./fixtures";
+import { test, expect, sel, login, mockApi, seedStorage, signIn, press, thread, tapArea, settleAnimations, KEYS, LIVE } from "./fixtures";
 
 const W = 375;
 const H = 812;
@@ -288,6 +288,7 @@ test("M02b recent chats: 36px rows and options button on touch, no overlap @M02"
   const drawer = page.locator(sel.drawer);
   const rows = drawer.locator('a[href^="/chat/r"]');
   await expect(rows).toHaveCount(4, { timeout: 30_000 });
+  await settleAnimations(page); // the rows rise in, staggered; measure them at rest
   const boxes = [];
   for (const row of await rows.all()) {
     const b = (await row.boundingBox())!;
