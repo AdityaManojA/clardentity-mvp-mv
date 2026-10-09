@@ -432,3 +432,44 @@ test("M30 tapping Clardentity at the top of the menu goes home @M30", async ({ s
   await expect(page).toHaveURL(/\/$/, { timeout: 15_000 });
   await expect(page.locator(sel.drawer)).toHaveCount(0);
 });
+
+/** Index of the brightest curtain pleat (the light's position), or -1 if dark. */
+const lightAt = (page: Page) =>
+  page.evaluate(() => {
+    const pleats = [...document.querySelectorAll<HTMLElement>(".landing-shimmer > span")];
+    let best = -1;
+    let max = 0.02;
+    pleats.forEach((p, i) => {
+      const o = Number(p.style.opacity || 0);
+      if (o > max) [max, best] = [o, i];
+    });
+    return best;
+  });
+
+test("M31 home curtain on a phone: lit without hover, sweeps or follows tilt, rests off-screen @M31", async ({ app: page, browserName }) => {
+  test.setTimeout(60_000);
+  await page.goto("/");
+  await expect(page.locator(".landing-shimmer")).toBeAttached({ timeout: 30_000 });
+
+  // lit and moving by itself - no pointer, no sensor
+  await expect.poll(() => lightAt(page), { timeout: 5_000 }).toBeGreaterThanOrEqual(0);
+  const a = await lightAt(page);
+  await page.waitForTimeout(2_500);
+  expect(await lightAt(page), "the light sweeps on its own").not.toBe(a);
+
+  // tilt steers it (Chromium/Android: no permission prompt in the way)
+  if (browserName === "chromium") {
+    const tilt = (gamma: number) =>
+      page.evaluate((g) => window.dispatchEvent(new DeviceOrientationEvent("deviceorientation", { alpha: 0, beta: 40, gamma: g })), gamma);
+    await tilt(0); // how it's held = centre
+    await page.waitForTimeout(1_200);
+    await tilt(-22); // full left
+    await expect.poll(() => lightAt(page), { timeout: 4_000 }).toBeLessThan(12);
+    await tilt(22); // full right
+    await expect.poll(() => lightAt(page), { timeout: 4_000 }).toBeGreaterThan(38);
+  }
+
+  // scrolled away: the loop stops and the light goes out
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await expect.poll(() => lightAt(page), { timeout: 4_000 }).toBe(-1);
+});

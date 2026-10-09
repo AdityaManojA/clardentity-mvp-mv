@@ -29,6 +29,14 @@ import { usePrefersReducedMotion } from "@/lib/useReducedMotion";
  * one, depending on what happened to be behind it.
  *
  * Nothing here runs under prefers-reduced-motion.
+ *
+ * A phone has no hover, so on the phone layout the light is steered without
+ * one: by tilting the phone where the browser hands over the motion sensor
+ * without asking (Android), and otherwise by a slow sweep of its own - iPhones
+ * only release the sensor after a permission prompt, and the curtain doesn't
+ * ask. A finger on the stage still takes over while it's down. The light then
+ * stays on rather than waiting for a pointer to arrive, so the loop runs only
+ * while the stage is on screen and the tab is visible.
  */
 
 const PLEAT = 1.9906; // % of the stage's width, one fold to the next
@@ -68,6 +76,15 @@ const WAVE_LENGTH = 11; // distance between crests
 const WAVE_SPEED = 0.009; // how fast crests travel outward
 const SWAY = 0.1; // the idle drift, present whether or not anything moved
 
+/* The phone layout (touch, below lg). */
+const PHONE_QUERY = "(max-width: 1023.98px) and (pointer: coarse)";
+const PHONE_LIT = 0.75; // the light stays on - there is no hover to wait for
+const TILT_RANGE = 22; // degrees either side of how it was first held -> full sweep
+const TILT_DEAD = 1.5; // degrees of hand tremor ignored
+const SWEEP = 30; // % either side of centre the self-steering light travels
+const SWEEP_SPEED = 0.00035; // radians per ms - a slow pass, ~18s there and back
+const FOLLOW = 0.06; // per frame: how quickly the light catches up with the tilt
+
 export function CurtainShimmer({ style }: { style: React.CSSProperties }) {
   const hostRef = useRef<HTMLSpanElement>(null);
   const reducedMotion = usePrefersReducedMotion();
@@ -92,7 +109,30 @@ export function CurtainShimmer({ style }: { style: React.CSSProperties }) {
     let frame = 0;
     let idle = 0;
 
+    // The phone: where tilt (or the sweep) wants the light, and whether a
+    // finger is currently steering it instead.
+    const phone = window.matchMedia(PHONE_QUERY).matches;
+    let touching = false;
+    let tiltX: number | null = null; // % across, from the sensor; null = sweep
+    let baseline: number | null = null; // the angle it was first held at
+    let onScreen = true;
+    const ambient = () => phone && onScreen && document.visibilityState === "visible";
+
     const step = (now: number) => {
+      if (phone && !touching) {
+        // Steer the light towards the tilt, or along the slow sweep - eased,
+        // so sensor noise reads as a drift rather than a tremble. How fast it
+        // moves becomes a little wind, as a pointer's speed does.
+        const goal = tiltX ?? 50 + SWEEP * Math.sin(now * SWEEP_SPEED);
+        const before = pointerX;
+        pointerX += (goal - pointerX) * FOLLOW;
+        const strength = Math.min(Math.abs(pointerX - before) * GUST_FROM_SPEED * 4, GUST_MAX * 0.6);
+        if (strength > gust) {
+          gust = strength;
+          gustX = pointerX;
+        }
+        target = ambient() ? PHONE_LIT : 0;
+      }
       phase = now * WAVE_SPEED;
       lit += (target - lit) * 0.08;
       gust *= GUST_DECAY;
@@ -124,7 +164,7 @@ export function CurtainShimmer({ style }: { style: React.CSSProperties }) {
 
       // Keep going while there is anything to show: the light fading out, or
       // the fabric still settling.
-      if (lit > 0.002 || gust > 0.002) {
+      if (ambient() || lit > 0.002 || gust > 0.002) {
         frame = requestAnimationFrame(step);
       } else {
         frame = 0;
@@ -154,6 +194,7 @@ export function CurtainShimmer({ style }: { style: React.CSSProperties }) {
     };
 
     const onEnter = (event: PointerEvent) => {
+      touching = event.pointerType !== "mouse";
       const rect = stage.getBoundingClientRect();
       pointerX = ((event.clientX - rect.left) / rect.width) * 100;
       lastPointerX = pointerX;
@@ -162,6 +203,7 @@ export function CurtainShimmer({ style }: { style: React.CSSProperties }) {
     };
 
     const onLeave = () => {
+      touching = false;
       target = 0;
       // The gust that was in flight keeps travelling and dies on its own.
       wake();
@@ -173,8 +215,51 @@ export function CurtainShimmer({ style }: { style: React.CSSProperties }) {
     stage.addEventListener("pointermove", onMove);
     stage.addEventListener("pointerleave", onLeave);
     stage.addEventListener("pointercancel", onLeave);
+
+    // Tilt, where it comes without a prompt. Always listened for, never
+    // asked: iOS sends nothing until requestPermission() is granted, and the
+    // curtain never calls it, so iPhones simply keep the sweep. (Detecting
+    // iOS by that function doesn't work - current Chrome has it too, resolving
+    // at once.) Sensors only report on secure (https) pages; elsewhere no
+    // event arrives and the sweep continues.
+    const onTilt = (event: DeviceOrientationEvent) => {
+      if (event.gamma === null || event.beta === null) return;
+      // Left-right tilt is gamma held upright; turned sideways it's beta,
+      // signed by which way the phone was turned.
+      const angle = screen.orientation?.angle ?? 0;
+      const raw = angle === 90 ? event.beta : angle === 270 ? -event.beta : event.gamma;
+      // However it was being held when the page opened is "centre".
+      if (baseline === null) baseline = raw;
+      let delta = raw - baseline;
+      delta = Math.abs(delta) < TILT_DEAD ? 0 : delta - Math.sign(delta) * TILT_DEAD;
+      tiltX = Math.max(8, Math.min(92, 50 + (delta / TILT_RANGE) * 42));
+      wake();
+    };
+    const onTurn = () => {
+      baseline = null; // the axis just changed; re-centre on the new hold
+    };
+    const onVisibility = () => {
+      if (ambient()) wake();
+    };
+    const sight = new IntersectionObserver(([entry]) => {
+      onScreen = entry.isIntersecting;
+      if (ambient()) wake();
+    });
+
+    if (phone) {
+      window.addEventListener("deviceorientation", onTilt);
+      screen.orientation?.addEventListener("change", onTurn);
+      document.addEventListener("visibilitychange", onVisibility);
+      sight.observe(stage);
+      wake();
+    }
+
     return () => {
       if (frame) cancelAnimationFrame(frame);
+      window.removeEventListener("deviceorientation", onTilt);
+      screen.orientation?.removeEventListener("change", onTurn);
+      document.removeEventListener("visibilitychange", onVisibility);
+      sight.disconnect();
       stage.removeEventListener("pointerenter", onEnter);
       stage.removeEventListener("pointermove", onMove);
       stage.removeEventListener("pointerleave", onLeave);

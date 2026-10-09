@@ -77,3 +77,11 @@ test.describe("desktop keeps the drawn design, even with a touch screen", () => 
     await expect(page.getByTestId("offline-notice")).toHaveCount(0);
   });
 });
+
+test("T15 desktop curtain stays dark until hovered (no sweep, no tilt) @T15", async ({ app: page }) => {
+  await page.goto("/");
+  await expect(page.locator(".landing-shimmer")).toBeAttached({ timeout: 30_000 });
+  await page.waitForTimeout(1_500);
+  const lit = await page.evaluate(() => [...document.querySelectorAll<HTMLElement>(".landing-shimmer > span")].some((p) => Number(p.style.opacity || 0) > 0.02));
+  expect(lit).toBe(false);
+});
