@@ -1,10 +1,12 @@
 import csv
 import io
+import logging
 import re
 import uuid
 from html.parser import HTMLParser
 
 import docx
+import pdfplumber
 import tiktoken
 from openpyxl import load_workbook
 from pptx import Presentation
@@ -12,6 +14,8 @@ from pypdf import PdfReader
 
 from app.models import DocumentChunk
 from app.services.openai_client import embed_texts
+
+logger = logging.getLogger("clardentity.ingestion")
 
 # Section 12.3: ~500-800 tokens per chunk, ~15% overlap.
 CHUNK_TOKENS = 650
@@ -113,6 +117,72 @@ def _sheet_text(rows) -> str:  # noqa: ANN001
     return "\n".join(lines)
 
 
+#: Beyond this, table detection is not worth the wall-clock. pdfplumber
+#: walks the drawn lines on a page and is an order of magnitude slower than
+#: pulling the text layer; a 400-page scan would hold a worker for minutes
+#: to find nothing. The text layer still comes out of every page.
+_MAX_TABLE_PAGES = 60
+
+
+def pdf_page_text(page, plumber_page=None) -> str:  # noqa: ANN001
+    """One PDF page as text, with any tables laid out as rows.
+
+    A PDF has no idea it contains a table. The text layer is a bag of
+    positioned strings, so pulling it in reading order turns a price list
+    into a run of numbers with no way to tell which belongs to which drink -
+    which is exactly how Kerala alcohol prices came back, Bevco publishing
+    them as PDF tables and this reading them linearly.
+
+    So any table found on the page is appended as ' | '-separated rows,
+    the same shape a spreadsheet gets, where a figure keeps its column
+    neighbours. Appended rather than substituted: table detection misses
+    tables ruled only by whitespace, and the prose around them is often
+    where the units and the date live.
+    """
+    text = page.extract_text() or ""
+    if plumber_page is None:
+        return text
+
+    rendered = []
+    try:
+        for table in plumber_page.extract_tables() or []:
+            laid_out = _sheet_text(table)
+            # A "table" of one cell is a text box pdfplumber mistook for
+            # one, and repeating it under the prose helps nobody.
+            if laid_out and laid_out.count("\n") >= 1:
+                rendered.append(laid_out)
+    except Exception:  # noqa: BLE001 - a page that will not parse is still a page
+        logger.warning("could not read tables from a pdf page", exc_info=True)
+
+    if not rendered:
+        return text
+    return "\n\n".join([text, *rendered]).strip()
+
+
+def _pdf_pages(file_bytes: bytes) -> list[tuple[int | None, str]]:
+    reader = PdfReader(io.BytesIO(file_bytes))
+    pages = list(reader.pages)
+
+    plumber_pages: list = [None] * len(pages)
+    if len(pages) <= _MAX_TABLE_PAGES:
+        try:
+            with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
+                # Zipped by position, and only as far as both agree: the two
+                # readers can disagree about page count on a damaged file,
+                # and pairing page 3's text with page 4's table would be
+                # worse than having no tables at all.
+                for i, plumber_page in enumerate(pdf.pages[: len(pages)]):
+                    plumber_pages[i] = plumber_page
+                return [
+                    (i + 1, pdf_page_text(page, plumber_pages[i]))
+                    for i, page in enumerate(pages)
+                ]
+        except Exception:  # noqa: BLE001 - fall back to the text layer alone
+            logger.warning("table-aware pdf read failed; using the text layer", exc_info=True)
+
+    return [(i + 1, pdf_page_text(page)) for i, page in enumerate(pages)]
+
+
 def extract_pages(file_bytes: bytes, file_type: str) -> list[tuple[int | None, str]]:
     """Returns (page_number, text) pairs. page_number is 1-indexed for PDFs
     and slide decks (so citations can point at a real page); the rest have
@@ -120,8 +190,7 @@ def extract_pages(file_bytes: bytes, file_type: str) -> list[tuple[int | None, s
     out as ' | '-separated cells so a figure keeps its column neighbours.
     """
     if file_type == "pdf":
-        reader = PdfReader(io.BytesIO(file_bytes))
-        return [(i + 1, page.extract_text() or "") for i, page in enumerate(reader.pages)]
+        return _pdf_pages(file_bytes)
 
     if file_type == "docx":
         document = docx.Document(io.BytesIO(file_bytes))

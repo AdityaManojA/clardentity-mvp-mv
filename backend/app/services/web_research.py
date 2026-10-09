@@ -35,7 +35,7 @@ from urllib.parse import urlparse
 import httpx
 
 from app.core.config import settings
-from app.services import openai_client
+from app.services import openai_client, pdf_source
 from app.services.anthropic_client import cached, generate_structured
 
 logger = logging.getLogger("clardentity.web_research")
@@ -325,7 +325,46 @@ async def _tavily_search(
                 date=(str(item["published_date"])[:20] if item.get("published_date") else None),
             )
         )
-    return sources
+    return await _read_any_pdf_tables(sources)
+
+
+#: At most this many PDFs per search. The fetch is worth it for the one
+#: document that is a price list; it is not worth doing to ten results on
+#: the chance that one of them is.
+_MAX_PDF_FETCHES = 2
+
+
+async def _read_any_pdf_tables(sources: list[WebSource]) -> list[WebSource]:
+    """Replace the search engine's excerpt with the document's own tables,
+    where the document is a PDF and has any.
+
+    A search engine summarises a PDF by pulling its text layer, which for a
+    table is a run of numbers with nothing to say which belongs to which
+    row - the excerpt reads as data and carries none. Reading the file
+    properly puts the figure back beside its label.
+
+    Best effort throughout: anything that fails leaves the original
+    excerpt, which is what the answer would have had anyway.
+    """
+    candidates = [s for s in sources if pdf_source.looks_like_pdf(s.url)][:_MAX_PDF_FETCHES]
+    if not candidates:
+        return sources
+
+    fetched = await asyncio.gather(
+        *(pdf_source.table_excerpt(s.url, _EXCERPT_CHARS) for s in candidates),
+        return_exceptions=True,
+    )
+    better = {
+        s.url: text
+        for s, text in zip(candidates, fetched)
+        if isinstance(text, str) and text
+    }
+    if not better:
+        return sources
+    return [
+        replace(s, excerpt=better[s.url]) if s.url in better else s
+        for s in sources
+    ]
 
 
 _STOPWORDS = frozenset(
