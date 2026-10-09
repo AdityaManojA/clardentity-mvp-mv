@@ -5,6 +5,7 @@
 #
 # Required env: UPSTREAM_URL, UPSTREAM_BRANCH, DEST_BRANCH
 # Optional env: EXPECTED_SHA (upstream sha the reviewer approved; informational)
+#               GATE_CMD     (command the merged tree must pass before the push)
 set -euo pipefail
 
 : "${UPSTREAM_URL:?UPSTREAM_URL is not set}"
@@ -51,6 +52,16 @@ else
     echo "Conflicting files:"
     git diff --name-only --diff-filter=U | sed 's/^/  /'
     git merge --abort
+    exit 1
+  fi
+fi
+
+# Post-merge gate: the merged tree must pass before anything is pushed. The
+# workflow sets GATE_CMD to the same `npm run test:e2e:ci` the PR check runs.
+if [ -n "${GATE_CMD:-}" ]; then
+  echo "Running the post-merge gate: ${GATE_CMD}"
+  if ! bash -c "$GATE_CMD"; then
+    echo "::error::The merged tree failed the E2E gate. Nothing was pushed; ${DEST_BRANCH} is unchanged. Reproduce locally by merging upstream and running: cd frontend && npm run test:e2e:ci"
     exit 1
   fi
 fi

@@ -65,7 +65,9 @@ export function CompanionNames() {
           const name = saved[mode.value] ?? "";
           const isEditing = editing === mode.value;
           return (
-            <li key={mode.value} className="flex items-center gap-4">
+            // Rows at least a finger apart on a touch screen, so each pencil's tap
+            // area is its own rather than shared with the row above.
+            <li key={mode.value} className="flex items-center gap-4 pointer-coarse:min-h-[calc(44px/var(--ui-zoom))]">
               <span className="flex w-[200px] shrink-0 items-center gap-2 text-sm leading-[normal] text-ink">
                 <MaskIcon src={mode.icon} size={24} />
                 <span className="truncate">{mode.label}</span>
@@ -106,7 +108,7 @@ export function CompanionNames() {
                   onClick={() => (isEditing ? commit(mode.value) : open(mode.value))}
                   title={name ? `Rename ${mode.label}` : `Name ${mode.label}`}
                   aria-label={name ? `Rename ${mode.label}` : `Name ${mode.label}`}
-                  className="shrink-0 rounded p-0.5 text-ink-secondary transition-colors hover:text-brand"
+                  className="tap-area shrink-0 rounded p-0.5 text-ink-secondary transition-colors hover:text-brand"
                 >
                   <svg
                     viewBox="0 0 24 24"

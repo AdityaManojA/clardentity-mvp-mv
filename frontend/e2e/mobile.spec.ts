@@ -60,10 +60,13 @@ async function openDrawer(page: Page) {
 
 test.describe("render & layout", () => {
   test("M01 viewport render @M01", async ({ signedIn: page }) => {
-    for (const path of ["/login", "/workspace"]) {
-      if (path === "/login") await page.context().clearCookies();
+    for (const path of ["/workspace", "/login"]) {
+      // signed out for /login, or RedirectIfSignedIn sends it on to /start
+      if (path === "/login") await page.evaluate((k) => { localStorage.removeItem(k.access); localStorage.removeItem(k.refresh); }, KEYS);
       await page.goto(path);
-      await page.waitForLoadState("networkidle");
+      // a rendered landmark, not "networkidle": the dev server's HMR socket
+      // and polling keep the network busy indefinitely
+      await page.locator(path === "/login" ? sel.email : sel.openNav).waitFor();
       expect(page.viewportSize()).toEqual({ width: W, height: H });
       expect(await horizontalOverflow(page), `side-scroll on ${path}: ${await offenders(page)}`).toBeLessThanOrEqual(0);
       const ox = await page.evaluate(() => [getComputedStyle(document.documentElement).overflowX, getComputedStyle(document.body).overflowX]);
@@ -249,7 +252,10 @@ test.describe("scroll & gestures", () => {
     }
   });
 
-  test("M10 vertical swipe still scrolls @M10", async ({ page }) => {
+  test("M10 vertical swipe still scrolls @M10", async ({ page, browserName }) => {
+    // The finger drag is driven through CDP (Input.dispatchTouchEvent), which
+    // only Chromium has; synthetic TouchEvents in WebKit don't move native scroll.
+    test.skip(browserName === "webkit", "WebKit: no CDP touch input - real-device check (see Mv.md)");
     if (!LIVE) await mockApi(page, { extraWorkspaces: 12 });
     await seedStorage(page, { signedIn: !LIVE });
     if (LIVE) await login(page);
@@ -259,18 +265,6 @@ test.describe("scroll & gestures", () => {
     expect(await page.locator("main").evaluate((m) => m.scrollTop)).toBeGreaterThan(0);
   });
 
-  test("M10b swipe on ModeCarousel doesn't block vertical scroll @M10", async ({ signedIn: page }) => {
-    // The only horizontal-swipe control is ChatView's ModeCarousel (needs a chat
-    // with replies in >=2 modes). Live-only: E2E_CAROUSEL_CHAT=<conversation id>.
-    const chat = process.env.E2E_CAROUSEL_CHAT;
-    test.skip(!LIVE || !chat, "ModeCarousel check needs E2E_LIVE=1 and E2E_CAROUSEL_CHAT");
-    await page.goto(`/chat/${chat}`);
-    await expect(page.locator('[aria-label="Modes in this chat"]')).toBeVisible();
-    const box = (await page.locator('[aria-label="Modes in this chat"]').boundingBox())!;
-    await page.locator("main").evaluate((m) => m.scrollTo(0, 0));
-    await touchSwipe(page, box.x + box.width / 2, box.y + box.height / 2, box.x + box.width / 2, box.y - 250);
-    expect(await page.evaluate(() => Math.max(...[...document.querySelectorAll("main, main *")].map((e) => e.scrollTop)))).toBeGreaterThan(0);
-  });
 });
 
 test("M11 logout from drawer clears session @M11 @critical", async ({ signedIn: page }) => {

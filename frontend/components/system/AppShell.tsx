@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { AppNotices } from "@/components/system/AppNotices";
+import { OfflineNotice } from "@/components/system/OfflineNotice";
 import { usePathname, useRouter } from "next/navigation";
 import {
   useCallback,
@@ -696,6 +697,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           user in. Here rather than on any one page: both are about opening
           the app, not about where you landed. */}
       <AppNotices />
+      <OfflineNotice />
       {/* Desktop sidebar. Slides out of view rather than unmounting, so
           collapsing and re-opening doesn't refetch the workspace list or lose
           the switcher's open/closed state. */}
@@ -747,6 +749,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           />
           <aside
             ref={drawerRef}
+            data-testid="nav-drawer"
             role="dialog"
             aria-modal="true"
             aria-label="Navigation"

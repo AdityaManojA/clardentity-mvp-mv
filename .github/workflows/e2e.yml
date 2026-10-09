@@ -1,0 +1,88 @@
+# Playwright E2E on every pull request to main (and by hand).
+#
+# One command - `npm run test:e2e:ci` - is the source of truth; the upstream
+# sync's post-merge gate runs the same script (sync-upstream.yml).
+#   web, mobile-chrome, mobile-safari  mocked backend, always run
+#   setup + live                       real backend; skip without secrets,
+#                                      which includes every fork PR
+#   @visual                            compares against committed -linux
+#                                      baselines; skips until they exist
+#
+# Runs inside the official Playwright image so browsers, system deps and
+# fonts match the visual baselines exactly. The image tag must equal the
+# @playwright/test version in package-lock.json - the first step checks.
+#
+# Make "E2E / playwright" a required status check: Settings > Branches (or
+# Rules) > main > Require status checks to pass > add "playwright".
+name: E2E
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  playwright:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.0-noble
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      CI: "true"
+      HOME: /root # Firefox/WebKit profile dirs under the image's root user
+      E2E_VISUAL: "1"
+      # Empty on fork PRs (GitHub withholds secrets) -> @live skips.
+      E2E_LIVE_BASE_URL: ${{ secrets.E2E_LIVE_BASE_URL }}
+      E2E_LIVE_API_URL: ${{ secrets.E2E_LIVE_API_URL }}
+      E2E_USER_EMAIL: ${{ secrets.E2E_USER_EMAIL }}
+      E2E_USER_PASSWORD: ${{ secrets.E2E_USER_PASSWORD }}
+      E2E_ADMIN_EMAIL: ${{ secrets.E2E_ADMIN_EMAIL }}
+      E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
+      E2E_CAROUSEL_CHAT: ${{ secrets.E2E_CAROUSEL_CHAT }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ hashFiles('frontend/package-lock.json') }}
+
+      - run: npm ci
+
+      - name: Image matches @playwright/test
+        run: |
+          want="$(npx playwright --version | awk '{print $2}')"
+          [ "$want" = "1.64.0" ] || { echo "::error::@playwright/test is $want but the image is v1.64.0 - bump the container tag in e2e.yml and e2e-visual-baselines.yml"; exit 1; }
+
+      - name: Run E2E
+        run: npm run test:e2e:ci
+
+      - name: Job summary
+        if: always()
+        run: node e2e/ci-summary.mjs
+
+      - name: Upload report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: frontend/playwright-report/
+          retention-days: 14
+
+      - name: Upload traces, screenshots, videos
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: frontend/test-results/
+          retention-days: 14

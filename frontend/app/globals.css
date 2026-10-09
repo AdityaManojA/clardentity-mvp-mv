@@ -64,7 +64,11 @@
 
   --text: #3d2a2f;
   --text-secondary: #6b5c60;
-  --text-muted: #9e8e93;
+  /* Muted text, held at WCAG AA (4.5:1) against every surface it sits on.
+     The old #9e8e93 was 2.8:1 - the hint and helper copy were the faintest
+     text on the page and the hardest to read on a phone in daylight. Same
+     hue, only as much darker as AA needs; each accent below does the same. */
+  --text-muted: #776b6f;
   --text-inverse: #ffffff;
   /* Two warm greys the design uses for chrome specifically: navigation
      labels and breadcrumbs sit a step warmer than body copy. */
@@ -167,7 +171,7 @@
      rather than two. */
   --text: #f5f0f2;
   --text-secondary: #b6a5aa;
-  --text-muted: #8e8084;
+  --text-muted: #928488; /* AA: 4.6:1 on every dark surface (was 4.4) */
   --text-inverse: #ffffff;
   --text-nav: #beafb3;
   --text-nav-strong: #ded3d6;
@@ -239,7 +243,7 @@
   --surface-sunken: #f3f3f5;
   --text: #2f334c;
   --text-secondary: #5f6582;
-  --text-muted: #8b8fa6;
+  --text-muted: #6a6d7f; /* AA (was #8b8fa6, 2.9:1) */
   --surface-hover: rgba(70, 57, 77, 0.05);
   --bubble-mine: #eaebed;
   --border: #f1edf2;
@@ -263,7 +267,7 @@
   --border-strong: #3a3c45;
   --text: #f0f1f5;
   --text-secondary: #a5a7b6;
-  --text-muted: #80828e;
+  --text-muted: #858793; /* AA (was #80828e, 4.3:1) */
   --text-nav: #afb1be;
   --text-nav-strong: #d3d5de;
   --text-nav-muted: #80828e;
@@ -283,7 +287,7 @@
   --surface-sunken: #f3f5f5;
   --text: #1a3434;
   --text-secondary: #4a6b6a;
-  --text-muted: #7b9898;
+  --text-muted: #5d7373; /* AA (was #7b9898, 2.8:1) */
   --surface-hover: rgba(57, 62, 77, 0.05);
   --bubble-mine: #eaeded;
   --border: #edeef2;
@@ -307,7 +311,7 @@
   --border-strong: #3a4545;
   --text: #f0f5f5;
   --text-secondary: #a5b6b6;
-  --text-muted: #808e8e;
+  --text-muted: #859393; /* AA (was #808e8e, 4.4:1) */
   --text-nav: #afbebe;
   --text-nav-strong: #d3dede;
   --text-nav-muted: #808e8e;
@@ -459,6 +463,25 @@
    you can tap grows. 44px is measured on the glass, so it is divided by the
    root zoom - 44 CSS pixels under the 85% zoom would be a 37px target, the
    same shortfall this exists to fix. Mice and trackpads keep the drawn size. */
+/* The same 44px, for a control whose drawn size must not change at all - a
+   filled or outlined button, where a bigger box would be a bigger button.
+   The reach is an invisible ::after centred on it, so the button looks as
+   drawn and a finger landing just outside its edge still presses it. */
+@utility tap-area {
+  @media (pointer: coarse) {
+    position: relative;
+    &::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: max(100%, calc(44px / var(--ui-zoom)));
+      height: max(100%, calc(44px / var(--ui-zoom)));
+      transform: translate(-50%, -50%);
+    }
+  }
+}
+
 @utility tap-target {
   @media (pointer: coarse) {
     min-width: calc(44px / var(--ui-zoom));

@@ -48,6 +48,10 @@ is ever pushed to.
    confirm nothing is pushed. Then run it again and **Approve**.
 3. Run it again. `check` should report *nothing to do* and the `sync` job should be skipped.
 
+## Test gate
+
+After merging, the sync job runs `npm run test:e2e:ci` on the merged tree, the same command the pull-request check (`e2e.yml`) runs. If any test fails, nothing is pushed and the Playwright report is attached to the run.
+
 ## Limitations
 
 - **Polling, not real-time.** The fork can't receive upstream push events. Syncs are

@@ -114,9 +114,14 @@ export function ResponseFlip({
           transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)",
         }}
       >
+        {/* Each face carries its own 3D transform and the -webkit- prefix:
+            WebKit (Safari, every iPhone browser) ignores backface-visibility
+            on a face with no transform of its own, and painted the back face
+            through the front - the "Unchecked - caveats removed" label,
+            mirrored, on top of every answer. */}
         <div
           className="col-start-1 row-start-1 min-w-0"
-          style={{ backfaceVisibility: "hidden" }}
+          style={{ backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden", transform: "rotateY(0deg)" }}
           aria-hidden={flipped}
         >
           {front}
@@ -124,7 +129,7 @@ export function ResponseFlip({
 
         <div
           className="col-start-1 row-start-1 min-w-0"
-          style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
+          style={{ backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
           aria-hidden={!flipped}
         >
           {/* Deliberately compact. Both faces share a grid cell so the card is

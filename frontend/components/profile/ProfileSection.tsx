@@ -73,7 +73,7 @@ export function OutlineButton({
       title={title}
       aria-label={ariaLabel}
       className={cx(
-        "flex h-[42px] shrink-0 items-center gap-2 rounded-[34px] border px-[21px] text-sm leading-[normal] transition-colors disabled:cursor-not-allowed disabled:opacity-50",
+        "tap-area flex h-[42px] shrink-0 items-center gap-2 rounded-[34px] border px-[21px] text-sm leading-[normal] transition-colors disabled:cursor-not-allowed disabled:opacity-50",
         danger
           ? "border-band-low-border text-band-low hover:bg-band-low-bg"
           : "border-hairline-strong text-ink hover:bg-surface-hover",

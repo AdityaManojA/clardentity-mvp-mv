@@ -129,7 +129,7 @@ export function DocumentUploader({
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            className="flex h-[42px] items-center gap-1 rounded-[34px] bg-brand px-3 py-2 text-xl leading-[normal] text-white transition-colors hover:bg-brand-dark disabled:opacity-60"
+            className="tap-area flex h-[42px] items-center gap-1 rounded-[34px] bg-brand px-3 py-2 text-xl leading-[normal] text-white transition-colors hover:bg-brand-dark disabled:opacity-60"
           >
             {uploading ? "Uploading…" : "Upload"}
             <svg
@@ -195,10 +195,13 @@ export function DocumentUploader({
                   <StatusBadge status={doc.status} />
                 </span>
               </span>
+              {/* Hover-revealed for a mouse; always shown on a touch screen,
+                  which has no hover - there it was invisible, and a phone
+                  had no way to know a file could be removed. */}
               <button
                 type="button"
                 onClick={() => handleDelete(doc.id)}
-                className="absolute right-2 top-2 rounded p-1 text-ink-muted opacity-0 transition-opacity hover:text-band-low focus-visible:opacity-100 group-hover/tile:opacity-100"
+                className="tap-target absolute right-2 top-2 inline-flex items-center justify-center rounded p-1 text-ink-muted opacity-0 transition-opacity hover:text-band-low focus-visible:opacity-100 group-hover/tile:opacity-100 pointer-coarse:opacity-100"
                 aria-label={`Delete ${doc.filename}`}
               >
                 <svg

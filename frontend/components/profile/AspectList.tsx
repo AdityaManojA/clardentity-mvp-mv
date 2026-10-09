@@ -115,7 +115,7 @@ export function AspectList({
                   disabled={removingId === aspect.id}
                   aria-label={`Remove ${aspect.label}`}
                   title="Remove"
-                  className="shrink-0 rounded p-0.5 text-ink-secondary transition-colors hover:text-band-low"
+                  className="tap-area shrink-0 rounded p-0.5 text-ink-secondary transition-colors hover:text-band-low"
                 >
                   {removingId === aspect.id ? (
                     <Spinner className="size-5" />

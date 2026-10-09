@@ -32,6 +32,7 @@ import { ClarifyingOptionsCard } from "@/components/chat/ClarifyingOptionsCard";
 import { MaskIcon } from "@/components/ui/MaskIcon";
 import { companionLabel, useCompanionNames } from "@/lib/companionNames";
 import { cx } from "@/components/ui/primitives";
+import { useOnline } from "@/lib/useOnline";
 import {
   AvatarPanel,
   type AvatarExpression,
@@ -158,6 +159,9 @@ export function ChatView({ conversationId }: { conversationId: string }) {
   const [playingMessageId, setPlayingMessageId] = useState<string | null>(null);
   // The composer's text lives here so editing a sent message can put it back.
   const [draft, setDraft] = useState("");
+  // Offline, a send can only fail - and fail after the question has been
+  // typed and the bubble drawn. The composer keeps the draft and waits.
+  const online = useOnline();
   // Carousel (split-by-mode) view is opt-IN, and only offered once a second
   // mode exists - "read as one thread" is the default view.
   const companionNames = useCompanionNames();
@@ -1325,9 +1329,13 @@ export function ChatView({ conversationId }: { conversationId: string }) {
             </div>
           )}
           <MessageInput
-            disabled={!mode || sending}
+            disabled={!mode || sending || !online}
             disabledReason={
-              !mode ? "Select a cognitive mode above to start typing" : undefined
+              !online
+                ? "You're offline - what you've typed stays here until you reconnect"
+                : !mode
+                  ? "Select a cognitive mode above to start typing"
+                  : undefined
             }
             value={draft}
             onChange={setDraft}

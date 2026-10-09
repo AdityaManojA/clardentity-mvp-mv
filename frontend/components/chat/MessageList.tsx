@@ -111,12 +111,23 @@ export function MessageList({
    * event and nothing renders from it. */
   const stickToBottom = useRef(true);
 
+  // True while our own smooth scroll is travelling. Its in-between positions
+  // fire scroll events that look exactly like the reader scrolling up, and
+  // used to switch following off halfway down - the new answer then grew
+  // below the fold with nothing scrolling after it.
+  const autoScrolling = useRef(false);
+
   function handleScroll() {
     const el = scrollRef.current;
     if (!el) return;
+    const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+    if (autoScrolling.current) {
+      if (atBottom) autoScrolling.current = false;
+      return;
+    }
     // 80px of slack, so "near enough the bottom" survives the last line of a
     // message and a rounding error.
-    stickToBottom.current = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+    stickToBottom.current = atBottom;
   }
 
   const lastMessageId = messages.at(-1)?.id ?? null;
@@ -126,7 +137,27 @@ export function MessageList({
   useEffect(() => {
     if (!stickToBottom.current) return;
     const el = scrollRef.current;
-    el?.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+    if (!el) return;
+    autoScrolling.current = true;
+    el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+    // Released when the scroll reaches the bottom (handleScroll), or after
+    // this long whatever happened - a finger may have stopped it.
+    const release = setTimeout(() => (autoScrolling.current = false), 800);
+    return () => clearTimeout(release);
+  }, [lastMessageId, busy]);
+
+  // An answer keeps growing after it lands - the analysis, badges and footer
+  // arrive with `final`, seconds later. While the reader is following, follow
+  // that too, instead of leaving the end of the answer below the fold.
+  useEffect(() => {
+    const el = scrollRef.current;
+    const last = el?.lastElementChild;
+    if (!el || !last || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(() => {
+      if (stickToBottom.current) el.scrollTop = el.scrollHeight;
+    });
+    observer.observe(last);
+    return () => observer.disconnect();
   }, [lastMessageId, busy]);
 
   // Streaming text arrives many times a second; smooth scrolling that would
@@ -171,6 +202,7 @@ export function MessageList({
     // to min-height:auto, which sizes it to its content and defeats scrolling.
     <div
       ref={scrollRef}
+      data-testid="message-list"
       onScroll={handleScroll}
       className="scroll-slim min-h-0 flex-1 animate-[fade-in_0.35s_ease] space-y-5 overflow-y-auto px-1 py-5"
     >
@@ -628,7 +660,7 @@ function MessageBubble({
   const [draft, setDraft] = useState(content);
 
   return (
-    <div className={`group/msg flex ${isUser ? "justify-end" : "justify-start"}`}>
+    <div data-testid="message" data-role={role} className={`group/msg flex ${isUser ? "justify-end" : "justify-start"}`}>
       <div
         className={
           isUser
