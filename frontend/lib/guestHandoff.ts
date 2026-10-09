@@ -116,11 +116,45 @@ let completed = false;
 let lastResult: ImportedConversation | null = null;
 let announced = false;
 
-/** Called by whoever puts the result on screen, so the next mount does not
- *  show it again. */
+const listeners = new Set<() => void>();
+
+/** Called by whoever puts the result on screen, so it is not shown again. */
 export function markImportAnnounced(): void {
   announced = true;
   lastResult = null;
+  emit();
+}
+
+function emit(): void {
+  listeners.forEach((fn) => fn());
+}
+
+/* A store rather than a promise the caller awaits.
+ *
+ * Awaiting it inside an effect made whether the user was told depend on
+ * where they happened to be standing when the request came back. On the
+ * sign-up path - /welcome, then /start, then the first chat - the shell
+ * mounts and unmounts around the redirects, and on production the import
+ * landed in one of those gaps: imported perfectly, announced to nobody,
+ * three accounts running. A store has no such window. Whoever is mounted
+ * when the result arrives is told, and whoever mounts afterwards reads it.
+ */
+export function subscribeImported(onChange: () => void): () => void {
+  listeners.add(onChange);
+  return () => {
+    listeners.delete(onChange);
+  };
+}
+
+/** The import nobody has shown yet, or null. Stable reference, as
+ *  useSyncExternalStore requires. */
+export function importedSnapshot(): ImportedConversation | null {
+  return announced ? null : lastResult;
+}
+
+/** Server render: there is no import on the server. */
+export function importedServerSnapshot(): ImportedConversation | null {
+  return null;
 }
 
 /** Write the waiting transcript into the signed-in account.
@@ -152,6 +186,7 @@ async function runImport(): Promise<ImportedConversation | null> {
     completed = true;
     lastResult = result;
     clearStashedTranscript();
+    emit();
     return result;
   } catch (error) {
     // A transcript the server will never accept - the wrong mode, too long,

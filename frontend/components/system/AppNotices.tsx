@@ -6,8 +6,10 @@ import { useAuth } from "@/lib/auth";
 import { welcomeBackFor } from "@/lib/greeting";
 import {
   importStashedTranscript,
+  importedServerSnapshot,
+  importedSnapshot,
   markImportAnnounced,
-  type ImportedConversation,
+  subscribeImported,
 } from "@/lib/guestHandoff";
 
 /* The two things the app says to you on arrival, in one strip above
@@ -119,23 +121,20 @@ function WelcomeBack() {
  */
 function SavedFromDemo() {
   const { user } = useAuth();
-  const [saved, setSaved] = useState<ImportedConversation | null>(null);
+  // Read from the store rather than from the promise: on the sign-up path
+  // the shell mounts and unmounts around /welcome and /start, and awaiting
+  // the import inside an effect made "was the user told" depend on which
+  // side of a redirect the response landed. It landed on the wrong side,
+  // three times, in production.
+  const saved = useSyncExternalStore(
+    subscribeImported,
+    importedSnapshot,
+    importedServerSnapshot,
+  );
 
   useEffect(() => {
-    // Not gated on there being a stash: by the time a remount runs this,
-    // the import has usually finished and cleared it, and what is waiting
-    // is the result nobody has shown yet. The call is cheap in both cases.
-    if (!user) return;
-    let cancelled = false;
-    void importStashedTranscript().then((result) => {
-      if (cancelled || !result) return;
-      setSaved(result);
-      // Claimed, so a later mount does not announce the same import again.
-      markImportAnnounced();
-    });
-    return () => {
-      cancelled = true;
-    };
+    // Starting it is all this does now; the store carries the answer.
+    if (user) void importStashedTranscript();
   }, [user]);
 
   if (!saved) return null;
@@ -150,14 +149,14 @@ function SavedFromDemo() {
       </span>
       <Link
         href={`/chat/${saved.conversation_id}`}
-        onClick={() => setSaved(null)}
+        onClick={markImportAnnounced}
         className="font-medium text-brand hover:underline"
       >
         Open it
       </Link>
       <button
         type="button"
-        onClick={() => setSaved(null)}
+        onClick={markImportAnnounced}
         aria-label="Dismiss"
         className="ml-auto flex size-6 items-center justify-center rounded-full text-ink-muted transition-colors hover:bg-surface-hover hover:text-ink"
       >
