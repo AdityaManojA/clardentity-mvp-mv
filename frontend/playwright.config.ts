@@ -21,7 +21,7 @@ const PORT = Number(process.env.E2E_PORT ?? 3100);
 const BASE_URL = process.env.E2E_BASE_URL ?? `http://localhost:${PORT}`;
 const LIVE_URL = process.env.E2E_LIVE_BASE_URL;
 const PHONE = { width: 375, height: 812 };
-const MOBILE_SPECS = /(mobile|chat|gates|screens|a11y|offline|visual)\.spec\.ts/;
+const MOBILE_SPECS = /(mobile|mobile-extras|chat|gates|screens|a11y|offline|visual)\.spec\.ts/;
 const skipTags = process.env.E2E_VISUAL === "1" ? /@live/ : /@live|@visual/;
 
 export default defineConfig({
@@ -93,6 +93,10 @@ export default defineConfig({
             command: CI ? `npm run build && npx next start -p ${PORT}` : `npx next dev -p ${PORT}`,
             url: BASE_URL,
             reuseExistingServer: !CI,
+            // A stand-in analytics key, pointed at the mocked API: the consent
+            // banner and error reports are then real code paths under test,
+            // and every event lands in the mock (nothing reaches PostHog).
+            env: { NEXT_PUBLIC_POSTHOG_KEY: "phc_e2e_test", NEXT_PUBLIC_POSTHOG_HOST: "http://localhost:8000/ph" },
             timeout: CI ? 600_000 : 180_000,
           },
         ]),

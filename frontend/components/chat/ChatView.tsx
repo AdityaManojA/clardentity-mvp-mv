@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { ErrorBoundary } from "@/components/system/ErrorBoundaries";
 import { API_BASE_URL, apiFetch } from "@/lib/apiClient";
 import { authErrorMessage, getAccessToken } from "@/lib/auth";
 import {
@@ -49,6 +50,16 @@ type Conversation = {
 };
 
 type AvatarCue = { expression: AvatarExpression; gesture: AvatarGesture };
+
+/** The stream's named phases (TECHNICAL_GUIDE §5), as the indicator says them. */
+const STATUS_NAMES: Record<string, string> = {
+  searching: "Searching the web",
+  reading: "Reading sources",
+  thinking: "Thinking",
+  validating: "Checking the claims",
+  image: "Drawing",
+  slow: "Taking a little longer",
+};
 
 /** How long an answer may go with nothing to show before the Quick answer
  *  button appears on its own (the server's "slow" warning shows it sooner). */
@@ -159,11 +170,33 @@ export function ChatView({ conversationId }: { conversationId: string }) {
   const [error, setError] = useState<string | null>(null);
   const [playingMessageId, setPlayingMessageId] = useState<string | null>(null);
   // The composer's text lives here so editing a sent message can put it back.
-  const [draft, setDraft] = useState("");
+  // Phone layout: what's being typed survives a tab switch or a refresh,
+  // kept per chat in sessionStorage and cleared once it's sent.
+  const draftKey = `clardentity-draft:${conversationId}`;
+  const [draft, setDraft] = useState(() => {
+    if (typeof window === "undefined" || !window.matchMedia("(max-width: 1023.98px)").matches) return "";
+    try {
+      return sessionStorage.getItem(draftKey) ?? "";
+    } catch {
+      return "";
+    }
+  });
+  // What the server says it's doing, named ("Searching the web") - shown in
+  // place of a bare "Thinking" on the phone layout.
+  const [statusLabel, setStatusLabel] = useState<string | null>(null);
   // Offline, a send can only fail - and fail after the question has been
   // typed and the bubble drawn. On the phone layout the composer keeps the
   // draft and waits; desktop behaves as it always has.
   const phoneLayout = usePhoneLayout();
+  useEffect(() => {
+    if (!phoneLayout) return;
+    try {
+      if (draft) sessionStorage.setItem(draftKey, draft);
+      else sessionStorage.removeItem(draftKey);
+    } catch {
+      // private mode or full storage: the draft just isn't kept
+    }
+  }, [draft, draftKey, phoneLayout]);
   const online = useOnline() || !phoneLayout;
   // Carousel (split-by-mode) view is opt-IN, and only offered once a second
   // mode exists - "read as one thread" is the default view.
@@ -291,6 +324,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
 
     setError(null);
     setSending(true);
+    setStatusLabel(null);
     setIsTyping(false);
 
     // Regenerating writes no new user row server-side, so there's nothing
@@ -370,6 +404,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
       },
       {
         onStatus: (status) => {
+          setStatusLabel(STATUS_NAMES[status.phase] ?? status.label ?? null);
           // The only phase the client acts on: the server's early warning
           // that this answer will be a long one. Every other label stays
           // under the hood (the rabbit only ever says Thinking).
@@ -942,6 +977,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
       onDeleteMessage={handleDeleteMessage}
       onSwitchBranch={handleSwitchBranch}
       busy={sending}
+      thinkingLabel={phoneLayout ? statusLabel : null}
       onClarifierAnswer={(answer) => handleSend(answer, [])}
       // Switching mode from a nudge only changes the composer's mode - it
       // does not re-ask anything. The answer you already have is still the
@@ -1063,6 +1099,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
             and the cap keeps a long card scrollable within itself rather than
             pushing the composer off the bottom. */}
         <div className="scroll-slim max-h-[calc(var(--app-vh)*50)] shrink-0 overflow-y-auto">
+        <ErrorBoundary where="question-card" label="This question couldn't be shown.">
         {pendingContext && (
           <ContextQuestionCard
             // A new round is a new question with its own fresh textarea, not
@@ -1183,6 +1220,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
             }
           />
         )}
+        </ErrorBoundary>
 
         </div>
 
@@ -1238,7 +1276,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
         {/* The composer column: 925px, centred, the rail 8px above the card -
             the design's measurements. No rule above it; on this canvas the
             card's own shadow is the separation. */}
-        <div className="relative mx-auto w-full max-w-[925px] shrink-0 space-y-2 py-3 sm:py-4">
+        <div data-safe="bottom" className="relative mx-auto w-full max-w-[925px] shrink-0 space-y-2 py-3 sm:py-4">
           {/* The companion sits above the rail rather than beside it: the
               design gives the rail the full 925px, so there is no room on
               that row any more. It appears with the first answer - the new

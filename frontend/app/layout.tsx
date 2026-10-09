@@ -72,6 +72,12 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
+  // Phone layout: the page reaches the screen's edges and pads itself by the
+  // safe-area insets (globals.css, data-safe), and on Android the layout
+  // shrinks with the on-screen keyboard so the composer sits right above it
+  // instead of under it. Neither does anything on a desktop browser.
+  viewportFit: "cover",
+  interactiveWidget: "resizes-content",
   // The colour the browser paints its chrome - and, on a phone, the status
   // bar - before the page has rendered. It was #000000, which was the dark
   // canvas until the dark palette was rebuilt and stopped being black; it

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { ErrorBoundary } from "@/components/system/ErrorBoundaries";
 import type {
   Claim,
   ChatMessage,
@@ -61,6 +62,7 @@ export function MessageList({
   onDeleteMessage,
   onSwitchBranch,
   busy,
+  thinkingLabel,
   onClarifierAnswer,
   onUseMode,
   onAskRefined,
@@ -86,6 +88,8 @@ export function MessageList({
   /** Fork switcher: move to the branch that starts with this sibling id. */
   onSwitchBranch?: (messageId: string) => void;
   busy?: boolean;
+  /** Named progress for the indicator ("Searching the web"); phone layout only, set by ChatView. */
+  thinkingLabel?: string | null;
   /** Sends a clarifying-question answer as the next message. */
   onClarifierAnswer?: (answer: string) => void;
   /** Acting on a guidance nudge: switch mode, or ask the sharper question. */
@@ -209,6 +213,11 @@ export function MessageList({
       className="scroll-slim min-h-0 flex-1 animate-[fade-in_0.35s_ease] space-y-5 overflow-y-auto px-1 py-5 max-sm:pb-20"
     >
       {messages.map((m) => (
+        <ErrorBoundary
+          key={m.id}
+          where="message"
+          label={m.role === "user" ? "This message couldn't be shown." : "This answer couldn't be shown."}
+        >
         <MessageBubble
           key={m.id}
           id={m.id}
@@ -253,6 +262,7 @@ export function MessageList({
           onAskRefined={onAskRefined}
           onSubmitEdit={onSubmitEdit}
         />
+        </ErrorBoundary>
       ))}
       {/* Generation happens under the hood. Until the gist lands, the whole
           wait is the rabbit; the body text that streams in meanwhile is
@@ -261,7 +271,7 @@ export function MessageList({
       {busy && !streaming?.crux && !streaming?.decisionReview && !streaming?.thinkingReview && (
         <div className="flex justify-start">
           <div className="rounded-2xl rounded-bl-md border border-hairline bg-surface px-4 py-3">
-            <ThinkingIndicator />
+            <ThinkingIndicator label={thinkingLabel} />
           </div>
         </div>
       )}
@@ -269,6 +279,7 @@ export function MessageList({
           the first thing read, and the rest is still being written behind
           it (the rabbit says so, under the card). */}
       {(streaming?.crux || streaming?.decisionReview || streaming?.thinkingReview) && (
+        <ErrorBoundary where="streaming-answer" label="This answer couldn't be shown.">
         <MessageBubble
           id="streaming"
           role="assistant"
@@ -284,6 +295,7 @@ export function MessageList({
           thinkingReview={streaming.thinkingReview ?? null}
           isStreaming
         />
+        </ErrorBoundary>
       )}
     </div>
   );

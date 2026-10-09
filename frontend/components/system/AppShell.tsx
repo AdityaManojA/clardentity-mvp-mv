@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ErrorBoundary } from "@/components/system/ErrorBoundaries";
 import { AppNotices } from "@/components/system/AppNotices";
 import { OfflineNotice } from "@/components/system/OfflineNotice";
 import { usePathname, useRouter } from "next/navigation";
@@ -728,13 +729,15 @@ export function AppShell({ children }: { children: ReactNode }) {
         )}
       </div>
 
-      <RecentConversations
-        workspaceId={activeWorkspaceId}
-        workspaces={workspaces}
-        activeId={conversationId}
-        refreshKey={recentsKey}
-        onNavigate={close}
-      />
+      <ErrorBoundary where="recents" label="Recent chats couldn't be shown.">
+        <RecentConversations
+          workspaceId={activeWorkspaceId}
+          workspaces={workspaces}
+          activeId={conversationId}
+          refreshKey={recentsKey}
+          onNavigate={close}
+        />
+      </ErrorBoundary>
 
     </nav>
   );
@@ -831,7 +834,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             )}
             style={{ transform: dragX ? `translateX(${dragX}px)` : undefined }}
           >
-            <div className="flex h-[var(--topbar-height)] items-center justify-between border-b border-hairline px-4">
+            <div data-safe="top" className="flex h-[var(--topbar-height)] items-center justify-between border-b border-hairline px-4">
               {/* Home, as the desktop sidebar's wordmark is. close(), not
                   dismiss(): this navigates, so the drawer's history entry is
                   left for the Back handler to step over. */}
@@ -862,7 +865,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           !collapsed && "lg:pl-[var(--sidebar-width)]",
         )}
       >
-        <header className="z-10 flex h-[var(--topbar-height)] shrink-0 items-center gap-3 border-b border-hairline bg-surface px-4 sm:px-6">
+        <header data-safe="top" className="z-10 flex h-[var(--topbar-height)] shrink-0 items-center gap-3 border-b border-hairline bg-surface px-4 sm:px-6">
           {/* Two buttons rather than one that branches on viewport width: the
               mobile drawer and the desktop collapse are genuinely different
               controls, and inferring which one to run from a JS media query
@@ -939,8 +942,12 @@ export function AppShell({ children }: { children: ReactNode }) {
           )}
         </header>
 
-        <main className="scroll-slim flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto">
-          {children}
+        {/* While the phone menu is open the page under it holds still. */}
+        <main className={cx("scroll-slim flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto", mobileOpen && "max-lg:overflow-hidden")}>
+          {/* keyed by route: a page that failed gets a fresh start on the next one */}
+          <ErrorBoundary key={pathname} where="page" variant="page" label="This page didn't load.">
+            {children}
+          </ErrorBoundary>
         </main>
       </div>
 

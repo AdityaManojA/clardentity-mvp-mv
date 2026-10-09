@@ -44,14 +44,14 @@ export function ConsentBanner() {
           <button
             type="button"
             onClick={() => setConsent("granted")}
-            className="flex-1 rounded-full border border-brand-border bg-brand-soft px-3 py-1.5 text-xs font-medium text-brand transition-colors hover:bg-brand hover:text-white"
+            className="tap-area flex-1 rounded-full border border-brand-border bg-brand-soft px-3 py-1.5 text-xs font-medium text-brand transition-colors hover:bg-brand hover:text-white"
           >
             Allow
           </button>
           <button
             type="button"
             onClick={() => setConsent("denied")}
-            className="flex-1 rounded-full border border-hairline px-3 py-1.5 text-xs font-medium text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink"
+            className="tap-area flex-1 rounded-full border border-hairline px-3 py-1.5 text-xs font-medium text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink"
           >
             No thanks
           </button>

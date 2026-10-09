@@ -99,8 +99,12 @@ export type MockOpts = {
   failWorkspaces?: boolean;
   extraWorkspaces?: number;
   admin?: boolean;
+  /** false: the account hasn't answered the welcome questions yet. */
+  onboarded?: boolean;
   messages?: Msg[];
   documents?: { id: string; filename: string; file_type: string | null; status: string; created_at: string }[];
+  /** Every analytics request the page makes (the test server's PostHog host is the mock). */
+  onAnalytics?: (req: Request) => void;
   /** Per-test overrides, keyed "METHOD /path" (path without /api/v1, no query). Checked first. */
   handlers?: Record<string, Handler>;
 };
@@ -110,7 +114,7 @@ export type MockOpts = {
 export async function mockApi(page: Page, opts: MockOpts = {}) {
   const user = {
     id: "u1", email: CREDS.email, display_name: "E2E User",
-    onboarding_completed_at: "2026-01-01T00:00:00Z", is_admin: !!opts.admin,
+    onboarding_completed_at: opts.onboarded === false ? null : "2026-01-01T00:00:00Z" as string | null, is_admin: !!opts.admin,
   };
   const workspaces = [
     { id: "w1", name: "Personal", role: "owner", created_at: "2026-09-01T10:00:00Z" },
@@ -152,6 +156,11 @@ export async function mockApi(page: Page, opts: MockOpts = {}) {
     const reply = (b: unknown, status = 200) => send(route, { body: b, status });
 
     if (m === "OPTIONS") return send(route, { status: 204 });
+    if (url.pathname.startsWith("/ph/")) {
+      opts.onAnalytics?.(req);
+      if (url.pathname.endsWith(".js")) return route.fulfill({ status: 200, contentType: "application/javascript", body: "" });
+      return reply({ status: 1 });
+    }
 
     const custom = opts.handlers?.[`${m} ${path}`];
     if (custom) {
@@ -202,6 +211,14 @@ export async function mockApi(page: Page, opts: MockOpts = {}) {
     if (path === "/profile" && m === "GET")
       return reply({ personality_md: null, aspects: [], roles: [], user_edited: false, updated_at: null, companion_names: {}, learning_role: null });
     if (path === "/compose/complete") return reply({ completion: "" });
+    if (path === "/profile/onboarding" && m === "POST") {
+      user.onboarding_completed_at = new Date().toISOString();
+      return reply({ ok: true });
+    }
+    if (/^\/chat\/[^/]+\/messages\/[^/]+\/feedback$/.test(path) && m === "PUT") {
+      const b = body() as { rating?: string | null; comment?: string | null };
+      return reply({ rating: b.rating ?? null, comment: b.comment ?? null });
+    }
 
     // --- chat ---
     const conv = path.match(/^\/chat\/conversations\/([^/]+)$/);
@@ -268,9 +285,21 @@ export async function mockApi(page: Page, opts: MockOpts = {}) {
   });
 }
 
+/** Next's dev-only "N" / "1 Issue" bubble sits bottom-left over whatever is
+ *  there - a sheet's first button, in practice - whenever a caught error is
+ *  logged. It doesn't exist in production builds (CI), so tests hide it. */
+export async function hideDevOverlay(page: Page) {
+  // After each load, not as an init script: a style injected before React
+  // hydrates <html> is removed by hydration (and threw in WebKit).
+  page.on("domcontentloaded", () => {
+    page.addStyleTag({ content: "nextjs-portal { display: none !important; }" }).catch(() => undefined);
+  });
+}
+
 /** Consent decided and both tours done, so no banner or coachmark sits over
  *  the page. `signedIn` also pre-seeds tokens (skips the login form). */
 export async function seedStorage(page: Page, { signedIn = false } = {}) {
+  await hideDevOverlay(page);
   await page.addInitScript(
     ({ KEYS, signedIn }) => {
       localStorage.setItem(KEYS.consent, "denied");
@@ -373,6 +402,17 @@ export async function swipeCarousel(page: Page, dx: number) {
     fire("pointerup", x0 + dx);
   }, dx);
   await page.waitForTimeout(350); // the 300ms track transition
+}
+
+/** Wait for running CSS animations (the phone layout's staggered rise) to
+ *  finish, so positions measured next are where things come to rest. */
+export async function settleAnimations(page: Page) {
+  await page.evaluate(() =>
+    Promise.race([
+      Promise.all(document.getAnimations().map((a) => a.finished.catch(() => undefined))),
+      new Promise((r) => setTimeout(r, 3000)),
+    ]),
+  );
 }
 
 export const isWebKit = (browserName: string) => browserName === "webkit";

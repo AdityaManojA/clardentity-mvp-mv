@@ -556,6 +556,75 @@ body {
   }
 }
 
+/* Phone layout: the edges of the device.
+   viewport-fit=cover (app/layout.tsx) lets the page reach under the notch and
+   the home indicator - which an installed app with black-translucent status
+   bar does anyway - so the bars that sit at those edges pad themselves by the
+   safe-area insets. env() is measured on the glass, hence the zoom divide.
+   Unlayered on purpose: these must beat the height/padding utilities. */
+@media (max-width: 1023.98px) {
+  [data-safe~="top"] {
+    padding-top: calc(env(safe-area-inset-top) / var(--ui-zoom));
+    height: calc(var(--topbar-height) + env(safe-area-inset-top) / var(--ui-zoom));
+  }
+  /* Small text fields: iOS zooms the whole page into any field whose text is
+     under 16px, and the 85% zoom draws text-sm fields at 13.6px. Drawn at
+     16px on the glass instead, so tapping a field never zooms the page. */
+  input.text-sm,
+  textarea.text-sm,
+  select.text-sm,
+  input.text-xs,
+  textarea.text-xs {
+    font-size: calc(16px / var(--ui-zoom));
+  }
+  /* The thread and the page scroll themselves; reaching the end of either
+     shouldn't bounce or drag the whole page with it. */
+  main,
+  [data-testid="message-list"] {
+    overscroll-behavior-y: contain;
+  }
+}
+@media (max-width: 639.98px) {
+  [data-safe~="bottom"] {
+    padding-bottom: calc(0.75rem + env(safe-area-inset-bottom) / var(--ui-zoom));
+  }
+}
+/* Chat icon buttons - attach, mic, call, send, copy, regenerate, delete,
+   helpful/not, the version arrows - are drawn at 16-24px. On a touch phone
+   each gets a 44px box (screen pixels), icon unchanged and centred in it;
+   the rows space out a little. Only min sizes: display is left alone, so
+   anything a utility hides stays hidden. */
+@media (pointer: coarse) and (max-width: 1023.98px) {
+  [data-testid="message"] button[aria-label],
+  [data-composer] button[aria-label] {
+    min-width: calc(44px / var(--ui-zoom));
+    min-height: calc(44px / var(--ui-zoom));
+  }
+  [data-testid="message"] button[aria-label] > svg,
+  [data-composer] button[aria-label] > svg {
+    margin-inline: auto;
+  }
+}
+
+/* A tap is a tap: no double-tap-to-zoom wait on anything you can press. In
+   the base layer, so a component's own touch-action (the drawer's pan-y, the
+   mode rail) still wins over it. */
+@layer base {
+  @media (max-width: 1023.98px) {
+    a,
+    button,
+    label,
+    input,
+    select,
+    textarea,
+    [role="button"],
+    [role="radio"],
+    [role="menuitem"] {
+      touch-action: manipulation;
+    }
+  }
+}
+
 /* Lists on the phone layout (workspaces, recent chats, search results,
    attachments) rise in one after another instead of all landing at once:
    --i is the item's index, 80ms apart, capped so a long list doesn't make
