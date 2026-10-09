@@ -50,7 +50,7 @@ export function ClarifyingOptionsCard({
                 // 36px rows on a touch screen (screen pixels, hence the zoom
                 // divide): stacked edge to edge, so a hit area can't reach
                 // past the row without landing on the next answer.
-                "flex w-full items-center gap-2.5 px-3.5 py-2 text-left text-sm transition-colors pointer-coarse:min-h-[calc(36px/var(--ui-zoom))]",
+                "flex w-full items-center gap-2.5 px-3.5 py-2 text-left text-sm transition-colors phone-touch:min-h-[calc(36px/var(--ui-zoom))]",
                 "hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-50",
               )}
             >
@@ -67,7 +67,7 @@ export function ClarifyingOptionsCard({
         <form
           // Roomier on a touch screen: the card clips at its edge, and the
           // buttons' tap areas reach past them into this padding.
-          className="flex items-center gap-2 border-t border-hairline px-3.5 py-2 pointer-coarse:py-3.5"
+          className="flex items-center gap-2 border-t border-hairline px-3.5 py-2 phone-touch:py-3.5"
           onSubmit={(event) => {
             event.preventDefault();
             const trimmed = custom.trim();
@@ -92,7 +92,7 @@ export function ClarifyingOptionsCard({
           </button>
         </form>
       ) : (
-        <div className="flex items-center gap-2 border-t border-hairline px-3.5 py-2 pointer-coarse:py-3.5">
+        <div className="flex items-center gap-2 border-t border-hairline px-3.5 py-2 phone-touch:py-3.5">
           <button
             type="button"
             onClick={() => setCustomOpen(true)}

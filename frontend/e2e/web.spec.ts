@@ -58,3 +58,22 @@ test("T13 logout clears session @T13 @critical", async ({ signedIn: page }) => {
   const tokens = await page.evaluate((k) => [localStorage.getItem(k.access), localStorage.getItem(k.refresh)], KEYS);
   expect(tokens).toEqual([null, null]);
 });
+
+test.describe("desktop keeps the drawn design, even with a touch screen", () => {
+  test.use({ hasTouch: true, viewport: { width: 1280, height: 800 } });
+
+  test("T14 phone-only changes stay off desktop @T14", async ({ signedIn: page }) => {
+    await page.goto("/workspace");
+    await expect(page.getByRole("heading", { name: "Workspaces" })).toBeVisible({ timeout: 30_000 });
+    const m = await page.evaluate(() => {
+      const theme = document.querySelector('button[aria-label="Toggle light and dark theme"]')!.getBoundingClientRect();
+      const row = [...document.querySelectorAll("aside a")].find((a) => a.textContent?.includes("Search"))!.getBoundingClientRect();
+      const muted = getComputedStyle(document.documentElement).getPropertyValue("--text-muted").trim();
+      return { themeH: Math.round(theme.height), rowH: Math.round(row.height), muted };
+    });
+    expect(m.themeH, "header icon keeps its drawn size").toBeLessThan(30);
+    expect(m.rowH, "sidebar row keeps its drawn 48px x 0.85").toBe(41);
+    expect(m.muted, "muted text keeps the drawn colour").toBe("#9e8e93");
+    await expect(page.getByTestId("offline-notice")).toHaveCount(0);
+  });
+});

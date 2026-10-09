@@ -33,6 +33,7 @@ import { MaskIcon } from "@/components/ui/MaskIcon";
 import { companionLabel, useCompanionNames } from "@/lib/companionNames";
 import { cx } from "@/components/ui/primitives";
 import { useOnline } from "@/lib/useOnline";
+import { usePhoneLayout } from "@/lib/usePhoneLayout";
 import {
   AvatarPanel,
   type AvatarExpression,
@@ -160,8 +161,10 @@ export function ChatView({ conversationId }: { conversationId: string }) {
   // The composer's text lives here so editing a sent message can put it back.
   const [draft, setDraft] = useState("");
   // Offline, a send can only fail - and fail after the question has been
-  // typed and the bubble drawn. The composer keeps the draft and waits.
-  const online = useOnline();
+  // typed and the bubble drawn. On the phone layout the composer keeps the
+  // draft and waits; desktop behaves as it always has.
+  const phoneLayout = usePhoneLayout();
+  const online = useOnline() || !phoneLayout;
   // Carousel (split-by-mode) view is opt-IN, and only offered once a second
   // mode exists - "read as one thread" is the default view.
   const companionNames = useCompanionNames();
@@ -1235,15 +1238,29 @@ export function ChatView({ conversationId }: { conversationId: string }) {
         {/* The composer column: 925px, centred, the rail 8px above the card -
             the design's measurements. No rule above it; on this canvas the
             card's own shadow is the separation. */}
-        <div className="mx-auto w-full max-w-[925px] shrink-0 space-y-2 py-3 sm:py-4">
+        <div className="relative mx-auto w-full max-w-[925px] shrink-0 space-y-2 py-3 sm:py-4">
           {/* The companion sits above the rail rather than beside it: the
               design gives the rail the full 925px, so there is no room on
               that row any more. It appears with the first answer - the new
               chat the design draws has nothing above the rail, and an
               expression tracking an answer that hasn't been given yet is an
               expression about nothing. */}
+          {/* On a phone the companion floats over the end of the thread
+              instead of taking a row of its own: that row was an opaque band
+              across the screen that cut the chat off above it. Just the
+              figure, nothing behind it; the thread keeps scrolling under it
+              (MessageList leaves room at the bottom so the last line can
+              clear it). From sm up it sits in its row as designed. */}
           {messages.length > 0 && (
-            <div className="flex justify-end pr-1">
+            <div
+              className={cx(
+                "flex justify-end pr-1 max-sm:pointer-events-none max-sm:absolute max-sm:bottom-full max-sm:right-1 max-sm:z-10",
+                // A question card or the switch notice sits exactly where the
+                // figure floats, and it covered their buttons - step aside
+                // while one is open. Taps always pass through (it's a picture).
+                (pendingContext || pendingRefined || pendingClarifyingOptions || (switchToast && switchedFrom)) && "max-sm:hidden",
+              )}
+            >
               <AvatarPanel
                 state={avatarState}
                 gesture={avatarGesture}

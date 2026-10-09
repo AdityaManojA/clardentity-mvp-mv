@@ -2,7 +2,7 @@
  * Responsive app - same URLs as web; only the drawer controls differ (see sel).
  * Upstream T-deps are in the table at the end of e2e/README.md. */
 import type { Page } from "@playwright/test";
-import { test, expect, sel, login, mockApi, seedStorage, signIn, press, KEYS, LIVE } from "./fixtures";
+import { test, expect, sel, login, mockApi, seedStorage, signIn, press, thread, tapArea, KEYS, LIVE } from "./fixtures";
 
 const W = 375;
 const H = 812;
@@ -84,12 +84,13 @@ test.describe("render & layout", () => {
   test("M02 touch targets >= 44px @M02", async ({ signedIn: page }) => {
     await page.goto("/workspace");
     const small: string[] = [];
+    // the area a finger can hit (tap areas reach past the drawn box), not the box
     const check = async (scope: string) => {
       for (const el of await page.locator(`${scope} :is(button, a[href]):visible`).all()) {
-        const b = await el.boundingBox();
-        if (b && (Math.round(b.width) < 44 || Math.round(b.height) < 44)) {
+        const b = await tapArea(el);
+        if (b.w < 44 || b.h < 44) {
           const name = (await el.getAttribute("aria-label")) ?? (await el.innerText()).trim().slice(0, 24);
-          small.push(`${scope} "${name}" ${Math.round(b.width)}x${Math.round(b.height)}`);
+          small.push(`${scope} "${name}" ${b.w}x${b.h}`);
         }
       }
     };
@@ -372,4 +373,62 @@ test("M03b swipe left closes the menu; short or vertical drags don't; no swipe-t
     await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
     await expect(drawer).toBeHidden();
   }
+});
+
+test("M28 tour on a phone: ring on its target, card on screen, phone wording @M28", async ({ page }) => {
+  test.setTimeout(60_000); // first visit compiles the chat route, then three steps
+  await signIn(page, { messages: thread(2) });
+  await page.goto("/chat/c1");
+  await expect(page.locator(sel.composer)).toBeEditable({ timeout: 30_000 });
+  await page.getByRole("button", { name: "Show me around this page" }).tap();
+  const targets: Record<string, string> = { "Choose how it thinks": "mode-picker", "Smart switching": "switching-toggle", "Ask here": "composer-input" };
+  for (let step = 0; step < 3; step++) {
+    const card = page.getByRole("dialog").filter({ has: page.getByRole("button", { name: "Next", exact: true }) });
+    await expect(card).toBeVisible();
+    await page.waitForTimeout(400); // scrollIntoView + the ring's RAF settle
+    const m = await page.evaluate((targets) => {
+      const ring = [...document.querySelectorAll<HTMLElement>('div[aria-hidden="true"]')].find((d) => d.style.boxShadow.includes("9999px"));
+      const title = document.querySelector('[role="dialog"] h2')?.textContent ?? "";
+      const target = [...document.querySelectorAll(`[data-tour="${targets[title]}"]`)].find((e) => e.getBoundingClientRect().width > 0);
+      const dlg = document.querySelector('[role="dialog"] h2')!.closest('[role="dialog"]')!.getBoundingClientRect();
+      const r = ring!.getBoundingClientRect();
+      const t = target!.getBoundingClientRect();
+      return { title, dx: r.left - t.left, dy: r.top - t.top, dw: r.width - t.width, dh: r.height - t.height, dlgL: dlg.left, dlgR: dlg.right, vw: innerWidth };
+    }, targets);
+    // the ring wraps its target with a few px of halo - never 15% away from it
+    for (const k of ["dx", "dy"] as const) expect(Math.abs(m[k]), `${m.title}: ring ${k}`).toBeLessThanOrEqual(8);
+    for (const k of ["dw", "dh"] as const) expect(Math.abs(m[k]), `${m.title}: ring ${k}`).toBeLessThanOrEqual(12);
+    expect(m.dlgL, `${m.title}: card off the left edge`).toBeGreaterThanOrEqual(0);
+    expect(m.dlgR, `${m.title}: card off the right edge`).toBeLessThanOrEqual(m.vw);
+    if (m.title === "Ask here") await expect(card).toContainText("tap the arrow to send"); // not "Enter sends it"
+    await card.getByRole("button", { name: "Next", exact: true }).click();
+  }
+});
+
+test("M29 companion floats over the thread on a phone - no band across the chat @M29", async ({ page }) => {
+  await signIn(page, { messages: thread(3) });
+  await page.goto("/chat/c1");
+  await expect(page.locator(sel.composer)).toBeEditable({ timeout: 30_000 });
+  const avatar = page.locator('[data-tour="companion"]');
+  await expect(avatar).toBeVisible();
+  const r = await page.evaluate(() => {
+    const a = document.querySelector('[data-tour="companion"]')!;
+    const row = a.parentElement!;
+    const list = document.querySelector('[data-testid="message-list"]')!.getBoundingClientRect();
+    const b = a.getBoundingClientRect();
+    return { rowPos: getComputedStyle(row).position, rowBg: getComputedStyle(row).backgroundColor, overList: b.top < list.bottom, rowWidth: row.getBoundingClientRect().width };
+  });
+  expect(r.rowPos).toBe("absolute"); // takes no row of its own
+  expect(r.rowBg).toMatch(/rgba\(0, 0, 0, 0\)|transparent/); // nothing behind the figure
+  expect(r.overList).toBe(true); // sits over the end of the thread
+});
+
+test("M30 tapping Clardentity at the top of the menu goes home @M30", async ({ signedIn: page }) => {
+  await page.goto("/workspace");
+  await press(page, sel.openNav);
+  const home = page.locator(sel.drawer).getByRole("link", { name: "Clardentity" });
+  await expect(home).toHaveAttribute("href", "/");
+  await home.tap();
+  await expect(page).toHaveURL(/\/$/, { timeout: 15_000 });
+  await expect(page.locator(sel.drawer)).toHaveCount(0);
 });

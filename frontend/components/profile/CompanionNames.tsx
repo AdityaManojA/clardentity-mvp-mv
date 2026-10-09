@@ -67,7 +67,7 @@ export function CompanionNames() {
           return (
             // Rows at least a finger apart on a touch screen, so each pencil's tap
             // area is its own rather than shared with the row above.
-            <li key={mode.value} className="flex items-center gap-4 pointer-coarse:min-h-[calc(44px/var(--ui-zoom))]">
+            <li key={mode.value} className="flex items-center gap-4 phone-touch:min-h-[calc(44px/var(--ui-zoom))]">
               <span className="flex w-[200px] shrink-0 items-center gap-2 text-sm leading-[normal] text-ink">
                 <MaskIcon src={mode.icon} size={24} />
                 <span className="truncate">{mode.label}</span>

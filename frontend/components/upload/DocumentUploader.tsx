@@ -201,7 +201,7 @@ export function DocumentUploader({
               <button
                 type="button"
                 onClick={() => handleDelete(doc.id)}
-                className="tap-target absolute right-2 top-2 inline-flex items-center justify-center rounded p-1 text-ink-muted opacity-0 transition-opacity hover:text-band-low focus-visible:opacity-100 group-hover/tile:opacity-100 pointer-coarse:opacity-100"
+                className="tap-target absolute right-2 top-2 inline-flex items-center justify-center rounded p-1 text-ink-muted opacity-0 transition-opacity hover:text-band-low focus-visible:opacity-100 group-hover/tile:opacity-100 phone-touch:opacity-100"
                 aria-label={`Delete ${doc.filename}`}
               >
                 <svg

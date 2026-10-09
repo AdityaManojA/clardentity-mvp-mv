@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { layoutViewport, toLayoutRect } from "@/lib/uiScale";
 import { useTour } from "@/lib/tour";
 import { usePrefersReducedMotion } from "@/lib/useReducedMotion";
+import { useTouchKeyboard } from "@/lib/useTouchKeyboard";
 import { cx } from "@/components/ui/primitives";
 
 type Rect = { top: number; left: number; width: number; height: number };
@@ -47,6 +48,7 @@ export function TourOverlay() {
   const { tour, active, step, stepIndex, total, isLast, advance, skip } = useTour();
   const inApp = APP_ROUTES.test(usePathname() ?? "");
   const reducedMotion = usePrefersReducedMotion();
+  const touchKeyboard = useTouchKeyboard();
   const panelRef = useRef<HTMLDivElement>(null);
   // Per-step one-shots, keyed on the step so they fire once per step and
   // again for the next one: focus, scroll-into-view, and the drawer request.
@@ -271,10 +273,14 @@ export function TourOverlay() {
           position: "fixed",
           top: calloutPos ? calloutPos.top : -9999,
           left: calloutPos ? calloutPos.left : -9999,
+          // In layout pixels, like top/left. A 100vw cap is a different unit
+          // under the root zoom on some engines and let the card run off the
+          // side of a phone.
+          maxWidth: calloutPos ? layoutViewport().width - MARGIN * 2 : undefined,
           visibility: visible ? "visible" : "hidden",
         }}
         className={cx(
-          "z-[45] w-72 max-w-[calc(100vw-1.5rem)] rounded-xl border border-hairline bg-surface-raised p-4 shadow-2xl focus:outline-none",
+          "z-[45] w-72 rounded-xl border border-hairline bg-surface-raised p-4 shadow-2xl focus:outline-none",
           visible && !reducedMotion && "animate-[fade-in_0.35s_ease]",
         )}
       >
@@ -285,7 +291,7 @@ export function TourOverlay() {
           {step.title}
         </h2>
         <p id={bodyId} className="mt-1 text-sm leading-relaxed text-ink-secondary">
-          {step.body}
+          {touchKeyboard && step.touchBody ? step.touchBody : step.body}
         </p>
         <div className="mt-3 flex items-center justify-between gap-3">
           <button

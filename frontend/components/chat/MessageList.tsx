@@ -204,7 +204,9 @@ export function MessageList({
       ref={scrollRef}
       data-testid="message-list"
       onScroll={handleScroll}
-      className="scroll-slim min-h-0 flex-1 animate-[fade-in_0.35s_ease] space-y-5 overflow-y-auto px-1 py-5"
+      // max-sm:pb-20: room for the companion, which floats over the end of
+      // the thread on a phone (ChatView), so the last line can scroll clear.
+      className="scroll-slim min-h-0 flex-1 animate-[fade-in_0.35s_ease] space-y-5 overflow-y-auto px-1 py-5 max-sm:pb-20"
     >
       {messages.map((m) => (
         <MessageBubble

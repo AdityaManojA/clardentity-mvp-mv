@@ -19,7 +19,7 @@ import { ThemeToggle } from "@/components/system/ThemeToggle";
 import { ChatRowMenu } from "@/components/chat/ChatRowMenu";
 import { rememberWorkspace } from "@/lib/lastWorkspace";
 import { startTour, type TourId } from "@/lib/tour";
-import { uiZoom } from "@/lib/uiScale";
+import { rectScale } from "@/lib/uiScale";
 import { MaskIcon } from "@/components/ui/MaskIcon";
 import { AccountMenu } from "@/components/system/AccountMenu";
 import { cx } from "@/components/ui/primitives";
@@ -184,7 +184,7 @@ function RecentConversations({
                 // 36px on a touch screen (measured on the glass, hence the
                 // zoom divide): the drawn 32px row is 27px under the 85% zoom,
                 // half a fingertip, in a list where a miss opens the wrong chat.
-                "flex h-8 min-w-0 flex-1 items-center gap-5 truncate rounded-[9px] pl-4 pr-1.5 text-sm transition-colors pointer-coarse:h-[calc(36px/var(--ui-zoom))]",
+                "flex h-8 min-w-0 flex-1 items-center gap-5 truncate rounded-[9px] pl-4 pr-1.5 text-sm transition-colors phone-touch:h-[calc(36px/var(--ui-zoom))]",
                 c.id === activeId
                   ? "bg-[var(--surface-hover)] font-medium text-ink"
                   : "text-[color:var(--text-nav)] hover:bg-surface-hover hover:text-ink",
@@ -515,7 +515,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     setDragX(0); // a swipe-close leaves the drawer parked off-screen
     setMobileOpen(true);
   }
-  const drawerWidth = () => (drawerRef.current?.getBoundingClientRect().width ?? 0) / uiZoom();
+  const drawerWidth = () => (drawerRef.current?.getBoundingClientRect().width ?? 0) / rectScale();
 
   function onDrawerPointerDown(e: ReactPointerEvent<HTMLElement>) {
     if (e.pointerType === "mouse") return; // a mouse has the X and the backdrop
@@ -542,14 +542,14 @@ export function AppShell({ children }: { children: ReactNode }) {
     }
     if (d.axis !== "x") return;
     // clientX is screen pixels; the transform is in the zoomed layout's.
-    setDragX(Math.min(0, mx) / uiZoom());
+    setDragX(Math.min(0, mx) / rectScale());
   }
   function onDrawerPointerEnd(e: ReactPointerEvent<HTMLElement>, cancelled = false) {
     const d = drag.current;
     drag.current = null;
     if (!d || d.axis !== "x") return;
     setDragging(false);
-    const travelled = Math.min(0, e.clientX - d.x) / uiZoom();
+    const travelled = Math.min(0, e.clientX - d.x) / rectScale();
     const speed = travelled / Math.max(1, e.timeStamp - d.t); // layout px per ms
     if (!cancelled && (-travelled > drawerWidth() * 0.4 || speed < -0.6)) {
       setDragX(-drawerWidth()); // finish the slide, then close
@@ -832,9 +832,16 @@ export function AppShell({ children }: { children: ReactNode }) {
             style={{ transform: dragX ? `translateX(${dragX}px)` : undefined }}
           >
             <div className="flex h-[var(--topbar-height)] items-center justify-between border-b border-hairline px-4">
-              <span className="text-sm font-semibold tracking-tight text-ink">
+              {/* Home, as the desktop sidebar's wordmark is. close(), not
+                  dismiss(): this navigates, so the drawer's history entry is
+                  left for the Back handler to step over. */}
+              <Link
+                href="/"
+                onClick={close}
+                className="tap-area -mx-1 rounded-md px-1 text-sm font-semibold tracking-tight text-ink"
+              >
                 Clardentity
-              </span>
+              </Link>
               <button
                 onClick={dismiss}
                 aria-label="Close navigation"

@@ -64,11 +64,7 @@
 
   --text: #3d2a2f;
   --text-secondary: #6b5c60;
-  /* Muted text, held at WCAG AA (4.5:1) against every surface it sits on.
-     The old #9e8e93 was 2.8:1 - the hint and helper copy were the faintest
-     text on the page and the hardest to read on a phone in daylight. Same
-     hue, only as much darker as AA needs; each accent below does the same. */
-  --text-muted: #776b6f;
+  --text-muted: #9e8e93;
   --text-inverse: #ffffff;
   /* Two warm greys the design uses for chrome specifically: navigation
      labels and breadcrumbs sit a step warmer than body copy. */
@@ -171,7 +167,7 @@
      rather than two. */
   --text: #f5f0f2;
   --text-secondary: #b6a5aa;
-  --text-muted: #928488; /* AA: 4.6:1 on every dark surface (was 4.4) */
+  --text-muted: #8e8084;
   --text-inverse: #ffffff;
   --text-nav: #beafb3;
   --text-nav-strong: #ded3d6;
@@ -243,7 +239,7 @@
   --surface-sunken: #f3f3f5;
   --text: #2f334c;
   --text-secondary: #5f6582;
-  --text-muted: #6a6d7f; /* AA (was #8b8fa6, 2.9:1) */
+  --text-muted: #8b8fa6;
   --surface-hover: rgba(70, 57, 77, 0.05);
   --bubble-mine: #eaebed;
   --border: #f1edf2;
@@ -267,7 +263,7 @@
   --border-strong: #3a3c45;
   --text: #f0f1f5;
   --text-secondary: #a5a7b6;
-  --text-muted: #858793; /* AA (was #80828e, 4.3:1) */
+  --text-muted: #80828e;
   --text-nav: #afb1be;
   --text-nav-strong: #d3d5de;
   --text-nav-muted: #80828e;
@@ -287,7 +283,7 @@
   --surface-sunken: #f3f5f5;
   --text: #1a3434;
   --text-secondary: #4a6b6a;
-  --text-muted: #5d7373; /* AA (was #7b9898, 2.8:1) */
+  --text-muted: #7b9898;
   --surface-hover: rgba(57, 62, 77, 0.05);
   --bubble-mine: #eaeded;
   --border: #edeef2;
@@ -311,7 +307,7 @@
   --border-strong: #3a4545;
   --text: #f0f5f5;
   --text-secondary: #a5b6b6;
-  --text-muted: #859393; /* AA (was #808e8e, 4.4:1) */
+  --text-muted: #808e8e;
   --text-nav: #afbebe;
   --text-nav-strong: #d3dede;
   --text-nav-muted: #808e8e;
@@ -451,6 +447,23 @@
    keep --ui-zoom at 0.85, which only --app-vh reads, and every full-height
    page would grow a sixth of a screen of scroll for nothing. Without the
    property, the app simply stays at full size. */
+/* Muted text on the phone layout, held at WCAG AA (4.5:1) against every
+   surface it sits on, in every accent and both themes. The drawn values are
+   2.8-4.4:1 - the hint and helper copy were the faintest text on the page and
+   the hardest to read on a phone in daylight. Same hue, only as much darker
+   (or lighter, in dark mode) as AA needs. Desktop keeps the drawn values. */
+@media (max-width: 1023.98px) {
+  :root { --text-muted: #776b6f; }
+  :root[data-theme="dark"],
+  [data-theme="dark"] { --text-muted: #928488; }
+  :root[data-accent="indigo"]:not([data-theme="dark"]) { --text-muted: #6a6d7f; }
+  :root[data-accent="indigo"][data-theme="dark"] { --text-muted: #858793; }
+  :root[data-accent="teal"]:not([data-theme="dark"]) { --text-muted: #5d7373; }
+  :root[data-accent="teal"][data-theme="dark"] { --text-muted: #859393; }
+  :root[data-accent="plum"]:not([data-theme="dark"]) { --text-muted: #77697d; }
+  :root[data-accent="plum"][data-theme="dark"] { --text-muted: #908a96; }
+}
+
 @supports (zoom: 1) {
   :root {
     --ui-zoom: 0.85;
@@ -467,8 +480,13 @@
    filled or outlined button, where a bigger box would be a bigger button.
    The reach is an invisible ::after centred on it, so the button looks as
    drawn and a finger landing just outside its edge still presses it. */
+/* Phone layout only: a touch screen below the lg breakpoint, where the app is
+   in its drawer layout. Desktop - touchscreen laptops included - keeps the
+   design exactly as drawn. Same condition as the phone-touch: variant. */
+@custom-variant phone-touch (@media (pointer: coarse) and (max-width: 1023.98px));
+
 @utility tap-area {
-  @media (pointer: coarse) {
+  @media (pointer: coarse) and (max-width: 1023.98px) {
     position: relative;
     &::after {
       content: "";
@@ -483,7 +501,7 @@
 }
 
 @utility tap-target {
-  @media (pointer: coarse) {
+  @media (pointer: coarse) and (max-width: 1023.98px) {
     min-width: calc(44px / var(--ui-zoom));
     min-height: calc(44px / var(--ui-zoom));
   }

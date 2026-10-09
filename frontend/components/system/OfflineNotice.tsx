@@ -12,7 +12,8 @@ export function OfflineNotice() {
     <div
       role="status"
       aria-live="polite"
-      className="pointer-events-none fixed inset-x-0 top-[calc(var(--topbar-height)+8px)] z-30 flex justify-center px-4"
+      // phone layout only
+      className="pointer-events-none fixed inset-x-0 top-[calc(var(--topbar-height)+8px)] z-30 flex justify-center px-4 lg:hidden"
     >
       {!online && (
         <p

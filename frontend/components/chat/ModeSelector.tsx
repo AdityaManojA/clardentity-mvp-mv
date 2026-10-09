@@ -6,7 +6,7 @@ import { COGNITIVE_MODES, type CognitiveMode } from "@/lib/modes";
 import { useLockedModes } from "@/lib/previewAccess";
 import { companionLabel, useCompanionNames } from "@/lib/companionNames";
 import { MaskIcon } from "@/components/ui/MaskIcon";
-import { uiZoom } from "@/lib/uiScale";
+import { rectScale } from "@/lib/uiScale";
 import { cx } from "@/components/ui/primitives";
 
 export { COGNITIVE_MODES };
@@ -67,7 +67,7 @@ export function ModeSelector({
     // rect is in screen pixels, which the root's zoom has already shrunk. The
     // gap between the two has to be converted before it joins them.
     const gap =
-      (pill.getBoundingClientRect().left - strip.getBoundingClientRect().left) / uiZoom();
+      (pill.getBoundingClientRect().left - strip.getBoundingClientRect().left) / rectScale();
     const offset = gap + strip.scrollLeft;
     strip.scrollLeft = Math.max(0, offset - (strip.clientWidth - pill.offsetWidth) / 2);
   }, [value]);
