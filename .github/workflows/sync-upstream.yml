@@ -1,0 +1,100 @@
+# Sync clardentity/clardentity-mvp@main into this fork's main, after manual approval.
+#
+# 1. `check` polls upstream (ls-remote only - no objects fetched) and decides
+#    whether upstream main has commits that are not yet in our main.
+# 2. `sync` waits on the protected `sync-approval` environment. Only after a
+#    reviewer approves does it fetch, merge (ff or merge commit), and push.
+#
+# Setup and testing notes: .github/SYNC_UPSTREAM.md
+name: Sync upstream main
+
+on:
+  schedule:
+    - cron: "17 * * * *" # hourly; polling, not real-time
+  workflow_dispatch:
+
+env:
+  UPSTREAM_URL: https://github.com/clardentity/clardentity-mvp.git
+  UPSTREAM_BRANCH: main
+  DEST_BRANCH: main # the only branch this workflow may push to
+
+permissions: {}
+
+jobs:
+  check:
+    # Never run in the upstream repo if this file is ever PR'd back.
+    if: github.repository == 'AdityaManojA/clardentity-mvp-mv'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      needs_sync: ${{ steps.check.outputs.needs_sync }}
+      upstream_sha: ${{ steps.check.outputs.upstream_sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEST_BRANCH }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          upstream_sha="$(git ls-remote "$UPSTREAM_URL" "refs/heads/$UPSTREAM_BRANCH" | cut -f1)"
+          if [ -z "$upstream_sha" ]; then
+            echo "::error::Could not read $UPSTREAM_BRANCH from $UPSTREAM_URL"
+            exit 1
+          fi
+          echo "upstream_sha=$upstream_sha" >> "$GITHUB_OUTPUT"
+          echo "Upstream $UPSTREAM_BRANCH is at $upstream_sha"
+
+          if git cat-file -e "${upstream_sha}^{commit}" 2>/dev/null \
+             && git merge-base --is-ancestor "$upstream_sha" HEAD; then
+            echo "$DEST_BRANCH already contains upstream - nothing to do."
+            echo "needs_sync=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Don't stack approval requests: if another run is already waiting
+          # for a reviewer, let that one handle it.
+          waiting="$(gh run list --repo "$GITHUB_REPOSITORY" --workflow sync-upstream.yml \
+                       --status waiting --json databaseId --jq "map(select(.databaseId != $GITHUB_RUN_ID)) | length")"
+          if [ "$waiting" != "0" ]; then
+            echo "A sync run is already awaiting approval - skipping."
+            echo "needs_sync=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "New upstream commits found - requesting approval."
+          echo "needs_sync=true" >> "$GITHUB_OUTPUT"
+
+  sync:
+    needs: check
+    if: needs.check.outputs.needs_sync == 'true'
+    runs-on: ubuntu-latest
+    environment: sync-approval # add required reviewers in Settings > Environments
+    concurrency:
+      group: sync-upstream-${{ github.repository }}
+      cancel-in-progress: false
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEST_BRANCH }}
+          fetch-depth: 0
+          # SYNC_TOKEN is only needed if upstream ever changes .github/workflows/*
+          token: ${{ secrets.SYNC_TOKEN || github.token }}
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Merge upstream and push
+        env:
+          EXPECTED_SHA: ${{ needs.check.outputs.upstream_sha }}
+        run: bash .github/scripts/sync-upstream.sh
