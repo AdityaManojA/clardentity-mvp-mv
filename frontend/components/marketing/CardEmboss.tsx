@@ -34,14 +34,16 @@ function Ring({ cx, cy, r, w = LINE, opacity }: { cx: number; cy: number; r: num
 }
 
 const SHAPES: Record<string, React.ReactNode> = {
-  // Ask: one question, sent out to the three models best suited for it.
+  // Ask: one question, sent out to the three models best suited for it -
+  // round dots, each line starting well clear of the star (so the three
+  // don't bunch where they meet) and stopping clear of each model.
   "Ask.": (
     <>
-      <Spark cx={50} cy={74} r={16} />
-      <path d="M50 58 V30 M50 58 L22 34 M50 58 L78 34" style={line} strokeWidth={2.2} strokeDasharray="3 4" {...round} />
-      <Ring cx={50} cy={22} r={6} />
-      <Ring cx={16} cy={28} r={6} />
-      <Ring cx={84} cy={28} r={6} />
+      <Spark cx={50} cy={80} r={16} />
+      <path d="M42.5 54.6 L24.9 32.6 M50.0 52.0 L50.0 27.0 M57.5 54.6 L75.1 32.6" style={line} strokeWidth={2.8} strokeDasharray="0.1 7" strokeLinecap="round" />
+      <Ring cx={18} cy={24} r={6} />
+      <Ring cx={50} cy={16} r={6} />
+      <Ring cx={82} cy={24} r={6} />
     </>
   ),
   // Check: a ring of sources around the answer, and a check.
@@ -80,7 +82,7 @@ const SHAPES: Record<string, React.ReactNode> = {
       <path d="M50 94 L50 67 M46.0 54.2 L33.6 36.0 M54.0 54.2 L66.4 36.0" style={line} strokeWidth={2.8} strokeDasharray="0.1 6" strokeLinecap="round" />
       <Spark cx={24} cy={22} r={13} w={2.4} />
       <Spark cx={76} cy={22} r={13} w={2.4} />
-      <circle cx={50} cy={60} r={3.5} style={{ fill: EDGE }} />
+      <Ring cx={50} cy={60} r={3.5} w={2.2} />
     </>
   ),
   // Thought Coach - a half-formed idea: half drawn, half still dotted.
