@@ -24,6 +24,7 @@ import { rectScale } from "@/lib/uiScale";
 import { MaskIcon } from "@/components/ui/MaskIcon";
 import { AccountMenu } from "@/components/system/AccountMenu";
 import { cx } from "@/components/ui/primitives";
+import { useScrollEdges } from "@/lib/useScrollEdges";
 
 /* Sidebar collapse lives in a tiny external store read through
    useSyncExternalStore rather than useState + an effect. Reading localStorage
@@ -164,6 +165,8 @@ function RecentConversations({
     if (id === activeId) router.push(workspaceId ? `/workspace/${workspaceId}` : "/workspace");
   }
 
+  const fadeEdges = useScrollEdges("y");
+
   if (!workspaceId || items.length === 0) return <div className="flex-1" />;
 
   return (
@@ -171,7 +174,7 @@ function RecentConversations({
       <p className="px-4 pb-1 text-sm font-medium uppercase text-[color:var(--text-nav-muted)]">
         Recents
       </p>
-      <ul className="scroll-slim min-h-0 flex-1 overflow-y-auto">
+      <ul ref={fadeEdges} className="scroll-slim scroll-fade-y min-h-0 flex-1 overflow-y-auto">
         {items.map((c, i) => (
           <li key={c.id} className="phone-rise group/recent flex items-center" style={{ "--i": i } as React.CSSProperties}>
             {/* 32px row, 9px radius, a 12px ring and a 20px title - the
