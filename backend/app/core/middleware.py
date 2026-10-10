@@ -25,4 +25,21 @@ class CorrelationIdMiddleware(BaseHTTPMiddleware):
         finally:
             correlation_id_var.reset(token)
         response.headers["X-Request-ID"] = correlation_id
+        # The API's own browser headers, set here rather than in a second
+        # middleware: every extra BaseHTTPMiddleware layer wraps the SSE
+        # stream again. None of these responses is a page, so: never sniff a
+        # JSON body or an image into something executable, never be framed,
+        # and never hand a URL (they can carry conversation ids) to anyone.
+        # No Cross-Origin-Resource-Policy - the app on clardentity.ai loads
+        # generated pictures from this origin in <img> tags, and same-site
+        # would block exactly that.
+        for name, value in _SECURITY_HEADERS:
+            response.headers.setdefault(name, value)
         return response
+
+
+_SECURITY_HEADERS = (
+    ("X-Content-Type-Options", "nosniff"),
+    ("X-Frame-Options", "DENY"),
+    ("Referrer-Policy", "no-referrer"),
+)

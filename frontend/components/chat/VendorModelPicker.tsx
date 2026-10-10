@@ -13,13 +13,14 @@ import {
   type PickableModel,
 } from "@/lib/pickableModels";
 
-/* Pick the model by name - Learning and Co-Creative only.
+/* Pick the model by name - Co-Creative only.
  *
- * Everywhere else the composer shows `ModelPicker`, which names tiers by
- * capability because the identity rules forbid naming the model. These two
- * modes are the deliberate exception: here the user is picking a tool rather
- * than consulting a companion, so the real names are shown and the system
- * prompt is relaxed to match. A product that refuses to say which model it is
+ * Everywhere else the composer shows no model control at all: the identity
+ * rules forbid naming the model, and the capability tiers live under Upgrade
+ * in the account menu, as plans rather than as a per-message switch.
+ * Co-Creative is the deliberate exception: here the user is picking a tool
+ * rather than consulting a companion, so the real names are shown and the
+ * system prompt is relaxed to match. A product that refuses to say which model it is
  * while a dropdown three inches away names it isn't protecting anything.
  *
  * Grouped by vendor, the way Cursor does it, because the vendor is most of

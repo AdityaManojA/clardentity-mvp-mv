@@ -3,7 +3,10 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/lib/auth";
+import { track } from "@/lib/analytics";
 import { cx } from "@/components/ui/primitives";
+import { UpgradeDialog } from "@/components/chat/UpgradeDialog";
+import { GemIcon, PlanTiers } from "@/components/system/PlanTiers";
 
 /* The account card's menu.
  *
@@ -12,6 +15,11 @@ import { cx } from "@/components/ui/primitives";
  * means "exit" to people who already know it means exit. Everything the
  * account can do now lives behind the card itself: where you are, what the
  * app does, and the way out, named in words.
+ *
+ * Upgrade sits beside Profile and Settings because a plan is a fact about
+ * the account, like the other two. It opens the Clar tiers in place - the
+ * menu turns into the list, with a way back - rather than a second popup
+ * stacked on the first, and a locked tier opens the plans dialog.
  *
  * It opens upwards because the card is the last thing in the sidebar, and
  * grows from that corner rather than fading in the middle of the screen - a
@@ -56,16 +64,25 @@ export function AccountMenu({ onNavigate }: { onNavigate?: () => void }) {
   const { user, logout } = useAuth();
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  // Which face of the menu is showing: the account's verbs, or its plans.
+  const [view, setView] = useState<"account" | "plans">("account");
+  const [upsell, setUpsell] = useState<string | null>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
     function onDown(e: MouseEvent) {
-      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setOpen(false);
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
+        setOpen(false);
+        setView("account");
+      }
     }
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape") {
+        setOpen(false);
+        setView("account");
+      }
     }
     document.addEventListener("mousedown", onDown);
     document.addEventListener("keydown", onKey);
@@ -81,8 +98,13 @@ export function AccountMenu({ onNavigate }: { onNavigate?: () => void }) {
   const item =
     "flex w-full items-center gap-3 rounded-[8px] px-2.5 py-2 text-left text-sm text-ink transition-colors hover:bg-surface-hover";
 
-  function go(href: string) {
+  function close() {
     setOpen(false);
+    setView("account");
+  }
+
+  function go(href: string) {
+    close();
     onNavigate?.();
     router.push(href);
   }
@@ -98,37 +120,75 @@ export function AccountMenu({ onNavigate }: { onNavigate?: () => void }) {
           // reads as having come out of the thing that was pressed.
           className="account-menu absolute bottom-full left-0 z-40 mb-2 w-[calc(100%-0.5rem)] min-w-[200px] rounded-[12px] border border-hairline bg-surface-raised p-1.5 shadow-xl"
         >
-          <p className="truncate px-2.5 pb-1.5 pt-1 text-xs text-ink-muted" title={user?.email}>
-            {user?.email}
-          </p>
-          <div className="my-1 border-t border-hairline" />
-          <button type="button" role="menuitem" className={item} onClick={() => go("/profile")}>
-            <PersonIcon />
-            Profile
-          </button>
-          <button type="button" role="menuitem" className={item} onClick={() => go("/settings")}>
-            <GearIcon />
-            Settings
-          </button>
-          <div className="my-1 border-t border-hairline" />
-          <button
-            type="button"
-            role="menuitem"
-            className={item}
-            onClick={() => {
-              setOpen(false);
-              // Only sign out; RequireAuth (which this menu always sits
-              // inside) sees the user go and replaces the page with /login -
-              // replace, so Back does not return to the shell. Navigating
-              // here as well issued a second identical replace() in the same
-              // tick, which the router could drop: signed out, but left on a
-              // spinner at the old URL.
-              logout();
-            }}
-          >
-            <LeaveIcon />
-            Log out
-          </button>
+          {view === "plans" ? (
+            <>
+              <button
+                type="button"
+                onClick={() => setView("account")}
+                className="flex w-full items-center gap-1.5 rounded-[8px] px-2 py-1.5 text-left text-xs font-medium text-ink-muted transition-colors hover:bg-surface-hover hover:text-ink"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                  strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="size-3.5">
+                  <path d="m15 18-6-6 6-6" />
+                </svg>
+                Plans
+              </button>
+              <div className="my-1 border-t border-hairline" />
+              <PlanTiers
+                onLocked={(label) => {
+                  track("locked_mode_tapped", { mode: label, via: "plans_menu" });
+                  close();
+                  setUpsell(label);
+                }}
+              />
+            </>
+          ) : (
+            <>
+              <p className="truncate px-2.5 pb-1.5 pt-1 text-xs text-ink-muted" title={user?.email}>
+                {user?.email}
+              </p>
+              <div className="my-1 border-t border-hairline" />
+              <button type="button" role="menuitem" className={item} onClick={() => go("/profile")}>
+                <PersonIcon />
+                Profile
+              </button>
+              <button type="button" role="menuitem" className={item} onClick={() => go("/settings")}>
+                <GearIcon />
+                Settings
+              </button>
+              <button
+                type="button"
+                role="menuitem"
+                className={item}
+                onClick={() => {
+                  track("plans_opened", { via: "account_menu" });
+                  setView("plans");
+                }}
+              >
+                <GemIcon className="size-5" />
+                Upgrade
+              </button>
+              <div className="my-1 border-t border-hairline" />
+              <button
+                type="button"
+                role="menuitem"
+                className={item}
+                onClick={() => {
+                  close();
+                  // Only sign out; RequireAuth (which this menu always sits
+                  // inside) sees the user go and replaces the page with
+                  // /login - replace, so Back does not return to the shell.
+                  // Navigating here as well issued a second identical
+                  // replace() in the same tick, which the router could drop:
+                  // signed out, but left on a spinner at the old URL.
+                  logout();
+                }}
+              >
+                <LeaveIcon />
+                Log out
+              </button>
+            </>
+          )}
         </div>
       )}
 
@@ -137,7 +197,10 @@ export function AccountMenu({ onNavigate }: { onNavigate?: () => void }) {
         data-tour="nav-profile"
         aria-haspopup="menu"
         aria-expanded={open}
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => {
+          setOpen((v) => !v);
+          setView("account");
+        }}
         className="tap-target flex w-full min-w-0 items-center gap-2.5 rounded-lg p-1 text-left transition-colors hover:bg-surface-hover"
       >
         <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand text-sm font-medium text-white">
@@ -149,6 +212,8 @@ export function AccountMenu({ onNavigate }: { onNavigate?: () => void }) {
         </span>
         <Chevron open={open} />
       </button>
+
+      <UpgradeDialog open={upsell !== null} trigger={upsell} onClose={() => setUpsell(null)} />
     </div>
   );
 }

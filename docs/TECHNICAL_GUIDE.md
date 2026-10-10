@@ -193,7 +193,7 @@ PUT  /chat/{conversation_id}/messages/{id}/feedback
 POST /chat/{conversation_id}/messages/{id}/devils-advocate
 GET  /chat/{conversation_id}/export         markdown / pdf
 POST /chat/{conversation_id}/call-transcript  save a finished voice call into the thread
-GET  /chat/models                           which models this deployment can route to
+GET  /chat/models?mode=                     models pickable by name (Co-Creative only)
 ```
 
 **A conversation is a tree, not a list.** Messages carry `parent_id`,
@@ -347,12 +347,52 @@ if not saw_terminal:
 
 ### Guest stream
 
-`POST /guest/chat` is unauthenticated, for the landing-page demo. Simpler
-protocol: `delta`, then `done` with
-`{ text, used, budget, limit_reached }`, or `error`. Budget is **5,000 tokens
-per browser session**, plus a per-address and a global daily ceiling. When
-`limit_reached` is true the client stashes the transcript and
-`POST /guest/import` writes it into the account after sign-up.
+`POST /guest/chat` is unauthenticated, for the landing-page demo. Since
+2026-10-10 it runs **the same answer pipeline as the signed-in chat**
+(`backend/app/services/answer_pipeline.py`) and speaks **the same events** -
+`status`, `review`, `crux`, `delta`, `answer`, `final`, `image`, the four
+gates, `error` - so read it with the same parser. It adds two of its own:
+
+- `switched` `{from, to}` - smart switching moved the question (the server
+  does the move itself, in one request, rather than sending `mode_suggestion`
+  for the client to re-send).
+- `budget` `{used, budget, limit_reached}` - always the last event, including
+  after a gate.
+
+The request carries the history (the browser holds it; nothing is stored),
+the same re-send flags as the app (`mode_confirmed`, `refined_confirmed`,
+`clarifying_confirmed`, `context_acknowledged`, `context_rounds`), plus
+`smart_switching`, `regenerate`, and `last_image_id` (lets "make it darker"
+edit the demo's last picture; the owner is always the caller's own session).
+`mode: "rapid"` is the Quick answer. Message payloads have the app's
+`MessageOut` shape with ids prefixed `guest-`.
+
+The allowance is **5,000 tokens of conversation per browser session** - the
+answer's output plus the visitor's own words, not the fetched sources or the
+claim checking - with a per-address (400k) and a global daily ceiling charged
+the full cost. When `limit_reached` is true the client stashes the transcript
+(with each turn's mode, gist, verdict box and picture) and
+`POST /guest/import` writes it into the account after sign-up; claims and
+confidence are never accepted from a client.
+
+### Model choice and plans
+
+- `GET /chat/models?mode=creative` lists the models a user may pick **by name
+  - Co-Creative only** (Learning had it until 2026-10-10). Every other mode
+  returns an empty list; show no picker there.
+- The capability tiers (**Clar Basic** - formerly "Auto" - and Clar Pro / Max
+  / Ultra) are **plans, not a per-message setting**: they live under
+  *Upgrade* in the account menu beside Profile and Settings, not on the
+  composer. Only Clar Basic is open today; the rest open the plans dialog.
+
+### Image + text → image
+
+In Co-Creative, attaching one or more images (up to 8 are used) and asking
+for a change ("put this logo on a mug", "merge these into one poster") sends
+them to the image model's edits endpoint as references. With no attachment,
+a follow-up like "now make it night-time" edits the last picture the
+conversation drew. Nothing changes in the request shape - images go in
+`attachments` as before.
 
 ---
 

@@ -38,9 +38,12 @@ _redis = redis.from_url(settings.redis_url)
 SESSION_BUDGET = 5_000
 
 #: What one network address gets in a day, across however many sessions it
-#: invents. Five conversations' worth: generous for a shared address, small
-#: enough that a loop hits it quickly.
-ADDRESS_BUDGET = 25_000
+#: invents, counted in what the turns actually cost - the claim checking
+#: included. A demo turn now runs the full pipeline, and one with per-claim
+#: research measured 37k tokens (2026-10-10), so this is roughly a dozen
+#: answers: enough for an office of people trying it from one address,
+#: small enough that a loop rotating session ids hits it quickly.
+ADDRESS_BUDGET = 400_000
 
 _DAY = 24 * 60 * 60
 
@@ -98,23 +101,31 @@ async def exhausted(session_id: str, address: str) -> bool:
     return session_spent >= SESSION_BUDGET or address_spent >= ADDRESS_BUDGET
 
 
-async def charge(session_id: str, address: str, tokens: int) -> int:
-    """Add one turn's tokens to both counters. Returns the session total.
+async def charge(
+    session_id: str, address: str, session_tokens: int, total_tokens: int
+) -> int:
+    """Add one turn to the counters. Returns the session total.
+
+    Two numbers, because the counters measure different things. The session
+    is the visitor's allowance and is charged the conversation they held -
+    the answer they were given. The address and the daily ceiling bound what
+    the demo costs, so they are charged everything the turn spent, including
+    the claim checking a visitor never asked to pay for.
 
     Charged after the answer rather than reserved before it: a turn that has
     already been generated has already been paid for, and refusing to count
     it would be the one way to actually lose money here.
     """
-    if tokens <= 0:
-        return await _get(_session_key(session_id))
     total = await _get(_session_key(session_id))
+    if session_tokens <= 0 and total_tokens <= 0:
+        return total
     try:
         pipe = _redis.pipeline()
-        pipe.incrby(_session_key(session_id), tokens)
+        pipe.incrby(_session_key(session_id), max(0, session_tokens))
         pipe.expire(_session_key(session_id), _DAY)
-        pipe.incrby(_address_key(address), tokens)
+        pipe.incrby(_address_key(address), max(0, total_tokens))
         pipe.expire(_address_key(address), _DAY)
-        pipe.incrby(_global_key(), tokens)
+        pipe.incrby(_global_key(), max(0, total_tokens))
         pipe.expire(_global_key(), _DAY)
         results = await pipe.execute()
         total = int(results[0])

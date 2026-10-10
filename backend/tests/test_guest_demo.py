@@ -220,90 +220,305 @@ class TestKeepingTheDemoConversation:
             await c.delete(f"{self.API}/auth/me", headers=headers)
 
 
+    async def test_the_answer_comes_across_as_it_looked(self, monkeypatch):
+        """The gist card, the verdict box and the picture travel with the
+        words, each turn keeps the companion it was answered in, and the
+        claim checking does not - a verification badge is never something
+        the browser gets to write."""
+        import uuid as _uuid
+
+        import pytest
+        from sqlalchemy import select
+
+        from app.api import guest as guest_api
+        from app.db.session import AsyncSessionLocal
+        from app.models import Message
+
+        async def fake_name(question, gist, fallback):
+            return "Singapore"
+
+        monkeypatch.setattr(guest_api, "name_conversation", fake_name)
+        review = {"options": [], "alternative": None, "alternative_why": None, "suggestions": []}
+        image = {"id": str(_uuid.uuid4()), "owner": str(_uuid.uuid4()), "prompt": "a skyline"}
+
+        async with self._client() as c:
+            reg = await self._account(c)
+            if reg.status_code >= 500:
+                pytest.skip("no database available")
+            headers = {"Authorization": f"Bearer {reg.json()['access_token']}"}
+            res = await c.post(
+                f"{self.API}/guest/import",
+                headers=headers,
+                json={
+                    "mode": "knowing",
+                    "turns": [
+                        {"role": "user", "content": "Singapore or stay?", "mode": "decision"},
+                        {
+                            "role": "assistant",
+                            "content": "Weigh the growth.",
+                            "mode": "decision",
+                            "crux_text": "Stay unless the role grows you faster.",
+                            "decision_review": review,
+                            "generated_image": image,
+                            # Not accepted from a browser, whatever it says.
+                            "confidence_band": "Likely Fact",
+                        },
+                    ],
+                },
+            )
+            assert res.status_code == 201, res.text
+            convo_id = _uuid_of(res.json()["conversation_id"])
+
+            async with AsyncSessionLocal() as db:
+                rows = (
+                    await db.execute(
+                        select(Message)
+                        .where(Message.conversation_id == convo_id)
+                        .order_by(Message.created_at)
+                    )
+                ).scalars().all()
+                question, answer = rows
+                assert question.mode_used == answer.mode_used == "decision"
+                assert answer.crux_text == "Stay unless the role grows you faster."
+                assert answer.decision_review == review
+                assert answer.generated_image == image
+                assert answer.confidence_band is None
+                assert question.crux_text is None
+
+            await c.delete(f"{self.API}/auth/me", headers=headers)
+
+
 def _uuid_of(value):
     import uuid as _uuid
 
     return _uuid.UUID(value)
 
 
-class TestTheDemoMovesAQuestionToTheRightCompanion:
-    """Smart switching, in the demo.
+def _frames(body: str) -> list[tuple[str, dict]]:
+    """The SSE stream as (event, data) pairs - CRLF-normalised, because
+    sse-starlette ends every frame with CRLF CRLF."""
+    import json
 
-    The demo had neither the control nor anything behind it: a visitor who
-    asked Finder something that belonged in Reflect & Relieve got it
-    answered in Finder, where a signed-in user would have been moved. Only
-    the automatic half exists here - stopping to ask costs a round trip and
-    a second message out of a 5,000-token allowance.
+    out = []
+    for frame in body.replace("\r\n", "\n").split("\n\n"):
+        event, data = None, ""
+        for line in frame.split("\n"):
+            if line.startswith("event:"):
+                event = line[6:].strip()
+            elif line.startswith("data:"):
+                data += line[5:].strip()
+        if event and data:
+            out.append((event, json.loads(data)))
+    return out
+
+
+class TestADemoAnswerIsTheProductsAnswer:
+    """A demo turn runs the signed-in pipeline, not a smaller one.
+
+    The demo used to stream plain prose from the fast model: no gist card,
+    no verdict box, no claims, no checking. A visitor asking Finder saw no
+    fact-check and a visitor asking Decision-making saw no structure - a
+    different product from the one they were invited to sign up for. These
+    drive a whole turn through `/guest/chat` with every model call faked,
+    and pin the events a demo answer must now carry. Needs Redis and a
+    database (for the admin settings it reads).
     """
 
-    class _Payload:
-        def __init__(self, mode, message, smart_switching=True):
-            self.mode = mode
-            self.message = message
-            self.smart_switching = smart_switching
+    ANSWER = (
+        "<crux>The wall fell on 9 November 1989.</crux>\n\n"
+        '<claim id="1">The Berlin Wall fell on 9 November 1989 [1].</claim>\n'
+        '<claim id="2" opinion="true">It was the defining moment of the decade.</claim>'
+    )
 
-    async def test_it_switches_when_another_companion_fits_better(self, monkeypatch):
+    def _fake_pipeline(self, monkeypatch, guidance=None, answer=None):
         from app.api import guest as guest_api
+        from app.services import answer_pipeline
+        from app.services.decision_classifier import NO_DECISION
+        from app.services.search_planner import SearchPlan
+        from app.services.verification_agent import ClaimVerification, EvidenceVerification
+        from app.services.web_research import ResearchResult, WebSource
 
-        async def suggests(question, mode, history=None):
-            return {"suggested_mode": "therapy", "mode_reason": "This is about how they feel."}
+        text = answer or self.ANSWER
+        seen = {"guidance": 0, "modes": []}
 
-        monkeypatch.setattr(guest_api, "propose_guidance", suggests)
-        mode, switched_from = await guest_api._settle_mode(
-            self._Payload("knowing", "I can't stop replaying the argument"), []
+        async def fake_guidance(question, mode, history=None):
+            seen["guidance"] += 1
+            return guidance
+
+        async def fake_plan(history, message):
+            return SearchPlan(retrieval_query=message, queries=["berlin wall"])
+
+        async def fake_gather(queries, depth="basic", *, country=None, news=False):
+            return [WebSource(url="https://example.org/wall", title="The Wall", excerpt="It fell in 1989.")]
+
+        async def fake_generation(*, instructions, input_text, model=None, temperature=None, input_images=None):
+            seen["modes"].append(instructions[0]["text"] if isinstance(instructions, list) else "")
+            for piece in (text[:20], text[20:]):
+                yield {"type": "delta", "text": piece}
+            yield {"type": "done", "full_text": text}
+
+        async def fake_classify(message):
+            return NO_DECISION
+
+        async def fake_review(question, bias_category_id=None):
+            return {"options": [], "alternative": None, "alternative_why": None, "suggestions": []}
+
+        async def fake_verify(claim_text, evidence_texts, bias_category_id=None):
+            return ClaimVerification(
+                evidence=[EvidenceVerification("entailment", 0.95, quote="It fell in 1989.")]
+                if evidence_texts else [],
+                distortion_flag=None,
+                distortion_explanation=None,
+            )
+
+        async def fake_research(claim, seed=None):
+            return ResearchResult()
+
+        async def fake_reflect(mode, draft):
+            return draft, False
+
+        async def fake_counterfactual(answer_text, flagged=None):
+            return "The unchecked version."
+
+        monkeypatch.setattr(guest_api, "propose_guidance", fake_guidance)
+        monkeypatch.setattr(guest_api, "plan_searches", fake_plan)
+        monkeypatch.setattr(guest_api, "gather_context", fake_gather)
+        monkeypatch.setattr(guest_api, "stream_generation", fake_generation)
+        monkeypatch.setattr(guest_api, "classify_decision", fake_classify)
+        monkeypatch.setattr(guest_api, "review_decisions", fake_review)
+        monkeypatch.setattr(answer_pipeline, "verify_claim", fake_verify)
+        monkeypatch.setattr(answer_pipeline, "research_claim", fake_research)
+        monkeypatch.setattr(answer_pipeline, "reflect_and_revise", fake_reflect)
+        monkeypatch.setattr(answer_pipeline, "generate_counterfactual", fake_counterfactual)
+        return seen
+
+    async def _ask(self, **body):
+        import uuid as _uuid
+
+        import httpx
+
+        from app.main import app
+
+        payload = {"session_id": str(_uuid.uuid4()), "history": [], **body}
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://t"
+        ) as c:
+            res = await c.post("/api/v1/guest/chat", json=payload)
+        return res
+
+    async def _available(self):
+        import pytest
+
+        from app.services.guest_demo import _redis
+
+        try:
+            await _redis.ping()
+        except Exception:  # noqa: BLE001
+            pytest.skip("no redis available")
+
+    async def test_finder_arrives_with_its_gist_claims_sources_and_score(self, monkeypatch):
+        await self._available()
+        self._fake_pipeline(monkeypatch)
+        res = await self._ask(mode="knowing", message="When did the Berlin Wall fall?")
+        assert res.status_code == 200, res.text
+        events = _frames(res.text)
+        names = [e for e, _ in events]
+
+        # The gist goes out on its own, before the body - the app's order.
+        assert names.index("crux") < names.index("answer") < names.index("final")
+        final = dict(events)["final"]
+        claims = final["claims"]
+        assert [c["claim_index"] for c in claims] == [1, 2]
+        # The cited fact was checked against the source the search found...
+        assert claims[0]["evidence"] and claims[0]["evidence"][0]["url"] == "https://example.org/wall"
+        assert claims[0]["entailment_label"] not in ("unsupported", "opinion")
+        # ...and the opinion was marked as one, not scored as a failed fact.
+        assert claims[1]["entailment_label"] == "opinion"
+        assert final["confidence"]["band"] is not None
+        assert final["message"]["crux_text"] == "The wall fell on 9 November 1989."
+        assert final["counterfactual_content"] == "The unchecked version."
+        # The message is shaped exactly like the app's, so the same list
+        # renders it; the id says it is not a database row.
+        assert final["message"]["id"].startswith("guest-")
+        # And the visitor learns what is left of the allowance.
+        assert names[-1] == "budget"
+
+    async def test_decision_making_arrives_with_its_verdict_box(self, monkeypatch):
+        await self._available()
+        self._fake_pipeline(monkeypatch)
+        res = await self._ask(mode="decision", message="Singapore or stay?")
+        events = _frames(res.text)
+        assert "review" in [e for e, _ in events]
+        final = dict(events)["final"]
+        assert final["decision_review"] is not None
+
+    async def test_it_stops_on_the_same_questions_as_the_app(self, monkeypatch):
+        await self._available()
+        self._fake_pipeline(
+            monkeypatch, guidance={"context_question": "What matters most to you here?"}
         )
-        assert (mode, switched_from) == ("therapy", "knowing")
+        res = await self._ask(mode="decision", message="Should I move abroad?")
+        events = _frames(res.text)
+        assert [e for e, _ in events] == ["context_question", "budget"]
+        assert events[0][1]["question"] == "What matters most to you here?"
 
-    async def test_the_toggle_really_turns_it_off(self, monkeypatch):
-        from app.api import guest as guest_api
-
-        called = []
-
-        async def suggests(question, mode, history=None):
-            called.append(question)
-            return {"suggested_mode": "therapy"}
-
-        monkeypatch.setattr(guest_api, "propose_guidance", suggests)
-        mode, switched_from = await guest_api._settle_mode(
-            self._Payload("knowing", "anything", smart_switching=False), []
+        # Answered, the question is not asked again - the app's rule.
+        res = await self._ask(
+            mode="decision",
+            message='Should I move abroad?\n\n(Clardentity asked: "What matters?")\nCareer.',
+            context_rounds=1,
         )
-        assert (mode, switched_from) == ("knowing", None)
-        # And it does not merely ignore the answer - it never asks, so a
-        # visitor who turned it off is not paying for the judgement.
-        assert called == []
+        assert "final" in [e for e, _ in _frames(res.text)]
+
+    async def test_smart_switching_moves_the_question_and_says_so(self, monkeypatch):
+        await self._available()
+        self._fake_pipeline(
+            monkeypatch, guidance={"suggested_mode": "therapy", "mode_reason": "Feelings."}
+        )
+        res = await self._ask(mode="knowing", message="I can't stop replaying the argument")
+        events = _frames(res.text)
+        assert events[0] == ("switched", {"from": "knowing", "to": "therapy"})
+        assert dict(events)["final"]["message"]["mode_used"] == "therapy"
+
+    async def test_manual_switching_never_moves_it(self, monkeypatch):
+        await self._available()
+        self._fake_pipeline(monkeypatch, guidance={"suggested_mode": "therapy"})
+        res = await self._ask(
+            mode="knowing", message="I can't stop replaying it", smart_switching=False
+        )
+        events = _frames(res.text)
+        assert "switched" not in [e for e, _ in events]
+        assert dict(events)["final"]["message"]["mode_used"] == "knowing"
 
     async def test_a_suggestion_it_cannot_honour_changes_nothing(self, monkeypatch):
+        await self._available()
+        for suggestion in ("knowing", "rapid", "nonsense"):
+            self._fake_pipeline(monkeypatch, guidance={"suggested_mode": suggestion})
+            res = await self._ask(mode="knowing", message="anything")
+            events = _frames(res.text)
+            assert "switched" not in [e for e, _ in events], suggestion
+            assert dict(events)["final"]["message"]["mode_used"] == "knowing", suggestion
+
+    async def test_the_quick_answer_skips_the_gates_and_the_checking(self, monkeypatch):
+        await self._available()
+        seen = self._fake_pipeline(
+            monkeypatch, guidance={"context_question": "Why do you ask?"}
+        )
+        res = await self._ask(mode="rapid", message="When did the wall fall?")
+        events = _frames(res.text)
+        names = [e for e, _ in events]
+        assert seen["guidance"] == 0
+        assert "final" in names and "context_question" not in names
+        assert dict(events)["final"]["claims"] == []
+
+    async def test_a_visitor_is_charged_for_the_conversation_not_the_checking(self, monkeypatch):
+        """The allowance is 5,000 tokens of conversation. The sources fetched
+        to ground the answer and the claim checking afterwards are counted
+        against the address and the daily ceiling, never the visitor - or a
+        single Finder answer would end the demo before anything was seen."""
         from app.api import guest as guest_api
 
-        for suggestion in ({"suggested_mode": "knowing"},      # same mode
-                           {"suggested_mode": "rapid"},        # the unpickable path
-                           {"suggested_mode": "nonsense"},     # not a companion
-                           {"suggested_mode": None},
-                           {},
-                           None):
-            async def suggests(question, mode, history=None, s=suggestion):
-                return s
-
-            monkeypatch.setattr(guest_api, "propose_guidance", suggests)
-            mode, switched_from = await guest_api._settle_mode(
-                self._Payload("knowing", "anything"), []
-            )
-            assert (mode, switched_from) == ("knowing", None), suggestion
-
-    async def test_a_judgement_that_fails_or_hangs_never_blocks_the_answer(self, monkeypatch):
-        import asyncio
-
-        from app.api import guest as guest_api
-
-        async def explodes(question, mode, history=None):
-            raise RuntimeError("guidance is down")
-
-        monkeypatch.setattr(guest_api, "propose_guidance", explodes)
-        assert await guest_api._settle_mode(self._Payload("knowing", "x"), []) == ("knowing", None)
-
-        async def hangs(question, mode, history=None):
-            await asyncio.sleep(30)
-
-        monkeypatch.setattr(guest_api, "propose_guidance", hangs)
-        monkeypatch.setattr(guest_api, "_SWITCH_BUDGET_SECONDS", 0.05)
-        assert await guest_api._settle_mode(self._Payload("knowing", "x"), []) == ("knowing", None)
+        assert guest_api._conversation_tokens(100, "abcd" * 10, []) == 110
+        assert guest_api._conversation_tokens(
+            0, "", [{"role": "user", "content": "x" * 400}]
+        ) == 100

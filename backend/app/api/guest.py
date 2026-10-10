@@ -4,12 +4,23 @@ A visitor with no account can ask the stage a question and hold a short
 conversation with the answer, until it has cost them 5,000 tokens and they
 are asked to sign up.
 
-Deliberately a much smaller thing than `/chat`. No account, no conversation
-row, no documents, no retrieval, no web research, no claim parsing, no
-verification, no profile - the history is held by the browser and posted
-back each turn, and the demo writes nothing to the database. That is partly
-cost, and partly that a demo which quietly stored strangers' conversations
-would be a worse product than one that does not.
+The answer is the product's answer. It used to be a much smaller thing -
+the fast model and the mode's instructions, no gist, no verdict box, no
+claims, no checking - on the theory that a taste did not need the
+apparatus. But the apparatus is the product: a visitor who asks Finder and
+gets prose with no fact-check has been shown a different, worse product
+than the one they would be signing up for. So a demo turn now runs through
+`services/answer_pipeline`, the same code as a signed-in turn: the same
+pre-answer questions, the same model routing, the same web research, the
+same streamed gist, verdict box, claim verification, per-claim research and
+score.
+
+What it still does not have is anything that needs an account: no
+documents (so no retrieval), no profile, no memory, no attachments, no
+model picker. And it writes nothing. The history is held by the browser and
+posted back each turn; nothing about a stranger's conversation is stored
+here, which is partly cost and partly that a demo which quietly kept
+strangers' conversations would be a worse product than one that does not.
 
 `/guest/import` is the single exception, and it is the opposite case: the
 visitor has read "sign up and we'll keep this", made an account, and is now
@@ -17,18 +28,16 @@ asking for their own transcript back. It is authenticated, it writes to the
 account that calls it, and the transcript it writes was posted up from that
 browser rather than retained here - which is only possible *because*
 nothing was stored, and is why the handoff goes through the client.
-
-What it keeps is the mode. The whole point of the box is that the question
-picks the companion, so a guest asking in Decision-making gets Decision
-mode's actual instructions - the demo is the product, just without the
-apparatus around it.
 """
 
 import asyncio
 import json
 import logging
+import time
 import uuid
 from collections.abc import AsyncIterator
+from datetime import UTC, datetime
+from types import SimpleNamespace
 from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
@@ -38,14 +47,27 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sse_starlette.sse import EventSourceResponse
 
 from app.api.deps import get_current_user
-from app.core.config import settings
 from app.core.rate_limit import check_rate_limit
-from app.db.session import get_db
+from app.db.session import AsyncSessionLocal, get_db
 from app.models import Conversation, Message, User, Workspace, WorkspaceMember
+from app.services.admin_settings_service import get_all_settings
 from app.services.anthropic_client import stream_generation
-from app.services.claim_parser import ClaimTagStripper, extract_crux
+from app.services.answer_pipeline import (
+    AnswerRun,
+    claims_out,
+    gate_event,
+    generation_model_for,
+)
+from app.services.avatar_cue_service import compute_avatar_cue
+from app.services.confidence_scoring import ScoringWeights
 from app.services.conversation_title import name_conversation
-from app.services.guidance import propose_guidance
+from app.services.decision_classifier import (
+    NO_DECISION,
+    DecisionClassification,
+    build_bias_guidance,
+    classify_decision,
+)
+from app.services.decision_review import review_decisions
 from app.services.guest_demo import (
     MAX_MESSAGE_CHARS,
     SESSION_BUDGET,
@@ -55,23 +77,20 @@ from app.services.guest_demo import (
     spent,
     trim_history,
 )
+from app.services.guidance import MAX_CONTEXT_ROUNDS, propose_guidance
+from app.services.image_generation import ImageRequest, reference_images
+from app.services.image_generation import generate as generate_image
+from app.services.image_generation import wanted_image
 from app.services.output_cleanup import clean_output
 from app.services.prompt_builder import MODE_INSTRUCTIONS, build_system_instructions
+from app.services.search_planner import SearchPlan, needs_live_data, plan_searches
+from app.services.thinking_review import review_thinking
 from app.services.token_meter import meter
+from app.services.web_research import gather_context
 
 logger = logging.getLogger("clardentity.guest")
 
 router = APIRouter(prefix="/guest", tags=["guest"])
-
-#: The quick path only. A guest answer is a taste, and the flagship model's
-#: deliberation is neither needed for that nor affordable at this price.
-_MODEL = settings.anthropic_fast_model
-
-#: How long the "is this the right companion?" judgement may hold up the
-#: answer. It is a nicety; past this the question is answered where it was
-#: asked rather than kept waiting for an opinion about where it belongs.
-_SWITCH_BUDGET_SECONDS = 6.0
-
 
 def _address(request: Request) -> str:
     """Who to count this against.
@@ -103,45 +122,78 @@ class GuestRequest(BaseModel):
     #: in one, rather than answering badly in the one that happens to be
     #: selected. On by default, exactly as in the app.
     smart_switching: bool = True
+    # The same re-send flags the app's composer sends after a pre-answer
+    # question, with the same meaning - see MessageCreate.
+    mode_confirmed: bool = False
+    refined_confirmed: bool = False
+    clarifying_confirmed: bool = False
+    context_acknowledged: bool = False
+    context_rounds: int = Field(default=0, ge=0, le=10)
+    #: Another answer to a question already asked and settled: no gate asks
+    #: about it a second time, exactly as with the app's regenerate.
+    regenerate: bool = False
+    #: The last picture this demo conversation drew, so "now make it night-
+    #: time" can edit it. Only the id: the owner is always this visitor's own
+    #: session, so a request cannot point the edit at anybody else's image.
+    last_image_id: uuid.UUID | None = None
 
 
-async def _settle_mode(
-    payload: "GuestRequest", history: list[dict]
-) -> tuple[str, str | None]:
-    """Which companion answers, and the one it was switched away from.
+def _history_row(role: str, content: str) -> SimpleNamespace:
+    """A demo turn, shaped like enough of a Message for the shared pipeline:
+    the prompt builder and the search planner read role, content and an
+    optional clarifier, and nothing else."""
+    return SimpleNamespace(role=role, content=content, clarifier=None)
 
-    The app offers two behaviours here: stop and ask ("would you like
-    Decision-making for this?"), or just answer in the better companion and
-    say so, with a way back. The demo does only the second. Asking costs a
-    round trip and a second message out of a 5,000-token allowance, and a
-    visitor who has not signed up yet should be shown the product working,
-    not interviewed by it.
 
-    Never raises and never blocks the turn: a judgement that fails, times
-    out, or names something unknown leaves the question in the companion
-    the visitor picked, which is what happened before this existed.
+def _message_payload(
+    role: str,
+    content: str,
+    mode: str,
+    *,
+    crux_text: str | None = None,
+    claims: list | None = None,
+    confidence: tuple[float | None, str | None] = (None, None),
+    counterfactual: str | None = None,
+    decision_review: dict | None = None,
+    thinking_review: dict | None = None,
+    generated_image: dict | None = None,
+    avatar: tuple[str | None, str | None] = (None, None),
+    message_id: str | None = None,
+) -> dict:
+    """A demo message in exactly the shape the app's MessageOut has, so the
+    landing page renders it with the same components and the same code
+    paths - there is no "guest message" for the list to special-case.
+
+    The id is not a database id because there is no database row. It is
+    prefixed so it can never be mistaken for one, and the client never sends
+    it anywhere.
     """
-    chosen = payload.mode
-    if not payload.smart_switching:
-        return chosen, None
-    try:
-        guidance = await asyncio.wait_for(
-            propose_guidance(payload.message, chosen, [(t["role"], t["content"]) for t in history]),
-            timeout=_SWITCH_BUDGET_SECONDS,
-        )
-    except Exception:  # noqa: BLE001 - an optional judgement is optional
-        logger.info("guest mode suggestion unavailable", exc_info=True)
-        return chosen, None
-
-    suggested = (guidance or {}).get("suggested_mode")
-    if (
-        not isinstance(suggested, str)
-        or suggested == chosen
-        or suggested not in MODE_INSTRUCTIONS
-        or suggested == "rapid"
-    ):
-        return chosen, None
-    return suggested, chosen
+    mid = message_id or f"guest-{uuid.uuid4()}"
+    return {
+        "id": mid,
+        "role": role,
+        "content": content,
+        "mode_used": mode,
+        "reasoning_lens": None,
+        "confidence_score": confidence[0],
+        "confidence_band": confidence[1],
+        "avatar_expression": avatar[0],
+        "avatar_gesture": avatar[1],
+        "created_at": datetime.now(UTC).isoformat(),
+        "counterfactual_content": counterfactual,
+        "crux_text": crux_text,
+        "clarifier": None,
+        "guidance": None,
+        "decision_review": decision_review,
+        "thinking_review": thinking_review,
+        "generated_image": generated_image,
+        "feedback": None,
+        "parent_id": None,
+        "sibling_index": 0,
+        "sibling_count": 1,
+        "sibling_ids": [mid],
+        "claims": claims or [],
+    }
 
 
 @router.get("/budget")
@@ -153,6 +205,14 @@ async def guest_budget(request: Request, session_id: uuid.UUID) -> dict:
 
 @router.post("/chat")
 async def guest_chat(payload: GuestRequest, request: Request) -> EventSourceResponse:
+    """One demo turn, through the same pipeline as a signed-in one.
+
+    The events are the app's events - status, review, crux, delta, answer,
+    final, image, and the four pre-answer questions - plus two of the
+    demo's own: `switched` (the question was moved to a better companion)
+    and `budget` (what this visitor has left). The client reads them with
+    the app's own stream reader.
+    """
     address = _address(request)
     session_id = str(payload.session_id)
 
@@ -162,7 +222,9 @@ async def guest_chat(payload: GuestRequest, request: Request) -> EventSourceResp
     # prompt.
     await check_rate_limit(f"guest:{address}", max_requests=30, window_seconds=600)
 
-    if payload.mode not in MODE_INSTRUCTIONS or payload.mode == "rapid":
+    # "rapid" is the Quick answer button: the app offers it when an answer
+    # is slow to start, and so does the demo.
+    if payload.mode not in MODE_INSTRUCTIONS:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Unknown mode"
         )
@@ -177,83 +239,410 @@ async def guest_chat(payload: GuestRequest, request: Request) -> EventSourceResp
     if await exhausted(session_id, address):
         return EventSourceResponse(_limit_reached())
 
-    history = trim_history([t.model_dump() for t in payload.history])
-    conversation = "\n\n".join(
-        f"{'User' if t['role'] == 'user' else 'You'}: {t['content']}" for t in history
-    )
-    input_text = f"{conversation}\n\nUser: {payload.message}" if conversation else payload.message
+    # Read, never written: the admin dashboard's switches (web search, bias
+    # screening, scoring weights, a model override) apply to the demo too,
+    # or the demo would quietly be a different product again.
+    async with AsyncSessionLocal() as db:
+        admin_settings = await get_all_settings(db)
+    flags = admin_settings.get("feature_flags") or {}
+    web_enabled = bool(flags.get("web_search_enabled", True))
+
+    turns = trim_history([t.model_dump() for t in payload.history])
+    history = [_history_row(t["role"], t["content"]) for t in turns]
+    pairs = [(t["role"], t["content"]) for t in turns]
+    content = payload.message
 
     async def stream() -> AsyncIterator[dict]:
-        text = ""
-        # The answer arrives wrapped in the same <crux> and <claim> markup the
-        # app's own pipeline unwraps downstream. The demo has none of that
-        # pipeline, so without stripping here the visitor's first impression
-        # of the product is angle brackets.
-        stripper = ClaimTagStripper()
+        # The whole turn's cost, for the address and the daily ceiling - the
+        # ones that exist to bound spending. The visitor's own allowance is
+        # charged the answer alone (see `answer_usage` below).
         with meter() as usage:
-            # Which companion actually answers. Inside the meter on purpose:
-            # the judgement is a model call and a guest pays for it out of
-            # the same allowance as the answer, which is the honest
-            # accounting and keeps the ceiling meaningful.
-            mode, switched_from = await _settle_mode(payload, history)
-            instructions = build_system_instructions(mode)
+            mode = payload.mode
+            started = time.monotonic()
+            marks: list[str] = []
+
+            def mark(phase: str) -> None:
+                marks.append(f"{phase}={time.monotonic() - started:.1f}s")
+
+            # The search plan depends on nothing the gates decide, so it runs
+            # alongside them, and the searches it names start the moment it
+            # lands - the same overlap the app relies on.
+            rapid = mode == "rapid"
+            if rapid:
+                # The quick answer, as in the app: no planner in front of it,
+                # and a search only for a question that is about right now.
+                quick = SearchPlan(
+                    retrieval_query=content,
+                    queries=[content] if needs_live_data(content) else [],
+                )
+
+                async def quick_plan() -> SearchPlan:
+                    return quick
+
+                plan_task = asyncio.create_task(quick_plan())
+            else:
+                plan_task = asyncio.create_task(plan_searches(history, content))
+            # Rapid skips the gates outright - every one of them is a round
+            # trip before the answer, and the button was pressed to not have
+            # those.
+            guidance_task = (
+                None
+                if payload.regenerate or rapid
+                else asyncio.create_task(propose_guidance(content, mode, pairs))
+            )
+            image_request: ImageRequest | None = None
+            previous_image = (
+                {"owner": session_id, "id": str(payload.last_image_id)}
+                if payload.last_image_id
+                else None
+            )
+            if mode == "creative":
+                image_request = await wanted_image(
+                    content, pairs, has_previous_image=previous_image is not None
+                )
+
+            guidance = await guidance_task if guidance_task is not None else None
+            mark("gates")
+            answered_a_gate = "(Clardentity asked:" in content
+            settled = payload.regenerate
+            gate = gate_event(
+                guidance,
+                refined_confirmed=settled or payload.refined_confirmed,
+                clarifying_confirmed=settled or payload.clarifying_confirmed,
+                context_acknowledged=settled or payload.context_acknowledged,
+                context_rounds=payload.context_rounds,
+                # Manual switching means the question is never moved - the
+                # same rule the app's composer applies.
+                mode_confirmed=settled or payload.mode_confirmed or not payload.smart_switching,
+                answered_a_gate=answered_a_gate,
+                making_image=image_request is not None,
+                max_context_rounds=MAX_CONTEXT_ROUNDS,
+            )
+
+            switched_from: str | None = None
+            if gate is not None and gate["event"] == "mode_suggestion":
+                # The app answers a smart switch by moving the question and
+                # re-sending it; the demo does the move here instead and
+                # saves the visitor the round trip. Same outcome, same
+                # banner, one request.
+                suggested = json.loads(gate["data"]).get("suggested_mode")
+                if (
+                    isinstance(suggested, str)
+                    and suggested != mode
+                    and suggested in MODE_INSTRUCTIONS
+                    and suggested != "rapid"
+                ):
+                    switched_from, mode = mode, suggested
+                gate = None
+            if gate is not None:
+                plan_task.cancel()
+                used, _ = await spent(session_id, address)
+                await charge(session_id, address, 0, usage.total_tokens)
+                yield gate
+                yield _budget_event(used)
+                return
+
             if switched_from:
                 yield {
                     "event": "switched",
                     "data": json.dumps({"from": switched_from, "to": mode}),
                 }
-            try:
-                async for event in stream_generation(
-                    instructions=instructions, input_text=input_text, model=_MODEL
-                ):
-                    if event["type"] == "delta":
-                        text += event["text"]
-                        visible = stripper.feed(event["text"])
-                        if visible:
-                            yield {"event": "delta", "data": json.dumps({"text": visible})}
-                    elif event["type"] == "done":
-                        text = event["full_text"]
-            except Exception:  # noqa: BLE001 - the visitor gets a sentence, not a stack
-                logger.warning("guest answer failed", exc_info=True)
+
+            # Bias screening and the verdict box, exactly as the app runs
+            # them: Decision-making puts a watch-list in the prompt, so it
+            # needs the classification first; the verdict box reads only the
+            # question, so it starts now and usually lands before the gist.
+            async def classify() -> DecisionClassification:
+                # Rapid runs no verification, so there is nothing to scope.
+                if not flags.get("bias_screening_enabled", True) or mode == "rapid":
+                    return NO_DECISION
+                return await classify_decision(content)
+
+            decision_task = asyncio.create_task(classify())
+            decision = NO_DECISION
+            review_task = thinking_task = None
+            if mode in ("decision", "thinking"):
+                try:
+                    decision = await decision_task
+                except Exception:  # noqa: BLE001 - screening scope degrades
+                    decision = NO_DECISION
+                if mode == "decision":
+                    review_task = asyncio.create_task(
+                        review_decisions(content, decision.bias_category_id)
+                    )
+                else:
+                    thinking_task = asyncio.create_task(
+                        review_thinking(content, decision.bias_category_id)
+                    )
+
+            # The web search the plan named. A demo has no documents, so this
+            # is the only context there is - which is also the case for any
+            # signed-in question the workspace has nothing to say about.
+            plan = await plan_task
+            web_task = (
+                asyncio.create_task(gather_context(plan.queries, news=plan.news))
+                if web_enabled and plan.queries
+                else None
+            )
+            search_started = time.monotonic()
+
+            references = (
+                await asyncio.to_thread(reference_images, [], previous_image)
+                if image_request and image_request.edit
+                else None
+            )
+            image_task = (
+                asyncio.create_task(
+                    generate_image(image_request.prompt, payload.session_id, references or None)
+                )
+                if image_request
+                else None
+            )
+            instructions = build_system_instructions(
+                mode,
+                None,
+                build_bias_guidance(decision) if mode == "decision" else None,
+                None,
+                making_image=bool(image_request),
+            )
+            gen_model = generation_model_for(mode, admin_settings)
+            gen_temperature = admin_settings.get("openai_temperature")
+
+            def make_generation(input_text: str) -> AsyncIterator[dict]:
+                return stream_generation(
+                    instructions=instructions,
+                    input_text=input_text,
+                    model=gen_model,
+                    temperature=gen_temperature,
+                )
+
+            run = AnswerRun(
+                mode=mode,
+                content=content,
+                history=history,
+                chunks=[],
+                web_task=web_task,
+                search_started=search_started,
+                memory_summary=None,
+                make_generation=make_generation,
+                image_task=image_task,
+                image_only=bool(image_request and image_request.only),
+                review_task=review_task,
+                thinking_task=thinking_task,
+                decision_task=decision_task,
+                web_enabled=web_enabled,
+                scoring_weights=ScoringWeights.from_settings(admin_settings["scoring_weights"]),
+                mark=mark,
+            )
+
+            # The answer metered on its own, so the visitor's allowance can be
+            # counted in the conversation rather than in the apparatus around
+            # it - see _conversation_tokens.
+            with meter() as answer_usage:
+                async for event in run.generate():
+                    yield event
+            if run.error is not None:
+                logger.warning("guest answer failed", exc_info=run.error)
                 yield {
                     "event": "error",
                     "data": json.dumps({"detail": "That didn't come through. Try again?"}),
                 }
                 return
 
-            used = await charge(session_id, address, usage.total_tokens)
+            async for event in run.review_grace():
+                yield event
 
-        # The gist leads, then a blank line, then the body. The app gives the
-        # gist its own card; here it is simply the first paragraph, which is
-        # the same shape without the furniture.
-        crux, body = extract_crux(text)
-        display = f"{crux}\n\n{body}" if crux else body
+            user_payload = _message_payload("user", content, mode)
+            answer_id = f"guest-{uuid.uuid4()}"
+            yield {
+                "event": "answer",
+                "data": json.dumps(
+                    {
+                        "message": _message_payload(
+                            "assistant",
+                            run.draft_display_text,
+                            mode,
+                            crux_text=run.crux_text,
+                            message_id=answer_id,
+                        ),
+                        "user_message": user_payload,
+                    }
+                ),
+            }
+
+            if mode == "rapid":
+                # That was the whole job: the answer ships as drafted, with no
+                # verdict attached, and says so by carrying none - exactly the
+                # app's quick answer.
+                decision_task.cancel()
+                avatar = compute_avatar_cue(mode, None, False, admin_settings["avatar_gesture_map"])
+                message = _message_payload(
+                    "assistant",
+                    run.draft_display_text,
+                    mode,
+                    crux_text=run.crux_text,
+                    avatar=(avatar.expression, avatar.gesture),
+                    message_id=answer_id,
+                )
+                used = await charge(
+                    session_id,
+                    address,
+                    _conversation_tokens(answer_usage.output_tokens, content, turns),
+                    usage.total_tokens + answer_usage.total_tokens,
+                )
+                yield {
+                    "event": "final",
+                    "data": json.dumps(
+                        {
+                            "message": message,
+                            "conversation_title": None,
+                            "counterfactual_content": None,
+                            "decision_review": None,
+                            "thinking_review": None,
+                            "research_notes": [],
+                            "claims": [],
+                            "confidence": {"score": None, "band": None},
+                            "avatar_cue": {"expression": avatar.expression, "gesture": avatar.gesture},
+                        }
+                    ),
+                }
+                yield _budget_event(used)
+                return
+
+            yield {
+                "event": "status",
+                "data": json.dumps({"phase": "validating", "label": "Weighing the evidence"}),
+            }
+            async for event in run.analyse():
+                yield event
+            analysis = run.analysis
+            assert analysis is not None
+
+            # The app writes a late Devil's Draft to the row and fetches it on
+            # demand; the demo has no row to write it to, so it waits a few
+            # seconds more instead. The flip is one of the things worth
+            # showing, and a demo that shows it only sometimes is not showing
+            # it.
+            counterfactual = analysis.counterfactual_text
+            if counterfactual is None and analysis.counterfactual_pending is not None:
+                try:
+                    counterfactual = await asyncio.wait_for(
+                        analysis.counterfactual_pending, timeout=_COUNTERFACTUAL_WAIT_SECONDS
+                    )
+                except Exception:  # noqa: BLE001 - optional
+                    counterfactual = None
+
+            pending_image_event = await run.collect_image()
+            if pending_image_event:
+                yield pending_image_event
+
+            score = analysis.message_score
+            avatar = compute_avatar_cue(
+                mode,
+                score.band,
+                score.distortion_penalty_applied,
+                admin_settings["avatar_gesture_map"],
+            )
+            claims = [c.model_dump(mode="json") for c in claims_out(analysis)]
+            message = _message_payload(
+                "assistant",
+                analysis.display_text,
+                mode,
+                crux_text=run.crux_text,
+                claims=claims,
+                confidence=(score.score, score.band),
+                counterfactual=clean_output(counterfactual) if counterfactual else None,
+                decision_review=analysis.decision_review,
+                thinking_review=analysis.thinking_review,
+                generated_image=run.generated_image,
+                avatar=(avatar.expression, avatar.gesture),
+                message_id=answer_id,
+            )
+            answer_tokens = _conversation_tokens(
+                answer_usage.output_tokens, content, turns
+            ) + (
+                # A picture is a fixed charge to the visitor: it is not
+                # metered in tokens and it is the most expensive thing the
+                # demo can do.
+                _IMAGE_CHARGE_TOKENS if run.generated_image else 0
+            )
+            total_tokens = usage.total_tokens + answer_usage.total_tokens
+            used = await charge(session_id, address, answer_tokens, total_tokens)
+            mark("final")
+            logger.info(
+                "guest turn mode=%s claims=%d answer_tokens=%d total_tokens=%d %s",
+                mode, len(claims), answer_tokens, total_tokens, " ".join(marks),
+            )
 
         yield {
-            "event": "done",
+            "event": "final",
             "data": json.dumps(
                 {
-                    "text": clean_output(display),
-                    "used": used,
-                    "budget": SESSION_BUDGET,
-                    # The client shows the sign-up wall on this rather than
-                    # counting for itself - the number that matters is the
-                    # one the server charged.
-                    "limit_reached": used >= SESSION_BUDGET,
+                    "message": message,
+                    "conversation_title": None,
+                    "counterfactual_content": message["counterfactual_content"],
+                    "decision_review": analysis.decision_review,
+                    "thinking_review": analysis.thinking_review,
+                    "research_notes": analysis.research_notes,
+                    "claims": claims,
+                    "confidence": {"score": score.score, "band": score.band},
+                    "avatar_cue": {"expression": avatar.expression, "gesture": avatar.gesture},
                 }
             ),
         }
+        yield _budget_event(used)
 
     return EventSourceResponse(stream())
 
 
-async def _limit_reached() -> AsyncIterator[dict]:
-    yield {
-        "event": "done",
+#: How much longer than the verdict the demo waits for the Devil's Draft.
+_COUNTERFACTUAL_WAIT_SECONDS = 8.0
+
+#: What one generated picture counts as against a visitor's allowance. Half
+#: of it: a guest can see Co-Creative draw, and cannot run up an image bill.
+_IMAGE_CHARGE_TOKENS = 2_500
+
+
+def _conversation_tokens(output_tokens: int, message: str, turns: list[dict]) -> int:
+    """What a turn costs the visitor: the conversation, not the apparatus.
+
+    The allowance is 5,000 tokens of conversation - what the visitor wrote
+    and what came back. It is not the web excerpts fetched to ground the
+    answer (about 3,500 tokens of input on a typical Finder question, which
+    alone would end the demo after one answer), and not the claim checking
+    afterwards (a call per claim, plus research, up to ~40k on a turn). Both
+    are the product showing its work, and charging the visitor for them
+    would close the demo before any of that work had been seen. They are
+    still counted, in full, against the address and the daily ceiling - the
+    counters that exist to bound what this costs.
+
+    The visitor's side is estimated from its length rather than metered,
+    because it is metered only as part of an input that also carries the
+    sources. Four characters a token is the usual rule for English, and the
+    precision this needs is "about right".
+    """
+    written = len(message) + sum(len(t["content"]) for t in turns)
+    return int(output_tokens) + (written + 3) // 4
+
+
+def _budget_event(used: int) -> dict:
+    return {
+        "event": "budget",
         "data": json.dumps(
-            {"text": "", "used": SESSION_BUDGET, "budget": SESSION_BUDGET, "limit_reached": True}
+            {
+                "used": used,
+                "budget": SESSION_BUDGET,
+                # The client shows the sign-up wall on this rather than
+                # counting for itself - the number that matters is the one
+                # the server charged.
+                "limit_reached": used >= SESSION_BUDGET,
+            }
         ),
     }
+
+
+async def _limit_reached() -> AsyncIterator[dict]:
+    yield _budget_event(SESSION_BUDGET)
 
 
 #: What a demo conversation can be at the outside. The session budget is
@@ -263,9 +652,28 @@ _MAX_IMPORT_TURNS = 40
 _MAX_IMPORT_CHARS = 60_000
 
 
+class ImportedImage(BaseModel):
+    """A picture the demo drew. The pointer only - the bytes are already in
+    storage under the visitor's session id, and the URL is the capability
+    (see api/images.py), so carrying it across loses nothing."""
+
+    id: uuid.UUID
+    owner: uuid.UUID
+    prompt: str = Field(default="", max_length=1000)
+
+
 class ImportTurn(BaseModel):
     role: Literal["user", "assistant"]
     content: str = Field(min_length=1, max_length=MAX_MESSAGE_CHARS * 8)
+    # What the answer looked like, so the copy in the account reads the way
+    # the demo did: the gist card, the verdict box, the picture. The mode is
+    # per turn because smart switching moves a demo conversation between
+    # companions. All optional - an older stash carries none of them.
+    mode: str | None = None
+    crux_text: str | None = Field(default=None, max_length=1000)
+    decision_review: dict | None = None
+    thinking_review: dict | None = None
+    generated_image: ImportedImage | None = None
 
 
 class ImportRequest(BaseModel):
@@ -294,18 +702,26 @@ async def import_guest_conversation(
     The caps above are the real guard, and they are generous enough that a
     genuine demo never meets them.
 
-    Saved unscored, like a call transcript: these answers were produced by
-    the demo, which runs without retrieval or verification, so there are no
-    claims, no citations and no confidence to record. Inventing any here
-    would put a verification badge on the one conversation in the account
-    that was never verified.
+    The gist, the verdict box and any picture come across, so the copy in
+    the account reads as the demo did. The claim checking does not: it was
+    computed on our side and its result is posted back by the browser, and a
+    verification badge is the one thing in the product that must never be
+    something a client can write. The answers are saved unscored.
     """
     if payload.mode not in MODE_INSTRUCTIONS or payload.mode == "rapid":
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Unknown mode"
         )
 
-    total = sum(len(t.content) for t in payload.turns)
+    # The reviews are free-form JSON from the browser; they count towards
+    # the same ceiling as the text, so a hand-rolled request cannot use them
+    # to post a novel by another route.
+    total = sum(
+        len(t.content)
+        + len(json.dumps(t.decision_review or {}))
+        + len(json.dumps(t.thinking_review or {}))
+        for t in payload.turns
+    )
     if total > _MAX_IMPORT_CHARS:
         raise HTTPException(
             status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
@@ -349,12 +765,22 @@ async def import_guest_conversation(
     parent_id: uuid.UUID | None = None
     saved: list[Message] = []
     for turn in payload.turns:
+        turn_mode = turn.mode if turn.mode in MODE_INSTRUCTIONS else payload.mode
+        assistant = turn.role == "assistant"
         message = Message(
             conversation_id=conversation.id,
             parent_id=parent_id,
             role=turn.role,
             content=clean_output(turn.content),
-            mode_used=payload.mode,
+            mode_used=turn_mode,
+            crux_text=clean_output(turn.crux_text) if assistant and turn.crux_text else None,
+            decision_review=turn.decision_review if assistant else None,
+            thinking_review=turn.thinking_review if assistant else None,
+            generated_image=(
+                turn.generated_image.model_dump(mode="json")
+                if assistant and turn.generated_image
+                else None
+            ),
         )
         db.add(message)
         await db.flush()

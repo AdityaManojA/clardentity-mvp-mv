@@ -366,7 +366,7 @@ def build_system_instructions(
             "for the image, a sentence or two is the whole answer."
         )
 
-    # Learning and Co-Creative only, and only when the user picked the model
+    # Co-Creative only, and only when the user picked the model
     # themselves. In those two the interface names it - "write this with
     # Opus" is a reasonable thing to want from a co-writer - and a product
     # that refuses to name a model while a dropdown three inches away names
@@ -439,6 +439,34 @@ def build_system_instructions(
     return blocks
 
 
+#: What the CONTEXT block says when nothing was retrieved.
+#:
+#: It used to say "(no relevant workspace documents found)", and the model
+#: took that two ways, both wrong. About one answer in three it reasoned
+#: that with no source in front of it nothing it said could be checked, and
+#: tagged *every* claim opinion - which switches off verification and the
+#: per-claim research for the whole answer, so a Finder answer about the
+#: Berlin Wall arrived with no fact-check at all. And it opened with a
+#: disclaimer claim, "No workspace documents were provided, so this relies
+#: on general knowledge" - read by a landing-page visitor who has never had
+#: a workspace. Measured 2026-10-10: three identical questions, one with all
+#: five claims tagged opinion, two with that disclaimer as claim 1.
+#:
+#: An empty context is ordinary - the web search ran past its budget, or
+#: nothing matched - and what happens next is not that claims go unchecked:
+#: every uncited factual claim is researched after it is written. So that is
+#: what this says, along with the two things not to do.
+EMPTY_CONTEXT_NOTE = (
+    "(Nothing was retrieved for this question. Answer from what you know. "
+    "Every factual claim you make is checked against outside sources after you "
+    "write it, so tag factual claims in the plain form exactly as you would with "
+    "sources in front of you - the opinion form is only for genuine judgement, "
+    "and a fact does not become an opinion because no source is listed here. "
+    "Do not mention that nothing was retrieved, and do not write any claim "
+    "about your sources or about where the answer comes from.)"
+)
+
+
 def build_context_block(chunks: list[RetrievedChunk], web_sources: list | None = None) -> str:
     """Numbered context the model cites with [n] markers.
 
@@ -459,7 +487,7 @@ def build_context_block(chunks: list[RetrievedChunk], web_sources: list | None =
         parts.append(f"[{i}] (web - {origin}{dated}): {source.excerpt}")
 
     if not parts:
-        return "(no relevant workspace documents found)"
+        return EMPTY_CONTEXT_NOTE
     return "\n\n".join(parts)
 
 

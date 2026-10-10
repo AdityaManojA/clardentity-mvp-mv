@@ -3,6 +3,7 @@
 import { apiFetch } from "@/lib/apiClient";
 import { getAccessToken } from "@/lib/auth";
 import type { GuestTurn } from "@/lib/guestDemo";
+import type { DecisionReviewData, GeneratedImage, ThinkingReviewData } from "@/lib/sse";
 
 /* Carrying the demo conversation into a new account.
  *
@@ -26,9 +27,22 @@ const KEY = "clardentity.guestTranscript";
  *  last month turns up in an account they made for something else. */
 const MAX_AGE_MS = 24 * 60 * 60 * 1000;
 
+/** One demo turn as it is kept: the words, plus what the answer looked like
+ *  - its companion (smart switching moves a demo conversation between
+ *  them), its gist, its verdict box and any picture - so the copy in the
+ *  account reads the way the demo did. The claim checking is not carried:
+ *  a verification badge must never be something the browser can write. */
+export type StashedTurn = GuestTurn & {
+  mode?: string;
+  crux_text?: string | null;
+  decision_review?: DecisionReviewData | null;
+  thinking_review?: ThinkingReviewData | null;
+  generated_image?: GeneratedImage | null;
+};
+
 export type StashedTranscript = {
   mode: string;
-  turns: GuestTurn[];
+  turns: StashedTurn[];
   /** Epoch ms. */
   savedAt: number;
 };
@@ -40,7 +54,7 @@ export type ImportedConversation = {
 };
 
 /** Hold on to this conversation for whoever this visitor turns out to be. */
-export function stashGuestTranscript(mode: string, turns: GuestTurn[]): void {
+export function stashGuestTranscript(mode: string, turns: StashedTurn[]): void {
   if (turns.length === 0) return;
   try {
     const payload: StashedTranscript = { mode, turns, savedAt: Date.now() };
@@ -68,7 +82,7 @@ export function readStashedTranscript(): StashedTranscript | null {
       clearStashedTranscript();
       return null;
     }
-    return { mode: parsed.mode, turns: turns as GuestTurn[], savedAt: parsed.savedAt as number };
+    return { mode: parsed.mode, turns: turns as StashedTurn[], savedAt: parsed.savedAt as number };
   } catch {
     // Anything unreadable is not worth a second attempt.
     clearStashedTranscript();

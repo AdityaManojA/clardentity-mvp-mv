@@ -226,7 +226,18 @@ export type ChatStreamHandlers = {
    *  connection lost after that point has left a complete answer behind that
    *  a re-read of the conversation will find. */
   onDropped?: () => void;
+  /** Landing demo only: the question was answered in a better-suited
+   *  companion than the one selected (the app does this client-side, by
+   *  re-sending after a mode suggestion; the demo's server does it in one
+   *  request). Fires before any text. */
+  onSwitched?: (from: string, to: string) => void;
+  /** Landing demo only: what this visitor has left of the allowance, sent
+   *  last on every stream. */
+  onBudget?: (budget: GuestBudget) => void;
 };
+
+/** The demo allowance, as the server charged it. */
+export type GuestBudget = { used: number; budget: number; limit_reached: boolean };
 
 export type SendMessageAttachment = {
   type: "image" | "document";
@@ -239,7 +250,7 @@ export type SendMessageBody = {
   content: string;
   mode: string;
   reasoning_lens?: string | null;
-  /** Learning and Co-Creative only: a model the user picked by name.
+  /** Co-Creative only: a model the user picked by name.
    *  Ignored by the server in every other mode. */
   model?: string | null;
   attachments?: SendMessageAttachment[];
@@ -341,7 +352,21 @@ export async function streamChatMessage(
     return;
   }
 
-  const reader = res.body.getReader();
+  await consumeChatStream(res.body, handlers);
+}
+
+/** Read an answer stream to its end, dispatching each event to `handlers`.
+ *
+ *  Shared by the app and the landing demo, which speak the same events -
+ *  the demo used to have a reader of its own that understood three of
+ *  them, which is how it came to show a different product. A stream that
+ *  ends without a conclusion (a final, an error, a gate, or the demo's
+ *  budget) is reported as dropped. */
+export async function consumeChatStream(
+  stream: ReadableStream<Uint8Array>,
+  handlers: ChatStreamHandlers,
+): Promise<void> {
+  const reader = stream.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
   // Whether anything arrived that means "this stream is over and the caller
@@ -382,6 +407,12 @@ export async function streamChatMessage(
       ? (o) => {
           concluded = true;
           handlers.onClarifyingOptions?.(o);
+        }
+      : undefined,
+    onBudget: handlers.onBudget
+      ? (b) => {
+          concluded = true;
+          handlers.onBudget?.(b);
         }
       : undefined,
   };
@@ -443,6 +474,8 @@ function handleRawEvent(raw: string, handlers: ChatStreamHandlers) {
     else if (eventType === "clarifying_options") handlers.onClarifyingOptions?.(parsed);
     else if (eventType === "context_question") handlers.onContextQuestion?.(parsed);
     else if (eventType === "refined_question") handlers.onRefinedQuestion?.(parsed);
+    else if (eventType === "switched") handlers.onSwitched?.(parsed.from, parsed.to);
+    else if (eventType === "budget") handlers.onBudget?.(parsed);
     else if (eventType === "error") handlers.onError(parsed.detail);
   } catch {
     // ignore malformed frame

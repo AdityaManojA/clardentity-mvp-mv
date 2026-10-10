@@ -45,7 +45,7 @@ export type AnalyticsEvent =
   | "answer_failed"
   // What people reach for
   | "mode_picked"
-  // Learning and Co-Creative, where the model is the user's choice.
+  // Co-Creative, where the model is the user's choice.
   | "model_picked"
   // Asked once, the first time Learning mode is opened.
   | "learning_role_set"
@@ -78,6 +78,8 @@ export type AnalyticsEvent =
   | "gate_answered"
   | "gate_skipped"
   | "locked_mode_tapped"
+  // The Clar tiers, opened from Upgrade in the account menu.
+  | "plans_opened"
   | "preview_opened"
   | "stream_dropped"
   // Housekeeping

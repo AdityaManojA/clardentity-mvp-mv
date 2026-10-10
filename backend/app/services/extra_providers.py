@@ -1,4 +1,4 @@
-"""Google and xAI, for the model picker in Learning and Co-Creative.
+"""Google and xAI, for the model picker in Co-Creative.
 
 Written against each vendor's HTTP streaming endpoint rather than their
 SDKs, deliberately. Both are a few dozen lines this way, neither adds a

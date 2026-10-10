@@ -65,14 +65,7 @@ export const TOURS: Record<TourId, TourStep[]> = {
       id: "nav-profile",
       target: "nav-profile",
       title: "Your profile",
-      body: "What Clardentity has learned about you - yours to read, correct or delete - plus companion names and your account.",
-      sidebar: true,
-    },
-    {
-      id: "nav-upgrade",
-      target: "nav-upgrade",
-      title: "Plans",
-      body: "What Pro, Max and Ultra will add, and a place to be told when they open.",
+      body: "Open this for your profile - what Clardentity has learned about you, yours to read, correct or delete - your settings, and Upgrade, where the Clar Pro, Max and Ultra plans are.",
       sidebar: true,
     },
     {
@@ -115,12 +108,6 @@ export const TOURS: Record<TourId, TourStep[]> = {
       // On a phone Enter is the new-line key (lib/useTouchKeyboard.ts), and
       // there is no Shift to hold - the arrow is how a question goes.
       touchBody: "Type your question. Return starts a new line; tap the arrow to send it. Spelling is checked as you type.",
-    },
-    {
-      id: "model-picker",
-      target: "model-picker",
-      title: "Model",
-      body: "Leave it on Auto and Clardentity picks the right one for the job, or choose yourself.",
     },
     {
       id: "voice",

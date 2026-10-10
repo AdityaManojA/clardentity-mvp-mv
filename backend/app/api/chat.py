@@ -26,23 +26,20 @@ from app.schemas.chat import (
     ConversationCreate,
     ConversationUpdate,
     ConversationOut,
-    EvidenceOut,
     ExportFileIn,
     FeedbackIn,
     MessageCreate,
     MessageOut,
 )
 from app.services.admin_settings_service import get_all_settings
+from app.services.answer_pipeline import (
+    AnswerRun,
+    claims_out,
+    gate_event,
+    generation_model_for,
+)
 from app.services.avatar_cue_service import compute_avatar_cue
 from app.services.claim_loader import load_claims_for_messages
-from app.services.claim_parser import (
-    ClaimTagStripper,
-    CruxSplitter,
-    extract_claims,
-    extract_crux,
-    split_leading_sentence,
-    strip_claim_tags,
-)
 from app.services.companion_names import name_for
 from app.services.conversation_title import name_conversation
 from app.services.document_ingestion import build_chunks, file_type_of, unsupported_reason
@@ -52,18 +49,11 @@ from app.services.thinking_review import review_thinking
 from app.services import model_catalog
 from app.services.model_router import stream_for as stream_for_model
 from app.services.guidance import MAX_CONTEXT_ROUNDS, propose_guidance
-from app.services.image_generation import ImageRequest
+from app.services.image_generation import ImageRequest, reference_images
 from app.services.image_generation import generate as generate_image
 from app.services.image_generation import wanted_image
 from app.services.output_cleanup import clean_output
-from app.services.confidence_scoring import (
-    ScoredClaim,
-    ScoringWeights,
-    build_scored_evidence,
-    compute_claim_score,
-    compute_message_score,
-    rescore_after_reconciliation,
-)
+from app.services.confidence_scoring import ScoringWeights
 from app.services.devils_advocate import generate_counterfactual
 from app.services.decision_classifier import (
     NO_DECISION,
@@ -86,11 +76,7 @@ from app.services.memory_service import (
     should_rebuild_memory,
 )
 from app.services.anthropic_client import is_provider_unavailable_error, stream_generation
-from app.services.prompt_builder import (
-    build_context_block,
-    build_conversation_input,
-    build_system_instructions,
-)
+from app.services.prompt_builder import build_system_instructions
 from app.services.profile_service import (
     get_profile,
     profile_prompt_block,
@@ -99,21 +85,12 @@ from app.services.profile_service import (
 )
 from app.services.query_optimizer import optimize_query
 from app.services.search_planner import SearchPlan, needs_live_data, plan_searches
-from app.services.reflection_agent import reflect_and_revise
 from app.services.preview_access import daily_limit, is_preview_mode, spend, used_today
 from app.services.retrieval import RetrievedChunk, retrieve_chunks
 from app.services.token_meter import meter as token_meter
 from app.services.storage import upload_file
 from app.services.router import InvalidModeError, InvalidReasoningLensError, validate_mode, validate_reasoning_lens
-from app.services.taxonomy import describe_bias
-from app.services.verification_agent import reconcile_gray_area, verify_claim
-from app.services.web_research import (
-    WebSource,
-    country_name,
-    gather_context,
-    research_claim,
-    tavily_available,
-)
+from app.services.web_research import WebSource, country_name, gather_context
 from app.workers.rebuild_memory import rebuild_memory_task
 from app.workers.rebuild_profile import rebuild_profile_task
 
@@ -128,39 +105,6 @@ _TITLE_MAX_CHARS = 38
 _TITLE_MAX_LENGTH = 120
 _TITLE_MAX_WORDS = 6
 
-# Unsupported claims are researched concurrently, one agent each. Was two,
-# which left the rest of a six-claim answer labelled as if nobody had looked
-# - "0 of 6 claims backed by a source" on a textbook account of Indian
-# independence. Six covers nearly every answer whole; each agent runs at most
-# two search+judge rounds (web_research.MAX_ROUNDS), and they all share the
-# deadline below, so the worst case is bounded in both calls and time.
-_MAX_RESEARCHED_CLAIMS = 6
-
-# How long the answer waits for the speculative web search that runs when
-# the workspace has nothing to say. Measured 2026-09-16: 19 of the 25 seconds
-# a user waited before the first token were this one call. Past the budget
-# the answer goes ahead without web context; the per-claim research after
-# the answer still finds and attaches sources, so what's lost is inline
-# markers in the first draft, not the checking.
-_PRE_SEARCH_BUDGET_SECONDS = 10.0
-
-# The whole per-claim research phase, however many agents are in it.
-#
-# Measured 2026-09-16: a search round is 5-20s depending on the day and the
-# tool, a supervisor round ~3s, so a claim that takes two rounds to settle
-# costs 20-40s. This runs after the answer is on screen and the composer is
-# live - the reader sees "Checking claims" under a finished answer - so the
-# trade is a longer wait for the verdict against claims left unchecked, and
-# unchecked claims were the complaint ("0 of 6 backed by a source" on a
-# textbook history answer). Agents run concurrently, so this is a wall-clock
-# cap on the phase, not a per-claim one.
-_RESEARCH_DEADLINE_SECONDS = 45.0
-# How long a finished answer waits for the verdict box (Decision-making /
-# Thought coach) before going out without it. The box normally lands well
-# before the last token; this is for the short answer that beats it, so the
-# box still fills the slot the client is holding rather than dropping in
-# above an answer already being read.
-_REVIEW_GRACE_SECONDS = 4.0
 # How much of an attached file goes in front of the model as-is this turn.
 # Twelve chunks is ~8k tokens - a whole short document, the opening of a
 # long one. The rest is in the workspace like any upload: retrieval finds
@@ -371,7 +315,7 @@ async def list_models(
 ) -> dict:
     """The models a user may pick from in this mode.
 
-    Empty in every mode but Learning and Co-Creative, where the choice is
+    Empty in every mode but Co-Creative, where the choice is
     theirs - the client uses that emptiness to decide whether to show a
     picker at all, so the rule lives on the server rather than being
     duplicated in the UI.
@@ -799,12 +743,13 @@ async def _store_title(conversation_id: uuid.UUID, pending: "asyncio.Task[str]",
             await db.commit()
 
 
-async def _no_text() -> AsyncIterator[dict]:
-    """A generation that produces nothing, for a turn whose answer is a
-    picture. Shaped like a real one so every consumer downstream - the crux
-    splitter, the claim parser, the persistence - works unchanged on an
-    empty string rather than needing to know about this case."""
-    yield {"type": "done", "full_text": ""}
+def _last_generated_image(history: list[Message]) -> dict | None:
+    """The most recent picture this conversation drew, if any - what "make it
+    darker" refers to."""
+    for message in reversed(history):
+        if message.role == "assistant" and message.generated_image:
+            return message.generated_image
+    return None
 
 
 async def _settle_title(
@@ -984,6 +929,11 @@ async def send_message(
     # skips the gates entirely and decides it further down.
     image_request: ImageRequest | None = None
     image_checked = False
+    # What pictures this turn could be made from, for the intent check: how
+    # many are attached, and the last one the conversation drew. Filled in
+    # once the history is known, on both paths below.
+    attached_image_count = sum(1 for a in payload.attachments if a.type == "image")
+    previous_image: dict | None = None
 
     if payload.regenerate_of is not None:
         # An alternate answer to a question already asked and settled - never
@@ -1016,6 +966,7 @@ async def send_message(
         # walks the path ending at the question's own parent, one level
         # further back than where the new answer itself attaches.
         history = active_path(all_messages, parent_message.parent_id)[-HISTORY_WINDOW:]
+        previous_image = _last_generated_image(history)
         plan_task = asyncio.create_task(_plan(history, effective_content, mode))
         prefetch_task = asyncio.create_task(_prefetch(plan_task, mode))
         memory_summary = await get_memory_summary(db, conversation_id)
@@ -1081,6 +1032,7 @@ async def send_message(
         # alone they re-asked, on a follow-up, what the conversation had
         # already established two turns earlier.
         history = active_path(all_messages, effective_parent_id)[-HISTORY_WINDOW:]
+        previous_image = _last_generated_image(history)
         guidance_task = (
             None if mode == "rapid"
             else asyncio.create_task(
@@ -1132,110 +1084,36 @@ async def send_message(
         # part of what the user asked for.
         if mode == "creative":
             image_request = await wanted_image(
-                effective_content, [(m.role, m.content or "") for m in history]
+                effective_content,
+                [(m.role, m.content or "") for m in history],
+                attached_images=attached_image_count,
+                has_previous_image=previous_image is not None,
             )
         image_checked = True
 
-        # Sharpening the phrasing comes before either of the checks below -
-        # judging whether more context or a different mode is needed against
-        # a question that's still genuinely unclear is itself unreliable, so
-        # this resolves first. Persists nothing, same as the two gates below:
-        # the message is not saved and no answer is generated.
-        if (
-            not payload.refined_confirmed
-            and not answered_a_gate
-            and image_request is None
-            and guidance
-            and guidance.get("refined_question")
-        ):
-            suggestion = {
-                "refined_question": guidance["refined_question"],
-                "refinement_reason": guidance.get("refinement_reason"),
-            }
+        # The four pre-answer gates, in their fixed order - sharpen the
+        # wording, pick an option, ask why, another companion - shared with
+        # the landing demo so both stop on the same questions. Each persists
+        # nothing: the message is not saved and no answer is generated, so
+        # the transcript never shows a question with nothing under it.
+        gate = gate_event(
+            guidance,
+            refined_confirmed=payload.refined_confirmed,
+            clarifying_confirmed=payload.clarifying_confirmed,
+            context_acknowledged=payload.context_acknowledged,
+            context_rounds=payload.context_rounds,
+            mode_confirmed=payload.mode_confirmed,
+            answered_a_gate=answered_a_gate,
+            making_image=image_request is not None,
+            max_context_rounds=MAX_CONTEXT_ROUNDS,
+        )
+        if gate is not None:
 
-            async def refined_gate() -> AsyncIterator[dict]:
-                yield {"event": "refined_question", "data": json.dumps(suggestion)}
-
-            _abandon(prefetch_task)
-            return EventSourceResponse(refined_gate())
-
-        # Same reasoning as the gate above, for the sibling case: the wording
-        # isn't ambiguous enough for one best rewrite, but the missing piece
-        # has a short, enumerable set of likely answers - worth a tap instead
-        # of either guessing or opening a free-text box. Also resolves before
-        # context/mode, for the same reason: both are about the wording, not
-        # about the user's situation or the chosen mode.
-        if (
-            not payload.clarifying_confirmed
-            and not answered_a_gate
-            and image_request is None
-            and guidance
-            and guidance.get("clarifying_options")
-        ):
-            suggestion = {
-                "question": guidance.get("clarifying_question"),
-                "options": guidance["clarifying_options"],
-            }
-
-            async def clarifying_gate() -> AsyncIterator[dict]:
-                yield {"event": "clarifying_options", "data": json.dumps(suggestion)}
+            async def stopped() -> AsyncIterator[dict]:
+                yield gate
 
             _abandon(prefetch_task)
-            return EventSourceResponse(clarifying_gate())
-
-        # Asking why comes before suggesting a mode, and before answering.
-        # The order is the point: a question like "I want to divorce my wife"
-        # has no useful answer until the reasons are on the table, and an
-        # answer written without them is advice fitted to a situation we
-        # invented. Stopping here costs one round trip; retracting a
-        # confident answer costs the user's trust in every answer after it.
-        #
-        # Persists nothing, exactly like the mode gate below - the message is
-        # not saved and no answer is generated, so the transcript never shows
-        # a question with nothing under it. Can fire more than once per turn
-        # (see MAX_CONTEXT_ROUNDS): each round's guidance call sees the
-        # accumulated content, prior questions and all, so it naturally stops
-        # asking once enough is on the table - the round cap only guards the
-        # case where it doesn't.
-        if (
-            not payload.context_acknowledged
-            and not answered_a_gate
-            and image_request is None
-            and payload.context_rounds < MAX_CONTEXT_ROUNDS
-            and guidance
-            and guidance.get("context_question")
-        ):
-
-            async def context_gate() -> AsyncIterator[dict]:
-                yield {
-                    "event": "context_question",
-                    "data": json.dumps({"question": guidance["context_question"]}),
-                }
-
-            _abandon(prefetch_task)
-            return EventSourceResponse(context_gate())
-
-        if (
-            not payload.mode_confirmed
-            and image_request is None
-            and guidance
-            and guidance.get("suggested_mode")
-        ):
-            # Nothing is persisted on this path. The user message is not
-            # saved, no answer is generated, and the turn is exactly where it
-            # was - so picking "stay" costs one round trip and picking
-            # "switch" costs the same, rather than leaving a dangling
-            # question with no answer under it in the transcript.
-            suggestion = {
-                "suggested_mode": guidance["suggested_mode"],
-                "mode_reason": guidance.get("mode_reason"),
-            }
-
-            async def mode_gate() -> AsyncIterator[dict]:
-                yield {"event": "mode_suggestion", "data": json.dumps(suggestion)}
-
-            _abandon(prefetch_task)
-            return EventSourceResponse(mode_gate())
+            return EventSourceResponse(stopped())
 
         # Past the gates, so a question stopped by one and re-sent does not
         # spend a second message from the preview allowance - a clarifying
@@ -1379,7 +1257,7 @@ async def send_message(
     )
     if location_line:
         profile_block = f"{profile_block}\n\n{location_line}" if profile_block else location_line
-    # Learning and Co-Creative let the user pick the model by name. Resolved
+    # Co-Creative lets the user pick the model by name. Resolved
     # against what this deployment can actually route to, so a stale id from
     # an old tab falls back to the normal routing instead of failing.
     chosen_model = (
@@ -1400,10 +1278,23 @@ async def send_message(
     # regenerate path arrives here without an answer.
     if not image_checked and mode == "creative":
         image_request = await wanted_image(
-            effective_content, [(m.role, m.content or "") for m in history]
+            effective_content,
+            [(m.role, m.content or "") for m in history],
+            attached_images=attached_image_count,
+            has_previous_image=previous_image is not None,
         )
+    # An edit works from pictures - the ones attached to this turn, or the
+    # last one this conversation drew - read off the request and out of
+    # storage here, off the event loop.
+    references = (
+        await asyncio.to_thread(reference_images, payload.attachments, previous_image)
+        if image_request and image_request.edit
+        else None
+    )
     image_task: asyncio.Task[dict | None] | None = (
-        asyncio.create_task(generate_image(image_request.prompt, current_user.id))
+        asyncio.create_task(
+            generate_image(image_request.prompt, current_user.id, references or None)
+        )
         if image_request
         else None
     )
@@ -1439,23 +1330,50 @@ async def send_message(
             if not data.startswith("data:"):
                 data = f"data:{attachment.mime_type};base64,{data}"
             input_images.append(data)
-    # Co-Creative only: a picture, if that is what was asked for. Started
-    # here and collected while the answer streams, because generating one
-    # takes ten to twenty seconds - long enough that doing it first would
-    # leave the user watching an empty bubble for the whole of it. The
-    # intent check in front of it is cheap; the generation behind it only
-    # runs when that check says yes.
-    gen_model = admin_settings.get("openai_model")
-    # Which model writes the answer, by mode (an explicit admin override still
-    # wins): the smallest for the quick answer, the fast one for the modes
-    # whose quality gate is verification rather than deliberation, the
-    # flagship for the reasoning-heavy rest. See config for the measurements.
-    if not gen_model:
-        if mode == "rapid":
-            gen_model = settings.anthropic_rapid_model
-        elif mode in {m.strip() for m in settings.fast_generation_modes.split(",") if m.strip()}:
-            gen_model = settings.anthropic_fast_model
+    # Which model writes the answer, by mode - see generation_model_for.
+    gen_model = generation_model_for(mode, admin_settings)
     gen_temperature = admin_settings.get("openai_temperature")
+
+    def make_generation(input_text: str) -> AsyncIterator[dict]:
+        # A picked model goes to its own provider with no fallback: if
+        # somebody asked for Grok, quietly answering as Claude would be
+        # worse than saying it is unavailable.
+        if chosen_model and chosen_model.provider != "anthropic":
+            return stream_for_model(
+                chosen_model,
+                instructions=instructions,
+                input_text=input_text,
+                input_images=input_images,
+            )
+        return stream_generation(
+            instructions=instructions,
+            input_text=input_text,
+            model=chosen_model.model_id if chosen_model else gen_model,
+            temperature=gen_temperature,
+            input_images=input_images,
+        )
+
+    # The answer itself - writing it, the gist, the verdict box, checking
+    # every claim - is the shared pipeline the landing demo also runs. What
+    # stays here is what only an account has: the rows it is written to.
+    run = AnswerRun(
+        mode=mode,
+        content=effective_content,
+        history=history,
+        chunks=chunks,
+        web_task=web_task,
+        search_started=search_started,
+        memory_summary=memory_summary,
+        make_generation=make_generation,
+        image_task=image_task,
+        image_only=image_only,
+        review_task=review_task,
+        thinking_task=thinking_task,
+        decision_task=decision_task,
+        web_enabled=web_enabled,
+        scoring_weights=scoring_weights,
+        mark=mark,
+    )
 
     async def event_stream() -> AsyncIterator[dict]:
         # Everything this turn spends - the answer, the plan, the gates, one
@@ -1464,207 +1382,10 @@ async def send_message(
         # Opened around the whole generator rather than the generation call,
         # because the fan-out after the answer is most of the bill.
         turn_usage = token_meter_stack.enter_context(token_meter())
-        full_text = ""
-        stripper = ClaimTagStripper()
-        crux_splitter = CruxSplitter()
 
-        # The verdict box, sent once, the first moment it is ready - checked
-        # before the first token and between tokens, so it goes out ahead
-        # of the gist when it can (it usually can: ~3s against ~5s).
-        review_sent = False
-
-        # The picture, on the same contract: sent once, whenever it lands,
-        # which is usually after the answer has finished streaming.
-        generated_image: dict | None = None
-        image_sent = False
-        image_announced = False
-
-        def image_status_event() -> dict | None:
-            """Said once, at the top of the stream: a picture is being made.
-
-            Known before the first token now, rather than a few seconds in,
-            because the intent check runs before the instructions are built.
-            """
-            nonlocal image_announced
-            if image_announced or image_task is None:
-                return None
-            image_announced = True
-            return {
-                "event": "status",
-                "data": json.dumps({"phase": "image", "label": "Making the image"}),
-            }
-
-        def image_event() -> dict | None:
-            nonlocal generated_image, image_sent
-            if image_sent or image_task is None or not image_task.done():
-                return None
-            image_sent = True
-            try:
-                generated_image = image_task.result()
-            except Exception:  # noqa: BLE001 - a failed picture never fails the answer
-                logger.warning("image task failed", exc_info=True)
-                generated_image = None
-            if not generated_image:
-                return None
-            # The same dict that is stored on the message, so the live event
-            # and a reload render from identical data.
-            return {"event": "image", "data": json.dumps(generated_image)}
-
-        def review_event() -> dict | None:
-            nonlocal review_sent
-            if review_sent:
-                return None
-            pending = review_task or thinking_task
-            if pending is None or not pending.done():
-                return None
-            review_sent = True
-            try:
-                result = pending.result()
-            except Exception:  # noqa: BLE001 - the box is optional
-                return None
-            if not result:
-                return None
-            key = "decision_review" if review_task is not None else "thinking_review"
-            return {"event": "review", "data": json.dumps({key: result})}
-
-        # An early warning the client acts on: this answer is going to be a
-        # long one, so offer the quick way out now rather than after a fixed
-        # wait. The tell is that nothing in the workspace matched and the
-        # only search available is the model's own tool, which takes 5-20s
-        # a round; with a search API in place the pre-search is a couple of
-        # seconds and the first token isn't far behind, so no warning (the
-        # client still shows the button on its own after a fixed wait).
-        # Quick answers themselves never warn; there is nothing quicker.
-        if mode != "rapid" and not chunks and web_task is not None and not tavily_available():
-            yield {
-                "event": "status",
-                "data": json.dumps(
-                    {"phase": "slow", "label": "This one will take a little longer"}
-                ),
-            }
-
-        # The wait for the web search happens here, inside the stream, so the
-        # warning above reaches the client before it rather than after.
-        web_sources: list[WebSource] = []
-        # A pre-search that missed its budget is not thrown away: it keeps
-        # running while the answer streams, and whatever it brings back seeds
-        # the per-claim research afterwards (see research_claim's `seed`).
-        late_search: asyncio.Task[list[WebSource]] | None = None
-        if web_task is not None:
-            if chunks:
-                web_task.cancel()
-            else:
-                # The budget counts from when the search started, not from now.
-                remaining = max(
-                    0.0, _PRE_SEARCH_BUDGET_SECONDS - (time.monotonic() - search_started)
-                )
-                try:
-                    web_sources = await asyncio.wait_for(
-                        asyncio.shield(web_task), timeout=remaining
-                    )
-                except asyncio.TimeoutError:
-                    logger.info("web pre-search over budget; answering without web context")
-                    web_sources = []
-                    late_search = web_task
-                except (asyncio.CancelledError, Exception):  # noqa: B014 - degrade, never fail
-                    web_sources = []
-        context_block = build_context_block(chunks, web_sources)
-        input_text = build_conversation_input(
-            context_block, memory_summary, history, effective_content
-        )
-        mark("context")
-
-        # Named phases, so the wait says what is being waited on. Silence for
-        # eight seconds and "Weighing sources" for eight seconds are the same
-        # eight seconds, and only one of them reads as progress.
-        yield {
-            "event": "status",
-            "data": json.dumps(
-                {"phase": "reading", "label": "Reading your documents"}
-                if chunks
-                else {"phase": "searching", "label": "Searching the web"}
-                if web_sources
-                else {"phase": "thinking", "label": "Cogitating"}
-            ),
-        }
-
-        # Sent first if it is already in hand; otherwise the client holds its
-        # slot at the top of the bubble and it fills in when it lands (the
-        # review is a ~10s judgement; the gist must not wait on it).
-        early = review_event()
-        if early:
-            mark("review")
-            yield early
-
-        # Before the first token rather than on it: when the picture is the
-        # whole answer there are no tokens, so a status that waited for one
-        # would never be sent.
-        announcement = image_status_event()
-        if announcement:
-            yield announcement
-
-        try:
-            # A picked model goes to its own provider with no fallback: if
-            # somebody asked for Grok, quietly answering as Claude would be
-            # worse than saying it is unavailable.
-            if image_only:
-                # Nothing to write. Substituted rather than branched around,
-                # so the rest of the turn is unchanged: the message is
-                # persisted, the branch pointer moves, the title is derived
-                # and the events fire exactly as they always do - there is
-                # simply no prose in the middle of it, and therefore no gist
-                # and no claims to verify.
-                generation = _no_text()
-            elif chosen_model and chosen_model.provider != "anthropic":
-                # A picked model goes to its own provider with no fallback:
-                # if somebody asked for Grok, quietly answering as Claude
-                # would be worse than saying it is unavailable.
-                generation = stream_for_model(
-                    chosen_model,
-                    instructions=instructions,
-                    input_text=input_text,
-                    input_images=input_images,
-                )
-            else:
-                generation = stream_generation(
-                    instructions=instructions,
-                    input_text=input_text,
-                    model=chosen_model.model_id if chosen_model else gen_model,
-                    temperature=gen_temperature,
-                    input_images=input_images,
-                )
-            async for event in generation:
-                if event["type"] == "delta":
-                    late = review_event()
-                    if late:
-                        mark("review")
-                        yield late
-                    announcement = image_status_event()
-                    if announcement:
-                        yield announcement
-                    picture = image_event()
-                    if picture:
-                        mark("image")
-                        yield picture
-                    full_text += event["text"]
-                    # The leading one-sentence crux goes out as its own event
-                    # the moment it closes, and never as body text - the
-                    # client shows it as the first thing, above a body that
-                    # streams in behind a fold. See CruxSplitter.
-                    crux_now, passthrough = crux_splitter.feed(event["text"])
-                    if crux_now:
-                        mark("crux")
-                        yield {"event": "crux", "data": json.dumps({"text": clean_output(crux_now)})}
-                    visible = stripper.feed(passthrough) if passthrough else ""
-                    if visible:
-                        yield {"event": "delta", "data": json.dumps({"text": visible})}
-                elif event["type"] == "done":
-                    full_text = event["full_text"]
-            tail = stripper.feed(crux_splitter.flush())
-            if tail:
-                yield {"event": "delta", "data": json.dumps({"text": tail})}
-        except Exception as exc:  # noqa: BLE001 - surfaced to the client as an SSE error event
-            decision_task.cancel()
+        async for event in run.generate():
+            yield event
+        if run.error is not None:
             # The raw exception never reaches the client: it can name a
             # vendor, quote a credit-balance message, or otherwise say things
             # the identity rules forbid the model itself from saying. Logged
@@ -1673,11 +1394,11 @@ async def send_message(
             # same test that drives the Claude<->OpenAI fallback in
             # anthropic_client.py - by the time either exception reaches
             # here, both providers have already been tried and failed.
-            logger.error("chat generation failed", exc_info=True)
+            logger.error("chat generation failed", exc_info=run.error)
             detail = (
                 "You've reached today's limit for responses. Please try again in a "
                 "little while."
-                if is_provider_unavailable_error(exc)
+                if is_provider_unavailable_error(run.error)
                 else "Something went wrong generating a response. Please try again."
             )
             yield {"event": "error", "data": json.dumps({"detail": detail})}
@@ -1694,31 +1415,12 @@ async def send_message(
         # window sees this turn in its history, rather than a hole where the
         # assistant's reply should be.
         # ------------------------------------------------------------------
-        # Pulled off the front before anything else touches full_text, so
-        # every downstream consumer - the draft, reflection, claim
-        # extraction, the counterfactual - works from crux-free text and
-        # none of them can reintroduce or duplicate it.
-        mark("generated")
-        crux_text, full_text = extract_crux(full_text)
-        if crux_text is None:
-            # The model sometimes skips the <crux> wrapper (the fast model
-            # in particular). Every brief asks for the bottom line first, so
-            # the first sentence is it - and without a gist there is no
-            # gist card and no fold, and the answer lands as a wall of text
-            # in an order nobody asked for.
-            crux_text, full_text = split_leading_sentence(full_text)
-            if crux_text is None and not image_only:
-                # Expected when the picture is the answer - there is no prose
-                # to take a gist from, and that is the point rather than a
-                # degraded answer worth warning about.
-                logger.warning("no gist could be derived; answer opens with: %r", full_text[:160])
-        draft_display_text = clean_output(strip_claim_tags(full_text))
-
+        crux_text = run.crux_text
         async with AsyncSessionLocal() as answer_db:
             assistant_message = Message(
                 conversation_id=conversation_id,
                 role="assistant",
-                content=draft_display_text,
+                content=run.draft_display_text,
                 mode_used=mode,
                 reasoning_lens=reasoning_lens if mode == "thinking" else None,
                 parent_id=assistant_parent_id,
@@ -1727,7 +1429,7 @@ async def send_message(
                 # bubble for that payload - so a crux missing here vanished
                 # from the screen for the whole claim-checking wait and came
                 # back with "final". A reload in that window lost it too.
-                crux_text=clean_output(crux_text) if crux_text else None,
+                crux_text=crux_text,
             )
             answer_db.add(assistant_message)
             await answer_db.flush()
@@ -1744,15 +1446,8 @@ async def send_message(
             assistant_message_id = assistant_message.id
             answer_payload = _serialize_message(assistant_message, []).model_dump(mode="json")
 
-        # A short answer can finish before the box does; give it a moment so
-        # the two arrive in the order they are shown.
-        pending_review = review_task or thinking_task
-        if pending_review is not None and not review_sent:
-            await asyncio.wait({pending_review}, timeout=_REVIEW_GRACE_SECONDS)
-            late = review_event()
-            if late:
-                mark("review")
-                yield late
+        async for event in run.review_grace():
+            yield event
 
         yield {
             "event": "answer",
@@ -1828,286 +1523,35 @@ async def send_message(
             "data": json.dumps({"phase": "validating", "label": "Weighing the evidence"}),
         }
 
-        # ------------------------------------------------------------------
-        # Everything left is independent of everything else left, so it all
-        # goes at once. Serially this was reflection, then classification,
-        # then verification, then the counterfactual - four round-trips
-        # stacked end to end for no reason other than the order they were
-        # written in.
-        #
-        # Claim verification runs against the *draft's* claims rather than
-        # waiting for reflection to finish. Reflection is explicitly
-        # instructed to preserve the claim structure and only improve the
-        # prose inside it, and a revision that changes the claim count is
-        # discarded - so the claims being scored are the claims that ship.
-        # ------------------------------------------------------------------
-        parsed_claims = extract_claims(full_text)
-
-        # The critique-and-rewrite pass is for reasoning: a Thinking chain
-        # or a Decision case reads better for it. A Knowing answer is a set
-        # of checked facts - the check *is* its quality gate - and the pass
-        # cost 4-6s at the end of every turn, after which the text a reader
-        # had already read swapped under them for the revised one.
-        reflection_task = (
-            asyncio.create_task(reflect_and_revise(mode, full_text))
-            if mode != "knowing"
-            else None
-        )
-        # `decision_task` has been running since earlier in this function, so
-        # awaiting it here is normally immediate - not a new blocking call.
-        # It has to happen before review_task/thinking_task below, which need
-        # its result: both take bias_category_id as a plain argument, so
-        # Python needs a value the moment the coroutine is constructed, not
-        # merely by the time it runs.
-        try:
-            decision_result = await decision_task
-        except Exception:  # noqa: BLE001 - screening scope degrades, nothing fails
-            decision_result = NO_DECISION
-        bias_category_id = decision_result.bias_category_id
-
-        counterfactual_task = (
-            asyncio.create_task(generate_counterfactual(draft_display_text))
-            if draft_display_text
-            else None
-        )
-
-        # Markers 1..len(chunks) are documents; anything above continues into
-        # the web sources, in the order build_context_block numbered them.
-        # `live_sources` grows below as per-claim research finds more, and the
-        # marker arithmetic follows it.
-        live_sources: list[WebSource] = list(web_sources)
-
-        def source_excerpt(marker: int) -> str:
-            if marker <= len(chunks):
-                return chunks[marker - 1].chunk.content
-            return live_sources[marker - len(chunks) - 1].excerpt
-
-        def valid_markers(raw: list[int]) -> list[int]:
-            limit = len(chunks) + len(live_sources)
-            return [m for m in sorted(set(raw)) if 0 < m <= limit]
-
-        # §9.1 step 3: per-claim, per-evidence verification + cognitive-bias
-        # screening, run concurrently across claims. `bias_category_id` scopes
-        # the screening vocabulary to the domain this conversation is about.
-        claim_marker_lists = [valid_markers(c.citation_markers) for c in parsed_claims]
-        verifications = await asyncio.gather(
-            *(
-                verify_claim(
-                    claim.claim_text,
-                    [source_excerpt(m) for m in markers],
-                    bias_category_id=bias_category_id,
-                )
-                for claim, markers in zip(parsed_claims, claim_marker_lists)
+        async for event in run.analyse():
+            yield event
+        analysis = run.analysis
+        assert analysis is not None
+        scored_claims = analysis.scored_claims
+        message_score = analysis.message_score
+        live_sources = analysis.live_sources
+        counterfactual_text = analysis.counterfactual_text
+        if analysis.counterfactual_pending is not None:
+            # Written to the row when it lands; a reader who flips before
+            # then gets it on demand from the devils-advocate endpoint.
+            _in_background(
+                _store_counterfactual(assistant_message_id, analysis.counterfactual_pending)
             )
-        )
-
-        # Claim verification is the long pole after the answer - it is also
-        # the window in which the picture usually finishes. Checking here
-        # sends it as soon as it exists rather than holding it to the end of
-        # the pipeline, which was another twenty seconds of a placeholder
-        # sitting there with nothing to show.
-        picture = image_event()
-        if picture:
-            mark("image")
-            yield picture
-
-        evidence_by_claim = [
-            build_scored_evidence(markers, chunks, v.evidence, live_sources)
-            for markers, v in zip(claim_marker_lists, verifications)
-        ]
-
-        # A claim nothing supports is where the search agent earns its keep:
-        # the answer already exists, so there is a specific proposition to go
-        # and check rather than a vague topic. Every such claim is researched
-        # at once - one agent per claim - because they have nothing to do with
-        # each other and running them in sequence made a three-unsupported-claim
-        # answer take three times as long for no benefit.
-        #
-        # Except a claim the model wrote as its own opinion: there is nothing
-        # to go and check by design (see prompt_builder's opinion framing),
-        # so searching for it would spend a call finding something irrelevant
-        # to attach - and if it succeeded, that evidence would fight with
-        # compute_claim_score's opinion tier over what the claim actually is.
-        research_notes: list[str] = []
-        if web_enabled:
-            targets = [
-                i
-                for i, ev in enumerate(evidence_by_claim)
-                if not ev and not parsed_claims[i].is_opinion
-            ][:_MAX_RESEARCHED_CLAIMS]
-            if targets:
-                # The pre-answer search, if it finished late: its sources
-                # are judged against every unsupported claim first, before
-                # any new search is spent.
-                seed: list[WebSource] | None = None
-                if late_search is not None:
-                    try:
-                        seed = await asyncio.wait_for(asyncio.shield(late_search), timeout=5.0)
-                    except (asyncio.TimeoutError, asyncio.CancelledError, Exception):  # noqa: B014
-                        seed = None
-                # A deadline, not a hope. Each agent can run two
-                # search-and-judge rounds, and rounds against a slow search
-                # are most of the end-to-end budget on their own. Whatever
-                # has come back when the clock runs out is what gets used;
-                # claims still unsupported stay unsupported, which is a true
-                # statement either way.
-                try:
-                    results = await asyncio.wait_for(
-                        asyncio.gather(
-                            *(
-                                research_claim(parsed_claims[i].claim_text, seed=seed)
-                                for i in targets
-                            ),
-                            return_exceptions=True,
-                        ),
-                        timeout=_RESEARCH_DEADLINE_SECONDS,
-                    )
-                except asyncio.TimeoutError:
-                    research_notes.append(
-                        "Ran out of time checking this against outside sources."
-                    )
-                    results = [None] * len(targets)
-                # Marker assignment is serial even though the searches weren't:
-                # every claim's sources need a distinct block of marker numbers
-                # in `live_sources`, and handing them out concurrently would
-                # interleave them.
-                recheck: list[tuple[int, list[int]]] = []
-                for i, research in zip(targets, results):
-                    if research is None:
-                        continue
-                    if isinstance(research, BaseException) or not research.succeeded:
-                        if not isinstance(research, BaseException):
-                            # Say what was tried. "Unsupported after three
-                            # searches" is a stronger statement than
-                            # "unsupported because nobody looked", and the
-                            # reader should be able to tell which they got.
-                            research_notes.extend(research.trail)
-                        continue
-                    first_marker = len(chunks) + len(live_sources) + 1
-                    live_sources.extend(research.sources)
-                    recheck.append(
-                        (i, list(range(first_marker, first_marker + len(research.sources))))
-                    )
-
-                if recheck:
-                    rechecked = await asyncio.gather(
-                        *(
-                            verify_claim(
-                                parsed_claims[i].claim_text,
-                                [source_excerpt(m) for m in found],
-                                bias_category_id=bias_category_id,
-                            )
-                            for i, found in recheck
-                        )
-                    )
-                    for (i, found), v in zip(recheck, rechecked):
-                        claim_marker_lists[i] = found
-                        evidence_by_claim[i] = build_scored_evidence(
-                            found, chunks, v.evidence, live_sources
-                        )
-
-        mark("verified")
-        scored_claims: list[ScoredClaim] = []
-        for claim, markers, verification, evidence in zip(
-            parsed_claims, claim_marker_lists, verifications, evidence_by_claim
-        ):
-            claim_score, entailment_label = compute_claim_score(
-                evidence,
-                distorted=bool(verification.distortion_flag),
-                opinion=claim.is_opinion,
-            )
-            scored_claims.append(
-                ScoredClaim(
-                    claim_index=claim.claim_index,
-                    claim_text=clean_output(claim.claim_text),
-                    claim_score=claim_score,
-                    entailment_label=entailment_label,
-                    distortion_flag=verification.distortion_flag,
-                    distortion_explanation=verification.distortion_explanation,
-                    bias_category=verification.bias_category,
-                    evidence=evidence,
-                )
-            )
-
-        # Veracity framework "Targeted Blind Sampling": claims that landed in
-        # the gray_area tier get one independent second look, run concurrently
-        # since they have nothing to do with each other. The second pass never
-        # sees the tier we just assigned, so it can't just rubber-stamp it.
-        gray_area_indices = [
-            i for i, c in enumerate(scored_claims) if c.entailment_label == "gray_area"
-        ]
-        if gray_area_indices:
-            reconciliations = await asyncio.gather(
-                *(
-                    reconcile_gray_area(
-                        scored_claims[i].claim_text,
-                        [source_excerpt(m) for m in claim_marker_lists[i]],
-                    )
-                    for i in gray_area_indices
-                ),
-                return_exceptions=True,
-            )
-            for i, result in zip(gray_area_indices, reconciliations):
-                if isinstance(result, BaseException):
-                    continue
-                c = scored_claims[i]
-                c.reconciliation_note = result.note
-                c.dynamic = result.dynamic
-                # A blind pass that recognizes a spoofed/deepfake-shaped premise
-                # or an accurate claim buried in informal phrasing overrules the
-                # first-pass number - the reconciliation matrix treats both as
-                # cases the first pass got wrong, not cases it was merely unsure
-                # about. "genuinely_developing" leaves the score untouched; it
-                # confirms gray_area rather than correcting it.
-                #
-                # Re-derived from the evidence rather than clamped: clamping a
-                # 41-80 score to max(.,81) or min(.,40) produced exactly 81 and
-                # exactly 40 every single time, which read as a measurement and
-                # was a constant.
-                rescored = rescore_after_reconciliation(c.evidence, result.pattern)
-                if rescored is not None:
-                    c.claim_score, c.entailment_label = rescored
-
-        message_score = compute_message_score(scored_claims, scoring_weights)
-
-        # Both were launched before verification started, so by now they are
-        # either done or nearly so - the await costs whatever is left, not the
-        # whole call.
-        final_text = full_text
-        if reflection_task is not None:
-            try:
-                final_text, _was_revised = await reflection_task
-            except Exception:  # noqa: BLE001 - a failed critique keeps the draft
-                final_text = full_text
-        # The Devil's Draft is not waited for. It is a whole second answer
-        # written by the fast model - as long as the verification it ran
-        # alongside, often longer - and it was the last thing the verdict
-        # waited on. If it has landed, it ships with the verdict; if not, it
-        # is written to the row when it does, and a reader who flips before
-        # then gets it on demand from the devils-advocate endpoint (which
-        # generates on a miss anyway).
-        counterfactual_text: str | None = None
-        if counterfactual_task is not None:
-            if counterfactual_task.done():
-                try:
-                    counterfactual_text = counterfactual_task.result()
-                except Exception:  # noqa: BLE001 - the comparison is optional
-                    counterfactual_text = None
-            else:
-                _in_background(_store_counterfactual(assistant_message_id, counterfactual_task))
-
-        # strip_claim_tags preserves the model's own formatting/whitespace
-        # between claims exactly, matching what streaming already showed -
-        # rejoining claim_text pieces with an artificial separator would
-        # flatten lists/paragraphs and visibly reflow the message on finalize.
-        decision_review = await review_task if review_task else None
-        thinking_review = await thinking_task if thinking_task else None
-        display_text = clean_output(strip_claim_tags(final_text))
+        decision_review = analysis.decision_review
+        thinking_review = analysis.thinking_review
+        display_text = analysis.display_text
         # §8.4: computed once confidence scoring completes; a distortion flag
         # overrides the expression to "concerned" regardless of the band.
         avatar_cue = compute_avatar_cue(
             mode, message_score.band, message_score.distortion_penalty_applied, gesture_map
         )
+
+        # The picture, if one was still being made when the answer finished.
+        # Its own event, not just the final payload: this is the usual case
+        # rather than the exception - the answer is written in ten seconds
+        # and the picture takes twenty.
+        pending_image_event = await run.collect_image()
+        generated_image = run.generated_image
 
         async with AsyncSessionLocal() as gen_db:
             # The row already exists - it was written the moment the answer
@@ -2131,31 +1575,6 @@ async def send_message(
                 assistant_message.counterfactual_content = clean_output(counterfactual_text)
             assistant_message.decision_review = decision_review
             assistant_message.thinking_review = thinking_review
-            # The picture, if one was still being made when the answer
-            # finished. Awaited here rather than abandoned: the bytes are
-            # already paid for, and a row without the pointer would lose an
-            # image that exists.
-            if image_task is not None and not image_sent:
-                try:
-                    generated_image = await image_task
-                except Exception:  # noqa: BLE001
-                    logger.warning("image task failed", exc_info=True)
-                    generated_image = None
-                image_sent = True
-                if generated_image:
-                    # Its own event, not just the final payload: this is the
-                    # usual case rather than the exception - the answer is
-                    # written in ten seconds and the picture takes twenty -
-                    # and the client should be able to drop it into the
-                    # bubble the moment it exists.
-                    pending_image_event = {
-                        "event": "image",
-                        "data": json.dumps(generated_image),
-                    }
-                else:
-                    pending_image_event = None
-            else:
-                pending_image_event = None
             assistant_message.generated_image = generated_image
             await gen_db.flush()
 
@@ -2191,20 +1610,9 @@ async def send_message(
                 await gen_db.flush()
                 marker_to_citation_id[marker] = citation.id
 
-            # The claim rows carry the sentence *as it ships*, not as drafted.
-            # Verification ran on the draft's claims, but reflection may have
-            # reworded the prose - it keeps the claim count (or is discarded),
-            # so the i-th shipped claim is the i-th scored one. Storing the
-            # draft wording left the client unable to find an opinion claim
-            # in the text it was rendering, so opinions went unmarked.
-            shipped = extract_claims(final_text)
-            shipped_text = (
-                [clean_output(s.claim_text) for s in shipped]
-                if len(shipped) == len(scored_claims)
-                else [c.claim_text for c in scored_claims]
-            )
-
-            for c, text_as_shipped in zip(scored_claims, shipped_text):
+            # The claim rows carry the sentence *as it ships*, not as drafted
+            # - see Analysis.shipped_text.
+            for c, text_as_shipped in zip(scored_claims, analysis.shipped_text):
                 claim_row = MessageClaim(
                     message_id=assistant_message.id,
                     claim_index=c.claim_index,
@@ -2252,42 +1660,13 @@ async def send_message(
             if await should_rebuild_profile(profile_db, current_user.id):
                 rebuild_profile_task.delay(str(current_user.id))
 
-        claims_out = [
-            ClaimOut(
-                claim_index=c.claim_index,
-                # Same as-shipped wording the rows were stored with, so the
-                # live "final" event and a later reload agree.
-                claim_text=text_as_shipped,
-                claim_score=c.claim_score,
-                entailment_label=c.entailment_label,
-                distortion_flag=c.distortion_flag,
-                distortion_explanation=c.distortion_explanation,
-                **describe_bias(c.distortion_flag, c.bias_category),
-                evidence=[
-                    EvidenceOut(
-                        citation_marker=e.citation_marker,
-                        document_id=e.document_id,
-                        document_filename=e.document_filename,
-                        excerpt=e.excerpt,
-                        support_score=e.support_score,
-                        relevance_score=e.relevance_score,
-                        entailment_label=e.entailment_label,
-                        source_type=e.source_type,
-                        url=e.url,
-                        credibility_score=e.credibility_score,
-                        credibility_note=e.credibility_note,
-                    )
-                    for e in c.evidence
-                ],
-            )
-            for c, text_as_shipped in zip(scored_claims, shipped_text)
-        ]
+        claims = claims_out(analysis)
 
         new_title = await _settle_title(
             conversation_id, title_task, conversation.title or "", wait_seconds=2.0
         )
         final_payload = {
-            "message": _serialize_message(assistant_message, claims_out).model_dump(mode="json"),
+            "message": _serialize_message(assistant_message, claims).model_dump(mode="json"),
             # Set on the first turn once the small model has named the chat.
             "conversation_title": new_title,
             # Ships with the answer so the Devil's Draft opens instantly.
@@ -2297,8 +1676,8 @@ async def send_message(
             # Only present when the search agent came back empty-handed; it is
             # the difference between "nothing supports this" and "nothing was
             # looked for".
-            "research_notes": research_notes,
-            "claims": [c.model_dump(mode="json") for c in claims_out],
+            "research_notes": analysis.research_notes,
+            "claims": [c.model_dump(mode="json") for c in claims],
             "confidence": {"score": message_score.score, "band": message_score.band},
             "avatar_cue": {"expression": avatar_cue.expression, "gesture": avatar_cue.gesture},
         }

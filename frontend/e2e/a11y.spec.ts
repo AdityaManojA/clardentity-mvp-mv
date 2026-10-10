@@ -10,6 +10,22 @@ import { test, expect, sel, press } from "./fixtures";
 test.describe.configure({ timeout: 60_000 });
 
 async function scan(page: Page, info: TestInfo, include?: string) {
+  // Let entrance animations finish first. The workspace cards rise in with a
+  // staggered fade (.phone-rise), and toBeVisible() is satisfied at opacity 0,
+  // so axe could measure the second card mid-fade and report its text as
+  // low-contrast - it did, on the run after the credentials fix put the
+  // cards' text on screen. Finite animations only: the companion idles for
+  // ever and would never settle.
+  await page
+    .waitForFunction(
+      () =>
+        document
+          .getAnimations()
+          .every((a) => a.playState !== "running" || a.effect?.getTiming().iterations === Infinity),
+      null,
+      { timeout: 5_000 },
+    )
+    .catch(() => {});
   let builder = new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]);
   if (include) builder = builder.include(include);
   const { violations } = await builder.analyze();
