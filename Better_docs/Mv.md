@@ -112,7 +112,7 @@ Status key: ✅ Done · 🔄 Built, waiting on a setup step · 🔍 Built, needs
 | ✅ | Recent chats, the mode row and the thread pills fade at an edge when there's more to scroll |
 | ✅ | Phone text drawn at 92% instead of 85% (touch phones only; desktop and narrow desktop windows keep 85%), with the smallest labels held at 12.5px on screen |
 | ✅ | While typing on a phone, the mode row folds into one chip ("Finder ▾") so the conversation keeps the space above the keyboard; tapping the chip opens the row without closing the keyboard |
-| ✅ | Home page cards on phones: one embossed celestial mark per card (sparkle, orbit, crescent, planet, flower, guiding star, scalloped circle, compass star; Ask/Check/See get sparkles, an orbit and a sunburst), in the empty middle only - text, fonts, icons and spacing unchanged; follows light, dark and every accent |
+| ✅ | Home page cards on phones: one small fine-outline celestial mark per card in a slightly pink hairline (sparkle, orbit, crescent, planet, flower, guiding star, scalloped circle, compass star; Ask/Check/See get sparkles, an orbit and a sunburst), in the empty middle only - text, fonts, icons and spacing unchanged; follows light, dark and every accent |
 
 ## 4. Mobile production readiness
 
