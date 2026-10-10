@@ -110,6 +110,8 @@ Status key: ✅ Done · 🔄 Built, waiting on a setup step · 🔍 Built, needs
 | ✅ | Chat: following a streaming answer is smoother (one scroll per frame instead of one per word) |
 | ✅ | Phones use their own thin, auto-hiding scrollbars instead of the desktop's permanent 8px bar |
 | ✅ | Recent chats, the mode row and the thread pills fade at an edge when there's more to scroll |
+| ✅ | Home curtain on phones moves on its own as a slow wave across the folds, with light riding the crests; tilt steering removed entirely (a finger still lights it where it touches) |
+| ✅ | Phone menu shows the five-dot Clardentity logo beside the name, as the desktop sidebar does |
 | ✅ | Phone text drawn at 92% instead of 85% (touch phones only; desktop and narrow desktop windows keep 85%), with the smallest labels held at 12.5px on screen |
 | ✅ | While typing on a phone, the mode row folds into one chip ("Finder ▾") so the conversation keeps the space above the keyboard; tapping the chip opens the row without closing the keyboard |
 | ✅ | Home page cards on phones: one small, symmetrical fine-outline mark per card in a slightly pink hairline, drawn from what the card says (Ask: one question to three models; Check: a ring of sources and a check; See: an eye; Finder: a tall star with a filled ace of spades (Aditya's sketch); Decision: a forking path; Thought Coach: a half-formed circle; Learning: a tree branching down from a star (Aditya's sketch); Co-Creative: three overlapping circles with a star in the middle (Aditya's sketch); Mentoring: a guiding star and path; Reflect & Relieve: a sparkle, three dots and an outlined star (Aditya's sketch); Legal: scales), centred in each card's measured empty space - text, fonts, icons and spacing unchanged |
