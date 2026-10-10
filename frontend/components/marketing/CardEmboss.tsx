@@ -64,8 +64,11 @@ const SHAPES: Record<string, React.ReactNode> = {
   knowing: (
     <>
       <path d="M50 4 Q55 40 75 50 Q55 60 50 96 Q45 60 25 50 Q45 40 50 4Z" style={line} strokeWidth={LINE} strokeLinejoin="round" />
+      {/* the ace at about two-thirds size, so it sits inside the star's
+          waist with room around it */}
       <path
         d="M50 38 C47 43 40.5 46.5 40.5 51.5 C40.5 55.6 44.6 57.4 47.8 55.4 L46.2 62 H53.8 L52.2 55.4 C55.4 57.4 59.5 55.6 59.5 51.5 C59.5 46.5 53 43 50 38Z"
+        transform="translate(50 50) scale(0.62) translate(-50 -50)"
         style={{ fill: EDGE }}
       />
     </>
@@ -129,11 +132,13 @@ const SHAPES: Record<string, React.ReactNode> = {
   // flicker of a feeling to something settled (Aditya's outline sketch).
   therapy: (
     <>
-      <path d="M19 30 Q22 46 35 50 Q22 54 19 70 Q16 54 3 50 Q16 46 19 30Z" style={line} strokeWidth={2.4} strokeLinejoin="round" />
-      <circle cx={42} cy={50} r={2.2} style={{ fill: EDGE }} />
-      <circle cx={50} cy={50} r={2.2} style={{ fill: EDGE }} />
-      <circle cx={58} cy={50} r={2.2} style={{ fill: EDGE }} />
-      <path d="M79.0 32.0 L84.0 45.1 L98.0 45.8 L87.1 54.6 L90.8 68.2 L79.0 60.5 L67.2 68.2 L70.9 54.6 L60.0 45.8 L74.0 45.1Z" style={line} strokeWidth={2.4} strokeLinejoin="round" />
+      <path d="M20 30 Q23 46 36 50 Q23 54 20 70 Q17 54 4 50 Q17 46 20 30Z" style={line} strokeWidth={2.4} strokeLinejoin="round" />
+      {/* evenly across the gap between the two stars */}
+      <circle cx={49} cy={50} r={2.4} style={{ fill: EDGE }} />
+      <circle cx={62} cy={50} r={2.4} style={{ fill: EDGE }} />
+      <circle cx={75} cy={50} r={2.4} style={{ fill: EDGE }} />
+      <circle cx={88} cy={50} r={2.4} style={{ fill: EDGE }} />
+      <path d="M120.0 33.0 L124.7 45.5 L138.1 46.1 L127.6 54.5 L131.2 67.4 L120.0 60.0 L108.8 67.4 L112.4 54.5 L101.9 46.1 L115.3 45.5Z" style={line} strokeWidth={2.4} strokeLinejoin="round" />
     </>
   ),
   // Legal: balanced scales, with a small star at the top.
@@ -145,6 +150,9 @@ const SHAPES: Record<string, React.ReactNode> = {
     </>
   ),
 };
+
+/** Drawn in a 140 x 100 box rather than a square. */
+const WIDE = new Set(["therapy"]);
 
 /** `shape`: a mode value ("knowing", "decision"...) or a step word ("Ask.").
  *  `center`: where to sit before the card has been measured, in card px.
@@ -192,14 +200,16 @@ export function CardEmboss({ shape, center, size }: { shape: string; center: num
 
   const art = SHAPES[shape];
   if (!art) return null;
+  // a row of shapes needs width more than height
+  const wide = WIDE.has(shape);
   return (
     <svg
       ref={ref}
-      viewBox="0 0 100 100"
+      viewBox={wide ? "0 0 140 100" : "0 0 100 100"}
       aria-hidden="true"
       data-testid="card-emboss"
       className="pointer-events-none absolute left-1/2 -translate-x-1/2 -translate-y-1/2 lg:hidden"
-      style={{ top: center, width: size, height: size }}
+      style={{ top: center, width: wide ? size * 1.4 : size, height: size }}
     >
       {art}
     </svg>
