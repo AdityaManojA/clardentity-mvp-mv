@@ -125,8 +125,16 @@ Add a row for every feature that ships and every bug found. Retire, never delete
 | L4 | Admin dashboard hidden from a normal account; 404 route behaves | browser |
 | L5 | Answer text is rendered as escaped text with no links; source links are `rel="noopener noreferrer nofollow"` | code review on change |
 
+## M. Mobile and responsive (Aditya's Playwright suite)
+| ID | Proves | Kind |
+|---|---|---|
+| E2E-SUITE | T01-T15 desktop, M01-M47 phone layouts (drawer, swipe, keyboard, gates, offline, error screens, tap targets), A11Y-1..3 axe scans - on Chrome, Pixel 7 and iPhone 14 | e2e |
+| E2E-1 | Unset repository secrets arrive as "" - fixtures fall back with `||`, never `??` | e2e (T03, M04, M17) |
+| E2E-2 | Accessibility scans wait for finite entrance animations before measuring contrast | e2e (A11Y-2) |
+
 ## Run log
 | Date | Target | Commit | Result | Notes |
 |---|---|---|---|---|
 | 2026-10-10 | local (prod build) | pre-commit | 20/20 script after a harness fix; 472 tests; browser B1-B7, B9, B10, C2-C4, E2-E4, G1, IMAGE-*, L1 | Found and fixed: all-opinion claims on empty context; demo missing gist/claims/verdict/gates/switch toast/Quick answer; no browser security headers |
 | 2026-10-10 | prod | fb0d41c | 20/20 script (`--images`); browser B1, B3, L1 (login + Google button, demo), SEC headers live | Rebased onto the mobile-view merge first (AccountMenu and sw.js conflicts resolved; cache now v12). E2E workflow dispatched (run 38030338040). |
+| 2026-10-10 | CI (e2e.yml) | fbe76a8 | 134 passed, 17 skipped (live/visual need secrets), 0 failed | Runs 1-2 failed on the suite, not the app: blank credentials from unset secrets (T03/M04/M17), M39's 127.0.0.1 stream vs the new CSP (test-only `CSP_EXTRA_CONNECT_SRC`), A11Y-2 scanning mid-fade. |

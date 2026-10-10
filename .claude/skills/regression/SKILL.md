@@ -18,6 +18,7 @@ what it proves, and how it is checked. Three kinds of check:
 |---|---|---|
 | `script` | `scripts/regression/smoke.py` - one line per row ID | ~3 min, a few cents |
 | `test` | `backend/.venv/bin/python -m pytest -q` (472+ tests, local DB + Redis) | ~30 s |
+| `e2e` | Aditya's Playwright suite (desktop, Pixel 7, iPhone 14; mocked API) via CI: `gh workflow run e2e.yml --ref main` | ~4 min |
 | `browser` | walked by hand in the browser pane, desktop 1280×860 | ~15 min |
 
 ## When to run it
@@ -47,12 +48,20 @@ what it proves, and how it is checked. Three kinds of check:
    After a deploy, the same with `--target prod`. `--images` costs real
    money (two image generations); include it whenever Co-Creative or the
    image pipeline changed.
-4. **Browser rows**: walk every `browser` row in `MATRIX.md` in the browser
+4. **E2E suite** (after pushing): `gh workflow run e2e.yml --ref main`, then
+   `gh run list --workflow e2e.yml --limit 1` and read the run. The workflow
+   only runs on PRs and dispatch, never on a push, so it must be dispatched.
+   Locally it needs Playwright's exact Chromium build; CI has it. Live and
+   visual-baseline tests skip without their secrets - that is expected.
+   A failure that looks like the app may be the suite: read the trace
+   (`gh run download <id> -n test-results`, then the `error-context.md` and
+   `trace.zip` of the failing test) before changing app code.
+5. **Browser rows**: walk every `browser` row in `MATRIX.md` in the browser
    pane at 1280×860. Unregister the service worker and clear caches and
    localStorage before trusting a reload. Use throwaway accounts only
    (`local-regress-*` / `regress-*@example.com`); never
    `clardentity@test.com`. Delete them with `DELETE /api/v1/auth/me`.
-5. **Record** the run at the bottom of `MATRIX.md`: date, target, commit,
+6. **Record** the run at the bottom of `MATRIX.md`: date, target, commit,
    pass/fail counts, and any row that failed with what was done about it.
 
 ## Rules that came from real misses
