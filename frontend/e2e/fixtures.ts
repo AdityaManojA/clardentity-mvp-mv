@@ -10,9 +10,14 @@ import { test as base, expect, type Locator, type Page, type Request, type Route
 
 export const LIVE = process.env.E2E_LIVE === "1";
 export const API = process.env.E2E_API_URL ?? "http://localhost:8000";
+// `||`, not `??`: the workflow passes `${{ secrets.E2E_USER_EMAIL }}`, which
+// is an empty string - not undefined - wherever the secret isn't set (this
+// repo's own runs as well as fork PRs). With `??` the empty string won, the
+// mock then rejected every login, and T03/M04/M17 failed on blank
+// credentials rather than on anything in the app.
 export const CREDS = {
-  email: process.env.E2E_USER_EMAIL ?? process.env.E2E_EMAIL ?? "e2e@clardentity.test",
-  password: process.env.E2E_USER_PASSWORD ?? process.env.E2E_PASSWORD ?? "e2e-password",
+  email: process.env.E2E_USER_EMAIL || process.env.E2E_EMAIL || "e2e@clardentity.test",
+  password: process.env.E2E_USER_PASSWORD || process.env.E2E_PASSWORD || "e2e-password",
 };
 
 // localStorage keys, from lib/auth.tsx, lib/consent.ts, lib/tour.tsx

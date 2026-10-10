@@ -129,3 +129,4 @@ Add a row for every feature that ships and every bug found. Retire, never delete
 | Date | Target | Commit | Result | Notes |
 |---|---|---|---|---|
 | 2026-10-10 | local (prod build) | pre-commit | 20/20 script after a harness fix; 472 tests; browser B1-B7, B9, B10, C2-C4, E2-E4, G1, IMAGE-*, L1 | Found and fixed: all-opinion claims on empty context; demo missing gist/claims/verdict/gates/switch toast/Quick answer; no browser security headers |
+| 2026-10-10 | prod | fb0d41c | 20/20 script (`--images`); browser B1, B3, L1 (login + Google button, demo), SEC headers live | Rebased onto the mobile-view merge first (AccountMenu and sw.js conflicts resolved; cache now v12). E2E workflow dispatched (run 38030338040). |

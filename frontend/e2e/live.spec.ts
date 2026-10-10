@@ -8,7 +8,8 @@ import { request, type APIRequestContext } from "@playwright/test";
 import { ADMIN_STATE, USER_STATE } from "./auth-paths";
 import { test, expect, sel, press, swipeCarousel } from "./fixtures";
 
-const API = process.env.E2E_LIVE_API_URL ?? "https://clardentity-backend.onrender.com/api/v1";
+// `||`: an unset repository secret arrives as "", not undefined.
+const API = process.env.E2E_LIVE_API_URL || "https://clardentity-backend.onrender.com/api/v1";
 const RUN = `e2e-${process.env.GITHUB_RUN_ID ?? Date.now()}`;
 const has = (f: string) => fs.existsSync(f);
 

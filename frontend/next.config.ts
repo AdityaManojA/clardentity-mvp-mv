@@ -46,6 +46,12 @@ const POSTHOG = "https://*.posthog.com";
 // A live call posts its SDP offer here; the media itself is WebRTC, which
 // connect-src does not govern.
 const OPENAI = "https://api.openai.com";
+// Test builds only: the Playwright suite streams one answer from a local
+// server on a random port (e2e M39) and sets this for its own build. Nothing
+// in production sets it, so the deployed policy is unchanged.
+const EXTRA_CONNECT = process.env.CSP_EXTRA_CONNECT_SRC
+  ? ` ${process.env.CSP_EXTRA_CONNECT_SRC}`
+  : "";
 
 const csp = [
   "default-src 'self'",
@@ -57,7 +63,7 @@ const csp = [
   "font-src 'self' data:",
   // Spoken answers are played from blob: URLs.
   `media-src 'self' blob: ${API}`,
-  `connect-src 'self' ${API} ${POSTHOG} ${OPENAI} ${GOOGLE}${isDev ? " ws: wss:" : ""}`,
+  `connect-src 'self' ${API} ${POSTHOG} ${OPENAI} ${GOOGLE}${isDev ? " ws: wss:" : ""}${EXTRA_CONNECT}`,
   `frame-src ${GOOGLE}`,
   "worker-src 'self' blob:",
   "manifest-src 'self'",
