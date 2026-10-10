@@ -615,14 +615,26 @@ body {
    anything a utility hides stays hidden. Buttons that sit inside the text
    (data-inline: the opinion marker) keep their size and use tap-area. */
 @media (pointer: coarse) and (max-width: 1023.98px) {
-  [data-testid="message"] button[aria-label]:not([data-inline]),
-  [data-composer] button[aria-label] {
+  [data-testid="message"] button[aria-label]:not([data-inline]) {
     min-width: calc(44px / var(--ui-zoom));
     min-height: calc(44px / var(--ui-zoom));
   }
-  [data-testid="message"] button[aria-label]:not([data-inline]) > svg,
-  [data-composer] button[aria-label] > svg {
+  [data-testid="message"] button[aria-label]:not([data-inline]) > svg {
     margin-inline: auto;
+  }
+  /* The chat box's buttons reach 44px through an invisible hit area rather
+     than a 44px box, so its toolbar stays compact. */
+  [data-composer] button[aria-label] {
+    position: relative;
+  }
+  [data-composer] button[aria-label]::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100%, calc(44px / var(--ui-zoom)));
+    height: max(100%, calc(44px / var(--ui-zoom)));
+    transform: translate(-50%, -50%);
   }
 }
 

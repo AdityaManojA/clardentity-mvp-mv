@@ -1,22 +1,21 @@
-/* The small mark in the empty middle of each landing card - phone layout
- * only. One shape per card, drawn as a fine outline in a slightly pink
- * hairline (the card border's colour with a touch of the accent). Nothing else on the card moves; the mark sits behind the
- * text in the space between the name and the blurb, so the card's fonts,
- * spacing and icon are exactly as designed. Colours come from the theme
- * tokens, so light, dark and every accent follow on their own.
- *
- * Shapes after the brief's references: sparkles, an orbit, a crescent, a
- * ringed planet, a flower, a guiding star, a scalloped circle, the faceted
- * compass star, and a sunburst. */
+"use client";
 
-// Fine outline, slightly pink: no fill, a hairline in the card border's
-// colour with a little of the accent mixed in - plum in light, pink in dark.
-const FILL = "none";
+import { useLayoutEffect, useRef } from "react";
+
+/* The small mark in the empty middle of each landing card - phone layout
+ * only. One symmetrical shape per card that says what the card says, drawn
+ * as a fine outline in a slightly pink hairline (the card border's colour
+ * with a touch of the accent: plum in light, pink in dark).
+ *
+ * Centred in the space the card's text leaves, measured rather than assumed:
+ * a two-line blurb and a three-line one leave different gaps, and a fixed
+ * position sat visibly high in one and low in the other. Nothing else on
+ * the card moves - the mark sits behind the text. */
+
 const EDGE = "color-mix(in srgb, var(--border-strong) 60%, var(--brand))";
-const CARD = "none";
 // the card's own colour, where an outline must hide what passes behind it
 const BEHIND = "var(--surface-muted)";
-const LINE = 2.4; // in the 100-unit box: about 1.7px at the card's mark size
+const LINE = 2.6; // in the 100-unit box: about 1.8px at the card's mark size
 
 /** A four-point sparkle with long, thin arms. */
 function spark(cx: number, cy: number, r: number): string {
@@ -24,133 +23,161 @@ function spark(cx: number, cy: number, r: number): string {
   return `M${cx} ${cy - r} C${cx + a} ${cy - b} ${cx + b} ${cy - a} ${cx + w} ${cy} C${cx + b} ${cy + a} ${cx + a} ${cy + b} ${cx} ${cy + r} C${cx - a} ${cy + b} ${cx - b} ${cy + a} ${cx - w} ${cy} C${cx - b} ${cy - a} ${cx - a} ${cy - b} ${cx} ${cy - r}Z`;
 }
 
-function sunburst(points: number, outer: number, inner: number): string {
-  let d = "";
-  for (let k = 0; k < points * 2; k++) {
-    const angle = -Math.PI / 2 + (Math.PI * k) / points;
-    const r = k % 2 ? inner : outer;
-    d += `${k ? "L" : "M"}${(50 + Math.cos(angle) * r).toFixed(1)} ${(50 + Math.sin(angle) * r).toFixed(1)}`;
-  }
-  return d + "Z";
-}
+const line = { fill: "none", stroke: EDGE } as const;
+const round = { strokeLinecap: "round", strokeLinejoin: "round" } as const;
 
-function scallop(bumps: number): string {
-  let d = "";
-  for (let k = 0; k <= bumps; k++) {
-    const angle = -Math.PI / 2 + (2 * Math.PI * k) / bumps;
-    const x = (50 + Math.cos(angle) * 34).toFixed(1);
-    const y = (50 + Math.sin(angle) * 34).toFixed(1);
-    if (k === 0) {
-      d = `M${x} ${y}`;
-      continue;
-    }
-    const mid = angle - Math.PI / bumps;
-    d += ` Q${(50 + Math.cos(mid) * 50).toFixed(1)} ${(50 + Math.sin(mid) * 50).toFixed(1)} ${x} ${y}`;
-  }
-  return d + "Z";
+function Spark({ cx, cy, r, w = LINE, behind = false }: { cx: number; cy: number; r: number; w?: number; behind?: boolean }) {
+  return <path d={spark(cx, cy, r)} style={{ fill: behind ? BEHIND : "none", stroke: EDGE }} strokeWidth={w} strokeLinejoin="round" />;
 }
-
-function Pressed({ d }: { d: string }) {
-  return <path d={d} style={{ fill: FILL, stroke: EDGE }} strokeWidth={LINE} strokeLinejoin="round" />;
-}
-
-/** An orbit: a soft band with a hairline edge. `front` draws only the near
- *  half, to pass in front of a planet. */
-function Orbit({ rx, ry, tilt, front = false }: { rx: number; ry: number; tilt: number; front?: boolean }) {
-  const d = front ? `M${50 - rx} 50 A${rx} ${ry} 0 0 0 ${50 + rx} 50` : null;
-  return (
-    <g transform={`rotate(${tilt} 50 50)`}>
-      {d ? (
-        <>
-                    <path d={d} fill="none" style={{ stroke: EDGE }} strokeWidth={LINE} />
-        </>
-      ) : (
-        <>
-                    <ellipse cx={50} cy={50} rx={rx} ry={ry} fill="none" style={{ stroke: EDGE }} strokeWidth={LINE} />
-        </>
-      )}
-    </g>
-  );
+function Ring({ cx, cy, r, w = LINE, opacity }: { cx: number; cy: number; r: number; w?: number; opacity?: number }) {
+  return <circle cx={cx} cy={cy} r={r} style={line} strokeWidth={w} opacity={opacity} />;
 }
 
 const SHAPES: Record<string, React.ReactNode> = {
-  knowing: <Pressed d={spark(50, 50, 46)} />,
-  decision: (
-    <>
-      <Orbit rx={46} ry={13} tilt={-22} />
-      <Pressed d={spark(38, 46, 28)} />
-      <Pressed d={spark(68, 60, 15)} />
-    </>
-  ),
-  thinking: (
-    <>
-      <Pressed d="M64 14 A36 36 0 1 0 86 72 A29 29 0 1 1 64 14Z" />
-      <Pressed d={spark(38, 38, 15)} />
-    </>
-  ),
-  learning: (
-    <>
-      <Orbit rx={46} ry={11} tilt={-18} />
-      <circle cx={50} cy={50} r={24} style={{ fill: BEHIND, stroke: EDGE }} strokeWidth={LINE} />
-      <Orbit rx={46} ry={11} tilt={-18} front />
-    </>
-  ),
-  creative: (
-    <>
-      {[0, 60, 120, 180, 240, 300].map((a) => (
-        <ellipse key={a} cx={50} cy={29} rx={11} ry={20} transform={`rotate(${a} 50 50)`} style={{ fill: FILL, stroke: EDGE }} strokeWidth={LINE} />
-      ))}
-      <circle cx={50} cy={50} r={12} style={{ fill: BEHIND, stroke: EDGE }} strokeWidth={LINE} />
-    </>
-  ),
-  mentoring: (
-    <>
-      <circle cx={50} cy={50} r={34} style={{ fill: FILL, stroke: EDGE }} strokeWidth={LINE} />
-      <path d={spark(50, 50, 22)} style={{ fill: CARD, stroke: EDGE }} strokeWidth={LINE} strokeLinejoin="round" />
-      <circle cx={74} cy={26} r={3.5} style={{ fill: EDGE }} />
-    </>
-  ),
-  therapy: (
-    <>
-      <Pressed d={scallop(9)} />
-      <circle cx={50} cy={50} r={13} style={{ fill: CARD, stroke: EDGE }} strokeWidth={LINE} />
-    </>
-  ),
-  legal: (
-    <>
-      <Pressed d="M50 6 L61 39 L94 50 L61 61 L50 94 L39 61 L6 50 L39 39Z" />
-      <path d="M50 6 V94 M6 50 H94 M39 39 L61 61 M61 39 L39 61" fill="none" style={{ stroke: EDGE }} strokeWidth={LINE} strokeLinecap="round" />
-    </>
-  ),
+  // Ask: one question, sent out to the three models best suited for it.
   "Ask.": (
     <>
-      <Pressed d={spark(44, 56, 34)} />
-      <Pressed d={spark(74, 24, 13)} />
-      <circle cx={82} cy={50} r={2.4} style={{ fill: EDGE }} />
+      <Spark cx={50} cy={74} r={16} />
+      <path d="M50 58 V30 M50 58 L22 34 M50 58 L78 34" style={line} strokeWidth={2.2} strokeDasharray="3 4" {...round} />
+      <Ring cx={50} cy={22} r={6} />
+      <Ring cx={16} cy={28} r={6} />
+      <Ring cx={84} cy={28} r={6} />
     </>
   ),
+  // Check: a ring of sources around the answer, and a check.
   "Check.": (
     <>
-      <Orbit rx={38} ry={38} tilt={0} />
-      <circle cx={77} cy={23} r={4} style={{ fill: FILL, stroke: EDGE }} strokeWidth={LINE} />
-      <Pressed d={spark(50, 50, 20)} />
+      <Ring cx={50} cy={50} r={40} />
+      <path d="M50 10 V22 M50 78 V90 M10 50 H22 M78 50 H90" style={line} strokeWidth={LINE} {...round} />
+      <path d="M36 51 L46 61 L65 40" style={line} strokeWidth={3} {...round} />
     </>
   ),
+  // See: an eye, with a star for what it sees.
   "See.": (
     <>
-      <Pressed d={sunburst(16, 47, 35)} />
-      <circle cx={50} cy={50} r={17} style={{ fill: CARD, stroke: EDGE }} strokeWidth={LINE} />
+      <path d="M8 50 Q50 12 92 50 Q50 88 8 50Z" style={line} strokeWidth={LINE} strokeLinejoin="round" />
+      <Spark cx={50} cy={50} r={17} w={2.4} />
+    </>
+  ),
+  // Finder - facts, fast: a north star.
+  knowing: (
+    <>
+      <Spark cx={50} cy={50} r={44} />
+      <circle cx={50} cy={50} r={3} style={{ fill: EDGE }} />
+    </>
+  ),
+  // Decision-making - weigh options: a path forking into two.
+  decision: (
+    <>
+      <path d="M50 92 V58 M50 58 L24 30 M50 58 L76 30" style={line} strokeWidth={LINE} {...round} />
+      <Spark cx={24} cy={22} r={13} w={2.4} />
+      <Spark cx={76} cy={22} r={13} w={2.4} />
+      <circle cx={50} cy={58} r={3.5} style={{ fill: EDGE }} />
+    </>
+  ),
+  // Thought Coach - a half-formed idea: half drawn, half still dotted.
+  thinking: (
+    <>
+      <path d="M50 12 A38 38 0 0 1 50 88" style={line} strokeWidth={LINE} />
+      <path d="M50 12 A38 38 0 0 0 50 88" style={line} strokeWidth={2.4} strokeDasharray="3 5" strokeLinecap="round" />
+      <Spark cx={50} cy={50} r={15} w={2.4} />
+    </>
+  ),
+  // Learning - from the ground up: built up from a base to a star.
+  learning: (
+    <>
+      <Spark cx={50} cy={20} r={14} w={2.4} />
+      <Ring cx={38} cy={50} r={5} w={2.4} />
+      <Ring cx={62} cy={50} r={5} w={2.4} />
+      <Ring cx={26} cy={74} r={5} w={2.4} />
+      <Ring cx={50} cy={74} r={5} w={2.4} />
+      <Ring cx={74} cy={74} r={5} w={2.4} />
+      <path d="M14 90 H86" style={line} strokeWidth={2.4} strokeLinecap="round" />
+    </>
+  ),
+  // Co-Creative - made together: two circles overlapping, a spark between.
+  creative: (
+    <>
+      <Ring cx={36} cy={50} r={26} />
+      <Ring cx={64} cy={50} r={26} />
+      <Spark cx={50} cy={50} r={12} w={2.2} behind />
+    </>
+  ),
+  // Mentoring - guidance: a guiding star, and a path down to you.
+  mentoring: (
+    <>
+      <Spark cx={50} cy={24} r={18} />
+      <path d="M50 48 V80" style={line} strokeWidth={2.4} strokeDasharray="2 6" strokeLinecap="round" />
+      <Ring cx={50} cy={86} r={4.5} w={2.4} />
+    </>
+  ),
+  // Reflect & Relieve - a calm place: still ripples.
+  therapy: (
+    <>
+      <Ring cx={50} cy={50} r={6} w={2.4} />
+      <Ring cx={50} cy={50} r={22} w={2.2} opacity={0.85} />
+      <Ring cx={50} cy={50} r={40} w={2} opacity={0.6} />
+    </>
+  ),
+  // Legal: balanced scales, with a small star at the top.
+  legal: (
+    <>
+      <path d="M50 14 V86 M30 86 H70 M18 30 H82" style={line} strokeWidth={LINE} strokeLinecap="round" />
+      <path d="M18 30 L8 56 H28 Z M82 30 L72 56 H92 Z" style={line} strokeWidth={2.2} strokeLinejoin="round" />
+      <Spark cx={50} cy={14} r={8} w={2} behind />
     </>
   ),
 };
 
 /** `shape`: a mode value ("knowing", "decision"...) or a step word ("Ask.").
- *  `center` / `size`: where the empty middle of that card is, in its own px. */
+ *  `center`: where to sit before the card has been measured, in card px.
+ *  `size`: the mark's size in card px. */
 export function CardEmboss({ shape, center, size }: { shape: string; center: number; size: number }) {
+  const ref = useRef<SVGSVGElement>(null);
+
+  // Midway between the text above and the text below, in this card's own
+  // layout. Re-measured when its text changes size (fonts arriving, rotation).
+  useLayoutEffect(() => {
+    const mark = ref.current;
+    const card = mark?.parentElement;
+    if (!mark || !card) return;
+    // Layout positions (offsetTop/offsetHeight), not screen rects: the cards
+    // scale in as they're revealed, and a rect read mid-animation is off.
+    const place = () => {
+      const height = card.clientHeight;
+      if (height === 0) return;
+      let above = 0;
+      let below = height;
+      for (const el of card.children) {
+        if (el === mark || !(el instanceof HTMLElement)) continue;
+        if (!(el.textContent?.trim() || el.querySelector("img"))) continue;
+        const top = el.offsetTop;
+        const h = el.offsetHeight;
+        if (h === 0) continue;
+        if (top + h / 2 < height / 2) above = Math.max(above, top + h);
+        else below = Math.min(below, top);
+      }
+      mark.style.top = `${(above + below) / 2}px`;
+    };
+    place();
+    // the card has a fixed size, so watch its text too - and re-measure once
+    // the web fonts arrive, which re-wraps the blurb
+    const watch = new ResizeObserver(place);
+    watch.observe(card);
+    for (const el of card.children) if (el !== mark) watch.observe(el);
+    let live = true;
+    void document.fonts?.ready.then(() => live && place());
+    return () => {
+      live = false;
+      watch.disconnect();
+    };
+  }, []);
+
   const art = SHAPES[shape];
   if (!art) return null;
   return (
     <svg
+      ref={ref}
       viewBox="0 0 100 100"
       aria-hidden="true"
       data-testid="card-emboss"
