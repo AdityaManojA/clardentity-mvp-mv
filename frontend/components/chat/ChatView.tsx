@@ -190,6 +190,30 @@ export function ChatView({ conversationId }: { conversationId: string }) {
   // draft and waits; desktop behaves as it always has.
   const phoneLayout = usePhoneLayout();
   const fadePillEdges = useScrollEdges("x");
+
+  /* Touch phone, typing: the mode rail folds to a chip so the thread keeps
+   * the room above the keyboard. Tracked from focus on the chat box itself;
+   * `railOpen` is the chip tapped open, until the box loses focus. A narrow
+   * desktop window (fine pointer) never folds. */
+  const [composerFocused, setComposerFocused] = useState(false);
+  const [railOpen, setRailOpen] = useState(false);
+  useEffect(() => {
+    if (!window.matchMedia("(pointer: coarse) and (max-width: 1023.98px)").matches) return;
+    const onIn = (e: FocusEvent) => {
+      if (e.target === composerRef.current) setComposerFocused(true);
+    };
+    const onOut = (e: FocusEvent) => {
+      if (e.target !== composerRef.current) return;
+      setComposerFocused(false);
+      setRailOpen(false);
+    };
+    document.addEventListener("focusin", onIn);
+    document.addEventListener("focusout", onOut);
+    return () => {
+      document.removeEventListener("focusin", onIn);
+      document.removeEventListener("focusout", onOut);
+    };
+  }, []);
   useEffect(() => {
     if (!phoneLayout) return;
     try {
@@ -1317,11 +1341,17 @@ export function ChatView({ conversationId }: { conversationId: string }) {
             <div className="min-w-0 flex-1">
               <ModeSelector
                 value={mode}
+                folded={composerFocused && !railOpen}
+                onUnfold={() => setRailOpen(true)}
+                holdFocus={railOpen}
                 onChange={(next) => {
                   // Picking a mode by hand supersedes any accepted suggestion.
                   track("mode_picked", { mode: next });
                   setSwitchedFrom(null);
                   setMode(next);
+                  // Opened from the chip mid-message: the chat box kept its
+                  // focus, so fold again around the new mode.
+                  if (railOpen) setRailOpen(false);
                 }}
                 disabled={sending}
                 onLocked={(locked) => {

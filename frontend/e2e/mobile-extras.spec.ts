@@ -333,10 +333,11 @@ test.describe("scrolling", () => {
     await openChat(page);
     const list = await settled(page);
     await list.evaluate((el) => el.scrollTo({ top: 120, behavior: "instant" }));
-    await expect.poll(() => page.evaluate(() => sessionStorage.getItem("clardentity-place:c1"))).toBe("120");
+    await expect.poll(() => page.evaluate(() => Math.abs(Number(sessionStorage.getItem("clardentity-place:c1") ?? -99) - 120) <= 1)).toBe(true);
     await page.reload();
     await expect(page.locator(sel.composer)).toBeEditable({ timeout: 30_000 });
-    await expect.poll(() => page.locator(sel.messageList).first().evaluate((el) => el.scrollTop)).toBe(120);
+    // within a pixel: under the root zoom, scroll positions snap to device pixels
+    await expect.poll(() => page.locator(sel.messageList).first().evaluate((el) => Math.abs(el.scrollTop - 120) <= 1)).toBe(true);
     await expect(page.getByRole("button", { name: "Jump to the latest message" })).toBeVisible();
     // back at the bottom, the saved place is dropped: the next visit opens at the latest
     await page.getByRole("button", { name: "Jump to the latest message" }).tap();
@@ -433,4 +434,41 @@ test("M54 home page cards: one embossed mark each, in the empty space only; none
   // desktop width: the cards are exactly as designed, no marks
   await page.setViewportSize({ width: 1280, height: 900 });
   await expect(page.locator('[data-testid="card-emboss"]').first()).toBeHidden();
+});
+
+test("M55 phone text: drawn at 92%, smallest labels held at 12.5px on the glass @M55", async ({ page }) => {
+  await signIn(page, { messages: thread(1) });
+  await openChat(page);
+  const zoom = await page.evaluate(() => Number.parseFloat(getComputedStyle(document.documentElement).zoom));
+  expect(zoom).toBeCloseTo(0.92, 2);
+  const label = page.getByText("Was this helpful?").first();
+  await expect(label).toBeVisible();
+  const px = await label.evaluate((el) => Number.parseFloat(getComputedStyle(el).fontSize));
+  expect(px * zoom, "label size on the glass").toBeGreaterThanOrEqual(12.4);
+  expect(await horizontalOverflow(page)).toBeLessThanOrEqual(0);
+});
+
+test("M56 typing folds the mode row to a chip; the chip opens it without closing the keyboard @M56", async ({ page }) => {
+  await signIn(page, { messages: thread(1) });
+  await openChat(page);
+  const rail = page.locator(sel.modeRail);
+  const chip = page.getByTestId("mode-chip");
+  const composer = page.locator(sel.composer);
+  await expect(rail).toBeVisible();
+  await composer.tap();
+  await expect(chip).toBeVisible();
+  await expect(chip).toContainText("Finder");
+  await expect(rail).toHaveCount(0);
+  await expectTappable(chip, "mode chip");
+  await chip.tap();
+  await expect(rail).toBeVisible();
+  await expect(composer).toBeFocused(); // keyboard stays up
+  await rail.getByRole("radio", { name: "Thought coach" }).tap();
+  await expect(composer).toBeFocused();
+  await expect(chip).toContainText("Thought coach");
+  // keyboard away (focus leaves the box): the full row is back. Blurred
+  // directly - WebKit's emulation doesn't move focus on a tap on plain text.
+  await composer.evaluate((el) => (el as HTMLElement).blur());
+  await expect(rail).toBeVisible();
+  await expect(rail.getByRole("radio", { name: "Thought coach" })).toHaveAttribute("aria-checked", "true");
 });

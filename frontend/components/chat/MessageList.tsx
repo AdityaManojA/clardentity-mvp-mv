@@ -146,7 +146,9 @@ export function MessageList({
           if (!box) return;
           try {
             if (box.scrollHeight - box.scrollTop - box.clientHeight < 80) sessionStorage.removeItem(placeKey);
-            else sessionStorage.setItem(placeKey, String(Math.round(box.scrollTop)));
+            // unrounded: under the root zoom a rounded value snaps a pixel
+            // further on restore, and the place crept on every visit
+            else sessionStorage.setItem(placeKey, box.scrollTop.toFixed(2));
           } catch {
             // storage blocked: the chat simply opens at the bottom
           }
@@ -182,6 +184,9 @@ export function MessageList({
     if (saved === null || !Number.isFinite(saved)) return;
     stickToBottom.current = false;
     el.scrollTop = saved;
+    // WebKit floors scroll positions to whole device pixels under the root
+    // zoom: a restore can land a pixel short, and a pixel shorter each visit.
+    if (saved - el.scrollTop >= 0.5) el.scrollTop = saved + 1;
   }, [phone, hasMessages, placeKey, loading]);
 
   useEffect(() => () => cancelAnimationFrame(savePlace.current), []);

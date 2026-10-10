@@ -469,6 +469,25 @@
     --ui-zoom: 0.85;
     zoom: var(--ui-zoom);
   }
+  /* Touch phones draw at 92%: 85% is a desktop density, and on a phone it
+     put body text and labels at 10-12px on the glass. 92% reads clearly and
+     still fits each screen much as before. Pointer-gated with the width, so
+     a narrow desktop window keeps the desktop's 85%. */
+  @media (pointer: coarse) and (max-width: 1023.98px) {
+    :root {
+      --ui-zoom: 0.92;
+    }
+  }
+}
+
+/* The smallest labels - "Was this helpful?", times, the mode name on an
+   answer, helper lines under fields - are text-xs by design, which zoom alone
+   leaves at 11px on a phone. Held at 12.5px on the glass there. */
+@media (pointer: coarse) and (max-width: 1023.98px) {
+  .text-xs {
+    font-size: calc(12.5px / var(--ui-zoom));
+    line-height: calc(17px / var(--ui-zoom));
+  }
 }
 
 /* A finger-sized hit area on touch screens, without redrawing the control:
