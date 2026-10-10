@@ -434,6 +434,11 @@ test("M30 tapping Clardentity at the top of the menu goes home @M30", async ({ s
   await press(page, sel.openNav);
   const home = page.locator(sel.drawer).getByRole("link", { name: "Clardentity" });
   await expect(home).toHaveAttribute("href", "/");
+  // the five-dot mark sits before the name, as in the desktop sidebar
+  const mark = (await home.locator('[aria-hidden="true"]').first().boundingBox())!;
+  const link = (await home.boundingBox())!;
+  expect(mark.width).toBeGreaterThan(10);
+  expect(mark.x).toBeLessThan(link.x + 12);
   await home.tap();
   await expect(page).toHaveURL(/\/$/, { timeout: 15_000 });
   await expect(page.locator(sel.drawer)).toHaveCount(0);

@@ -844,8 +844,10 @@ export function AppShell({ children }: { children: ReactNode }) {
               <Link
                 href="/"
                 onClick={close}
-                className="tap-area -mx-1 rounded-md px-1 text-sm font-semibold tracking-tight text-ink"
+                className="tap-area -mx-1 inline-flex items-center gap-1.5 rounded-md px-1 text-sm font-semibold tracking-tight text-ink"
               >
+                {/* the five-dot mark, as the desktop sidebar draws it */}
+                <MaskIcon src="/ui/logo-dots.svg" className="h-[18px] w-[18.6px] shrink-0 text-brand" />
                 Clardentity
               </Link>
               <button
