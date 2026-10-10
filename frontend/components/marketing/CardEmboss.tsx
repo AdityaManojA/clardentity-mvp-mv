@@ -73,13 +73,14 @@ const SHAPES: Record<string, React.ReactNode> = {
       />
     </>
   ),
-  // Decision-making - weigh options: a path forking into two.
+  // Decision-making - weigh options: a dotted path forking into two
+  // options, every line stopping short of what it joins.
   decision: (
     <>
-      <path d="M50 92 V58 M50 58 L24 30 M50 58 L76 30" style={line} strokeWidth={LINE} {...round} />
+      <path d="M50 94 L50 67 M46.0 54.2 L33.6 36.0 M54.0 54.2 L66.4 36.0" style={line} strokeWidth={2.8} strokeDasharray="0.1 6" strokeLinecap="round" />
       <Spark cx={24} cy={22} r={13} w={2.4} />
       <Spark cx={76} cy={22} r={13} w={2.4} />
-      <circle cx={50} cy={58} r={3.5} style={{ fill: EDGE }} />
+      <circle cx={50} cy={60} r={3.5} style={{ fill: EDGE }} />
     </>
   ),
   // Thought Coach - a half-formed idea: half drawn, half still dotted.
@@ -110,14 +111,13 @@ const SHAPES: Record<string, React.ReactNode> = {
       <Ring cx={94} cy={80} r={2.8} w={2} />
     </>
   ),
-  // Co-Creative - made together: three circles overlapping, a spark in the
-  // space they share (after Aditya's sketch).
+  // Co-Creative - made together: two circles overlapping, a small spark
+  // where they meet.
   creative: (
     <>
-      <Ring cx={50} cy={33} r={27} />
-      <Ring cx={34} cy={60} r={27} />
-      <Ring cx={66} cy={60} r={27} />
-      <Spark cx={50} cy={51} r={9} w={2.2} />
+      <Ring cx={36} cy={50} r={26} />
+      <Ring cx={64} cy={50} r={26} />
+      <Spark cx={50} cy={50} r={7} w={2} />
     </>
   ),
   // Mentoring - guidance: a guiding star, and a path down to you.
