@@ -295,3 +295,74 @@ test.describe("routes the graph found untested", () => {
     await expect(banner).toHaveCount(0);
   });
 });
+
+test.describe("scrolling", () => {
+  const fromBottom = (page: Page) =>
+    page.locator(sel.messageList).first().evaluate((el) => el.scrollHeight - el.scrollTop - el.clientHeight);
+  // the thread opens with a smooth scroll of its own: let it land before
+  // scrolling by script (WebKit doesn't cancel a smooth scroll for a jump)
+  async function settled(page: Page) {
+    const list = page.locator(sel.messageList).first();
+    let last = -1;
+    await expect.poll(async () => {
+      const now = await list.evaluate((el) => el.scrollTop);
+      const same = now === last;
+      last = now;
+      return same;
+    }, { intervals: [250] }).toBe(true);
+    return list;
+  }
+
+  test("M48 chat: a jump-to-latest button once you've scrolled up @M48", async ({ page }) => {
+    await signIn(page, { messages: thread(8) });
+    await openChat(page);
+    const jump = page.getByRole("button", { name: "Jump to the latest message" });
+    await expect.poll(() => fromBottom(page)).toBeLessThan(80);
+    await expect(jump).toHaveCount(0);
+    const list = await settled(page);
+    await list.evaluate((el) => el.scrollTo({ top: 0, behavior: "instant" }));
+    await expect(jump).toBeVisible();
+    await expectTappable(jump, "jump to latest");
+    await jump.tap();
+    await expect.poll(() => fromBottom(page)).toBeLessThan(80);
+    await expect(jump).toHaveCount(0);
+  });
+
+  test("M49 chat: your place is kept when you come back to it @M49", async ({ page }) => {
+    await signIn(page, { messages: thread(8) });
+    await openChat(page);
+    const list = await settled(page);
+    await list.evaluate((el) => el.scrollTo({ top: 120, behavior: "instant" }));
+    await expect.poll(() => page.evaluate(() => sessionStorage.getItem("clardentity-place:c1"))).toBe("120");
+    await page.reload();
+    await expect(page.locator(sel.composer)).toBeEditable({ timeout: 30_000 });
+    await expect.poll(() => page.locator(sel.messageList).first().evaluate((el) => el.scrollTop)).toBe(120);
+    await expect(page.getByRole("button", { name: "Jump to the latest message" })).toBeVisible();
+    // back at the bottom, the saved place is dropped: the next visit opens at the latest
+    await page.getByRole("button", { name: "Jump to the latest message" }).tap();
+    await expect.poll(() => page.evaluate(() => sessionStorage.getItem("clardentity-place:c1"))).toBeNull();
+  });
+
+  test("M50 lists fade at an edge with more past it; no desktop scrollbars on a phone @M50", async ({ page, browserName }) => {
+    const recents = Array.from({ length: 24 }, (_, i) => ({ id: `r${i}`, title: `Chat number ${i + 1}`, created_at: "2026-10-01T10:00:00Z", pinned: false }));
+    await signIn(page, { messages: thread(2), handlers: { "GET /chat/conversations": () => ({ body: recents }) } });
+    await page.goto("/workspace/w1");
+    await press(page, sel.openNav);
+    const list = page.locator(sel.drawer).locator("ul.scroll-fade-y");
+    await expect(list.locator('a[href^="/chat/r"]')).toHaveCount(12, { timeout: 30_000 }) // the list shows 12 at a time;
+    await expect(list).toHaveAttribute("data-more-end", "");
+    await expect(list).not.toHaveAttribute("data-more-start", "");
+    expect(await list.evaluate((el) => getComputedStyle(el).maskImage || getComputedStyle(el).webkitMaskImage)).toContain("gradient");
+    await list.evaluate((el) => el.scrollTo({ top: el.scrollHeight, behavior: "instant" }));
+    await expect(list).toHaveAttribute("data-more-start", "");
+    await expect(list).not.toHaveAttribute("data-more-end", "");
+
+    // the mode rail in a chat runs past the screen: its far edge fades
+    await page.locator(sel.closeNav).first().tap();
+    await openChat(page);
+    await expect(page.locator(sel.modeRail)).toHaveAttribute("data-more-end", "");
+    // the phone's own scrollbar (an overlay), not a styled 8px bar taking width
+    if (browserName === "chromium")
+      expect(await page.locator(sel.messageList).first().evaluate((el) => (el as HTMLElement).offsetWidth - el.clientWidth)).toBe(0);
+  });
+});

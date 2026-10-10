@@ -841,17 +841,49 @@ textarea[data-tour="composer-input"]:focus-visible {
   display: none;
 }
 
-/* Restrained scrollbars - the sidebar and evidence panels use these a lot. */
-.scroll-slim::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+/* Restrained scrollbars - the sidebar and evidence panels use these a lot.
+   Not on a touch phone: a styled scrollbar there is a permanent 8px bar that
+   takes width from the content, where the phone's own is a thin indicator
+   that shows while you scroll and fades. */
+@media (min-width: 1024px), (pointer: fine), (pointer: none) {
+  .scroll-slim::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .scroll-slim::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 999px;
+  }
+  .scroll-slim::-webkit-scrollbar-track {
+    background: transparent;
+  }
 }
-.scroll-slim::-webkit-scrollbar-thumb {
-  background: var(--border-strong);
-  border-radius: 999px;
-}
-.scroll-slim::-webkit-scrollbar-track {
-  background: transparent;
+
+/* Edge fades on phone scroll boxes: an edge with more past it fades out, so a
+   list that runs off the screen says so. The data-more-* attributes come from
+   lib/useScrollEdges; an edge with nothing past it stays sharp. */
+@media (max-width: 1023.98px) {
+  .scroll-fade-y,
+  .scroll-fade-x {
+    --fade-start: 0px;
+    --fade-end: 0px;
+  }
+  .scroll-fade-y {
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--fade-start), #000 calc(100% - var(--fade-end)), transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0, #000 var(--fade-start), #000 calc(100% - var(--fade-end)), transparent 100%);
+  }
+  .scroll-fade-x {
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 var(--fade-start), #000 calc(100% - var(--fade-end)), transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0, #000 var(--fade-start), #000 calc(100% - var(--fade-end)), transparent 100%);
+  }
+  .scroll-fade-y[data-more-start],
+  .scroll-fade-x[data-more-start] {
+    --fade-start: 28px;
+  }
+  .scroll-fade-y[data-more-end],
+  .scroll-fade-x[data-more-end] {
+    --fade-end: 28px;
+  }
 }
 
 /* ---------------------------------------------------------------------------

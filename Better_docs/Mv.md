@@ -63,13 +63,14 @@ Status key: ✅ Done · 🔄 Built, waiting on a setup step · 🔍 Built, needs
 | ✅ | M32–M36: Error screens - one broken answer, page, whole app, recent chats, question card |
 | ✅ | M37–M44: Menu holds the page still, draft kept, named progress, no field zoom, phone edges, chat icon tap sizes, paid limit, feedback |
 | ✅ | M45–M47: Welcome questions, Privacy and Terms pages, cookie banner on a first visit |
+| ✅ | M48–M50: Jump to latest, place kept in a chat, list edge fades and phone scrollbars |
 | ✅ | Whole mobile suite: 125 passed on both phone profiles (1 skipped by design) |
 | ✅ | Stress run: the whole mobile suite repeated 10× on a production build with 6 parallel browsers and no retries - every repeat-flake traced and fixed (1,248 passed, then the last one fixed and re-checked 40/40) |
 | ✅ | Load test: 500 phones at once on the production build - 0 errors, every page a 200 |
 | ✅ | Fixed from stress testing: scrolling up just as an answer finished could be ignored, then the next message yanked you to the bottom |
 | ✅ | Fixed from code review: the inline "opinion" tag in answers was being blown up to a 44px box mid-sentence on phones; it keeps its size with an invisible 44px tap area |
 | 🔄 | Live tests against the real backend: built and skipping cleanly; waiting on the test accounts and secrets |
-| 🔄 | Screenshot comparison of 5 key screens: built; waiting on the first baseline run in CI |
+| ✅ | Screenshot comparison of 5 key screens on both phones: baselines generated in CI and reviewed; compared on every pull request |
 | ✅ | M24: "Did you mean" card: ask it reworded or keep your wording; never asked twice |
 | ✅ | M25: Clarifying options: tap an option, type your own (keyboard up), or skip; 7 long options all reachable |
 | ✅ | M26: "Why do you ask?" card: answer with the keyboard up, a fresh second round, skip |
@@ -101,6 +102,11 @@ Status key: ✅ Done · 🔄 Built, waiting on a setup step · 🔍 Built, needs
 | ✅ | Recent chats in the menu: rows and the ⋮ button 36px on phones (were 27px and 24px); desktop unchanged |
 | ✅ | Question cards: easier-to-tap buttons (same look), answer options 36px rows, upgrade dialog close button |
 | ✅ | Outdated code comment about phone scaling fixed |
+| ✅ | Chat: a "jump to latest" button appears once you've scrolled more than a screen up |
+| ✅ | Chat: coming back to a chat opens where you left off (per chat, for the session); back at the bottom, it opens at the latest again |
+| ✅ | Chat: following a streaming answer is smoother (one scroll per frame instead of one per word) |
+| ✅ | Phones use their own thin, auto-hiding scrollbars instead of the desktop's permanent 8px bar |
+| ✅ | Recent chats, the mode row and the thread pills fade at an edge when there's more to scroll |
 
 ## 4. Mobile production readiness
 
@@ -264,7 +270,7 @@ Regression: if a test fails, fix it, then rerun it, its upstream T-test and the 
 |:---:|---|
 | ⬜ | Create two test accounts on the environment to test: an ordinary one and one on the backend's admin list. Sign each in once and finish the welcome questions |
 | ⬜ | Add repository secrets: `E2E_LIVE_BASE_URL`, `E2E_LIVE_API_URL`, `E2E_USER_EMAIL`, `E2E_USER_PASSWORD`, `E2E_ADMIN_EMAIL`, `E2E_ADMIN_PASSWORD`, and optionally `E2E_CAROUSEL_CHAT` (a chat answered in 2+ modes) |
-| ⬜ | Make "E2E / playwright" a required check: Settings → Branches → `main` → Require status checks |
-| ⬜ | If `main` is protected, allow GitHub Actions to push (bypass), or the sync's direct push will be refused |
-| ⬜ | Run "E2E visual baselines" once from the Actions tab, then review the committed screenshots |
+| ✅ | "E2E / playwright" as a required check: decided against for now - work is pushed straight to the fork's `main`, and a required check would refuse those pushes (it only gates pull requests). The suite still runs on every PR |
+| ✅ | Not needed: the fork's `main` has no branch protection or rulesets, so the sync can push |
+| ✅ | "E2E visual baselines" run on `main`; all 10 screenshots reviewed (the first run's misplaced masks were fixed first) |
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 import { COGNITIVE_MODES, type CognitiveMode } from "@/lib/modes";
 import { useLockedModes } from "@/lib/previewAccess";
@@ -8,6 +8,7 @@ import { companionLabel, useCompanionNames } from "@/lib/companionNames";
 import { MaskIcon } from "@/components/ui/MaskIcon";
 import { rectScale } from "@/lib/uiScale";
 import { cx } from "@/components/ui/primitives";
+import { useScrollEdges } from "@/lib/useScrollEdges";
 
 export { COGNITIVE_MODES };
 export type { CognitiveMode };
@@ -45,6 +46,15 @@ export function ModeSelector({
   const accountLocks = useLockedModes();
   const lockedModes = lockedOverride ?? accountLocks;
   const stripRef = useRef<HTMLDivElement>(null);
+  // on a phone the rail scrolls; its edges fade where more companions are
+  const fadeEdges = useScrollEdges("x");
+  const setStrip = useCallback(
+    (el: HTMLDivElement | null) => {
+      stripRef.current = el;
+      return fadeEdges(el);
+    },
+    [fadeEdges],
+  );
   const selectedRef = useRef<HTMLButtonElement>(null);
 
   // The row scrolls, so at 320px the fourth pill sits past the right edge -
@@ -125,7 +135,7 @@ export function ModeSelector({
     // onto its own line, or off the edge entirely.
     <div className="flex w-full min-w-0 flex-col gap-1.5">
       <div
-        ref={stripRef}
+        ref={setStrip}
         role="radiogroup"
         aria-label="Cognitive mode"
         data-tour="mode-picker"
@@ -133,7 +143,7 @@ export function ModeSelector({
         // the composer below, each a 20px mark above a 16px name. Below that
         // width it scrolls rather than wrapping into a ragged second row -
         // every companion stays one tap away and the rail keeps its shape.
-        className="scroll-slim flex w-full max-w-full items-stretch justify-between gap-1 overflow-x-auto"
+        className="scroll-slim scroll-fade-x flex w-full max-w-full items-stretch justify-between gap-1 overflow-x-auto"
       >
         {COGNITIVE_MODES.map((mode) => {
           const selected = value === mode.value;

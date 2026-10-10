@@ -35,6 +35,7 @@ import { companionLabel, useCompanionNames } from "@/lib/companionNames";
 import { cx } from "@/components/ui/primitives";
 import { useOnline } from "@/lib/useOnline";
 import { usePhoneLayout } from "@/lib/usePhoneLayout";
+import { useScrollEdges } from "@/lib/useScrollEdges";
 import {
   AvatarPanel,
   type AvatarExpression,
@@ -188,6 +189,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
   // typed and the bubble drawn. On the phone layout the composer keeps the
   // draft and waits; desktop behaves as it always has.
   const phoneLayout = usePhoneLayout();
+  const fadePillEdges = useScrollEdges("x");
   useEffect(() => {
     if (!phoneLayout) return;
     try {
@@ -1028,7 +1030,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
             that said what it would do but never which modes were in play. */}
         {multiMode && (
           <div className="flex shrink-0 justify-center pt-[37px] pb-4">
-            <div className="scroll-slim flex max-w-full items-center gap-1 overflow-x-auto">
+            <div ref={fadePillEdges} className="scroll-slim scroll-fade-x flex max-w-full items-center gap-1 overflow-x-auto">
               <ThreadPill
                 selected={!carousel}
                 onClick={() => setCarousel(false)}
