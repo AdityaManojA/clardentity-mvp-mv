@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 100" width="140" height="100" fill="none">
+  <!-- Clardentity card mark: Reflect & Relieve. Drawn in currentColor - set color (or stroke/fill) to recolour. -->
+  <path d="M20 30 Q23 46 36 50 Q23 54 20 70 Q17 54 4 50 Q17 46 20 30Z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" />
+  <circle cx="49" cy="50" r="2.4" fill="currentColor" />
+  <circle cx="62" cy="50" r="2.4" fill="currentColor" />
+  <circle cx="75" cy="50" r="2.4" fill="currentColor" />
+  <circle cx="88" cy="50" r="2.4" fill="currentColor" />
+  <path d="M120.0 33.0 L124.7 45.5 L138.1 46.1 L127.6 54.5 L131.2 67.4 L120.0 60.0 L108.8 67.4 L112.4 54.5 L101.9 46.1 L115.3 45.5Z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" />
+</svg>

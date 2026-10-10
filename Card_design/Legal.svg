@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" fill="none">
+  <!-- Clardentity card mark: Legal. Drawn in currentColor - set color (or stroke/fill) to recolour. -->
+  <path d="M50 14 V86 M30 86 H70 M18 30 H82" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" />
+  <path d="M18 30 L8 56 H28 Z M82 30 L72 56 H92 Z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" />
+  <path d="M50 6 C50.64 12.879999999999999 51.12 13.36 54.4 14 C51.12 14.64 50.64 15.120000000000001 50 22 C49.36 15.120000000000001 48.88 14.64 45.6 14 C48.88 13.36 49.36 12.879999999999999 50 6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+</svg>
