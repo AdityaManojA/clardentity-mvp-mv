@@ -19,7 +19,7 @@ export function ThemeToggle({ className, tourId }: { className?: string; tourId?
       title="Toggle light and dark theme"
       aria-label="Toggle light and dark theme"
       className={cx(
-        "rounded-md p-1.5 text-ink-muted transition-colors hover:bg-surface-hover hover:text-ink",
+        "tap-target inline-flex items-center justify-center rounded-md p-1.5 text-ink-muted transition-colors hover:bg-surface-hover hover:text-ink",
         className,
       )}
     >

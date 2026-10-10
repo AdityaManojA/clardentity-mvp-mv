@@ -59,7 +59,12 @@ export function Reveal({
       // Fires a little before the element's top edge arrives, so the motion
       // is finishing as it reaches a comfortable reading position rather
       // than starting there.
-      { threshold: 0.08, rootMargin: "0px 0px -8% 0px" },
+      // On the phone layout, later - a fifth of the way up the screen - so
+      // it plays where it's being looked at instead of at the very edge.
+      {
+        threshold: 0.08,
+        rootMargin: window.matchMedia("(max-width: 1023.98px)").matches ? "0px 0px -20% 0px" : "0px 0px -8% 0px",
+      },
     );
     observer.observe(node);
     return () => observer.disconnect();

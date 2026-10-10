@@ -54,11 +54,11 @@ export function SettingsView() {
             description="See what each plan opens, or install Clardentity as an app."
             action={
               <>
-                <InstallAppButton className="flex h-[42px] items-center rounded-[34px] border border-hairline-strong px-[21px] text-sm leading-[normal] text-ink transition-colors hover:bg-surface-hover" />
+                <InstallAppButton className="tap-area flex h-[42px] items-center rounded-[34px] border border-hairline-strong px-[21px] text-sm leading-[normal] text-ink transition-colors hover:bg-surface-hover" />
                 <button
                   type="button"
                   onClick={() => setPlansOpen(true)}
-                  className="flex h-[42px] items-center rounded-[34px] bg-brand px-[21px] text-sm leading-[normal] text-white transition-colors hover:bg-brand-dark"
+                  className="tap-area flex h-[42px] items-center rounded-[34px] bg-brand px-[21px] text-sm leading-[normal] text-white transition-colors hover:bg-brand-dark"
                 >
                   See plans
                 </button>

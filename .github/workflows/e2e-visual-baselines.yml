@@ -1,0 +1,56 @@
+# Regenerates the @visual screenshot baselines inside the same Playwright
+# image the E2E workflow compares them in, and commits them to the branch it
+# was run on. Run it by hand (Actions > E2E visual baselines > Run workflow)
+# after an intended layout change, then review the committed PNGs in the PR
+# diff before merging - that review is the approval.
+name: E2E visual baselines
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: e2e-baselines-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.0-noble
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      CI: "true"
+      HOME: /root
+      E2E_VISUAL: "1"
+    steps:
+      # git first, so checkout makes a real clone the commit step can push from
+      - name: Install git
+        working-directory: /
+        run: (command -v git >/dev/null) || (apt-get update -qq && apt-get install -y -qq git)
+
+      - uses: actions/checkout@v4
+
+      - run: npm ci
+
+      - name: Capture baselines
+        run: npx playwright test --project=mobile-chrome --project=mobile-safari --grep @visual --update-snapshots=all
+
+      - name: Commit baselines
+        working-directory: .
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config user.name "Aditya Manoj"
+          git config user.email "130238815+AdityaManojA@users.noreply.github.com"
+          git add frontend/e2e/visual.spec.ts-snapshots
+          if git diff --cached --quiet; then
+            echo "Baselines unchanged."
+          else
+            git commit -m "Update E2E visual baselines"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi

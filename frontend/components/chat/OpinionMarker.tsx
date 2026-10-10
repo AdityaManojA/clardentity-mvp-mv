@@ -16,8 +16,9 @@ export function OpinionMarker() {
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
+        data-inline
         aria-label="Stated as an opinion - Clardentity's own view, not a sourced fact"
-        className="mx-0.5 rounded border border-hairline-strong bg-surface-muted px-1 align-super text-xs font-semibold uppercase tracking-wide text-ink-secondary transition-colors hover:border-brand-border hover:text-ink"
+        className="tap-area mx-0.5 rounded border border-hairline-strong bg-surface-muted px-1 align-super text-xs font-semibold uppercase tracking-wide text-ink-secondary transition-colors hover:border-brand-border hover:text-ink"
       >
         opinion
       </button>

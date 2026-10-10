@@ -83,7 +83,7 @@ export function ModeSwitchToast({
       <button
         type="button"
         onClick={onRevert}
-        className="shrink-0 rounded-lg border border-brand-border bg-surface px-2.5 py-1 text-xs font-medium text-brand transition-colors hover:bg-surface-hover"
+        className="tap-area shrink-0 rounded-lg border border-brand-border bg-surface px-2.5 py-1 text-xs font-medium text-brand transition-colors hover:bg-surface-hover"
       >
         Stay in {from}
       </button>

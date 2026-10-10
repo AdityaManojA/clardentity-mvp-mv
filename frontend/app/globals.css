@@ -447,10 +447,63 @@
    keep --ui-zoom at 0.85, which only --app-vh reads, and every full-height
    page would grow a sixth of a screen of scroll for nothing. Without the
    property, the app simply stays at full size. */
+/* Muted text on the phone layout, held at WCAG AA (4.5:1) against every
+   surface it sits on, in every accent and both themes. The drawn values are
+   2.8-4.4:1 - the hint and helper copy were the faintest text on the page and
+   the hardest to read on a phone in daylight. Same hue, only as much darker
+   (or lighter, in dark mode) as AA needs. Desktop keeps the drawn values. */
+@media (max-width: 1023.98px) {
+  :root { --text-muted: #776b6f; }
+  :root[data-theme="dark"],
+  [data-theme="dark"] { --text-muted: #928488; }
+  :root[data-accent="indigo"]:not([data-theme="dark"]) { --text-muted: #6a6d7f; }
+  :root[data-accent="indigo"][data-theme="dark"] { --text-muted: #858793; }
+  :root[data-accent="teal"]:not([data-theme="dark"]) { --text-muted: #5d7373; }
+  :root[data-accent="teal"][data-theme="dark"] { --text-muted: #859393; }
+  :root[data-accent="plum"]:not([data-theme="dark"]) { --text-muted: #77697d; }
+  :root[data-accent="plum"][data-theme="dark"] { --text-muted: #908a96; }
+}
+
 @supports (zoom: 1) {
   :root {
     --ui-zoom: 0.85;
     zoom: var(--ui-zoom);
+  }
+}
+
+/* A finger-sized hit area on touch screens, without redrawing the control:
+   the icon and label stay the size the design draws them, and only the box
+   you can tap grows. 44px is measured on the glass, so it is divided by the
+   root zoom - 44 CSS pixels under the 85% zoom would be a 37px target, the
+   same shortfall this exists to fix. Mice and trackpads keep the drawn size. */
+/* The same 44px, for a control whose drawn size must not change at all - a
+   filled or outlined button, where a bigger box would be a bigger button.
+   The reach is an invisible ::after centred on it, so the button looks as
+   drawn and a finger landing just outside its edge still presses it. */
+/* Phone layout only: a touch screen below the lg breakpoint, where the app is
+   in its drawer layout. Desktop - touchscreen laptops included - keeps the
+   design exactly as drawn. Same condition as the phone-touch: variant. */
+@custom-variant phone-touch (@media (pointer: coarse) and (max-width: 1023.98px));
+
+@utility tap-area {
+  @media (pointer: coarse) and (max-width: 1023.98px) {
+    position: relative;
+    &::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: max(100%, calc(44px / var(--ui-zoom)));
+      height: max(100%, calc(44px / var(--ui-zoom)));
+      transform: translate(-50%, -50%);
+    }
+  }
+}
+
+@utility tap-target {
+  @media (pointer: coarse) and (max-width: 1023.98px) {
+    min-width: calc(44px / var(--ui-zoom));
+    min-height: calc(44px / var(--ui-zoom));
   }
 }
 
@@ -488,6 +541,110 @@ body {
 .landing-reveal[data-visible="true"] {
   opacity: 1;
   transform: none;
+}
+
+/* Phone layout: slower and longer, so the motion is seen rather than
+   finished before the eye arrives. On a phone a section is fully on screen
+   almost as soon as it enters, and the desktop timing played out as a blink.
+   Further to rise, a beat more between siblings, and (Reveal.tsx) a later
+   trigger. Reduced motion keeps the block at the bottom of this section. */
+@media (max-width: 1023.98px) and (prefers-reduced-motion: no-preference) {
+  .landing-reveal {
+    transform: translateY(36px);
+    transition-duration: 1.1s;
+    transition-delay: calc(var(--reveal-delay, 0ms) * 1.6 + 80ms);
+  }
+}
+
+/* Phone layout: the edges of the device.
+   viewport-fit=cover (app/layout.tsx) lets the page reach under the notch and
+   the home indicator - which an installed app with black-translucent status
+   bar does anyway - so the bars that sit at those edges pad themselves by the
+   safe-area insets. env() is measured on the glass, hence the zoom divide.
+   Unlayered on purpose: these must beat the height/padding utilities. */
+@media (max-width: 1023.98px) {
+  [data-safe~="top"] {
+    padding-top: calc(env(safe-area-inset-top) / var(--ui-zoom));
+    height: calc(var(--topbar-height) + env(safe-area-inset-top) / var(--ui-zoom));
+  }
+  /* Small text fields: iOS zooms the whole page into any field whose text is
+     under 16px, and the 85% zoom draws text-sm fields at 13.6px. Drawn at
+     16px on the glass instead, so tapping a field never zooms the page. */
+  input.text-sm,
+  textarea.text-sm,
+  select.text-sm,
+  input.text-xs,
+  textarea.text-xs {
+    font-size: calc(16px / var(--ui-zoom));
+  }
+  /* The thread and the page scroll themselves; reaching the end of either
+     shouldn't bounce or drag the whole page with it. */
+  main,
+  [data-testid="message-list"] {
+    overscroll-behavior-y: contain;
+  }
+}
+@media (max-width: 639.98px) {
+  [data-safe~="bottom"] {
+    padding-bottom: calc(0.75rem + env(safe-area-inset-bottom) / var(--ui-zoom));
+  }
+}
+/* Chat icon buttons - attach, mic, call, send, copy, regenerate, delete,
+   helpful/not, the version arrows - are drawn at 16-24px. On a touch phone
+   each gets a 44px box (screen pixels), icon unchanged and centred in it;
+   the rows space out a little. Only min sizes: display is left alone, so
+   anything a utility hides stays hidden. Buttons that sit inside the text
+   (data-inline: the opinion marker) keep their size and use tap-area. */
+@media (pointer: coarse) and (max-width: 1023.98px) {
+  [data-testid="message"] button[aria-label]:not([data-inline]),
+  [data-composer] button[aria-label] {
+    min-width: calc(44px / var(--ui-zoom));
+    min-height: calc(44px / var(--ui-zoom));
+  }
+  [data-testid="message"] button[aria-label]:not([data-inline]) > svg,
+  [data-composer] button[aria-label] > svg {
+    margin-inline: auto;
+  }
+}
+
+/* A tap is a tap: no double-tap-to-zoom wait on anything you can press. In
+   the base layer, so a component's own touch-action (the drawer's pan-y, the
+   mode rail) still wins over it. */
+@layer base {
+  @media (max-width: 1023.98px) {
+    a,
+    button,
+    label,
+    input,
+    select,
+    textarea,
+    [role="button"],
+    [role="radio"],
+    [role="menuitem"] {
+      touch-action: manipulation;
+    }
+  }
+}
+
+/* Lists on the phone layout (workspaces, recent chats, search results,
+   attachments) rise in one after another instead of all landing at once:
+   --i is the item's index, 80ms apart, capped so a long list doesn't make
+   the tenth row wait. */
+@keyframes phone-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (max-width: 1023.98px) and (prefers-reduced-motion: no-preference) {
+  .phone-rise {
+    animation: phone-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(min(var(--i, 0), 10) * 80ms);
+  }
 }
 
 /* Cards lift on hover. 6px and a shadow that matches the plum in the

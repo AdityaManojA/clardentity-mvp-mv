@@ -39,3 +39,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+# visual baselines come from the CI image only (-linux); never commit local ones
+/e2e/visual.spec.ts-snapshots/*-win32.png
+/e2e/visual.spec.ts-snapshots/*-darwin.png

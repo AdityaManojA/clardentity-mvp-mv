@@ -117,11 +117,13 @@ export function AccountMenu({ onNavigate }: { onNavigate?: () => void }) {
             className={item}
             onClick={() => {
               setOpen(false);
+              // Only sign out; RequireAuth (which this menu always sits
+              // inside) sees the user go and replaces the page with /login -
+              // replace, so Back does not return to the shell. Navigating
+              // here as well issued a second identical replace() in the same
+              // tick, which the router could drop: signed out, but left on a
+              // spinner at the old URL.
               logout();
-              // replace, so Back after signing out does not return to the app
-              // shell with no session behind it - which only bounces straight
-              // here again.
-              router.replace("/login");
             }}
           >
             <LeaveIcon />
@@ -136,7 +138,7 @@ export function AccountMenu({ onNavigate }: { onNavigate?: () => void }) {
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full min-w-0 items-center gap-2.5 rounded-lg p-1 text-left transition-colors hover:bg-surface-hover"
+        className="tap-target flex w-full min-w-0 items-center gap-2.5 rounded-lg p-1 text-left transition-colors hover:bg-surface-hover"
       >
         <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand text-sm font-medium text-white">
           {initial}

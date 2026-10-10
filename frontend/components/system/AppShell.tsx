@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { ErrorBoundary } from "@/components/system/ErrorBoundaries";
 import { AppNotices } from "@/components/system/AppNotices";
+import { OfflineNotice } from "@/components/system/OfflineNotice";
 import { usePathname, useRouter } from "next/navigation";
 import {
   useCallback,
@@ -9,6 +11,7 @@ import {
   useRef,
   useState,
   useSyncExternalStore,
+  type PointerEvent as ReactPointerEvent,
   type ReactNode,
 } from "react";
 import { apiFetch } from "@/lib/apiClient";
@@ -17,6 +20,7 @@ import { ThemeToggle } from "@/components/system/ThemeToggle";
 import { ChatRowMenu } from "@/components/chat/ChatRowMenu";
 import { rememberWorkspace } from "@/lib/lastWorkspace";
 import { startTour, type TourId } from "@/lib/tour";
+import { rectScale } from "@/lib/uiScale";
 import { MaskIcon } from "@/components/ui/MaskIcon";
 import { AccountMenu } from "@/components/system/AccountMenu";
 import { cx } from "@/components/ui/primitives";
@@ -168,8 +172,8 @@ function RecentConversations({
         Recents
       </p>
       <ul className="scroll-slim min-h-0 flex-1 overflow-y-auto">
-        {items.map((c) => (
-          <li key={c.id} className="group/recent flex items-center">
+        {items.map((c, i) => (
+          <li key={c.id} className="phone-rise group/recent flex items-center" style={{ "--i": i } as React.CSSProperties}>
             {/* 32px row, 9px radius, a 12px ring and a 20px title - the
                 design's shape. The ring is what gives the list its rhythm
                 against the 48px rows above it. */}
@@ -178,7 +182,10 @@ function RecentConversations({
               onClick={onNavigate}
               aria-current={c.id === activeId ? "page" : undefined}
               className={cx(
-                "flex h-8 min-w-0 flex-1 items-center gap-5 truncate rounded-[9px] pl-4 pr-1.5 text-sm transition-colors",
+                // 36px on a touch screen (measured on the glass, hence the
+                // zoom divide): the drawn 32px row is 27px under the 85% zoom,
+                // half a fingertip, in a list where a miss opens the wrong chat.
+                "flex h-8 min-w-0 flex-1 items-center gap-5 truncate rounded-[9px] pl-4 pr-1.5 text-sm transition-colors phone-touch:h-[calc(36px/var(--ui-zoom))]",
                 c.id === activeId
                   ? "bg-[var(--surface-hover)] font-medium text-ink"
                   : "text-[color:var(--text-nav)] hover:bg-surface-hover hover:text-ink",
@@ -244,7 +251,7 @@ function NavItem({
       onClick={onNavigate}
       aria-current={active ? "page" : undefined}
       className={cx(
-        "flex h-12 items-center gap-3 rounded-[9px] px-4 text-sm transition-colors",
+        "tap-target flex h-12 items-center gap-3 rounded-[9px] px-4 text-sm transition-colors",
         active
           ? "bg-[var(--surface-hover)] font-medium text-ink"
           : "text-[color:var(--text-nav)] hover:bg-surface-hover hover:text-ink",
@@ -296,7 +303,7 @@ function WorkspaceSwitcher({
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="menu"
         aria-expanded={open}
-        className="flex w-full items-center gap-2.5 rounded-lg border border-hairline bg-surface px-2.5 py-2 text-left transition-colors hover:bg-surface-hover"
+        className="tap-target flex w-full items-center gap-2.5 rounded-lg border border-hairline bg-surface px-2.5 py-2 text-left transition-colors hover:bg-surface-hover"
       >
         <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-brand text-xs font-semibold text-white">
           {(active?.name ?? "W").slice(0, 1).toUpperCase()}
@@ -384,7 +391,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   // page itself must not be shown behind the drawer.
   useEffect(() => {
     function onOpen() {
-      setMobileOpen(true);
+      openDrawer();
       setSidebarCollapsed(false);
     }
     function onClose() {
@@ -472,7 +479,149 @@ export function AppShell({ children }: { children: ReactNode }) {
   // Bumped after a conversation is created or deleted here, so the recents
   // list refetches without the sidebar owning the list itself.
   const [recentsKey, setRecentsKey] = useState(0);
-  const close = () => setMobileOpen(false);
+
+  /* The drawer is a modal on a phone, so it behaves like one: it owns focus
+     while open, Escape closes it, and the phone's Back button closes it
+     rather than leaving the page under it. Back needs a history entry to
+     consume, so opening pushes one (same URL, the router's own state copied
+     so it restores the page untouched). */
+  const drawerRef = useRef<HTMLElement>(null);
+  const openNavRef = useRef<HTMLButtonElement>(null);
+  const drawerEntry = useRef(false);
+
+  // Closed by navigating somewhere from inside it: the link pushes on top of
+  // the drawer's entry, which is skipped on the way back (below).
+  const close = () => {
+    drawerEntry.current = false;
+    setMobileOpen(false);
+  };
+  // Closed in place (X, backdrop, Escape): spend the entry, and let the
+  // popstate close it, so Back afterwards goes where it would have anyway.
+  const dismiss = useCallback(() => {
+    if (drawerEntry.current) window.history.back();
+    else setMobileOpen(false);
+  }, []);
+
+  /* Swipe to close: the drawer follows a finger dragged left and closes past
+     40% of its width or on a quick flick; anything shorter springs back.
+     Close only - no edge-swipe to open, because a swipe in from the left edge
+     is iOS Safari's own Back gesture and the two would fight. A drag can
+     start anywhere, links included: once it's sideways the pointer is
+     captured, so the link under the finger never receives a click. */
+  const [dragX, setDragX] = useState(0); // layout px, 0 = fully open
+  const [dragWidth, setDragWidth] = useState(1); // drawer width at drag start, layout px
+  const [dragging, setDragging] = useState(false);
+  const drag = useRef<{ x: number; y: number; t: number; axis: "x" | "y" | null } | null>(null);
+  function openDrawer() {
+    setDragX(0); // a swipe-close leaves the drawer parked off-screen
+    setMobileOpen(true);
+  }
+  const drawerWidth = () => (drawerRef.current?.getBoundingClientRect().width ?? 0) / rectScale();
+
+  function onDrawerPointerDown(e: ReactPointerEvent<HTMLElement>) {
+    if (e.pointerType === "mouse") return; // a mouse has the X and the backdrop
+    drag.current = { x: e.clientX, y: e.clientY, t: e.timeStamp, axis: null };
+  }
+  function onDrawerPointerMove(e: ReactPointerEvent<HTMLElement>) {
+    const d = drag.current;
+    if (!d) return;
+    const mx = e.clientX - d.x;
+    const my = e.clientY - d.y;
+    if (d.axis === null) {
+      if (Math.abs(mx) < 8 && Math.abs(my) < 8) return;
+      // Up/down stays a scroll of the menu; only a sideways start is a swipe.
+      d.axis = Math.abs(mx) > Math.abs(my) ? "x" : "y";
+      if (d.axis === "x") {
+        setDragging(true);
+        setDragWidth(drawerWidth() || 1);
+        try {
+          e.currentTarget.setPointerCapture(e.pointerId);
+        } catch {
+          // a pointer the browser no longer tracks; the drag still works
+        }
+      }
+    }
+    if (d.axis !== "x") return;
+    // clientX is screen pixels; the transform is in the zoomed layout's.
+    setDragX(Math.min(0, mx) / rectScale());
+  }
+  function onDrawerPointerEnd(e: ReactPointerEvent<HTMLElement>, cancelled = false) {
+    const d = drag.current;
+    drag.current = null;
+    if (!d || d.axis !== "x") return;
+    setDragging(false);
+    const travelled = Math.min(0, e.clientX - d.x) / rectScale();
+    const speed = travelled / Math.max(1, e.timeStamp - d.t); // layout px per ms
+    if (!cancelled && (-travelled > drawerWidth() * 0.4 || speed < -0.6)) {
+      setDragX(-drawerWidth()); // finish the slide, then close
+      setTimeout(dismiss, 180);
+    } else {
+      setDragX(0);
+    }
+  }
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    if (!drawerEntry.current) {
+      window.history.pushState({ ...window.history.state, clardentityDrawer: true }, "");
+      drawerEntry.current = true;
+    }
+    function onPop() {
+      drawerEntry.current = false;
+      setMobileOpen(false);
+    }
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, [mobileOpen]);
+
+  // An entry left behind by a drawer that closed by navigating is the same
+  // page twice; Back steps over it instead of appearing to do nothing.
+  useEffect(() => {
+    function onPop() {
+      if (window.history.state?.clardentityDrawer && !drawerEntry.current) window.history.back();
+    }
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const drawer = drawerRef.current;
+    const opener = openNavRef.current;
+    drawer?.querySelector<HTMLElement>('button[aria-label="Close navigation"]')?.focus();
+    function onKey(e: KeyboardEvent) {
+      if (!drawer) return;
+      if (e.key === "Escape") {
+        // An open menu inside the drawer (workspaces, account) closes first.
+        if (drawer.querySelector('[aria-expanded="true"]')) return;
+        e.preventDefault();
+        dismiss();
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const items = [
+        ...drawer.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      ].filter((el) => el.offsetParent !== null);
+      if (items.length === 0) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      const inside = drawer.contains(document.activeElement);
+      if (e.shiftKey && (!inside || document.activeElement === first)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (!inside || document.activeElement === last)) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      opener?.focus();
+    };
+  }, [mobileOpen, dismiss]);
 
   // A chat names itself after its first answer (see ChatView's final
   // handler): refresh the recents list and, if it's the one in view, the
@@ -533,7 +682,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           void startConversation();
         }}
         disabled={starting}
-        className="mt-3 flex h-12 items-center gap-3 rounded-[9px] px-4 text-left text-sm text-[color:var(--text-nav)] transition-colors hover:bg-surface-hover hover:text-ink disabled:opacity-50"
+        className="tap-target mt-3 flex h-12 items-center gap-3 rounded-[9px] px-4 text-left text-sm text-[color:var(--text-nav)] transition-colors hover:bg-surface-hover hover:text-ink disabled:opacity-50"
       >
         <MaskIcon src="/ui/nav-newchat.svg" size={24} />
         {starting ? "Starting…" : "New chat"}
@@ -580,13 +729,15 @@ export function AppShell({ children }: { children: ReactNode }) {
         )}
       </div>
 
-      <RecentConversations
-        workspaceId={activeWorkspaceId}
-        workspaces={workspaces}
-        activeId={conversationId}
-        refreshKey={recentsKey}
-        onNavigate={close}
-      />
+      <ErrorBoundary where="recents" label="Recent chats couldn't be shown.">
+        <RecentConversations
+          workspaceId={activeWorkspaceId}
+          workspaces={workspaces}
+          activeId={conversationId}
+          refreshKey={recentsKey}
+          onNavigate={close}
+        />
+      </ErrorBoundary>
 
     </nav>
   );
@@ -612,6 +763,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           user in. Here rather than on any one page: both are about opening
           the app, not about where you landed. */}
       <AppNotices />
+      <OfflineNotice />
       {/* Desktop sidebar. Slides out of view rather than unmounting, so
           collapsing and re-opening doesn't refetch the workspace list or lose
           the switcher's open/closed state. */}
@@ -657,18 +809,46 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="fixed inset-0 z-40 lg:hidden">
           <button
             aria-label="Close navigation"
-            onClick={close}
-            className="absolute inset-0 bg-black/40"
+            tabIndex={-1}
+            onClick={dismiss}
+            className={cx("absolute inset-0 bg-black/40", !dragging && "transition-opacity duration-200")}
+            style={{ opacity: dragX ? Math.max(0, 1 + dragX / dragWidth) : undefined }}
           />
-          <aside className="absolute inset-y-0 left-0 flex w-[var(--sidebar-width)] flex-col border-r border-hairline bg-surface-muted">
-            <div className="flex h-[var(--topbar-height)] items-center justify-between border-b border-hairline px-4">
-              <span className="text-sm font-semibold tracking-tight text-ink">
-                Clardentity
-              </span>
-              <button
+          <aside
+            ref={drawerRef}
+            data-testid="nav-drawer"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Navigation"
+            onPointerDown={onDrawerPointerDown}
+            onPointerMove={onDrawerPointerMove}
+            onPointerUp={(e) => onDrawerPointerEnd(e)}
+            onPointerCancel={(e) => onDrawerPointerEnd(e, true)}
+            className={cx(
+              // pan-y on every descendant, not just the aside: a scroll box
+              // inside (the recents list) resets touch-action, and there the
+              // browser claimed the sideways drag and cancelled the swipe.
+              "absolute inset-y-0 left-0 flex w-[var(--sidebar-width)] touch-pan-y flex-col border-r border-hairline bg-surface-muted [&_*]:touch-pan-y",
+              !dragging && "transition-transform duration-200 ease-out",
+              dragging && "select-none",
+            )}
+            style={{ transform: dragX ? `translateX(${dragX}px)` : undefined }}
+          >
+            <div data-safe="top" className="flex h-[var(--topbar-height)] items-center justify-between border-b border-hairline px-4">
+              {/* Home, as the desktop sidebar's wordmark is. close(), not
+                  dismiss(): this navigates, so the drawer's history entry is
+                  left for the Back handler to step over. */}
+              <Link
+                href="/"
                 onClick={close}
+                className="tap-area -mx-1 rounded-md px-1 text-sm font-semibold tracking-tight text-ink"
+              >
+                Clardentity
+              </Link>
+              <button
+                onClick={dismiss}
                 aria-label="Close navigation"
-                className="rounded-md p-1.5 text-ink-muted hover:bg-surface-hover"
+                className="tap-target inline-flex items-center justify-center rounded-md p-1.5 text-ink-muted hover:bg-surface-hover"
               >
                 <Icon path={icons.close} />
               </button>
@@ -685,15 +865,17 @@ export function AppShell({ children }: { children: ReactNode }) {
           !collapsed && "lg:pl-[var(--sidebar-width)]",
         )}
       >
-        <header className="z-10 flex h-[var(--topbar-height)] shrink-0 items-center gap-3 border-b border-hairline bg-surface px-4 sm:px-6">
+        <header data-safe="top" className="z-10 flex h-[var(--topbar-height)] shrink-0 items-center gap-3 border-b border-hairline bg-surface px-4 sm:px-6">
           {/* Two buttons rather than one that branches on viewport width: the
               mobile drawer and the desktop collapse are genuinely different
               controls, and inferring which one to run from a JS media query
               means the first render can pick wrong. */}
           <button
-            onClick={() => setMobileOpen(true)}
+            ref={openNavRef}
+            onClick={() => openDrawer()}
             aria-label="Open navigation"
-            className="rounded-md p-1.5 text-ink-secondary hover:bg-surface-hover lg:hidden"
+            aria-expanded={mobileOpen}
+            className="tap-target inline-flex items-center justify-center rounded-md p-1.5 text-ink-secondary hover:bg-surface-hover lg:hidden"
           >
             <Icon path={icons.menu} />
           </button>
@@ -721,7 +903,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             disabled={starting}
             aria-label="New chat"
             title="New chat"
-            className="ml-auto shrink-0 rounded-md p-1.5 text-brand transition-colors hover:bg-surface-hover disabled:opacity-50 lg:hidden"
+            className="tap-target ml-auto inline-flex shrink-0 items-center justify-center rounded-md p-1.5 text-brand transition-colors hover:bg-surface-hover disabled:opacity-50 lg:hidden"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9"
               strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="h-4 w-4">
@@ -740,7 +922,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               onClick={() => startTour(tourHere, { force: true })}
               title="Show me around this page"
               aria-label="Show me around this page"
-              className="shrink-0 rounded-md p-1.5 text-ink-muted transition-colors hover:bg-surface-hover hover:text-ink"
+              className="tap-target inline-flex shrink-0 items-center justify-center rounded-md p-1.5 text-ink-muted transition-colors hover:bg-surface-hover hover:text-ink"
             >
               <svg
                 viewBox="0 0 24 24"
@@ -760,8 +942,12 @@ export function AppShell({ children }: { children: ReactNode }) {
           )}
         </header>
 
-        <main className="scroll-slim flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto">
-          {children}
+        {/* While the phone menu is open the page under it holds still. */}
+        <main className={cx("scroll-slim flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto", mobileOpen && "max-lg:overflow-hidden")}>
+          {/* keyed by route: a page that failed gets a fresh start on the next one */}
+          <ErrorBoundary key={pathname} where="page" variant="page" label="This page didn't load.">
+            {children}
+          </ErrorBoundary>
         </main>
       </div>
 
