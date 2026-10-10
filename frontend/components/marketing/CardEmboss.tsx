@@ -59,11 +59,13 @@ const SHAPES: Record<string, React.ReactNode> = {
       <Spark cx={50} cy={50} r={17} w={2.4} />
     </>
   ),
-  // Finder - facts, fast: a north star.
+  // Finder - facts, fast: a tall star with a magnifier inside it (after
+  // Aditya's sketch - the long arm points down, the side points sit high).
   knowing: (
     <>
-      <Spark cx={50} cy={50} r={44} />
-      <circle cx={50} cy={50} r={3} style={{ fill: EDGE }} />
+      <path d="M50 4 Q54 33 78 39 Q55 46 50 96 Q45 46 22 39 Q46 33 50 4Z" style={line} strokeWidth={LINE} strokeLinejoin="round" />
+      <circle cx={48.5} cy={36} r={5.5} style={line} strokeWidth={2.2} />
+      <path d="M52.4 39.9 L56.5 44.5" style={line} strokeWidth={2.4} strokeLinecap="round" />
     </>
   ),
   // Decision-making - weigh options: a path forking into two.
@@ -83,24 +85,34 @@ const SHAPES: Record<string, React.ReactNode> = {
       <Spark cx={50} cy={50} r={15} w={2.4} />
     </>
   ),
-  // Learning - from the ground up: built up from a base to a star.
+  // Learning - from the ground up: a tree of what you know, branching from
+  // a star, 1 - 2 - 3 - 6 (after Aditya's sketch: the lines stop short of
+  // each node).
   learning: (
     <>
-      <Spark cx={50} cy={20} r={14} w={2.4} />
-      <Ring cx={38} cy={50} r={5} w={2.4} />
-      <Ring cx={62} cy={50} r={5} w={2.4} />
-      <Ring cx={26} cy={74} r={5} w={2.4} />
-      <Ring cx={50} cy={74} r={5} w={2.4} />
-      <Ring cx={74} cy={74} r={5} w={2.4} />
-      <path d="M14 90 H86" style={line} strokeWidth={2.4} strokeLinecap="round" />
+      <Spark cx={50} cy={10} r={10} w={2.4} />
+      <path d="M43.1 19.1 L37.5 26.4 M56.9 19.1 L62.5 26.4 M30.4 35.6 L19.6 49.4 M37.3 35.8 L46.7 49.2 M62.7 35.8 L53.3 49.2 M69.6 35.6 L80.4 49.4 M13.9 59.4 L7.9 75.1 M18.1 59.4 L24.1 75.1 M47.9 59.4 L41.9 75.1 M52.1 59.4 L58.1 75.1 M81.9 59.4 L75.9 75.1 M86.1 59.4 L92.1 75.1" style={line} strokeWidth={2} strokeLinecap="round" />
+      <Ring cx={34} cy={31} r={3.4} w={2.2} />
+      <Ring cx={66} cy={31} r={3.4} w={2.2} />
+      <Ring cx={16} cy={54} r={3.4} w={2.2} />
+      <Ring cx={50} cy={54} r={3.4} w={2.2} />
+      <Ring cx={84} cy={54} r={3.4} w={2.2} />
+      <Ring cx={6} cy={80} r={2.8} w={2} />
+      <Ring cx={26} cy={80} r={2.8} w={2} />
+      <Ring cx={40} cy={80} r={2.8} w={2} />
+      <Ring cx={60} cy={80} r={2.8} w={2} />
+      <Ring cx={74} cy={80} r={2.8} w={2} />
+      <Ring cx={94} cy={80} r={2.8} w={2} />
     </>
   ),
-  // Co-Creative - made together: two circles overlapping, a spark between.
+  // Co-Creative - made together: three circles overlapping, a spark in the
+  // space they share (after Aditya's sketch).
   creative: (
     <>
-      <Ring cx={36} cy={50} r={26} />
-      <Ring cx={64} cy={50} r={26} />
-      <Spark cx={50} cy={50} r={12} w={2.2} behind />
+      <Ring cx={50} cy={33} r={27} />
+      <Ring cx={34} cy={60} r={27} />
+      <Ring cx={66} cy={60} r={27} />
+      <Spark cx={50} cy={51} r={9} w={2.2} />
     </>
   ),
   // Mentoring - guidance: a guiding star, and a path down to you.
