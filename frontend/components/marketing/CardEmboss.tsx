@@ -59,13 +59,15 @@ const SHAPES: Record<string, React.ReactNode> = {
       <Spark cx={50} cy={50} r={17} w={2.4} />
     </>
   ),
-  // Finder - facts, fast: a tall star with a magnifier inside it (after
-  // Aditya's sketch - the long arm points down, the side points sit high).
+  // Finder: a tall four-point star with the ace of spades at its heart -
+  // the card that finds it (after Aditya's sketch; the ace is filled).
   knowing: (
     <>
-      <path d="M50 4 Q54 33 78 39 Q55 46 50 96 Q45 46 22 39 Q46 33 50 4Z" style={line} strokeWidth={LINE} strokeLinejoin="round" />
-      <circle cx={48.5} cy={36} r={5.5} style={line} strokeWidth={2.2} />
-      <path d="M52.4 39.9 L56.5 44.5" style={line} strokeWidth={2.4} strokeLinecap="round" />
+      <path d="M50 4 Q55 40 75 50 Q55 60 50 96 Q45 60 25 50 Q45 40 50 4Z" style={line} strokeWidth={LINE} strokeLinejoin="round" />
+      <path
+        d="M50 38 C47 43 40.5 46.5 40.5 51.5 C40.5 55.6 44.6 57.4 47.8 55.4 L46.2 62 H53.8 L52.2 55.4 C55.4 57.4 59.5 55.6 59.5 51.5 C59.5 46.5 53 43 50 38Z"
+        style={{ fill: EDGE }}
+      />
     </>
   ),
   // Decision-making - weigh options: a path forking into two.
@@ -123,12 +125,15 @@ const SHAPES: Record<string, React.ReactNode> = {
       <Ring cx={50} cy={86} r={4.5} w={2.4} />
     </>
   ),
-  // Reflect & Relieve - a calm place: still ripples.
+  // Reflect & Relieve: a spark, a few quiet steps, and a star - from a
+  // flicker of a feeling to something settled (Aditya's outline sketch).
   therapy: (
     <>
-      <Ring cx={50} cy={50} r={6} w={2.4} />
-      <Ring cx={50} cy={50} r={22} w={2.2} opacity={0.85} />
-      <Ring cx={50} cy={50} r={40} w={2} opacity={0.6} />
+      <path d="M19 30 Q22 46 35 50 Q22 54 19 70 Q16 54 3 50 Q16 46 19 30Z" style={line} strokeWidth={2.4} strokeLinejoin="round" />
+      <circle cx={42} cy={50} r={2.2} style={{ fill: EDGE }} />
+      <circle cx={50} cy={50} r={2.2} style={{ fill: EDGE }} />
+      <circle cx={58} cy={50} r={2.2} style={{ fill: EDGE }} />
+      <path d="M79.0 32.0 L84.0 45.1 L98.0 45.8 L87.1 54.6 L90.8 68.2 L79.0 60.5 L67.2 68.2 L70.9 54.6 L60.0 45.8 L74.0 45.1Z" style={line} strokeWidth={2.4} strokeLinejoin="round" />
     </>
   ),
   // Legal: balanced scales, with a small star at the top.
