@@ -8,7 +8,7 @@ but only after a person approves each sync.
 
 | Job | Permissions | What it does |
 |---|---|---|
-| `check` | `contents: read`, `actions: read` | Runs hourly (and on demand). Reads upstream's head with `git ls-remote`, which fetches no objects. If our `main` already contains that commit, or another run is already waiting for approval, it stops. |
+| `check` | `contents: read`, `actions: read` | Runs every 15 minutes (and on demand). Reads upstream's head with `git ls-remote`, which fetches no objects. If our `main` already contains that commit, or another run is already waiting for approval, it stops. |
 | `sync` | `contents: write` | Gated on the `sync-approval` environment. After approval it fetches upstream, fast-forwards or creates a merge commit, and pushes to `main`. |
 
 The script never force-pushes or resets. A merge conflict or a rejected push fails the
@@ -55,12 +55,14 @@ After merging, the sync job runs `npm run test:e2e:ci` on the merged tree, the s
 ## Limitations
 
 - **Polling, not real-time.** The fork can't receive upstream push events. Syncs are
-  detected up to about an hour late (GitHub's scheduler can also add delays). For
+  detected up to about 15 minutes late (GitHub's scheduler can also add delays). For
   real-time syncing, upstream would need a workflow that sends a `repository_dispatch`
-  to this fork using a PAT.
+  to this fork, plus a secret holding a token for it - and secrets on an organisation
+  repo need admin access there. Since every sync waits for approval anyway, 15-minute
+  polling was chosen instead.
 - **Scheduled workflows pause after 60 days without repo activity.** Re-enable them from the Actions tab.
-- **Pending approvals don't pile up.** While one run waits for review, hourly checks
+- **Pending approvals don't pile up.** While one run waits for review, the 15-minute checks
   skip. If upstream moves before you approve, the approved run syncs the newest upstream head.
-- **Rejecting a request doesn't snooze it.** The next hourly check asks again.
+- **Rejecting a request doesn't snooze it.** The next check, up to 15 minutes later, asks again.
 - **Pushes by `GITHUB_TOKEN` don't trigger other workflows** (for example CI on `main`).
   Use `SYNC_TOKEN` if you need them to.

@@ -10,7 +10,7 @@ name: Sync upstream main
 
 on:
   schedule:
-    - cron: "17 * * * *" # hourly; polling, not real-time
+    - cron: "2,17,32,47 * * * *" # every 15 min; polling, not real-time (see SYNC_UPSTREAM.md)
   workflow_dispatch:
 
 env:

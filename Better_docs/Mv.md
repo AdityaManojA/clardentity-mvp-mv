@@ -10,7 +10,7 @@ Status key: ✅ Done · 🔄 Built, waiting on a setup step · 🔍 Built, needs
 
 | Status | Task |
 |:---:|---|
-| ✅ | Hourly check for new changes on upstream `main`, plus a manual "Run now" button |
+| ✅ | Check every 15 minutes for new changes on upstream `main`, plus a manual "Run now" button |
 | ✅ | Nothing is fetched or merged until a reviewer approves the run |
 | ✅ | Safe merge into the fork's `main`: fast-forward or merge commit, never a force-push |
 | ✅ | Merge conflicts or rejected pushes stop the run with a clear message; `main` is left untouched |
@@ -21,7 +21,7 @@ Status key: ✅ Done · 🔄 Built, waiting on a setup step · 🔍 Built, needs
 | ✅ | Setup and testing guide (`.github/SYNC_UPSTREAM.md`) |
 | ✅ | Actions enabled on the fork; `sync-approval` requires Aditya's approval before any sync |
 | ✅ | The merged result must pass the full test suite before a sync is pushed; a failure pushes nothing |
-| ⬜ | Real-time sync triggered by upstream (needs admin access on the upstream repo) |
+| ✅ | Real-time sync: decided against - it needs an org admin to add a secret on the main repo, and every sync waits for approval anyway, so the check runs every 15 minutes instead of hourly |
 | ✅ | Upstream PRs go from a feature branch (`mobile-view`), so fork-only files stay out |
 
 ## 2. Mobile testing
