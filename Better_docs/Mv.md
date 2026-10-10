@@ -64,6 +64,7 @@ Status key: ✅ Done · 🔄 Built, waiting on a setup step · 🔍 Built, needs
 | ✅ | M37–M44: Menu holds the page still, draft kept, named progress, no field zoom, phone edges, chat icon tap sizes, paid limit, feedback |
 | ✅ | M45–M47: Welcome questions, Privacy and Terms pages, cookie banner on a first visit |
 | ✅ | M48–M50: Jump to latest, place kept in a chat, list edge fades and phone scrollbars |
+| ✅ | M51–M53: Server waking notice, sign-in retried on a booting server, no false alarm mid-session |
 | ✅ | Whole mobile suite: 125 passed on both phone profiles (1 skipped by design) |
 | ✅ | Stress run: the whole mobile suite repeated 10× on a production build with 6 parallel browsers and no retries - every repeat-flake traced and fixed (1,248 passed, then the last one fixed and re-checked 40/40) |
 | ✅ | Load test: 500 phones at once on the production build - 0 errors, every page a 200 |
@@ -198,7 +199,7 @@ Status key: ✅ Done · 🔄 Built, waiting on a setup step · 🔍 Built, needs
 | ✅ | Tests never use the shared `clardentity@test.com` account |
 | ⬜ | Live test runs use a throwaway account registered via the API and deleted afterwards |
 | ✅ | Named progress on phones while an answer is on its way: "Searching the web", "Reading sources", "Checking the claims" |
-| ⬜ | Loading states designed for backend cold starts (several seconds after inactivity) |
+| ✅ | Cold starts on phones: a "Waking the server up" notice when a request waits 4s+ and the server hasn't answered recently (no false alarms mid-session), and the first sign-in check is retried for up to a minute instead of sending you to the login screen |
 | ✅ | Paid-preview limit (402) explained in the chat, which stays usable |
 | ✅ | Latest upstream changes merged (one conflict resolved, keeping both fixes) |
 

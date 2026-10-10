@@ -366,3 +366,42 @@ test.describe("scrolling", () => {
       expect(await page.locator(sel.messageList).first().evaluate((el) => (el as HTMLElement).offsetWidth - el.clientWidth)).toBe(0);
   });
 });
+
+test.describe("server waking from a quiet spell", () => {
+  const notice = (page: Page) => page.getByTestId("server-waking");
+  const later = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+  test("M51 a slow first answer says the server is waking, then gets out of the way @M51", async ({ page }) => {
+    test.slow();
+    await signIn(page, { handlers: { "GET /auth/me": async () => { await later(7000); return undefined; } } });
+    await page.goto("/workspace");
+    await expect(notice(page)).toContainText("Waking the server up", { timeout: 10_000 });
+    const n = (await notice(page).boundingBox())!;
+    expect(n.x).toBeGreaterThanOrEqual(0);
+    expect(n.x + n.width).toBeLessThanOrEqual(376);
+    await expect(page.locator('a[href^="/workspace/w"]').first()).toBeVisible({ timeout: 20_000 });
+    await expect(notice(page)).toHaveCount(0);
+  });
+
+  test("M52 a server still booting doesn't sign you out: the first check is retried @M52", async ({ page }) => {
+    test.slow();
+    let calls = 0;
+    await signIn(page, {
+      handlers: { "GET /auth/me": () => (++calls <= 2 ? { status: 503, body: { detail: "starting" } } : undefined) },
+    });
+    await page.goto("/workspace");
+    await expect(page.locator('a[href^="/workspace/w"]').first()).toBeVisible({ timeout: 30_000 });
+    expect(page.url()).not.toContain("/login");
+    expect(calls).toBeGreaterThanOrEqual(3);
+  });
+
+  test("M53 one slow request in an awake session isn't called a cold start @M53", async ({ page }) => {
+    test.slow();
+    await signIn(page, { handlers: { "GET /workspaces": async () => { await later(7000); return undefined; } } });
+    await page.goto("/workspace");
+    // /auth/me answered quickly, so the server is awake: no notice while /workspaces crawls
+    await later(5500);
+    await expect(notice(page)).toHaveCount(0);
+    await expect(page.locator('a[href^="/workspace/w"]').first()).toBeVisible({ timeout: 20_000 });
+  });
+});
