@@ -97,3 +97,24 @@ class TestResetSingleUse:
         fp = password_fingerprint(OLD_HASH)
         assert OLD_HASH not in fp
         assert len(fp) == 32
+
+
+class TestTheApiSaysWhatItIs:
+    """Every API response carries the browser headers - added 2026-10-10,
+    when the review found the API served none."""
+
+    async def test_security_headers_on_every_response(self):
+        import httpx
+
+        from app.main import app
+
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://t"
+        ) as c:
+            for path in ("/health", "/api/v1/auth/me"):
+                res = await c.get(path)
+                assert res.headers["x-content-type-options"] == "nosniff", path
+                assert res.headers["x-frame-options"] == "DENY", path
+                assert res.headers["referrer-policy"] == "no-referrer", path
+                # Never same-site: the app loads generated images from here.
+                assert "cross-origin-resource-policy" not in res.headers
