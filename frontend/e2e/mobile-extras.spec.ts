@@ -211,8 +211,10 @@ test.describe("checklist items", () => {
     for (const name of ["Attach a file or image", "Record a voice message", "Regenerate this answer", "Mark this answer helpful", "Mark this answer not helpful"]) {
       const el = page.getByRole("button", { name }).first();
       if (!(await el.count())) continue;
-      const b = (await el.boundingBox())!;
-      if (Math.round(b.width) < 44 || Math.round(b.height) < 44) small.push(`${name} ${Math.round(b.width)}x${Math.round(b.height)}`);
+      // what a finger can hit: the chat box's icons stay small and reach 44px
+      // through an invisible hit area; the answer's icons are 44px boxes
+      const a = await tapArea(el);
+      if (a.w < 44 || a.h < 44) small.push(`${name} ${a.w}x${a.h}`);
     }
     expect(small, small.join("\n")).toEqual([]);
     expect(await horizontalOverflow(page)).toBeLessThanOrEqual(0);
@@ -411,6 +413,11 @@ test("M54 home page cards: one embossed mark each, in the empty space only; none
   await page.goto("/");
   const cards = page.locator("article.landing-card");
   await expect(cards).toHaveCount(11, { timeout: 30_000 });
+  // the marks are placed once each card's text has laid out; read them then
+  await cards.last().scrollIntoViewIfNeeded();
+  await page.waitForTimeout(800);
+  await cards.first().scrollIntoViewIfNeeded();
+  await page.waitForTimeout(800);
   const report = await cards.evaluateAll((els) =>
     els.map((card) => {
       const marks = card.querySelectorAll('[data-testid="card-emboss"]');
@@ -424,12 +431,23 @@ test("M54 home page cards: one embossed mark each, in the empty space only; none
             return r.width > 0 && r.left < mark.right && r.right > mark.left && r.top < mark.bottom && r.bottom > mark.top;
           }).map((el) => el.textContent?.trim().slice(0, 20) || el.tagName)
         : [];
-      return { marks: marks.length, hits };
+      // centred in the gap the text leaves: as much room above as below
+      let above = -Infinity, below = Infinity;
+      const box = card.getBoundingClientRect();
+      for (const el of words) {
+        const r = el.getBoundingClientRect();
+        if (r.height === 0) continue;
+        if (r.top + r.height / 2 < box.top + box.height / 2) above = Math.max(above, r.bottom);
+        else below = Math.min(below, r.top);
+      }
+      const skew = mark ? Math.abs((mark.top - above) - (below - mark.bottom)) : 0;
+      return { marks: marks.length, hits, skew };
     }),
   );
   for (const [i, r] of report.entries()) {
     expect.soft(r.marks, `card ${i}: one mark`).toBe(1);
     expect.soft(r.hits, `card ${i}: mark overlaps text`).toEqual([]);
+    expect.soft(r.skew, `card ${i}: mark off-centre in its gap`).toBeLessThanOrEqual(3);
   }
   // desktop width: the cards are exactly as designed, no marks
   await page.setViewportSize({ width: 1280, height: 900 });
