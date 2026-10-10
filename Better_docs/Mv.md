@@ -65,6 +65,7 @@ Status key: ✅ Done · 🔄 Built, waiting on a setup step · 🔍 Built, needs
 | ✅ | M45–M47: Welcome questions, Privacy and Terms pages, cookie banner on a first visit |
 | ✅ | M48–M50: Jump to latest, place kept in a chat, list edge fades and phone scrollbars |
 | ✅ | M51–M53: Server waking notice, sign-in retried on a booting server, no false alarm mid-session |
+| ✅ | M54: Home page card marks - one per card, never over text, none on desktop |
 | ✅ | Whole mobile suite: 125 passed on both phone profiles (1 skipped by design) |
 | ✅ | Stress run: the whole mobile suite repeated 10× on a production build with 6 parallel browsers and no retries - every repeat-flake traced and fixed (1,248 passed, then the last one fixed and re-checked 40/40) |
 | ✅ | Load test: 500 phones at once on the production build - 0 errors, every page a 200 |
@@ -108,6 +109,7 @@ Status key: ✅ Done · 🔄 Built, waiting on a setup step · 🔍 Built, needs
 | ✅ | Chat: following a streaming answer is smoother (one scroll per frame instead of one per word) |
 | ✅ | Phones use their own thin, auto-hiding scrollbars instead of the desktop's permanent 8px bar |
 | ✅ | Recent chats, the mode row and the thread pills fade at an edge when there's more to scroll |
+| ✅ | Home page cards on phones: one embossed celestial mark per card (sparkle, orbit, crescent, planet, flower, guiding star, scalloped circle, compass star; Ask/Check/See get sparkles, an orbit and a sunburst), in the empty middle only - text, fonts, icons and spacing unchanged; follows light, dark and every accent |
 
 ## 4. Mobile production readiness
 

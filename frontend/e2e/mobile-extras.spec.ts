@@ -405,3 +405,32 @@ test.describe("server waking from a quiet spell", () => {
     await expect(page.locator('a[href^="/workspace/w"]').first()).toBeVisible({ timeout: 20_000 });
   });
 });
+
+test("M54 home page cards: one embossed mark each, in the empty space only; none on desktop @M54", async ({ app: page }) => {
+  await page.goto("/");
+  const cards = page.locator("article.landing-card");
+  await expect(cards).toHaveCount(11, { timeout: 30_000 });
+  const report = await cards.evaluateAll((els) =>
+    els.map((card) => {
+      const marks = card.querySelectorAll('[data-testid="card-emboss"]');
+      const mark = marks[0]?.getBoundingClientRect();
+      const words = [...card.querySelectorAll("h3, p, span, img")].filter(
+        (el) => el.closest('[data-testid="card-emboss"]') === null && (el.textContent?.trim() || el.tagName === "IMG"),
+      );
+      const hits = mark
+        ? words.filter((el) => {
+            const r = el.getBoundingClientRect();
+            return r.width > 0 && r.left < mark.right && r.right > mark.left && r.top < mark.bottom && r.bottom > mark.top;
+          }).map((el) => el.textContent?.trim().slice(0, 20) || el.tagName)
+        : [];
+      return { marks: marks.length, hits };
+    }),
+  );
+  for (const [i, r] of report.entries()) {
+    expect.soft(r.marks, `card ${i}: one mark`).toBe(1);
+    expect.soft(r.hits, `card ${i}: mark overlaps text`).toEqual([]);
+  }
+  // desktop width: the cards are exactly as designed, no marks
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await expect(page.locator('[data-testid="card-emboss"]').first()).toBeHidden();
+});
