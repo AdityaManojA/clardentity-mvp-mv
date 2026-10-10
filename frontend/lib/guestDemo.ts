@@ -1,21 +1,15 @@
 import { API_BASE_URL } from "@/lib/apiClient";
+import { consumeChatStream, type ChatStreamHandlers } from "@/lib/sse";
 
 /* The landing page's try-it-here conversation.
  *
- * Its own small client rather than the app's: there is no token to attach,
- * no conversation id to address, and nothing to persist. The history lives
- * in the component and is posted back each turn, which is also why signing
- * up does not inherit it - there is nothing on the server to inherit.
+ * Its own request rather than the app's - there is no token to attach, no
+ * conversation id to address, and nothing to persist; the history lives in
+ * the component and is posted back each turn - but the app's stream reader
+ * and the app's events, so what comes back is the app's answer.
  */
 
 export type GuestTurn = { role: "user" | "assistant"; content: string };
-
-export type GuestDone = {
-  text: string;
-  used: number;
-  budget: number;
-  limit_reached: boolean;
-};
 
 const SESSION_KEY = "clardentity.guest.session";
 
@@ -43,26 +37,34 @@ export function guestSessionId(): string {
   }
 }
 
-export type GuestHandlers = {
-  onDelta: (text: string) => void;
-  onDone: (done: GuestDone) => void;
-  onError: (message: string) => void;
-  /** The question was answered in a better-suited companion than the one
-   *  selected. Fires before any text, so the banner is up while the answer
-   *  is still being written rather than appearing under a finished one. */
-  onSwitched?: (from: string, to: string) => void;
+export type GuestSendBody = {
+  sessionId: string;
+  mode: string;
+  message: string;
+  history: GuestTurn[];
+  smartSwitching?: boolean;
+  /** The same re-send flags the app's composer sends after a pre-answer
+   *  question - see SendMessageBody in lib/sse. */
+  modeConfirmed?: boolean;
+  refinedConfirmed?: boolean;
+  clarifyingConfirmed?: boolean;
+  contextAcknowledged?: boolean;
+  contextRounds?: number;
+  /** Another answer to a question already asked: no gate asks again. */
+  regenerate?: boolean;
+  /** The last picture this demo drew, so a follow-up can edit it. */
+  lastImageId?: string | null;
 };
 
-/** Ask one question. Resolves when the stream is finished. */
-export async function askGuest(
-  body: {
-    sessionId: string;
-    mode: string;
-    message: string;
-    history: GuestTurn[];
-    smartSwitching?: boolean;
-  },
-  handlers: GuestHandlers,
+/** Ask one question. Resolves when the stream is finished.
+ *
+ *  The events and the handlers are the app's own (`ChatStreamHandlers`),
+ *  read by the app's own reader - so a demo answer arrives with its gist,
+ *  verdict box, claims and score through exactly the code a signed-in one
+ *  does, plus the demo's two extras: `onSwitched` and `onBudget`. */
+export async function streamGuestMessage(
+  body: GuestSendBody,
+  handlers: ChatStreamHandlers,
   signal?: AbortSignal,
 ): Promise<void> {
   let response: Response;
@@ -76,10 +78,19 @@ export async function askGuest(
         message: body.message,
         history: body.history,
         smart_switching: body.smartSwitching ?? true,
+        mode_confirmed: body.modeConfirmed ?? false,
+        refined_confirmed: body.refinedConfirmed ?? false,
+        clarifying_confirmed: body.clarifyingConfirmed ?? false,
+        context_acknowledged: body.contextAcknowledged ?? false,
+        context_rounds: body.contextRounds ?? 0,
+        regenerate: body.regenerate ?? false,
+        last_image_id: body.lastImageId ?? null,
       }),
       signal,
     });
-  } catch {
+  } catch (err) {
+    // An abort is the visitor stopping or closing the demo, not a failure.
+    if (signal?.aborted || (err instanceof DOMException && err.name === "AbortError")) return;
     handlers.onError("Couldn't reach Clardentity. Check your connection and try again.");
     return;
   }
@@ -98,52 +109,5 @@ export async function askGuest(
     return;
   }
 
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = "";
-
-  /* One SSE frame: lines until a blank line, with the event name and its
-     data on separate lines. Parsed here rather than with EventSource because
-     this is a POST and EventSource only does GET. */
-  const handleFrame = (frame: string) => {
-    let event = "message";
-    const data: string[] = [];
-    for (const line of frame.split("\n")) {
-      if (line.startsWith("event:")) event = line.slice(6).trim();
-      else if (line.startsWith("data:")) data.push(line.slice(5).trim());
-    }
-    if (!data.length) return;
-    let parsed: unknown;
-    try {
-      parsed = JSON.parse(data.join("\n"));
-    } catch {
-      return;
-    }
-    if (event === "delta") handlers.onDelta((parsed as { text: string }).text);
-    else if (event === "done") handlers.onDone(parsed as GuestDone);
-    else if (event === "switched") {
-      const { from, to } = parsed as { from: string; to: string };
-      handlers.onSwitched?.(from, to);
-    } else if (event === "error") handlers.onError((parsed as { detail: string }).detail);
-  };
-
-  try {
-    for (;;) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      // Normalised first: sse-starlette ends every frame with CRLF CRLF, so
-      // splitting on a bare blank line finds nothing and the whole stream
-      // arrives as one frame that is never parsed.
-      buffer += decoder.decode(value, { stream: true }).replace(/\r\n/g, "\n");
-      let split = buffer.indexOf("\n\n");
-      while (split !== -1) {
-        handleFrame(buffer.slice(0, split));
-        buffer = buffer.slice(split + 2);
-        split = buffer.indexOf("\n\n");
-      }
-    }
-  } catch {
-    // An aborted read is the user closing the demo, not a failure.
-    if (!signal?.aborted) handlers.onError("The answer stopped partway. Try again?");
-  }
+  await consumeChatStream(response.body, handlers);
 }

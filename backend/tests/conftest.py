@@ -39,3 +39,10 @@ async def _dispose_pools_between_tests():
     await worker_engine.dispose()
     await _redis.aclose()
     await _redis.connection_pool.disconnect()
+    # The demo allowance keeps its own client; it binds to a loop the same
+    # way, and left alone it made every demo test after the first report
+    # "no redis available" and skip.
+    from app.services.guest_demo import _redis as guest_redis
+
+    await guest_redis.aclose()
+    await guest_redis.connection_pool.disconnect()

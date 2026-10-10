@@ -132,3 +132,84 @@ class TestTheIntentCheckCanReadTheConversation:
         out = _with_history("draw it", history)
         assert out.count("User:") == _HISTORY_TURNS
         assert "turn 49" in out and "turn 0" not in out
+
+
+class TestPicturesMadeFromPictures:
+    """Image + text -> image.
+
+    Until 2026-10-10 an attached picture only ever reached the text model, as
+    something to describe: the intent check was told that anything about an
+    attached image was "no", and a follow-up like "now make it night-time"
+    redrew the scene from a sentence. Edits now go to the image model with
+    the source pictures as references.
+    """
+
+    def test_the_judge_is_told_what_there_is_to_work_from(self):
+        from app.services.image_generation import _with_sources
+
+        assert _with_sources("make it pop", 0, False) == "make it pop"
+        assert "2 images are attached" in _with_sources("merge these", 2, False)
+        assert "1 image is attached" in _with_sources("put this on a mug", 1, False)
+        assert "produced earlier" in _with_sources("now at night", 0, True)
+
+    def test_an_edit_with_nothing_to_edit_is_drawn_from_the_prompt(self, monkeypatch):
+        from app.services import image_generation
+
+        async def says_edit(**kwargs):
+            return {
+                "wants_image": True,
+                "prompt": "a fox at night",
+                "image_is_whole_request": True,
+                "uses_existing_images": True,
+            }
+
+        monkeypatch.setattr(image_generation, "generate_structured", says_edit)
+        nothing = asyncio.run(image_generation.wanted_image("make it night-time"))
+        assert nothing is not None and nothing.edit is False
+        something = asyncio.run(
+            image_generation.wanted_image("make it night-time", has_previous_image=True)
+        )
+        assert something is not None and something.edit is True
+
+    def test_the_turns_own_attachments_are_the_references(self):
+        import base64
+        from types import SimpleNamespace
+
+        from app.services.image_generation import MAX_REFERENCE_IMAGES, reference_images
+
+        png = base64.b64encode(b"\x89PNG fake").decode()
+        attachments = [
+            SimpleNamespace(type="image", data=f"data:image/webp;base64,{png}", mime_type="image/png"),
+            SimpleNamespace(type="image", data=png, mime_type="image/jpeg"),
+            # A document is never a picture to draw from.
+            SimpleNamespace(type="document", data=png, mime_type="application/pdf"),
+        ]
+        refs = reference_images(attachments, {"owner": "x", "id": "y"})
+        # The data-URI header wins over the declared type, and the previous
+        # picture is not read when the turn brought its own.
+        assert refs == [(b"\x89PNG fake", "image/webp"), (b"\x89PNG fake", "image/jpeg")]
+
+        many = [SimpleNamespace(type="image", data=png, mime_type="image/png")] * 20
+        assert len(reference_images(many, None)) == MAX_REFERENCE_IMAGES
+
+    def test_without_attachments_it_edits_the_last_picture_drawn(self, monkeypatch):
+        from app.services import image_generation
+
+        asked: list[str] = []
+
+        def fake_download(key):
+            asked.append(key)
+            if key.endswith(".webp"):
+                return b"webp bytes"
+            raise FileNotFoundError(key)
+
+        monkeypatch.setattr(image_generation, "download_file", fake_download)
+        refs = image_generation.reference_images([], {"owner": "owner-1", "id": "img-1"})
+        assert refs == [(b"webp bytes", "image/webp")]
+        assert asked == ["generated/owner-1/img-1.webp"]
+        # Nothing to read back is not an error - the picture is drawn from
+        # the prompt instead.
+        monkeypatch.setattr(
+            image_generation, "download_file", lambda key: (_ for _ in ()).throw(KeyError(key))
+        )
+        assert image_generation.reference_images([], {"owner": "o", "id": "i"}) == []
