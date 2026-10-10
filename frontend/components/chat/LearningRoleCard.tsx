@@ -17,12 +17,13 @@ import { cx } from "@/components/ui/primitives";
  * Learning is the one mode where the same question wants a different answer
  * depending on who is asking. "Explain the Krebs cycle" from a student is a
  * request to understand it; from a teacher it is a request for the order to
- * introduce it in and the misconceptions to expect; from someone browsing it
- * is neither. Inference could work this out eventually, but not from the
- * first message - which is exactly the one where getting it wrong is most
- * obvious.
+ * introduce it in and the misconceptions to expect. ("Just visiting" was a
+ * third option until 2026-10-10; it was taken out, and an account that
+ * picked it keeps its answer - the server still understands it.)
+ * Inference could work this out eventually, but not from the first message -
+ * which is exactly the one where getting it wrong is most obvious.
  *
- * Three buttons rather than a text box, because the answer steers the system
+ * Buttons rather than a text box, because the answer steers the system
  * prompt. A closed set is a setting; free text would be user input reaching
  * the instructions. (`ContextQuestionCard` is the open-text sibling, for
  * questions where a menu would be grotesque.)
@@ -35,7 +36,6 @@ import { cx } from "@/components/ui/primitives";
 const OPTIONS: { value: LearningRole; label: string; blurb: string }[] = [
   { value: "student", label: "A student", blurb: "Teach me the material" },
   { value: "teacher", label: "A teacher", blurb: "Help me put it across" },
-  { value: "visiting", label: "Just visiting", blurb: "I'm curious, that's all" },
 ];
 
 export function LearningRoleCard() {

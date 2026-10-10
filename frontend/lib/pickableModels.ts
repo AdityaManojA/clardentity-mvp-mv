@@ -1,7 +1,7 @@
 import { apiFetch } from "@/lib/apiClient";
 
-/* The models a user may choose by name, in the two modes where the choice is
- * theirs.
+/* The models a user may choose by name, in Co-Creative - the one mode where
+ * the choice is theirs. (Learning had it too until 2026-10-10.)
  *
  * The list comes from the server rather than being written here, for one
  * reason that matters: a model is only offered if that deployment has the
@@ -25,7 +25,7 @@ export type PickableModel = {
 /** Modes where a picker is shown at all. The server owns this rule too (it
  *  returns an empty list elsewhere); this spares a request in the modes that
  *  will never have one. */
-export const PICKABLE_MODES = new Set(["learning", "creative"]);
+export const PICKABLE_MODES = new Set(["creative"]);
 
 const CHOICE_KEY = "clardentity.model.choice";
 

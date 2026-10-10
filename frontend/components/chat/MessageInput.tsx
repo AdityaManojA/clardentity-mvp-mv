@@ -12,7 +12,6 @@ import {
 import { autocorrectSupported, fixAtBoundary, loadSpeller, type Fix, type Speller } from "@/lib/autocorrect";
 import { apiFetch } from "@/lib/apiClient";
 import { AudioRecorder } from "@/components/upload/AudioRecorder";
-import { ModelPicker } from "@/components/chat/ModelPicker";
 import { VendorModelPicker } from "@/components/chat/VendorModelPicker";
 import { PICKABLE_MODES } from "@/lib/pickableModels";
 import { MaskIcon } from "@/components/ui/MaskIcon";
@@ -112,9 +111,10 @@ export function MessageInput({
    *  the controls that describe *how* the answer is produced there, which is
    *  where switching belongs now that the rail spans the full width. */
   trailing?: ReactNode;
-  /** Which companion is selected. Only used to decide which model
-   *  picker belongs here - the real names in Learning and Co-Creative,
-   *  the capability tiers everywhere else. */
+  /** Which companion is selected. Only used to decide whether a model
+   *  picker belongs here at all: Co-Creative names the models; every other
+   *  mode has none (the capability tiers are plans, under Upgrade in the
+   *  account menu). */
   mode?: string | null;
   /** True while an answer is being generated - swaps the send button for a
    *  stop control instead of just greying it out, so cutting a slow or
@@ -458,30 +458,28 @@ export function MessageInput({
           />
 
           <div className="ml-auto flex min-w-0 items-center gap-1">
-            {gated ? (
-              // The chip, without the menu behind it. Same shape and the same
-              // place, so the foot of the card reads as it does in the app.
-              <button
-                type="button"
-                onClick={() => gated("model")}
-                title="Model: Auto"
-                aria-label="Model: Auto. Change model."
-                className="flex h-8 shrink-0 items-center gap-0.5 rounded-lg px-1.5 text-sm leading-[normal] transition-colors hover:bg-surface-hover"
-              >
-                <span className="text-ink">Auto</span>
-                <span aria-hidden="true" className="hidden size-3 items-center justify-center sm:flex">
-                  <span className="size-1 rounded-full bg-ink-muted" />
-                </span>
-                <span className="hidden text-ink-muted sm:inline">Free</span>
-              </button>
-            ) : mode && PICKABLE_MODES.has(mode) ? (
-              // The two modes where the user picks the model by name. Shown
-              // instead of the tier picker rather than beside it: two
-              // controls both called "model" is worse than either.
-              <VendorModelPicker mode={mode} disabled={disabled} />
-            ) : (
-              <ModelPicker disabled={disabled} />
-            )}
+            {mode && PICKABLE_MODES.has(mode) ? (
+              gated ? (
+                // The chip, without the menu behind it. Same shape and the
+                // same place, so the foot of the card reads as it does in
+                // the app.
+                <button
+                  type="button"
+                  onClick={() => gated("model")}
+                  title="Choose which model answers in this mode"
+                  className="flex items-center gap-1 rounded-md px-2 py-1 text-sm text-ink-muted transition-colors hover:bg-surface-hover hover:text-ink"
+                >
+                  <span>Auto</span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                    strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="size-3.5">
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </button>
+              ) : (
+                // The one mode where the user picks the model by name.
+                <VendorModelPicker mode={mode} disabled={disabled} />
+              )
+            ) : null}
             {trailing}
 
             {/* Next to the mic, because they are the same intention at two

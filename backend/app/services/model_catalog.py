@@ -26,9 +26,12 @@ from dataclasses import dataclass
 
 from app.core.config import settings
 
-#: Only these two modes let the user choose. Named here rather than in the
-#: API so the list and the rule that governs it stay together.
-PICKABLE_MODES = frozenset({"learning", "creative"})
+#: Only Co-Creative lets the user choose. Learning had the list too until
+#: 2026-10-10, when it moved: picking a tool by name belongs where the user
+#: is making something, and in Learning the companion's own pacing is the
+#: point. Named here rather than in the API so the list and the rule that
+#: governs it stay together.
+PICKABLE_MODES = frozenset({"creative"})
 
 
 @dataclass(frozen=True)

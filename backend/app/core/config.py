@@ -115,7 +115,7 @@ class Settings(BaseSettings):
     #: aspect ratio changed to match or the answer jumps when it arrives.
     image_size: str = "1024x1024"
 
-    #: Extra providers for the model picker in Learning and Co-Creative. Both
+    #: Extra providers for the model picker in Co-Creative. Both
     #: are optional: a model whose provider has no key is hidden from the
     #: picker rather than offered and then failing when chosen.
     google_api_key: str = ""
