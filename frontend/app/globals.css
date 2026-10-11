@@ -570,8 +570,8 @@ body {
 @media (max-width: 1023.98px) and (prefers-reduced-motion: no-preference) {
   .landing-reveal {
     transform: translateY(36px);
-    transition-duration: 1.1s;
-    transition-delay: calc(var(--reveal-delay, 0ms) * 1.6 + 80ms);
+    transition-duration: 1.6s;
+    transition-delay: calc(var(--reveal-delay, 0ms) * 2.4 + 120ms);
   }
 }
 
@@ -659,7 +659,7 @@ body {
 
 /* Lists on the phone layout (workspaces, recent chats, search results,
    attachments) rise in one after another instead of all landing at once:
-   --i is the item's index, 80ms apart, capped so a long list doesn't make
+   --i is the item's index, 120ms apart, capped so a long list doesn't make
    the tenth row wait. */
 @keyframes phone-rise {
   from {
@@ -673,8 +673,8 @@ body {
 }
 @media (max-width: 1023.98px) and (prefers-reduced-motion: no-preference) {
   .phone-rise {
-    animation: phone-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
-    animation-delay: calc(min(var(--i, 0), 10) * 80ms);
+    animation: phone-rise 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(min(var(--i, 0), 10) * 120ms);
   }
 }
 

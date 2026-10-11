@@ -8,6 +8,7 @@ import { ChatRowMenu } from "@/components/chat/ChatRowMenu";
 import { authErrorMessage } from "@/lib/auth";
 import { modeLabel, type CognitiveMode } from "@/lib/modes";
 import { Button, Spinner } from "@/components/ui/primitives";
+import { markFreshChat } from "@/lib/freshChats";
 
 type Workspace = {
   id: string;
@@ -82,6 +83,7 @@ export function WorkspaceDetail({ workspaceId }: { workspaceId: string }) {
         method: "POST",
         body: { workspace_id: workspaceId, default_mode: mode ?? null },
       });
+      markFreshChat(conv.id);
       router.push(`/chat/${conv.id}`);
     } catch (err) {
       setError(authErrorMessage(err));
