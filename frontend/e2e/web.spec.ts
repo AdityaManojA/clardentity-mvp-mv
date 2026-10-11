@@ -85,3 +85,21 @@ test("T15 desktop curtain stays dark until hovered (no sweep, no tilt) @T15", as
   const lit = await page.evaluate(() => [...document.querySelectorAll<HTMLElement>(".landing-shimmer > span")].some((p) => Number(p.style.opacity || 0) > 0.02));
   expect(lit).toBe(false);
 });
+
+test("T16 desktop curtain lights up and ripples under the mouse @T16", async ({ page }) => {
+  await mockApi(page);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  await expect(page.locator(".landing-shimmer")).toBeAttached({ timeout: 30_000 });
+  const stage = page.locator(".landing-shimmer").locator("..");
+  const b = (await stage.boundingBox())!;
+  for (let i = 0; i < 12; i++) {
+    await page.mouse.move(b.x + b.width * (0.3 + i * 0.03), b.y + b.height * 0.3);
+    await page.waitForTimeout(50);
+  }
+  const lit = () => page.evaluate(() => Math.max(0, ...[...document.querySelectorAll<HTMLElement>(".landing-shimmer > span")].map((p) => Number(p.style.opacity || 0))));
+  await expect.poll(lit, { message: "hover lights the curtain" }).toBeGreaterThan(0.3);
+  // and it goes dark again once the mouse leaves
+  await page.mouse.move(5, 5);
+  await expect.poll(lit, { message: "dark after the mouse leaves", timeout: 4_000 }).toBeLessThan(0.05);
+});

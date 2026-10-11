@@ -30,7 +30,7 @@ import { usePrefersReducedMotion } from "@/lib/useReducedMotion";
  *
  * Nothing here runs under prefers-reduced-motion.
  *
- * A phone has no hover, so on the phone layout the curtain moves on its own:
+ * A phone or tablet has no hover, so there the curtain moves on its own:
  * a slow wave travels across the folds, and the light rides its crests. No
  * motion sensor - tilt steering was tried and dropped (iPhones only release
  * the sensor behind a permission prompt, so it was never the same on both).
@@ -75,8 +75,11 @@ const WAVE_LENGTH = 11; // distance between crests
 const WAVE_SPEED = 0.009; // how fast crests travel outward
 const SWAY = 0.1; // the idle drift, present whether or not anything moved
 
-/* The phone layout (touch, below lg). */
-const PHONE_QUERY = "(max-width: 1023.98px) and (pointer: coarse)";
+/* Screens that can't hover - phones and tablets at any size, and a touch
+ * phone of course - get the automatic wave instead of the hover light.
+ * Keyed on the device's input, not its width: a tablet held sideways is
+ * wider than the phone breakpoint and still has no pointer to hover with. */
+const PHONE_QUERY = "(hover: none), (max-width: 1023.98px) and (pointer: coarse)";
 const PHONE_LIT = 0.75; // the light stays on - there is no hover to wait for
 const PHONE_WAVE_LENGTH = 34; // % of the width from one crest to the next
 const PHONE_WAVE_SPEED = 0.0007; // radians per ms - a crest crosses in ~6s

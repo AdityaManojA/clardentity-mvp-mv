@@ -227,10 +227,12 @@ test.describe("signed in", () => {
     await expect(page.getByText("Nothing said in this workspace matches that.")).toBeVisible();
 
     const special = `50% & <script>"x"</script> #tag ?q=1`;
-    await box.fill(special);
+    await fillStable(box, special);
     await go.tap();
+    // the empty state is already showing from the last search, so wait for
+    // this one to reach the server rather than for the message
+    await expect.poll(() => queries.at(-1)).toBe(special); // encoded on the way out, intact at the server
     await expect(page.getByText("Nothing said in this workspace matches that.")).toBeVisible();
-    expect(queries.at(-1)).toBe(special); // encoded on the way out, intact at the server
     await noSideScroll(page);
   });
 
