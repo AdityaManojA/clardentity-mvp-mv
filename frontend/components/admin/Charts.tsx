@@ -80,13 +80,15 @@ export function DonutChart({ slices, total }: { slices: Slice[]; total: number }
         <p className="text-2xl font-semibold text-ink">{formatTokens(total)}</p>
         <ul className="space-y-1 pt-1">
           {slices.map((s, i) => (
-            <li key={s.label} className="flex items-center gap-2 text-xs">
+            // flex-wrap: on the narrowest phones the figures drop under the
+            // label rather than running off the side of the card.
+            <li key={s.label} className="flex flex-wrap items-center gap-x-2 text-xs">
               <span
                 aria-hidden="true"
                 className="h-2.5 w-2.5 shrink-0 rounded-sm"
                 style={{ background: paletteColor(i) }}
               />
-              <span className="min-w-0 flex-1 truncate text-ink-secondary">{s.label}</span>
+              <span className="min-w-0 flex-1 basis-20 truncate text-ink-secondary">{s.label}</span>
               <span className="shrink-0 tabular-nums text-ink">{formatTokens(s.value)}</span>
               <span className="w-10 shrink-0 text-right tabular-nums text-ink-muted">
                 {Math.round((s.value / sum) * 100)}%

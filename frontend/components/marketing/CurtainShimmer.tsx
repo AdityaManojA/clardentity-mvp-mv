@@ -142,7 +142,7 @@ export function CurtainShimmer({ style }: { style: React.CSSProperties }) {
         // How much of the gust reaches this fold, and the ripple it rides.
         const falloff = Math.exp(-(toGust * toGust) / (2 * GUST_WIDTH * GUST_WIDTH));
         const ripple = Math.sin((Math.abs(toGust) / WAVE_LENGTH) * Math.PI * 2 - phase);
-        let shift = gust * falloff * ripple + idle * Math.sin(x * 0.4);
+        const shift = gust * falloff * ripple + idle * Math.sin(x * 0.4);
 
         // The light: a pool around the cursor, fading with distance.
         let glow = Math.exp(-(toCursor * toCursor) / (2 * REACH * REACH));

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { ErrorBoundary } from "@/components/system/ErrorBoundaries";
 import { API_BASE_URL, apiFetch } from "@/lib/apiClient";
 import { authErrorMessage, getAccessToken } from "@/lib/auth";
@@ -198,6 +198,9 @@ export function ChatView({ conversationId }: { conversationId: string }) {
    * desktop window (fine pointer) never folds. */
   const [composerFocused, setComposerFocused] = useState(false);
   const [railOpen, setRailOpen] = useState(false);
+  // A phone held sideways (under 500px tall) folds the rail all the time: the
+  // rail and the box otherwise left the thread about two lines of the screen.
+  const shortScreen = useSyncExternalStore(subscribeShortScreen, isShortScreen, () => false);
   useEffect(() => {
     if (!window.matchMedia("(pointer: coarse) and (max-width: 1023.98px)").matches) return;
     const onIn = (e: FocusEvent) => {
@@ -1346,7 +1349,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
             <div className="min-w-0 flex-1">
               <ModeSelector
                 value={mode}
-                folded={composerFocused && !railOpen}
+                folded={(composerFocused || shortScreen) && !railOpen}
                 onUnfold={() => setRailOpen(true)}
                 holdFocus={railOpen}
                 onChange={(next) => {
@@ -1517,4 +1520,14 @@ function ThreadPill({
       <span className="whitespace-nowrap">{label}</span>
     </button>
   );
+}
+
+const SHORT_SCREEN = "(pointer: coarse) and (max-width: 1023.98px) and (max-height: 500px)";
+function subscribeShortScreen(onChange: () => void) {
+  const mq = window.matchMedia(SHORT_SCREEN);
+  mq.addEventListener("change", onChange);
+  return () => mq.removeEventListener("change", onChange);
+}
+function isShortScreen() {
+  return window.matchMedia(SHORT_SCREEN).matches;
 }

@@ -42,6 +42,12 @@
      band at the bottom. Anything that wants to be as tall as the window
      uses this instead. */
   --app-vh: calc(1vh / var(--ui-zoom));
+  /* ...and measured on what is actually visible. `vh` on a phone is the
+     viewport with the browser's toolbars hidden, so while iPhone Safari's
+     bottom bar (or Chrome's address bar) is showing, a full-height app
+     reached behind it - and the composer, at the bottom, was under the
+     toolbar on a small iPhone. `dvh` follows the toolbars (set just below
+     this block); browsers without it keep `vh`. */
 
   /* The app's canvas is the design's background/primary; panels sit above it
      in white, and the chrome - sidebar, header - is the warmer #faf8f9 the
@@ -116,6 +122,13 @@
      what makes the breadcrumb and the sidebar's logo row share a baseline. */
   --sidebar-width: 287px;
   --topbar-height: 67px;
+}
+
+/* Visible-viewport height where supported - see --app-vh above. */
+@supports (height: 1dvh) {
+  :root {
+    --app-vh: calc(1dvh / var(--ui-zoom));
+  }
 }
 
 /* Keyed off an attribute rather than `prefers-color-scheme` so the in-app
@@ -654,6 +667,18 @@ body {
     [role="menuitem"] {
       touch-action: manipulation;
     }
+  }
+}
+
+/* A phone held sideways: the hero's desktop spacing (it is wider than sm)
+   put 250px of empty space above the headline and the banner below the
+   bottom of a 390px-tall screen. Unlayered, so it beats the utilities. */
+@media (max-height: 500px) and (max-width: 1023.98px) {
+  .landing-hero {
+    padding-top: 20px;
+  }
+  .landing-hero-gap {
+    margin-top: 28px;
   }
 }
 
