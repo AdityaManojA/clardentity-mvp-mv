@@ -614,8 +614,19 @@ test("M61 a new chat opens centred, with only the companion while it loads @M61"
   // centred, not on the floor (the floor is within ~200px of the bottom)
   expect(loadingY).toBeLessThan(viewport.height * 0.75);
 
+  const avatarY = () => avatar.evaluate((el) => Math.round(el.getBoundingClientRect().top));
+  const loadingAvatarY = await avatarY();
+
   release();
   await expect(page.getByText("Opening the chat")).toHaveCount(0);
   await page.waitForTimeout(500);
   expect(Math.abs((await composerY()) - loadingY), "no jump once the history arrives").toBeLessThanOrEqual(4);
+  // the companion stays, above the greeting, where it already was
+  await expect(avatar).toBeVisible();
+  expect(Math.abs((await avatarY()) - loadingAvatarY), "the companion doesn't move").toBeLessThanOrEqual(4);
+  const greeting = page.locator(".chat-empty-avatar + div");
+  await expect(greeting).toBeVisible();
+  await expect(greeting).not.toHaveAttribute("aria-hidden", "true");
+  const [a, g] = await Promise.all([avatar.boundingBox(), greeting.boundingBox()]);
+  expect(a!.y + a!.height, "companion above the greeting").toBeLessThanOrEqual(g!.y + 1);
 });

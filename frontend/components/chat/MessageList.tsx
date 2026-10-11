@@ -248,24 +248,34 @@ export function MessageList({
   }, [streaming?.content]);
   useEffect(() => () => cancelAnimationFrame(followFrame.current), []);
 
+  // A phone's new chat: the companion above the greeting. While the history
+  // loads the greeting is laid out but invisible, so the companion is
+  // already where it will stay and nothing moves when the greeting appears.
+  // chat-empty (globals.css) drops the companion when the space is too short
+  // for both - the keyboard open on a small phone.
+  const phoneEmpty = (greeting: boolean) => (
+    <div className="chat-empty flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden px-4">
+      <div className="chat-empty-avatar mb-3 shrink-0">{emptyStateAvatar}</div>
+      <div className={greeting ? undefined : "invisible"} aria-hidden={greeting ? undefined : true}>
+        {emptyState}
+      </div>
+    </div>
+  );
+
   if (loading) {
+    if (phone) return phoneEmpty(false);
     return (
-      // On a phone this takes the same room as the empty chat that usually
-      // follows it (min-h-0, no padding), so the composer below doesn't move
-      // when the history arrives.
-      <div className={phone ? "flex min-h-0 flex-1 flex-col items-center justify-center px-4" : "flex flex-1 flex-col items-center justify-center px-4 py-16 sm:px-6"}>
+      <div className="flex flex-1 flex-col items-center justify-center px-4 py-16 sm:px-6">
         {emptyStateAvatar}
-        {/* On a phone the companion alone says the chat is opening. */}
-        {!phone && (
-          <div className="mt-4">
-            <ThinkingIndicator label="Opening the chat" />
-          </div>
-        )}
+        <div className="mt-4">
+          <ThinkingIndicator label="Opening the chat" />
+        </div>
       </div>
     );
   }
 
   if (messages.length === 0 && !streaming && !busy) {
+    if (phone) return phoneEmpty(true);
     return (
       // min-h-0 + overflow so this gives way, on a short screen, to a gate
       // card and the composer beneath it rather than pushing them off the
