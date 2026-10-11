@@ -98,7 +98,7 @@ export function VendorModelPicker({ mode, disabled }: { mode: string; disabled?:
         <div
           role="menu"
           aria-label="Model"
-          className="account-menu absolute bottom-full right-0 z-40 mb-2 max-h-[22rem] w-[19rem] overflow-y-auto rounded-[12px] border border-hairline bg-surface-raised p-1.5 shadow-xl"
+          className="account-menu absolute bottom-full right-0 z-40 mb-2 max-h-[22rem] w-[19rem] overflow-y-auto max-lg:-left-2 max-lg:right-auto rounded-[12px] border border-hairline bg-surface-raised p-1.5 shadow-xl"
         >
           <Row
             label="Auto"

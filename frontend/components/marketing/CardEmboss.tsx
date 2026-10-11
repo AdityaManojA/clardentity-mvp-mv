@@ -12,7 +12,10 @@ import { useLayoutEffect, useRef } from "react";
  * position sat visibly high in one and low in the other. Nothing else on
  * the card moves - the mark sits behind the text. */
 
-const EDGE = "color-mix(in srgb, var(--border-strong) 60%, var(--brand))";
+// Each colour theme's own mark colour, from the Card_design files (1 default,
+// 2 teal, 3 indigo, 4 plum velvet): the theme's accent, with plum velvet's
+// drawn a touch lighter. Set in globals.css as --card-mark.
+const EDGE = "var(--card-mark)";
 // the card's own colour, where an outline must hide what passes behind it
 const BEHIND = "var(--surface-muted)";
 const LINE = 2.6; // in the 100-unit box: about 1.8px at the card's mark size
@@ -134,13 +137,11 @@ const SHAPES: Record<string, React.ReactNode> = {
   // flicker of a feeling to something settled (Aditya's outline sketch).
   therapy: (
     <>
-      <path d="M20 30 Q23 46 36 50 Q23 54 20 70 Q17 54 4 50 Q17 46 20 30Z" style={line} strokeWidth={2.4} strokeLinejoin="round" />
-      {/* evenly across the gap between the two stars */}
-      <circle cx={49} cy={50} r={2.4} style={{ fill: EDGE }} />
-      <circle cx={62} cy={50} r={2.4} style={{ fill: EDGE }} />
-      <circle cx={75} cy={50} r={2.4} style={{ fill: EDGE }} />
-      <circle cx={88} cy={50} r={2.4} style={{ fill: EDGE }} />
-      <path d="M120.0 33.0 L124.7 45.5 L138.1 46.1 L127.6 54.5 L131.2 67.4 L120.0 60.0 L108.8 67.4 L112.4 54.5 L101.9 46.1 L115.3 45.5Z" style={line} strokeWidth={2.4} strokeLinejoin="round" />
+      <path d="M20 30C22 40.6667 27.3333 47.3333 36 50C27.3333 52.6667 22 59.3333 20 70C18 59.3333 12.6667 52.6667 4 50C12.6667 47.3333 18 40.6667 20 30Z" style={line} strokeWidth={2.4} strokeLinejoin="round" />
+      <circle cx={43.4} cy={50.4} r={2.4} style={{ fill: EDGE }} />
+      <circle cx={53.4} cy={50.4} r={2.4} style={{ fill: EDGE }} />
+      <circle cx={63.4} cy={50.4} r={2.4} style={{ fill: EDGE }} />
+      <path d="M89.1 33L93.8 45.5L107.2 46.1L96.7 54.5L100.3 67.4L89.1 60L77.9 67.4L81.5 54.5L71 46.1L84.4 45.5L89.1 33Z" style={line} strokeWidth={2.4} strokeLinejoin="round" />
     </>
   ),
   // Legal: balanced scales, with a small star at the top.
@@ -153,7 +154,7 @@ const SHAPES: Record<string, React.ReactNode> = {
   ),
 };
 
-/** Drawn in a 140 x 100 box rather than a square. */
+/** Drawn in a 111 x 100 box rather than a square. */
 const WIDE = new Set(["therapy"]);
 
 /** `shape`: a mode value ("knowing", "decision"...) or a step word ("Ask.").
@@ -207,11 +208,11 @@ export function CardEmboss({ shape, center, size }: { shape: string; center: num
   return (
     <svg
       ref={ref}
-      viewBox={wide ? "0 0 140 100" : "0 0 100 100"}
+      viewBox={wide ? "0 0 111 100" : "0 0 100 100"}
       aria-hidden="true"
       data-testid="card-emboss"
       className="pointer-events-none absolute left-1/2 -translate-x-1/2 -translate-y-1/2 lg:hidden"
-      style={{ top: center, width: wide ? size * 1.4 : size, height: size }}
+      style={{ top: center, width: wide ? size * 1.11 : size, height: size }}
     >
       {art}
     </svg>
