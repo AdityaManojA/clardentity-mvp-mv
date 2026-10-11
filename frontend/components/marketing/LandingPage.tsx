@@ -280,7 +280,7 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
       {/* ---------------------------------------------------------------- */}
       {/* Hero (69:8) */}
       {/* ---------------------------------------------------------------- */}
-      <section className="relative mx-auto w-full max-w-[1728px] px-4 pb-[40px] pt-[48px] sm:px-8 sm:pb-[80px] sm:pt-[82px]">
+      <section className="landing-hero relative mx-auto w-full max-w-[1728px] px-4 pb-[40px] pt-[48px] sm:px-8 sm:pb-[80px] sm:pt-[82px]">
         {/* The nav (116:1908). The wordmark used to be centred over the page
             with the way in pinned to the right of it, which left the two
             halves of the bar unrelated to each other. They are now the ends
@@ -322,7 +322,7 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
           </span>
         </nav>
 
-        <div className="mx-auto mt-[96px] flex w-full max-w-[1032.46px] flex-col items-center sm:mt-[171px]">
+        <div className="landing-hero-gap mx-auto mt-[96px] flex w-full max-w-[1032.46px] flex-col items-center sm:mt-[171px]">
           <h1
             className="w-full text-center font-normal"
             style={{ fontSize: "clamp(20px, 2.35vw, 28px)", color: INK }}
@@ -515,9 +515,16 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
       {/* ---------------------------------------------------------------- */}
       {/* The audit (69:66) */}
       {/* ---------------------------------------------------------------- */}
-      <section className="mx-auto flex w-full max-w-[1728px] items-center px-4 py-[72px] sm:px-8 sm:py-[126px]">
+      {/* Phone and tablet layout: the design's 3.6px gaps between the label
+          row, the headline and the two sentences are sized for an 86px
+          headline on a wide screen. At phone sizes they ran together into one
+          block, so there each part gets room - wider side margins on a phone,
+          the headline and sentences dropped well below the label row - the
+          sentences are justified to a clean block under the centred headline,
+          and the lines are given air. */}
+      <section className="mx-auto flex w-full max-w-[1728px] items-center px-4 py-[72px] max-sm:px-7 max-lg:pb-[96px] max-lg:pt-[96px] sm:px-8 sm:py-[126px]">
         <div className="mx-auto w-full max-w-[1001.775px]">
-          <Reveal className="flex items-center justify-between">
+          <Reveal className="flex items-center justify-between max-lg:mb-10">
             <Wordmark size={PAGE_WORDMARK} tone={INK} mark={PLUM} />
             <p
               className="whitespace-nowrap text-center font-semibold uppercase"
@@ -527,15 +534,18 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
             </p>
           </Reveal>
 
-          <Reveal as="h2" delay={90} className="mt-[3.61px] text-center font-normal">
+          <Reveal as="h2" delay={90} className="mt-[3.61px] text-center font-normal max-lg:leading-[1.15]">
             <span style={{ fontSize: "clamp(36px, 5vw, 86px)", color: INK }}>
               An answer is many claims.
             </span>
           </Reveal>
-          <Reveal delay={180} className="mt-[3.61px] max-w-[769.429px] font-normal">
+          <Reveal delay={180} className="mt-[3.61px] max-w-[769.429px] font-normal max-lg:mx-auto max-lg:mt-7 max-lg:max-w-[34rem] max-lg:text-justify max-lg:hyphens-auto max-lg:leading-[1.55]">
             <div style={{ fontSize: "clamp(16px, 1.7vw, 28px)", color: INK_BODY }}>
-              <p>Clardentity splits every answer into individual claims.</p>
-              <p>Each one is checked against sources. You see what holds up and what doesn&apos;t.</p>
+              {/* One flowing paragraph on phones and tablets: justified, a
+                  one-line-and-a-bit sentence stretched its first line into
+                  wide gaps. */}
+              <p className="max-lg:inline">Clardentity splits every answer into individual claims.</p>{" "}
+              <p className="max-lg:inline">Each one is checked against sources. You see what holds up and what doesn&apos;t.</p>
             </div>
           </Reveal>
         </div>

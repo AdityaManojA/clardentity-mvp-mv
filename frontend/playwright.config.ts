@@ -22,7 +22,7 @@ const BASE_URL = process.env.E2E_BASE_URL ?? `http://localhost:${PORT}`;
 // `||`: an unset repository secret arrives as "", not undefined.
 const LIVE_URL = process.env.E2E_LIVE_BASE_URL || undefined;
 const PHONE = { width: 375, height: 812 };
-const MOBILE_SPECS = /(mobile|mobile-extras|chat|gates|screens|a11y|offline|visual)\.spec\.ts/;
+const MOBILE_SPECS = /(mobile|mobile-extras|devices|chat|gates|screens|a11y|offline|visual)\.spec\.ts/;
 const skipTags = process.env.E2E_VISUAL === "1" ? /@live/ : /@live|@visual/;
 
 export default defineConfig({
