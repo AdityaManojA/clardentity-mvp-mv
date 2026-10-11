@@ -657,6 +657,19 @@ body {
   }
 }
 
+/* A phone's new chat shows the companion above the greeting (MessageList).
+   Sized by the room the chat area has: when the keyboard leaves too little
+   for both, the companion steps out rather than pushing the greeting over
+   the top bar. */
+.chat-empty {
+  container-type: size;
+}
+@container (max-height: 260px) {
+  .chat-empty-avatar {
+    display: none;
+  }
+}
+
 /* Lists on the phone layout (workspaces, recent chats, search results,
    attachments) rise in one after another instead of all landing at once:
    --i is the item's index, 120ms apart, capped so a long list doesn't make
