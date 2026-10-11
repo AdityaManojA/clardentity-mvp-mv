@@ -2,8 +2,8 @@
 
 import { useLayoutEffect, useRef } from "react";
 
-/* The small mark in the empty middle of each landing card - phone layout
- * only. One symmetrical shape per card that says what the card says, drawn
+/* The small mark in the empty middle of each landing card - on phones and
+ * desktop alike. One symmetrical shape per card that says what the card says, drawn
  * as a fine outline in a slightly pink hairline (the card border's colour
  * with a touch of the accent: plum in light, pink in dark).
  *
@@ -211,7 +211,7 @@ export function CardEmboss({ shape, center, size }: { shape: string; center: num
       viewBox={wide ? "0 0 111 100" : "0 0 100 100"}
       aria-hidden="true"
       data-testid="card-emboss"
-      className="pointer-events-none absolute left-1/2 -translate-x-1/2 -translate-y-1/2 lg:hidden"
+      className="pointer-events-none absolute left-1/2 -translate-x-1/2 -translate-y-1/2"
       style={{ top: center, width: wide ? size * 1.11 : size, height: size }}
     >
       {art}

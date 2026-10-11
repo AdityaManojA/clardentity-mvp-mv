@@ -409,49 +409,52 @@ test.describe("server waking from a quiet spell", () => {
   });
 });
 
-test("M54 home page cards: one embossed mark each, in the empty space only; none on desktop @M54", async ({ app: page }) => {
+test("M54 home page cards: one mark each, in the empty space only, centred - on phones and desktop @M54", async ({ app: page }) => {
   await page.goto("/");
   const cards = page.locator("article.landing-card");
   await expect(cards).toHaveCount(11, { timeout: 30_000 });
-  // the marks are placed once each card's text has laid out; read them then
-  await cards.last().scrollIntoViewIfNeeded();
-  await page.waitForTimeout(800);
-  await cards.first().scrollIntoViewIfNeeded();
-  await page.waitForTimeout(800);
-  const report = await cards.evaluateAll((els) =>
-    els.map((card) => {
-      const marks = card.querySelectorAll('[data-testid="card-emboss"]');
-      const mark = marks[0]?.getBoundingClientRect();
-      const words = [...card.querySelectorAll("h3, p, span, img")].filter(
-        (el) => el.closest('[data-testid="card-emboss"]') === null && (el.textContent?.trim() || el.tagName === "IMG"),
-      );
-      const hits = mark
-        ? words.filter((el) => {
-            const r = el.getBoundingClientRect();
-            return r.width > 0 && r.left < mark.right && r.right > mark.left && r.top < mark.bottom && r.bottom > mark.top;
-          }).map((el) => el.textContent?.trim().slice(0, 20) || el.tagName)
-        : [];
-      // centred in the gap the text leaves: as much room above as below
-      let above = -Infinity, below = Infinity;
-      const box = card.getBoundingClientRect();
-      for (const el of words) {
-        const r = el.getBoundingClientRect();
-        if (r.height === 0) continue;
-        if (r.top + r.height / 2 < box.top + box.height / 2) above = Math.max(above, r.bottom);
-        else below = Math.min(below, r.top);
-      }
-      const skew = mark ? Math.abs((mark.top - above) - (below - mark.bottom)) : 0;
-      return { marks: marks.length, hits, skew };
-    }),
-  );
-  for (const [i, r] of report.entries()) {
-    expect.soft(r.marks, `card ${i}: one mark`).toBe(1);
-    expect.soft(r.hits, `card ${i}: mark overlaps text`).toEqual([]);
-    expect.soft(r.skew, `card ${i}: mark off-centre in its gap`).toBeLessThanOrEqual(3);
-  }
-  // desktop width: the cards are exactly as designed, no marks
+  const check = async (where: string) => {
+    // the marks are placed once each card's text has laid out; read them then
+    await cards.last().scrollIntoViewIfNeeded();
+    await page.waitForTimeout(800);
+    await cards.first().scrollIntoViewIfNeeded();
+    await page.waitForTimeout(800);
+    const report = await cards.evaluateAll((els) =>
+      els.map((card) => {
+        const marks = card.querySelectorAll('[data-testid="card-emboss"]');
+        const mark = marks[0]?.getBoundingClientRect();
+        const words = [...card.querySelectorAll("h3, p, span, img")].filter(
+          (el) => el.closest('[data-testid="card-emboss"]') === null && (el.textContent?.trim() || el.tagName === "IMG"),
+        );
+        const hits = mark
+          ? words.filter((el) => {
+              const r = el.getBoundingClientRect();
+              return r.width > 0 && r.left < mark.right && r.right > mark.left && r.top < mark.bottom && r.bottom > mark.top;
+            }).map((el) => el.textContent?.trim().slice(0, 20) || el.tagName)
+          : [];
+        // centred in the gap the text leaves: as much room above as below
+        let above = -Infinity, below = Infinity;
+        const box = card.getBoundingClientRect();
+        for (const el of words) {
+          const r = el.getBoundingClientRect();
+          if (r.height === 0) continue;
+          if (r.top + r.height / 2 < box.top + box.height / 2) above = Math.max(above, r.bottom);
+          else below = Math.min(below, r.top);
+        }
+        const skew = mark ? Math.abs((mark.top - above) - (below - mark.bottom)) : 0;
+        return { marks: marks.length, hits, skew };
+      }),
+    );
+    for (const [i, r] of report.entries()) {
+      expect.soft(r.marks, `${where} card ${i}: one mark`).toBe(1);
+      expect.soft(r.hits, `${where} card ${i}: mark overlaps text`).toEqual([]);
+      expect.soft(r.skew, `${where} card ${i}: mark off-centre in its gap`).toBeLessThanOrEqual(3);
+    }
+  };
+  await check("phone");
+  // desktop shows the same marks, four cards across
   await page.setViewportSize({ width: 1280, height: 900 });
-  await expect(page.locator('[data-testid="card-emboss"]').first()).toBeHidden();
+  await check("desktop");
 });
 
 test("M55 phone text: drawn at 92%, smallest labels held at 12.5px on the glass @M55", async ({ page }) => {

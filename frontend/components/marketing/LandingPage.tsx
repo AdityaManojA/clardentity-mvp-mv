@@ -466,7 +466,7 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
                   // because the rule is never generated.
                   style={{ border: `1.099px solid ${HAIRLINE}` }}
                 />
-                {/* phone only: a small outlined mark in the empty middle */}
+                {/* a small outlined mark in the empty middle */}
                 <CardEmboss shape={step.word} center={249} size={86} />
                 <p
                   className="absolute font-normal"
@@ -568,7 +568,7 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
                   className="pointer-events-none absolute inset-0 rounded-[10.83px]"
                   style={{ border: `0.902px solid ${HAIRLINE}` }}
                 />
-                {/* phone only: a small outlined mark in the empty middle */}
+                {/* a small outlined mark in the empty middle */}
                 <CardEmboss shape={mode.value} center={155} size={70} />
                 <div
                   className="absolute flex items-center justify-between"
