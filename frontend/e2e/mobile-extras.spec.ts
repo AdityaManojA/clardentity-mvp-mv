@@ -490,3 +490,51 @@ test("M56 typing folds the mode row to a chip; the chip opens it without closing
   await expect(rail).toBeVisible();
   await expect(rail.getByRole("radio", { name: "Thought coach" })).toHaveAttribute("aria-checked", "true");
 });
+
+test("M57 home page cards follow the colour theme: mark colour and tap glow @M57", async ({ app: page }) => {
+  await page.goto("/");
+  const card = page.locator("article.landing-card").nth(3); // Finder
+  await expect(card).toBeAttached({ timeout: 30_000 });
+  await card.scrollIntoViewIfNeeded();
+  const expected: Record<string, string> = { "": "rgb(107, 45, 92)", teal: "rgb(13, 124, 123)", indigo: "rgb(45, 53, 97)", plum: "rgb(93, 58, 122)" };
+  for (const [accent, colour] of Object.entries(expected)) {
+    await page.evaluate((a) => {
+      if (a) document.documentElement.dataset.accent = a;
+      else delete document.documentElement.dataset.accent;
+    }, accent);
+    const mark = await card.locator('[data-testid="card-emboss"] path').first().evaluate((el) => getComputedStyle(el).stroke);
+    expect(mark, `mark colour, ${accent || "default"}`).toBe(colour);
+    // the glow under a tapped card is the theme's accent, not burgundy everywhere
+    await card.hover();
+    const glowRgb = () => card.evaluate((el) => {
+      const s = getComputedStyle(el).boxShadow;
+      const srgb = s.match(/color\(srgb ([\d.]+) ([\d.]+) ([\d.]+)/);
+      const rgb = srgb ? srgb.slice(1).map((v) => Math.round(Number(v) * 255)) : (s.match(/rgba?\((\d+), (\d+), (\d+)/) ?? []).slice(1).map(Number);
+      return `rgb(${rgb.join(", ")})`;
+    });
+    // the theme's accent (plum velvet's glow is its accent, #4b2f64)
+    await expect.poll(glowRgb, { message: `glow, ${accent || "default"}` }).toBe(accent === "plum" ? "rgb(75, 47, 100)" : colour);
+  }
+});
+
+test("M58 the model picker's menu opens fully on screen @M58", async ({ page }) => {
+  await signIn(page, {
+    messages: thread(1, "creative"),
+    handlers: {
+      "GET /pro/preview": () => ({ body: { unlocked: true, modes: [], daily_limit: 20, used_today: 0, remaining_today: 20 } }),
+      "GET /chat/models": () => ({ body: { models: [
+        { id: "opus", label: "Claude Opus 5.5", vendor: "Anthropic", blurb: "Deep reasoning. Slower, and worth it on hard questions." },
+        { id: "sonnet", label: "Claude Sonnet 5.5", vendor: "Anthropic", blurb: "Fast and capable. A good default for most work." },
+        { id: "gpt", label: "GPT 5.1", vendor: "OpenAI", blurb: "Very capable, and the most expensive." },
+      ] } }),
+    },
+  });
+  await openChat(page);
+  await page.locator(sel.modeRail).getByRole("radio", { name: "Co-Creative" }).tap();
+  await page.locator('[aria-haspopup="menu"][title="Choose which model answers in this mode"]').tap();
+  const menu = page.getByRole("menu", { name: "Model" });
+  await expect(menu).toBeVisible();
+  const b = (await menu.boundingBox())!;
+  expect(b.x, "menu's left edge on screen").toBeGreaterThanOrEqual(0);
+  expect(b.x + b.width, "menu's right edge on screen").toBeLessThanOrEqual(375);
+});
