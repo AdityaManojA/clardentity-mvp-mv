@@ -286,5 +286,6 @@ Regression: if a test fails, fix it, then rerun it, its upstream T-test and the 
 | ✅ | "E2E / playwright" as a required check: decided against for now - work is pushed straight to the fork's `main`, and a required check would refuse those pushes (it only gates pull requests). The suite still runs on every PR |
 | ✅ | Not needed: the fork's `main` has no branch protection or rulesets, so the sync can push |
 | ✅ | "E2E visual baselines" run on `main`; all 10 screenshots reviewed (the first run's misplaced masks were fixed first) |
-| ⬜ | Re-run "E2E visual baselines" on `main` and on `mobile-polish`: the 92% phone text, scrolling and compact chat box changed the chat and settings screenshots, and PR #3 carries none yet |
+| ✅ | "E2E visual baselines" re-run on `main` (2026-10-11) for the 92% phone text, phone scrollbars and compact chat box; all 10 reviewed |
+| ⬜ | Run "E2E visual baselines" on `mobile-polish` so PR #3 carries baselines too (until then its screenshot tests skip) |
 
