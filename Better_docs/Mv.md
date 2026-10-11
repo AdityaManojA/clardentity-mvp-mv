@@ -120,6 +120,8 @@ Status key: ✅ Done · 🔄 Built, waiting on a setup step · 🔍 Built, needs
 | ✅ | The glow behind a tapped home page card follows the colour theme on phones (it was burgundy in every theme) |
 | ✅ | Model picker menu opens fully on screen on phones (it ran off the left edge) |
 | ✅ | M57–M58: card marks and tap glow per colour theme; model picker menu on screen |
+| ✅ | Card marks shown on desktop too (requested), same designs and theme colours, centred in each card; M54 now checks phone and desktop |
+| ⬜ | Healthcare card: design ready in `Card_design` (4 theme versions); to be added with the Healthcare mode later |
 | ✅ | Phone text drawn at 92% instead of 85% (touch phones only; desktop and narrow desktop windows keep 85%), with the smallest labels held at 12.5px on screen |
 | ✅ | While typing on a phone, the mode row folds into one chip ("Finder ▾") so the conversation keeps the space above the keyboard; tapping the chip opens the row without closing the keyboard |
 | ✅ | Home page cards on phones: one small, symmetrical fine-outline mark per card in a slightly pink hairline, drawn from what the card says (Ask: one question to three models; Check: a ring of sources and a check; See: an eye; Finder: a tall star with a filled ace of spades (Aditya's sketch); Decision: a forking path; Thought Coach: a half-formed circle; Learning: a tree branching down from a star (Aditya's sketch); Co-Creative: three overlapping circles with a star in the middle (Aditya's sketch); Mentoring: a guiding star and path; Reflect & Relieve: a sparkle, three dots and an outlined star (Aditya's sketch); Legal: scales), centred in each card's measured empty space - text, fonts, icons and spacing unchanged |
