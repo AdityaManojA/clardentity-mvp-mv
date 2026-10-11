@@ -448,7 +448,10 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
             </span>
           </Reveal>
 
-          <div className="grid w-full grid-cols-1 justify-items-center gap-[35.161px] md:grid-cols-3">
+          {/* As many across as fit, the rest centred: the cards are a fixed size,
+              so fixed column counts squeezed them at tablet widths and their
+              text ran out of the card. Three across at the design's width. */}
+          <div className="flex w-full flex-wrap justify-center gap-[35.161px]">
             {STEPS.map((step, i) => (
               <Reveal
                 as="article"
@@ -456,7 +459,7 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
                 // Ask, then Check, then See - in that order, which is the
                 // point the three cards are making.
                 delay={i * 110}
-                className="landing-card relative h-[439.515px] w-full max-w-[329.636px] overflow-hidden rounded-[13.185px]"
+                className="landing-card relative h-[439.515px] w-[329.636px] max-w-full overflow-hidden rounded-[13.185px]"
               >
                 <span
                   aria-hidden="true"
@@ -553,7 +556,7 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
           {/* Four across at the design's width, reflowing below it. The cards
               keep their 270.75 x 361 shape, so the wall of them reads the
               same at every breakpoint. */}
-          <div className="grid w-full grid-cols-1 justify-items-center gap-x-[28.88px] gap-y-[36.1px] sm:grid-cols-2 lg:grid-cols-4">
+          <div className="flex w-full flex-wrap justify-center gap-x-[28.88px] gap-y-[36.1px]">
             {MODES.map((mode, i) => (
               <Reveal
                 as="article"
@@ -561,7 +564,7 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
                 // Staggered across the row, capped so the second row does not
                 // wait most of a second behind the first.
                 delay={(i % 4) * 70}
-                className="landing-card relative h-[361px] w-full max-w-[270.75px] overflow-hidden rounded-[10.83px]"
+                className="landing-card relative h-[361px] w-[270.75px] max-w-full overflow-hidden rounded-[10.83px]"
               >
                 <span
                   aria-hidden="true"

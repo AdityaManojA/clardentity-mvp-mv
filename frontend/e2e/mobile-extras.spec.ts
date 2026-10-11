@@ -541,3 +541,49 @@ test("M58 the model picker's menu opens fully on screen @M58", async ({ page }) 
   expect(b.x, "menu's left edge on screen").toBeGreaterThanOrEqual(0);
   expect(b.x + b.width, "menu's right edge on screen").toBeLessThanOrEqual(375);
 });
+
+test("M59 home page cards fit inside themselves on every screen width @M59", async ({ app: page }) => {
+  test.setTimeout(120_000);
+  await page.goto("/");
+  const cards = page.locator("article.landing-card");
+  await expect(cards).toHaveCount(11, { timeout: 30_000 });
+  const problems: string[] = [];
+  for (const [w, h] of [[360, 780], [375, 812], [430, 932], [600, 960], [768, 1024], [820, 1180], [1024, 1366], [1100, 900], [1280, 800], [1440, 900], [1920, 1080]] as const) {
+    await page.setViewportSize({ width: w, height: h });
+    await page.waitForTimeout(400);
+    const r = await cards.evaluateAll((els) => {
+      const out: string[] = [];
+      const vw = document.documentElement.clientWidth;
+      const rows = new Map<number, number>();
+      els.forEach((card, i) => {
+        const c = card.getBoundingClientRect();
+        if (c.left < -1 || c.right > vw + 1) out.push(`card ${i} off screen`);
+        for (const el of card.querySelectorAll("h3, p, span, img")) {
+          const t = el.getBoundingClientRect();
+          if (t.width === 0 || (!el.textContent?.trim() && el.tagName !== "IMG")) continue;
+          if (t.left < c.left - 1 || t.right > c.right + 1) out.push(`card ${i}: "${(el.textContent || el.tagName).trim().slice(0, 14)}" runs out`);
+        }
+        rows.set(Math.round(c.top), (rows.get(Math.round(c.top)) ?? 0) + 1);
+      });
+      return { out, rows: [...rows.values()] };
+    });
+    problems.push(...r.out.map((p) => `${w}px ${p}`));
+    if (w === 1440) {
+      expect(r.rows.slice(0, 1), "1440: the three steps share a row").toEqual([3]);
+      expect(r.rows.slice(1), "1440: modes four across").toEqual([4, 4]);
+    }
+  }
+  expect(problems, problems.join("\n")).toEqual([]);
+});
+
+test("M60 a wide screen with no hover (a tablet) gets the automatic wave @M60", async ({ app: page }) => {
+  await page.setViewportSize({ width: 1180, height: 820 }); // iPad landscape: wider than the phone layout, still touch
+  await page.goto("/");
+  await expect(page.locator(".landing-shimmer")).toBeAttached({ timeout: 30_000 });
+  expect(await page.evaluate(() => matchMedia("(hover: none)").matches)).toBe(true);
+  const sway = () => page.locator(".landing-shimmer > span").nth(10).evaluate((el) => (el as HTMLElement).style.transform);
+  const lit = () => page.evaluate(() => Math.max(0, ...[...document.querySelectorAll<HTMLElement>(".landing-shimmer > span")].map((p) => Number(p.style.opacity || 0))));
+  await expect.poll(lit, { message: "lit without hover", timeout: 5_000 }).toBeGreaterThan(0.1);
+  const t0 = await sway();
+  await expect.poll(sway, { message: "the folds sway on their own", timeout: 3_000 }).not.toBe(t0);
+});
