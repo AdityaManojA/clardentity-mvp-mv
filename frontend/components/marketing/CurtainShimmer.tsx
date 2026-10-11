@@ -80,10 +80,14 @@ const SWAY = 0.1; // the idle drift, present whether or not anything moved
  * Keyed on the device's input, not its width: a tablet held sideways is
  * wider than the phone breakpoint and still has no pointer to hover with. */
 const PHONE_QUERY = "(hover: none), (max-width: 1023.98px) and (pointer: coarse)";
-const PHONE_LIT = 0.75; // the light stays on - there is no hover to wait for
+const PHONE_LIT = 0.9; // the light stays on - there is no hover to wait for
 const PHONE_WAVE_LENGTH = 34; // % of the width from one crest to the next
-const PHONE_WAVE_SPEED = 0.0007; // radians per ms - a crest crosses in ~6s
-const PHONE_WAVE_SWAY = 0.9; // how far a fold moves with the wave, % of width
+const PHONE_WAVE_SPEED = 0.0013; // radians per ms - one crest to the next in ~5s
+const PHONE_WAVE_SWAY = 0.5; // how far a fold moves with the wave, % of the stage
+// A pleat's translate() percentage is of its own width, not the stage's: this
+// turns a sway in stage-% into the pleat's. Without it the wave moved each
+// fold by a few hundredths of a pixel on a phone - running, and invisible.
+const STAGE_TO_PLEAT = 100 / (PLEAT * LIT);
 
 export function CurtainShimmer({ style }: { style: React.CSSProperties }) {
   const hostRef = useRef<HTMLSpanElement>(null);
@@ -143,19 +147,23 @@ export function CurtainShimmer({ style }: { style: React.CSSProperties }) {
         // The light: a pool around the cursor, fading with distance.
         let glow = Math.exp(-(toCursor * toCursor) / (2 * REACH * REACH));
 
+        let swing = 0;
         if (waving) {
           // The phone's wave: every fold swings with it, and the light is
-          // brightest on the crests, so bands of light travel across.
+          // brightest on the crests, so bands of light travel across - narrow
+          // bands with dark between, or the eye reads it as a steady glow.
           const angle = (x / PHONE_WAVE_LENGTH) * Math.PI * 2 - wavePhase;
-          shift += Math.sin(angle) * PHONE_WAVE_SWAY;
-          glow = 0.25 + 0.75 * (0.5 + 0.5 * Math.cos(angle));
+          swing = Math.sin(angle) * PHONE_WAVE_SWAY;
+          const crest = 0.5 + 0.5 * Math.cos(angle);
+          glow = 0.08 + 0.92 * crest * crest;
         }
 
         const node = pleats[i];
         // translate moves the fold; scaleX narrows it as it turns edge-on,
         // which is what sells the billow - a pleat swinging toward you gets
         // wider, one swinging away gets thinner.
-        node.style.transform = `translate3d(${shift.toFixed(3)}%, 0, 0) scaleX(${(1 + shift * 0.09).toFixed(4)})`;
+        const move = shift + swing * STAGE_TO_PLEAT;
+        node.style.transform = `translate3d(${move.toFixed(3)}%, 0, 0) scaleX(${(1 + shift * 0.09 + swing * 0.12).toFixed(4)})`;
         node.style.opacity = (glow * lit * 0.8).toFixed(3);
       }
 
