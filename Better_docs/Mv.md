@@ -23,6 +23,9 @@ Status key: ✅ Done · 🔄 Built, waiting on a setup step · 🔍 Built, needs
 | ✅ | The merged result must pass the full test suite before a sync is pushed; a failure pushes nothing |
 | ✅ | Real-time sync: decided against - it needs an org admin to add a secret on the main repo, and every sync waits for approval anyway, so the check runs every 15 minutes instead of hourly |
 | ✅ | Upstream PRs go from a feature branch (`mobile-view`), so fork-only files stay out |
+| ✅ | PR #2 (first mobile pass) merged into the main repo |
+| 🔄 | PR #3 (second mobile pass, branch `mobile-polish`): scrolling, cold starts, larger text, folding mode row, compact chat box, card marks, curtain wave, menu logo and `Card_design` - open, waiting on review |
+| ✅ | Work now happens on the fork's `main`; upstream PRs are cut from it with fork-only files left out |
 
 ## 2. Mobile testing
 
@@ -112,6 +115,7 @@ Status key: ✅ Done · 🔄 Built, waiting on a setup step · 🔍 Built, needs
 | ✅ | Recent chats, the mode row and the thread pills fade at an edge when there's more to scroll |
 | ✅ | Home curtain on phones moves on its own as a slow wave across the folds, with light riding the crests; tilt steering removed entirely (a finger still lights it where it touches) |
 | ✅ | Phone menu shows the five-dot Clardentity logo beside the name, as the desktop sidebar does |
+| ✅ | Card marks exported as standalone SVGs in `Card_design` (one per card, drawn in currentColor so they recolour anywhere), plus a zip of all eleven; included in PR #3 |
 | ✅ | Phone text drawn at 92% instead of 85% (touch phones only; desktop and narrow desktop windows keep 85%), with the smallest labels held at 12.5px on screen |
 | ✅ | While typing on a phone, the mode row folds into one chip ("Finder ▾") so the conversation keeps the space above the keyboard; tapping the chip opens the row without closing the keyboard |
 | ✅ | Home page cards on phones: one small, symmetrical fine-outline mark per card in a slightly pink hairline, drawn from what the card says (Ask: one question to three models; Check: a ring of sources and a check; See: an eye; Finder: a tall star with a filled ace of spades (Aditya's sketch); Decision: a forking path; Thought Coach: a half-formed circle; Learning: a tree branching down from a star (Aditya's sketch); Co-Creative: three overlapping circles with a star in the middle (Aditya's sketch); Mentoring: a guiding star and path; Reflect & Relieve: a sparkle, three dots and an outlined star (Aditya's sketch); Legal: scales), centred in each card's measured empty space - text, fonts, icons and spacing unchanged |
@@ -282,4 +286,5 @@ Regression: if a test fails, fix it, then rerun it, its upstream T-test and the 
 | ✅ | "E2E / playwright" as a required check: decided against for now - work is pushed straight to the fork's `main`, and a required check would refuse those pushes (it only gates pull requests). The suite still runs on every PR |
 | ✅ | Not needed: the fork's `main` has no branch protection or rulesets, so the sync can push |
 | ✅ | "E2E visual baselines" run on `main`; all 10 screenshots reviewed (the first run's misplaced masks were fixed first) |
+| ⬜ | Re-run "E2E visual baselines" on `main` and on `mobile-polish`: the 92% phone text, scrolling and compact chat box changed the chat and settings screenshots, and PR #3 carries none yet |
 
