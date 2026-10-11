@@ -250,11 +250,17 @@ export function MessageList({
 
   if (loading) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center px-4 py-16 sm:px-6">
+      // On a phone this takes the same room as the empty chat that usually
+      // follows it (min-h-0, no padding), so the composer below doesn't move
+      // when the history arrives.
+      <div className={phone ? "flex min-h-0 flex-1 flex-col items-center justify-center px-4" : "flex flex-1 flex-col items-center justify-center px-4 py-16 sm:px-6"}>
         {emptyStateAvatar}
-        <div className="mt-4">
-          <ThinkingIndicator label="Opening the chat" />
-        </div>
+        {/* On a phone the companion alone says the chat is opening. */}
+        {!phone && (
+          <div className="mt-4">
+            <ThinkingIndicator label="Opening the chat" />
+          </div>
+        )}
       </div>
     );
   }

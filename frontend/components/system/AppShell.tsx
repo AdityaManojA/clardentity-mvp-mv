@@ -25,6 +25,7 @@ import { MaskIcon } from "@/components/ui/MaskIcon";
 import { AccountMenu } from "@/components/system/AccountMenu";
 import { cx } from "@/components/ui/primitives";
 import { useScrollEdges } from "@/lib/useScrollEdges";
+import { markFreshChat } from "@/lib/freshChats";
 
 /* Sidebar collapse lives in a tiny external store read through
    useSyncExternalStore rather than useState + an effect. Reading localStorage
@@ -655,6 +656,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         body: { workspace_id: activeWorkspaceId, default_mode: null },
       });
       setRecentsKey((k) => k + 1);
+      markFreshChat(conv.id);
       router.push(`/chat/${conv.id}`);
     } catch {
       // The room page has the same button with visible error handling; a

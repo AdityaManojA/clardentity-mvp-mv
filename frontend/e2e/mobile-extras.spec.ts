@@ -587,3 +587,35 @@ test("M60 a wide screen with no hover (a tablet) gets the automatic wave @M60", 
   const t0 = await sway();
   await expect.poll(sway, { message: "the folds sway on their own", timeout: 3_000 }).not.toBe(t0);
 });
+
+test("M61 a new chat opens centred, with only the companion while it loads @M61", async ({ page }) => {
+  let release: () => void = () => {};
+  const held = new Promise<void>((r) => (release = r));
+  await signIn(page, {
+    messages: thread(2),
+    handlers: {
+      // the new chat's (empty) history answers only when the test says so
+      "GET /chat/c2/messages": async () => {
+        await held;
+        return { body: [] };
+      },
+    },
+  });
+  await openChat(page);
+  await page.locator(sel.newChatMobile).tap();
+  await page.waitForURL(/\/chat\/c2/);
+
+  const avatar = page.locator('[data-tour="companion"]');
+  await expect(avatar).toBeVisible();
+  await expect(page.getByText("Opening the chat")).toHaveCount(0);
+  const composerY = () => page.locator(sel.composer).evaluate((el) => Math.round(el.getBoundingClientRect().top));
+  const viewport = page.viewportSize()!;
+  const loadingY = await composerY();
+  // centred, not on the floor (the floor is within ~200px of the bottom)
+  expect(loadingY).toBeLessThan(viewport.height * 0.75);
+
+  release();
+  await expect(page.getByText("Opening the chat")).toHaveCount(0);
+  await page.waitForTimeout(500);
+  expect(Math.abs((await composerY()) - loadingY), "no jump once the history arrives").toBeLessThanOrEqual(4);
+});
