@@ -24,7 +24,8 @@ Status key: ✅ Done · 🔄 Built, waiting on a setup step · 🔍 Built, needs
 | ✅ | Real-time sync: decided against - it needs an org admin to add a secret on the main repo, and every sync waits for approval anyway, so the check runs every 15 minutes instead of hourly |
 | ✅ | Upstream PRs go from a feature branch (`mobile-view`), so fork-only files stay out |
 | ✅ | PR #2 (first mobile pass) merged into the main repo |
-| 🔄 | PR #3 (second mobile pass, branch `mobile-polish`): scrolling, cold starts, larger text, folding mode row, compact chat box, card marks, curtain wave, menu logo and `Card_design` - open, waiting on review |
+| ✅ | PR #3 (second mobile pass, branch `mobile-polish`): scrolling, cold starts, larger text, folding mode row, compact chat box, card marks, curtain wave, menu logo and `Card_design` - merged upstream 2026-10-11 |
+| 🔄 | PR #4 (`mobile-polish` again): themed card marks, tap glow, model picker, desktop marks, cards on every screen, visible wave, new-chat opening, device sweep and fixes - open; upstream main merged in (`7cf9cc9`) |
 | ✅ | Work now happens on the fork's `main`; upstream PRs are cut from it with fork-only files left out |
 
 ## 2. Mobile testing
@@ -305,5 +306,5 @@ Regression: if a test fails, fix it, then rerun it, its upstream T-test and the 
 | ✅ | Not needed: the fork's `main` has no branch protection or rulesets, so the sync can push |
 | ✅ | "E2E visual baselines" run on `main`; all 10 screenshots reviewed (the first run's misplaced masks were fixed first) |
 | ✅ | "E2E visual baselines" re-run on `main` (2026-10-11) for the 92% phone text, phone scrollbars and compact chat box; all 10 reviewed |
-| ⬜ | Run "E2E visual baselines" on `mobile-polish` so PR #3 carries baselines too (until then its screenshot tests skip) |
+| ⬜ | Run "E2E visual baselines" on `mobile-polish` for PR #4: the baselines on upstream main (`79ce2e9`) were captured before PR #3 merged, so all 10 screenshot tests fail on main and PR #4 until they are regenerated |
 
