@@ -212,6 +212,16 @@ _TAVILY_TIMEOUT_SECONDS = 8.0
 # Forums and social feeds are where a claim's exact words turn up with no
 # authority behind them; the supervisor would reject them anyway, so they
 # are not worth the result slots.
+#
+# Filtered here, after the results arrive - never sent as Tavily's
+# `exclude_domains`. Sent, it wrecks the search: measured 2026-10-12, "why is
+# sky blue light scattering" with the list came back as five dictionary
+# entries for the word "why" (scores 0.04-0.11); the same body without it
+# returned NASA, NOAA and the Royal Observatory (0.84-0.88). Every pre-answer
+# search and every per-claim check had been going through that, which is
+# why answers arrived with few or no sources and Finder's claims went
+# unchecked. `country`, `topic` and `search_depth` were tested the same way
+# and are fine.
 _EXCLUDED_DOMAINS = [
     "facebook.com",
     "reddit.com",
@@ -225,6 +235,17 @@ _EXCLUDED_DOMAINS = [
     "alternatehistory.com",
 ]
 _EXCERPT_CHARS = 1800
+#: Asked for on top of the caller's count, to make up for the results the
+#: domain filter drops.
+_FILTER_HEADROOM = 4
+
+
+def _excluded(host: str | None) -> bool:
+    """Whether a result's host is one of the excluded sites or under one."""
+    if not host:
+        return False
+    host = host.lower()
+    return any(host == d or host.endswith("." + d) for d in _EXCLUDED_DOMAINS)
 
 
 def tavily_available() -> bool:
@@ -279,10 +300,11 @@ async def _tavily_search(
     body = {
         "query": query[:400],
         "search_depth": depth,
-        "max_results": max_results,
+        # More than needed, because the excluded sites are dropped below
+        # rather than excluded by Tavily - see _EXCLUDED_DOMAINS for why.
+        "max_results": min(max_results + _FILTER_HEADROOM, 20),
         "include_answer": False,
         "include_raw_content": False,
-        "exclude_domains": _EXCLUDED_DOMAINS,
     }
     if country:
         body["country"] = country
@@ -316,6 +338,8 @@ async def _tavily_search(
             host = urlparse(url).hostname or None
         except ValueError:
             host = None
+        if _excluded(host):
+            continue
         sources.append(
             WebSource(
                 url=url,
@@ -325,7 +349,7 @@ async def _tavily_search(
                 date=(str(item["published_date"])[:20] if item.get("published_date") else None),
             )
         )
-    return await _read_any_pdf_tables(sources)
+    return await _read_any_pdf_tables(sources[:max_results])
 
 
 #: At most this many PDFs per search. The fetch is worth it for the one

@@ -26,6 +26,7 @@ Add a row for every feature that ships and every bug found. Retire, never delete
 | DEMO-GATES | Pre-answer questions arrive as the app's events and stop the turn | script |
 | DEMO-SWITCH | Smart switching moves a question (`switched` event); a miss is a judgement call (SKIP) | script |
 | B3 | In the browser: gist card leads with the rabbit under it; then "Likely Fact"-style badge (Finder), Devil's Draft toggle, "Show full answer", citation markers, Sources list | browser |
+| B3b | In the demo, tapping a citation marker opens its source card **on top of the demo** (dark theme), and Esc closes only the card - the demo and its conversation stay (2026-10-12: the card used to open behind the demo, and Esc closed the whole demo) | browser |
 | B4 | Decision-making in the browser, demo and signed in: **gist first, then the "One decision that's correct, and the ones that aren't" box, then "Details of the decision making journey"** (since 2026-10-12). While streaming, the box's placeholder sits under the gist, and a box that lands first waits for the gist rather than being pushed down by it | browser |
 | B4b | Thought coach keeps its box above the gist (box, gist, journey) | browser |
 | B5 | Context-question card: answer it → answered turn; "Answer without this" → answered turn | browser |
@@ -119,6 +120,7 @@ Add a row for every feature that ships and every bug found. Retire, never delete
 | SEC-CORS | A foreign origin's preflight gets no Allow-Origin | script |
 | SEC-APP-HEADERS | App serves CSP (default-src 'self', object-src 'none', frame-ancestors 'none', base-uri 'self'), X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy | script |
 | SEC-SOURCEMAPS | Source maps are not served | script |
+| L6 | Web search returns topical sources: Tavily is never sent `exclude_domains` (it turns results into dictionary pages); excluded sites are filtered locally. DEMO-FINDER / APP-FINDER fail if most factual claims have no source | test (`test_search_locality.py`) + script |
 | SEC-BUNDLE-SECRETS | No API keys in shipped JS (PostHog's public key is expected) | script |
 | L1 | No CSP violations in the console across landing, demo, login (Google button), chat, images, live call | browser (production build) |
 | L2 | No console errors / failed requests on the main flows | browser |

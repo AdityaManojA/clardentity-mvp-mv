@@ -149,6 +149,13 @@ def answer_structure_ok(events, *, need_review: str | None = None) -> tuple[bool
     if need_review and not final.get(need_review):
         problems.append(f"no {need_review}")
     checked = sum(1 for c in claims if c.get("evidence"))
+    # A Finder answer is a set of checked facts. When most of its factual
+    # claims come back with no source, the search is broken even though the
+    # answer looks fine - which is exactly how a Tavily request parameter
+    # silently turned every search into dictionary pages (2026-10-12).
+    factual = [c for c in claims if c.get("entailment_label") != "opinion"]
+    if final["message"]["mode_used"] == "knowing" and len(factual) >= 3 and checked * 2 < len(factual):
+        problems.append(f"only {checked} of {len(factual)} factual claims have a source")
     detail = (
         f"mode={final['message']['mode_used']} claims={len(claims)} with_evidence={checked} "
         f"band={final['confidence'].get('band')}"
