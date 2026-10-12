@@ -18,7 +18,7 @@ what it proves, and how it is checked. Three kinds of check:
 |---|---|---|
 | `script` | `scripts/regression/smoke.py` - one line per row ID | ~3 min, a few cents |
 | `test` | `backend/.venv/bin/python -m pytest -q` (472+ tests, local DB + Redis) | ~30 s |
-| `e2e` | Aditya's Playwright suite (desktop, Pixel 7, iPhone 14; mocked API) via CI: `gh workflow run e2e.yml --ref main` | ~4 min |
+| `e2e` | Aditya's Playwright suite (desktop, phones, device sweep; mocked API) - no longer in this repo or CI; Aditya runs it locally | ~20 min |
 | `browser` | walked by hand in the browser pane, desktop 1280×860 | ~15 min |
 
 ## When to run it
@@ -48,14 +48,9 @@ what it proves, and how it is checked. Three kinds of check:
    After a deploy, the same with `--target prod`. `--images` costs real
    money (two image generations); include it whenever Co-Creative or the
    image pipeline changed.
-4. **E2E suite** (after pushing): `gh workflow run e2e.yml --ref main`, then
-   `gh run list --workflow e2e.yml --limit 1` and read the run. The workflow
-   only runs on PRs and dispatch, never on a push, so it must be dispatched.
-   Locally it needs Playwright's exact Chromium build; CI has it. Live and
-   visual-baseline tests skip without their secrets - that is expected.
-   A failure that looks like the app may be the suite: read the trace
-   (`gh run download <id> -n test-results`, then the `error-context.md` and
-   `trace.zip` of the failing test) before changing app code.
+4. **E2E suite**: kept out of this repo since PR #5 - Aditya keeps the
+   Playwright suite (`frontend/e2e`, gitignored) and runs it locally. Ask him
+   to run it before a release or after any UI change; there is no CI job.
 5. **Browser rows**: walk every `browser` row in `MATRIX.md` in the browser
    pane at 1280×860. Unregister the service worker and clear caches and
    localStorage before trusting a reload. Use throwaway accounts only
