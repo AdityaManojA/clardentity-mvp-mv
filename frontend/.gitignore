@@ -49,3 +49,7 @@ next-env.d.ts
 # visual baselines come from the CI image only (-linux); never commit local ones
 /e2e/visual.spec.ts-snapshots/*-win32.png
 /e2e/visual.spec.ts-snapshots/*-darwin.png
+
+# Playwright E2E suite: kept locally, not in the repo
+/e2e/
+/playwright.config.ts

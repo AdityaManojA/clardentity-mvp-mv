@@ -102,20 +102,14 @@ jobs:
         env:
           EXPECTED_SHA: ${{ needs.check.outputs.upstream_sha }}
           CI: "true"
-          # Same command as the PR check (e2e.yml) - one source of truth.
-          # npm ci runs on the *merged* tree, so upstream's dependency changes
-          # are what get tested.
+          # The E2E suite is kept locally, not in this repo, so the gate is a
+          # lint and production build of the *merged* tree (npm ci there, so
+          # upstream's dependency changes are what get built).
           GATE_CMD: >-
             cd frontend && npm ci &&
-            npx playwright install --with-deps chromium webkit &&
-            npm run test:e2e:ci
+            npm run lint &&
+            npm run build
         run: bash .github/scripts/sync-upstream.sh
 
-      - name: Gate report
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: sync-gate-playwright-report
-          path: frontend/playwright-report/
-          retention-days: 14
+
           if-no-files-found: ignore

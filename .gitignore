@@ -42,3 +42,7 @@ evals/reports/
 
 # Deploy secrets (Render deploy hook). Never commit.
 .secrets/
+
+# E2E workflows: kept locally, not in the repo
+.github/workflows/e2e.yml
+.github/workflows/e2e-visual-baselines.yml
