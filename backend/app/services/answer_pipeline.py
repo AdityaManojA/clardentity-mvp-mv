@@ -473,7 +473,8 @@ class AnswerRun:
 
     async def review_grace(self) -> AsyncIterator[dict]:
         """A short answer can finish before the verdict box does; give it a
-        moment so the two arrive in the order they are shown."""
+        moment, so the box is part of the answer the client is handed rather
+        than arriving after the bubble has been swapped for it."""
         pending = self.review_task or self.thinking_task
         if pending is not None and not self._review_sent:
             await asyncio.wait({pending}, timeout=REVIEW_GRACE_SECONDS)

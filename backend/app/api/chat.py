@@ -1214,8 +1214,10 @@ async def send_message(
     # fan-out and drop into the top of the bubble several seconds after the
     # gist and journey were already on screen, which read as the wrong
     # order. Started here, before generation, and sent the moment it lands
-    # (see the `review` event in the stream), it is the first thing shown -
-    # the client's Option 2: box, gist, journey. Thought coach pays for the
+    # (see the `review` event in the stream), so it is on screen by the time
+    # it is reached: Thought coach shows box, gist, journey; Decision-making
+    # shows gist, box, journey (since 2026-10-12), and the client holds the
+    # box under the gist if it arrives first. Thought coach pays for the
     # classification it needs here rather than later; it has been running
     # since before the gates and is normally done.
     review_task: "asyncio.Task[dict | None] | None" = None
