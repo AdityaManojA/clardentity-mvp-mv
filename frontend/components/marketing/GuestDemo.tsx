@@ -258,6 +258,12 @@ export function GuestDemo({
   const hasAnsweredRef = useRef(false);
   const pendingQuestionIdRef = useRef<string | null>(null);
   const lastSendRef = useRef<{ content: string; mode: string } | null>(null);
+  // What a regenerate took off the screen - the old answer and anything
+  // after it - kept until the new answer exists. Stopped, dropped or refused
+  // before then, the question gets its old answer back rather than being
+  // left unanswered, which is what the app shows: it re-reads the thread,
+  // and there the old answer was never deleted.
+  const replacedRef = useRef<ChatMessage[] | null>(null);
 
   useEffect(() => {
     messagesRef.current = messages;
@@ -296,20 +302,35 @@ export function GuestDemo({
     return () => clearTimeout(timer);
   }, [sending]);
 
-  /** Cut the answer off. Before the answer event nothing exists, so the
-   *  question comes back off the screen too - the app's rule. */
-  const stop = useCallback(() => {
-    abortRef.current?.abort();
-    if (!hasAnsweredRef.current && pendingQuestionIdRef.current) {
-      const id = pendingQuestionIdRef.current;
-      setMessages((prev) => prev.filter((m) => m.id !== id));
-    }
-    pendingQuestionIdRef.current = null;
-    setStreaming(null);
-    setSending(false);
-    setSlowHint(false);
-    setValidatingId(null);
+  /** Put back what a regenerate replaced, if its replacement never came. */
+  const restoreReplaced = useCallback(() => {
+    const replaced = replacedRef.current;
+    replacedRef.current = null;
+    if (hasAnsweredRef.current || !replaced?.length) return;
+    setMessages((prev) => [...prev, ...replaced]);
   }, []);
+
+  /** Cut the answer off. Before the answer event nothing exists, so the
+   *  question comes back off the screen too - the app's rule - and a
+   *  regenerate's old answer comes back on, unless `restore` is false
+   *  because the same regenerate is about to be asked again. */
+  const halt = useCallback(
+    (restore: boolean) => {
+      abortRef.current?.abort();
+      if (!hasAnsweredRef.current && pendingQuestionIdRef.current) {
+        const id = pendingQuestionIdRef.current;
+        setMessages((prev) => prev.filter((m) => m.id !== id));
+      }
+      if (restore) restoreReplaced();
+      pendingQuestionIdRef.current = null;
+      setStreaming(null);
+      setSending(false);
+      setSlowHint(false);
+      setValidatingId(null);
+    },
+    [restoreReplaced],
+  );
+  const stop = useCallback(() => halt(true), [halt]);
 
   const send = useCallback(
     async (content: string, sendMode: string, options: SendOptions = {}) => {
@@ -333,6 +354,7 @@ export function GuestDemo({
       );
       const question = options.regenerate ? null : questionMessage(message, sendMode);
       if (question) setMessages((prev) => [...prev, question]);
+      if (!options.regenerate) replacedRef.current = null;
       pendingQuestionIdRef.current = question?.id ?? null;
       hasAnsweredRef.current = false;
       earlyReviewRef.current = null;
@@ -349,6 +371,7 @@ export function GuestDemo({
 
       const rollBack = () => {
         if (question) setMessages((prev) => prev.filter((m) => m.id !== question.id));
+        restoreReplaced();
         setStreaming(null);
         setSending(false);
         setSlowHint(false);
@@ -428,6 +451,7 @@ export function GuestDemo({
             // composer comes back now rather than after it - the app's rule.
             hasAnsweredRef.current = true;
             pendingQuestionIdRef.current = null;
+            replacedRef.current = null;
             setSlowHint(false);
             const early = earlyReviewRef.current;
             const earlyImage = earlyImageRef.current;
@@ -476,6 +500,7 @@ export function GuestDemo({
             if (!budget.limit_reached) return;
             // The wall can also be the whole reply - an allowance already
             // spent - in which case nothing is being written.
+            restoreReplaced();
             setStreaming(null);
             setSending(false);
             setValidatingId(null);
@@ -491,6 +516,7 @@ export function GuestDemo({
             });
           },
           onError: (detail) => {
+            restoreReplaced();
             setError(detail);
             setStreaming(null);
             setSending(false);
@@ -504,6 +530,7 @@ export function GuestDemo({
             if (!hasAnsweredRef.current && question) {
               setMessages((prev) => prev.filter((m) => m.id !== question.id));
             }
+            restoreReplaced();
             setError("The answer stopped partway. Try again?");
             setStreaming(null);
             setSending(false);
@@ -514,7 +541,7 @@ export function GuestDemo({
         controller.signal,
       );
     },
-    [smartSwitching],
+    [smartSwitching, restoreReplaced],
   );
 
   useEffect(() => {
@@ -543,6 +570,7 @@ export function GuestDemo({
      finding that out here is better than finding it out after signing up. */
   const newChat = useCallback(() => {
     abortRef.current?.abort();
+    replacedRef.current = null;
     setMessages([]);
     setStreaming(null);
     setSending(false);
@@ -569,6 +597,7 @@ export function GuestDemo({
       const question = index > 0 ? list[index - 1] : null;
       if (!question || question.role !== "user") return;
       track("answer_regenerated", { mode: list[index].mode_used });
+      replacedRef.current = list.slice(index);
       setMessages(list.slice(0, index));
       messagesRef.current = list.slice(0, index);
       void send(question.content ?? "", list[index].mode_used, { regenerate: true });
@@ -599,9 +628,12 @@ export function GuestDemo({
     const last = lastSendRef.current;
     if (!last) return;
     track("quick_answer_tapped", { mode: last.mode });
-    stop();
-    void send(last.content, "rapid", { modeConfirmed: true });
-  }, [send, stop]);
+    // The quick answer to a regenerate is still a regenerate: the question
+    // stays where it is and the old answer stays off.
+    const regenerating = replacedRef.current !== null && !hasAnsweredRef.current;
+    halt(!regenerating);
+    void send(last.content, "rapid", { modeConfirmed: true, regenerate: regenerating });
+  }, [send, halt]);
 
   const zoom = typeof window === "undefined" ? 1 : Number(getComputedStyle(document.documentElement).zoom) || 1;
   const start: React.CSSProperties =
