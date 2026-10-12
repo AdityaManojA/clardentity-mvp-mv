@@ -2747,7 +2747,7 @@ Estimates assume **one full-stack developer** familiar with this repo. ASSUMPTIO
 
 ### 12.2 Repository workflow (this fork)
 - **Upstream** is `clardentity/clardentity-mvp`. **This fork** is `AdityaManojA/clardentity-mvp-mv`, with work committed to the fork's `main`.
-- Upstream changes are synced automatically every 15 minutes (`.github/workflows/sync-upstream.yml`, `.github/scripts/sync-upstream.sh`, `.github/SYNC_UPSTREAM.md`).
+- Upstream changes are merged into the fork by hand (the automatic 15-minute sync workflow was removed on 2026-10-12). The Playwright E2E suite is kept locally only (`frontend/e2e`, gitignored); upstream still runs it in CI.
 - **Upstream pull requests** come from a branch with fork-only files stripped. The current one is `mobile-polish`, PR #3.
 - `graphify-out/` holds a generated code knowledge graph. A git hook rebuilds it on commit (`Better_docs/GRAPHIFY_WORKFLOW.md`). Don't commit its churn by accident.
 - Product and technical documentation:
