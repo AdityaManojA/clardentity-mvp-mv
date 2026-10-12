@@ -25,6 +25,7 @@ import { MaskIcon } from "@/components/ui/MaskIcon";
 import { AccountMenu } from "@/components/system/AccountMenu";
 import { cx } from "@/components/ui/primitives";
 import { useScrollEdges } from "@/lib/useScrollEdges";
+import { markFreshChat } from "@/lib/freshChats";
 
 /* Sidebar collapse lives in a tiny external store read through
    useSyncExternalStore rather than useState + an effect. Reading localStorage
@@ -655,6 +656,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         body: { workspace_id: activeWorkspaceId, default_mode: null },
       });
       setRecentsKey((k) => k + 1);
+      markFreshChat(conv.id);
       router.push(`/chat/${conv.id}`);
     } catch {
       // The room page has the same button with visible error handling; a
@@ -870,7 +872,10 @@ export function AppShell({ children }: { children: ReactNode }) {
           !collapsed && "lg:pl-[var(--sidebar-width)]",
         )}
       >
-        <header data-safe="top" className="z-10 flex h-[var(--topbar-height)] shrink-0 items-center gap-3 border-b border-hairline bg-surface px-4 sm:px-6">
+        {/* Phones: the icons sit closer (their 44px tap areas already keep them
+            apart), and under 360px the tour replay steps out, so the page's
+            title has room to be read rather than cut to a letter. */}
+        <header data-safe="top" className="z-10 flex h-[var(--topbar-height)] shrink-0 items-center gap-3 max-sm:gap-1 border-b border-hairline bg-surface px-4 sm:px-6">
           {/* Two buttons rather than one that branches on viewport width: the
               mobile drawer and the desktop collapse are genuinely different
               controls, and inferring which one to run from a JS media query
@@ -927,7 +932,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               onClick={() => startTour(tourHere, { force: true })}
               title="Show me around this page"
               aria-label="Show me around this page"
-              className="tap-target inline-flex shrink-0 items-center justify-center rounded-md p-1.5 text-ink-muted transition-colors hover:bg-surface-hover hover:text-ink"
+              className="tap-target inline-flex shrink-0 max-[359px]:hidden items-center justify-center rounded-md p-1.5 text-ink-muted transition-colors hover:bg-surface-hover hover:text-ink"
             >
               <svg
                 viewBox="0 0 24 24"
@@ -1039,8 +1044,11 @@ function Crumbs({ crumbs }: { crumbs: Array<{ label: string; href?: string }> })
       {crumbs.map((c, i) => {
         const last = i === crumbs.length - 1;
         return (
-          <span key={i} className="flex min-w-0 items-center gap-2">
-            {i > 0 && <span className="text-[color:var(--text-nav-muted)]">/</span>}
+          // On a phone only the page you are on: two crumbs shared the bar
+          // down to "P... / E..." on a 375px screen and "P /" on a folded
+          // Galaxy. The workspace is still one tap away, in the menu.
+          <span key={i} className={cx("flex min-w-0 items-center gap-2", !last && "max-sm:hidden")}>
+            {i > 0 && <span className="text-[color:var(--text-nav-muted)] max-sm:hidden">/</span>}
             {last || !c.href ? (
               <span className="truncate text-[color:var(--text-nav)]">{c.label}</span>
             ) : (

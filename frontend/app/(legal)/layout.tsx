@@ -10,7 +10,10 @@ export default function LegalLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-[calc(var(--app-vh)*100)] bg-canvas">
       <header className="sticky top-0 z-10 border-b border-hairline bg-canvas/90 backdrop-blur">
-        <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-3 sm:px-6">
+        {/* flex-wrap: on the narrowest phones (a folded Galaxy, 280px) the links
+            drop under the wordmark instead of pushing the theme toggle off
+            the side of the screen. */}
+        <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-y-1 px-4 py-3 sm:px-6">
           <Wordmark />
           <div className="flex items-center gap-4 text-sm">
             <Link href="/privacy" className="text-ink-secondary transition-colors hover:text-ink">

@@ -70,8 +70,11 @@ export function FeedbackWidget({
 
   return (
     <div className="mt-1.5 flex flex-col gap-1.5 text-xs text-ink-muted">
-      <div className="flex items-center gap-2">
-        <span>Was this helpful?</span>
+      {/* flex-wrap + nowrap label: on the narrowest phones the buttons drop
+          under the question (all together, under 360px) instead of squeezing it
+          onto three lines. */}
+      <div className="flex flex-wrap items-center gap-x-2">
+        <span className="whitespace-nowrap max-[359px]:basis-full">Was this helpful?</span>
         <button
           type="button"
           onClick={() => toggleRating("up")}

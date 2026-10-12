@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { ErrorBoundary } from "@/components/system/ErrorBoundaries";
 import { API_BASE_URL, apiFetch } from "@/lib/apiClient";
 import { authErrorMessage, getAccessToken } from "@/lib/auth";
@@ -14,6 +14,7 @@ import {
   type ThinkingReviewData,
 } from "@/lib/sse";
 import { ModeSelector, type CognitiveMode } from "@/components/chat/ModeSelector";
+import { forgetFreshChat, isFreshChat } from "@/lib/freshChats";
 import { ChatGreeting } from "@/components/chat/ChatGreeting";
 import { MessageList, type StreamingMessage } from "@/components/chat/MessageList";
 import { ModeCarousel, groupByMode } from "@/components/chat/ModeCarousel";
@@ -197,6 +198,9 @@ export function ChatView({ conversationId }: { conversationId: string }) {
    * desktop window (fine pointer) never folds. */
   const [composerFocused, setComposerFocused] = useState(false);
   const [railOpen, setRailOpen] = useState(false);
+  // A phone held sideways (under 500px tall) folds the rail all the time: the
+  // rail and the box otherwise left the thread about two lines of the screen.
+  const shortScreen = useSyncExternalStore(subscribeShortScreen, isShortScreen, () => false);
   useEffect(() => {
     if (!window.matchMedia("(pointer: coarse) and (max-width: 1023.98px)").matches) return;
     const onIn = (e: FocusEvent) => {
@@ -282,6 +286,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
     ])
       .then(([conv, msgs]) => {
         if (cancelled) return;
+        forgetFreshChat(conversationId);
         setMessages(msgs);
         setLoadingHistory(false);
         // Only a mode from the picker: a chat whose last answer was a quick
@@ -298,6 +303,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
       })
       .catch((err) => {
         if (cancelled) return;
+        forgetFreshChat(conversationId);
         setError(authErrorMessage(err));
         setLoadingHistory(false);
       });
@@ -989,6 +995,8 @@ export function ChatView({ conversationId }: { conversationId: string }) {
   const activeIndex =
     modeTrackIndex >= 0 ? modeTrackIndex : Math.min(activeTrack, tracks.length - 1);
 
+  const freshChat = isFreshChat(conversationId);
+
   const messageListFor = (subset: ChatMessage[], streamingHere: StreamingMessage | null) => (
     <MessageList
       conversationId={conversationId}
@@ -1341,7 +1349,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
             <div className="min-w-0 flex-1">
               <ModeSelector
                 value={mode}
-                folded={composerFocused && !railOpen}
+                folded={(composerFocused || shortScreen) && !railOpen}
                 onUnfold={() => setRailOpen(true)}
                 holdFocus={railOpen}
                 onChange={(next) => {
@@ -1470,7 +1478,10 @@ export function ChatView({ conversationId }: { conversationId: string }) {
             with the empty message list as the spacer above and this one
             below. Once there are messages the list takes the room back and
             the composer settles to the bottom, where it belongs. */}
-        {messages.length === 0 && !streaming && !sending && !loadingHistory && (
+        {/* A chat this tab just created is known to be empty, so on a phone
+            it is centred while its (empty) history loads too - otherwise the
+            composer sat on the floor for a beat and then jumped up. */}
+        {messages.length === 0 && !streaming && !sending && (!loadingHistory || (phoneLayout && freshChat)) && (
           <div className="min-h-0 flex-1" />
         )}
         <UpgradeDialog open={upsell !== null} trigger={upsell} onClose={() => setUpsell(null)} />
@@ -1509,4 +1520,14 @@ function ThreadPill({
       <span className="whitespace-nowrap">{label}</span>
     </button>
   );
+}
+
+const SHORT_SCREEN = "(pointer: coarse) and (max-width: 1023.98px) and (max-height: 500px)";
+function subscribeShortScreen(onChange: () => void) {
+  const mq = window.matchMedia(SHORT_SCREEN);
+  mq.addEventListener("change", onChange);
+  return () => mq.removeEventListener("change", onChange);
+}
+function isShortScreen() {
+  return window.matchMedia(SHORT_SCREEN).matches;
 }
