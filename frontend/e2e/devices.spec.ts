@@ -165,6 +165,8 @@ for (const device of DEVICES) {
           if (await open.isVisible()) {
             await open.click();
             await expect(page.locator(sel.drawer)).toBeVisible();
+            // the checks below scope to the open menu: wait until it counts as one
+            await expect(page.locator('[aria-modal="true"]')).toBeVisible();
           }
         }
         await settleAnimations(page);

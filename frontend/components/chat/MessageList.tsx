@@ -201,6 +201,15 @@ export function MessageList({
     setTimeout(() => (autoScrolling.current = false), 800);
   }
 
+  /* What a streaming answer opens with, and so when its bubble may appear.
+   *
+   * The gist, normally. Thought coach leads with its box instead, so the box
+   * alone is enough to open the bubble there. Decision-making's box sits
+   * *under* the gist (gist, then the decisions, then the journey), so a box
+   * that lands first - it often does, a few seconds ahead - waits for the
+   * gist rather than appearing and then being pushed down by it. */
+  const streamingLead = Boolean(streaming?.crux || streaming?.thinkingReview);
+
   // A new message - yours or its answer - is the moment you want to be at the
   // bottom, so this one is smooth and deliberate.
   useEffect(() => {
@@ -366,7 +375,7 @@ export function MessageList({
           wait is the rabbit; the body text that streams in meanwhile is
           accumulated (so cancelling mid-way still has it) but never shown
           token by token - the finished answer replaces this all at once. */}
-      {busy && !streaming?.crux && !streaming?.decisionReview && !streaming?.thinkingReview && (
+      {busy && !streamingLead && (
         <div className="flex justify-start">
           <div className="rounded-2xl rounded-bl-md border border-hairline bg-surface px-4 py-3">
             <ThinkingIndicator label={thinkingLabel} />
@@ -376,7 +385,7 @@ export function MessageList({
       {/* The bubble appears as soon as there is a gist to show - the gist is
           the first thing read, and the rest is still being written behind
           it (the rabbit says so, under the card). */}
-      {(streaming?.crux || streaming?.decisionReview || streaming?.thinkingReview) && (
+      {streaming && streamingLead && (
         <ErrorBoundary where="streaming-answer" label="This answer couldn't be shown.">
         <MessageBubble
           id="streaming"
@@ -879,31 +888,34 @@ function MessageBubble({
             me a logo", not an illustration of a paragraph. */}
         {!isUser && generatedImage && <GeneratedImageCard image={generatedImage} />}
         {!isUser && !generatedImage && makingImage && <GeneratedImagePlaceholder />}
-        {/* The reasoning-contrast / decision-verdict box is the analysis
-            itself, not detail to hide behind a click - it leads, above the
-            gist (the client's order: verdict box, then the one-line answer,
-            then the journey folded beneath), with the raw paragraph text
-            tucked behind a mode-named expand toggle below. */}
+        {/* Thought coach's box is the analysis itself and leads, above the
+            gist: the reasoning contrast, then the one-line answer, then the
+            journey folded beneath. */}
         {!isUser && panel === "thinking" && thinkingReview && (
           <ThinkingReview review={thinkingReview} />
         )}
+        {/* Its slot, held while it is still being written, so that order is
+            visible from the first frame rather than the box dropping in
+            above things already read. */}
+        {!isUser && isStreaming && panel === "thinking" && !thinkingReview && (
+          <div className="mb-3 rounded-[12px] border border-dashed border-hairline-strong p-4">
+            <ThinkingIndicator compact label="Working out how to think about this" />
+          </div>
+        )}
+        {hasCrux && <CruxCard text={crux as string} />}
+        {/* Decision-making reads gist, then "One decision that's correct,
+            and the ones that aren't", then the journey (2026-10-12; it used
+            to lead with the box, as Thought coach still does). The box's
+            slot is held under the gist while it is being written, for the
+            same reason as above. */}
         {!isUser && panel === "decision" && decisionReview && (
           <DecisionReview review={decisionReview} />
         )}
-        {/* The box's slot, held while it is still being written, so the
-            order box -> gist -> journey is visible from the first frame
-            rather than the box dropping in above things already read. */}
-        {!isUser &&
-          isStreaming &&
-          ((panel === "decision" && !decisionReview) || (panel === "thinking" && !thinkingReview)) && (
-            <div className="mb-3 rounded-[12px] border border-dashed border-hairline-strong p-4">
-              <ThinkingIndicator
-                compact
-                label={panel === "decision" ? "Weighing the decisions" : "Working out how to think about this"}
-              />
-            </div>
-          )}
-        {hasCrux && <CruxCard text={crux as string} />}
+        {!isUser && isStreaming && panel === "decision" && !decisionReview && (
+          <div className="mb-3 rounded-[12px] border border-dashed border-hairline-strong p-4">
+            <ThinkingIndicator compact label="Weighing the decisions" />
+          </div>
+        )}
         {isStreaming && (hasCrux || decisionReview || thinkingReview) && (
           // The rest is still being written, out of sight. No fold yet -
           // there's nothing finished behind it to open. (While only the
