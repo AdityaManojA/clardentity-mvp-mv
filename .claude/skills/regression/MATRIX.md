@@ -26,7 +26,8 @@ Add a row for every feature that ships and every bug found. Retire, never delete
 | DEMO-GATES | Pre-answer questions arrive as the app's events and stop the turn | script |
 | DEMO-SWITCH | Smart switching moves a question (`switched` event); a miss is a judgement call (SKIP) | script |
 | B3 | In the browser: gist card leads with the rabbit under it; then "Likely Fact"-style badge (Finder), Devil's Draft toggle, "Show full answer", citation markers, Sources list | browser |
-| B4 | Decision-making in the browser: decisions box with bias tags above the gist; "Details of the decision making journey" | browser |
+| B4 | Decision-making in the browser, demo and signed in: **gist first, then the "One decision that's correct, and the ones that aren't" box, then "Details of the decision making journey"** (since 2026-10-12). While streaming, the box's placeholder sits under the gist, and a box that lands first waits for the gist rather than being pushed down by it | browser |
+| B4b | Thought coach keeps its box above the gist (box, gist, journey) | browser |
 | B5 | Context-question card: answer it → answered turn; "Answer without this" → answered turn | browser |
 | B6 | Switch toast (4s ring, "Stay in X") then banner "Switched to X - … Back to Y"; labels use the app's spelling ("Thought coach") | browser |
 | B7 | Quick answer button appears after 7s with no gist and returns an instant answer | browser |
@@ -138,3 +139,6 @@ Add a row for every feature that ships and every bug found. Retire, never delete
 | 2026-10-10 | local (prod build) | pre-commit | 20/20 script after a harness fix; 472 tests; browser B1-B7, B9, B10, C2-C4, E2-E4, G1, IMAGE-*, L1 | Found and fixed: all-opinion claims on empty context; demo missing gist/claims/verdict/gates/switch toast/Quick answer; no browser security headers |
 | 2026-10-10 | prod | fb0d41c | 20/20 script (`--images`); browser B1, B3, L1 (login + Google button, demo), SEC headers live | Rebased onto the mobile-view merge first (AccountMenu and sw.js conflicts resolved; cache now v12). E2E workflow dispatched (run 38030338040). |
 | 2026-10-10 | CI (e2e.yml) | fbe76a8 | 134 passed, 17 skipped (live/visual need secrets), 0 failed | Runs 1-2 failed on the suite, not the app: blank credentials from unset secrets (T03/M04/M17), M39's 127.0.0.1 stream vs the new CSP (test-only `CSP_EXTRA_CONNECT_SRC`), A11Y-2 scanning mid-fade. |
+
+| 2026-10-12 | local (demo, Decision-making) | pre-commit | B4 verified by a DOM observer while streaming: GIST > BOX-SLOT, GIST > BOX, GIST > BOX > JOURNEY | Decision answer order changed to gist, box, journey |
+| 2026-10-12 | prod + CI (e2e.yml run 38201643131) | e374bcc | B4 on production: GIST > BOX-SLOT, GIST > BOX, GIST > BOX > JOURNEY. E2E 152 passed, 10 failed - all V1-V4 visual baselines on mobile-chrome, the same 10 that failed on PR #3's own run before it merged (not this change) | First Vercel build of e374bcc failed fetching the Outfit Google font (turbopack `@vercel/turbopack-next/internal/font/google/font`); a clean redeploy of the same commit succeeded |
