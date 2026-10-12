@@ -63,3 +63,18 @@ export function ChatGreeting() {
     </div>
   );
 }
+
+/** What an empty temporary chat says instead of the greeting: what the
+ *  header's dashed bubble did, in the words the chat is held to. The server
+ *  keeps every one of these promises (app/services/temporary_chats.py). */
+export function TemporaryChatIntro() {
+  return (
+    <div className="animate-[fade-in_0.4s_ease] text-center">
+      <p className="text-2xl font-medium text-ink-secondary sm:text-3xl">Temporary chat</p>
+      <p className="mx-auto mt-2 max-w-md text-sm text-ink-muted sm:text-base">
+        This chat won&apos;t appear in your history or shape your profile, and it&apos;s
+        deleted when you leave it.
+      </p>
+    </div>
+  );
+}

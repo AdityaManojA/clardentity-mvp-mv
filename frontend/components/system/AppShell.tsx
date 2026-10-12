@@ -26,6 +26,7 @@ import { AccountMenu } from "@/components/system/AccountMenu";
 import { cx } from "@/components/ui/primitives";
 import { useScrollEdges } from "@/lib/useScrollEdges";
 import { markFreshChat } from "@/lib/freshChats";
+import { holdTemporaryChat, leaveTemporaryChatUnless } from "@/lib/temporaryChat";
 
 /* Sidebar collapse lives in a tiny external store read through
    useSyncExternalStore rather than useState + an effect. Reading localStorage
@@ -438,20 +439,23 @@ export function AppShell({ children }: { children: ReactNode }) {
     id: string;
     workspaceId: string;
     title: string | null;
+    temporary: boolean;
   } | null>(null);
 
   useEffect(() => {
     if (!conversationId) return;
     let cancelled = false;
-    apiFetch<{ workspace_id: string; title: string | null }>(
+    apiFetch<{ workspace_id: string; title: string | null; temporary?: boolean }>(
       `/chat/conversations/${conversationId}`,
     )
       .then((conv) => {
         if (!cancelled) {
+          if (conv.temporary) holdTemporaryChat(conversationId);
           setResolved({
             id: conversationId,
             workspaceId: conv.workspace_id,
             title: conv.title,
+            temporary: Boolean(conv.temporary),
           });
         }
       })
@@ -464,6 +468,12 @@ export function AppShell({ children }: { children: ReactNode }) {
     };
   }, [conversationId]);
 
+  // Leaving a temporary chat - for a new chat, another chat, any other page -
+  // deletes it, which is the promise its intro makes. See lib/temporaryChat.
+  useEffect(() => {
+    leaveTemporaryChatUnless(conversationId);
+  }, [conversationId]);
+
   const chatWorkspaceId =
     conversationId && resolved?.id === conversationId ? resolved.workspaceId : null;
   const activeWorkspaceId = workspaceMatch ? workspaceMatch[1] : chatWorkspaceId;
@@ -471,8 +481,15 @@ export function AppShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (activeWorkspaceId) rememberWorkspace(activeWorkspaceId);
   }, [activeWorkspaceId]);
+  const inTemporaryChat = Boolean(
+    conversationId && resolved?.id === conversationId && resolved.temporary,
+  );
   const conversationTitle =
-    conversationId && resolved?.id === conversationId ? resolved.title : null;
+    conversationId && resolved?.id === conversationId
+      ? resolved.temporary
+        ? "Temporary chat"
+        : resolved.title
+      : null;
   // Which tour, if any, walks the page in view - drives the replay button.
   const tourHere: TourId | null = conversationId
     ? "chat"
@@ -661,6 +678,32 @@ export function AppShell({ children }: { children: ReactNode }) {
     } catch {
       // The room page has the same button with visible error handling; a
       // failure here should not put an error banner in the chrome.
+    } finally {
+      setStarting(false);
+    }
+  }
+
+  /** The header's temporary-chat switch. From an ordinary chat it opens a
+   *  temporary one; from a temporary chat it goes back to an ordinary new
+   *  chat - and leaving deletes the temporary one (the effect above). */
+  async function toggleTemporaryChat() {
+    if (starting) return;
+    if (inTemporaryChat) {
+      void startConversation();
+      return;
+    }
+    if (!activeWorkspaceId) return;
+    setStarting(true);
+    try {
+      const conv = await apiFetch<{ id: string }>("/chat/conversations", {
+        method: "POST",
+        body: { workspace_id: activeWorkspaceId, default_mode: null, temporary: true },
+      });
+      holdTemporaryChat(conv.id);
+      markFreshChat(conv.id);
+      router.push(`/chat/${conv.id}`);
+    } catch {
+      // As with New chat: the chrome carries no error banner.
     } finally {
       setStarting(false);
     }
@@ -921,7 +964,37 @@ export function AppShell({ children }: { children: ReactNode }) {
               <path d="M12.5 8.5v6M9.5 11.5h6" />
             </svg>
           </button>
-          <ThemeToggle className="shrink-0 lg:ml-auto" tourId="theme-toggle" />
+          {/* Signed in and inside a workspace only - the visitor demo has no
+              history to keep a chat out of. Pressed while a temporary chat
+              is open, and pressing it again goes back to an ordinary one. */}
+          {user && activeWorkspaceId && (
+            <button
+              type="button"
+              onClick={() => void toggleTemporaryChat()}
+              disabled={starting}
+              aria-pressed={inTemporaryChat}
+              aria-label={inTemporaryChat ? "Leave temporary chat" : "Start a temporary chat"}
+              title={
+                inTemporaryChat
+                  ? "Leave temporary chat - it will be deleted"
+                  : "Temporary chat - not saved to your history"
+              }
+              className={cx(
+                "tap-target inline-flex shrink-0 items-center justify-center rounded-md p-1.5 transition-colors hover:bg-surface-hover disabled:opacity-50 lg:ml-auto",
+                inTemporaryChat ? "bg-brand-soft text-brand" : "text-ink-muted hover:text-ink",
+              )}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"
+                strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="h-4 w-4">
+                {/* The new-chat bubble, drawn dashed: a chat that is not kept. */}
+                <path
+                  d="M21 11.5a8.4 8.4 0 0 1-8.5 8.3 9 9 0 0 1-3.9-.9L3 21l1.6-4.5A8.3 8.3 0 0 1 3.5 11.5 8.5 8.5 0 0 1 12.5 3a8.5 8.5 0 0 1 8.5 8.5z"
+                  strokeDasharray="2.6 2.6"
+                />
+              </svg>
+            </button>
+          )}
+          <ThemeToggle className={cx("shrink-0", !(user && activeWorkspaceId) && "lg:ml-auto")} tourId="theme-toggle" />
           {tourHere && (
             // The coachmarks, again, on request - for anyone who skipped them
             // or wants a second look. Only where a tour exists for the page

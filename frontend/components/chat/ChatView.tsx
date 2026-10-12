@@ -15,7 +15,7 @@ import {
 } from "@/lib/sse";
 import { ModeSelector, type CognitiveMode } from "@/components/chat/ModeSelector";
 import { forgetFreshChat, isFreshChat } from "@/lib/freshChats";
-import { ChatGreeting } from "@/components/chat/ChatGreeting";
+import { ChatGreeting, TemporaryChatIntro } from "@/components/chat/ChatGreeting";
 import { MessageList, type StreamingMessage } from "@/components/chat/MessageList";
 import { ModeCarousel, groupByMode } from "@/components/chat/ModeCarousel";
 import { MessageInput, type PendingAttachment } from "@/components/chat/MessageInput";
@@ -49,6 +49,7 @@ type Conversation = {
   title: string | null;
   default_mode: CognitiveMode | null;
   workspace_id: string;
+  temporary?: boolean;
 };
 
 type AvatarCue = { expression: AvatarExpression; gesture: AvatarGesture };
@@ -92,6 +93,10 @@ export function ChatView({ conversationId }: { conversationId: string }) {
   // Distinct from "no messages". Without it, reopening a chat rendered the
   // "Start a chat" empty state for the second or two the fetch took.
   const [loadingHistory, setLoadingHistory] = useState(true);
+  // Which chat is temporary, by id - so a stale answer for the chat before
+  // this one is ignored by derivation, as the shell does with its title.
+  const [temporaryId, setTemporaryId] = useState<string | null>(null);
+  const temporary = temporaryId === conversationId;
   // Never null in practice: a new chat opens in Finder, always - not in
   // whatever this device last used, which had a Decision-making chat
   // reopening the composer in Decision-making and read as the wrong
@@ -288,6 +293,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
         if (cancelled) return;
         forgetFreshChat(conversationId);
         setMessages(msgs);
+        setTemporaryId(conv.temporary ? conversationId : null);
         setLoadingHistory(false);
         // Only a mode from the picker: a chat whose last answer was a quick
         // one must not reopen with the composer set to the unpickable path.
@@ -1018,7 +1024,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
       // answer; this sets up the next question.
       onUseMode={(next) => setMode(next as CognitiveMode)}
       onAskRefined={(question) => handleSend(question, [])}
-      emptyState={<ChatGreeting />}
+      emptyState={temporary ? <TemporaryChatIntro /> : <ChatGreeting />}
       emptyStateAvatar={
         <AvatarPanel
           state={avatarState}
