@@ -2,7 +2,7 @@ import asyncio
 import uuid
 from dataclasses import dataclass
 
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import Document, DocumentChunk
@@ -39,9 +39,18 @@ class RetrievedChunk:
 
 
 async def retrieve_chunks(
-    db: AsyncSession, workspace_id: uuid.UUID, query: str, mode: str, top_k: int = TOP_K
+    db: AsyncSession,
+    workspace_id: uuid.UUID,
+    query: str,
+    mode: str,
+    top_k: int = TOP_K,
+    conversation_id: uuid.UUID | None = None,
 ) -> list[RetrievedChunk]:
     """Top-k pgvector similarity search over the workspace's processed documents.
+
+    The workspace's own documents, plus any attached inside `conversation_id`
+    if that is a temporary chat - a file attached in one belongs to it alone,
+    so no other chat in the workspace reads it.
 
     Runs for every mode. Knowing mode additionally expands the query with up
     to two Wh-lensed sub-queries (§7.4) and merges/dedupes the results.
@@ -50,11 +59,14 @@ async def retrieve_chunks(
     # a workspace with no attachments, and each query below costs an
     # embedding call (~0.5-1s) before the database is even asked - three of
     # them in Knowing mode, run one after another, on an empty table.
-    has_documents = await db.scalar(
-        select(Document.id)
-        .where(Document.workspace_id == workspace_id, Document.status == "processed")
-        .limit(1)
+    in_scope = (
+        Document.workspace_id == workspace_id,
+        Document.status == "processed",
+        or_(Document.conversation_id.is_(None), Document.conversation_id == conversation_id)
+        if conversation_id is not None
+        else Document.conversation_id.is_(None),
     )
+    has_documents = await db.scalar(select(Document.id).where(*in_scope).limit(1))
     if has_documents is None:
         return []
 
@@ -73,7 +85,7 @@ async def retrieve_chunks(
         rows = await db.execute(
             select(DocumentChunk, Document, distance.label("distance"))
             .join(Document, Document.id == DocumentChunk.document_id)
-            .where(Document.workspace_id == workspace_id, Document.status == "processed")
+            .where(*in_scope)
             .order_by(distance)
             .limit(top_k)
         )

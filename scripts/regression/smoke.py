@@ -290,6 +290,27 @@ def check_signed_in(api: str, images: bool) -> None:
         ok, detail = answer_structure_ok(events)
         record("APP-FINDER", ok, f"{detail} {secs:.0f}s")
 
+        # A temporary chat: openable, in no list, not handed back at sign-in,
+        # and gone once deleted (which is what leaving it does).
+        ws = boot.get("active_workspace_id")
+        status, _, body = post_json(f"{api}/api/v1/chat/conversations", {"workspace_id": ws, "temporary": True}, token)
+        temp = json.loads(body) if status == 201 else {}
+        _, _, body = curl([f"{api}/api/v1/chat/conversations?workspace_id={ws}", *auth], 60)
+        listed = [c["id"] for c in json.loads(body)] if body.startswith("[") else None
+        _, _, body = post_json(f"{api}/api/v1/bootstrap", {"workspace_id": ws}, token)
+        reentry = json.loads(body).get("conversation_id") if body.startswith("{") else None
+        deleted, _, _ = curl(["-X", "DELETE", f"{api}/api/v1/chat/conversations/{temp.get('id')}", *auth], 60)
+        after, _, _ = curl([f"{api}/api/v1/chat/conversations/{temp.get('id')}", *auth], 60)
+        record(
+            "TEMP-CHAT",
+            temp.get("temporary") is True
+            and listed is not None and temp["id"] not in listed
+            and reentry != temp["id"]
+            and deleted == 204 and after == 404,
+            f"created={status} listed={temp.get('id') in (listed or [])} reentry={reentry == temp.get('id')} "
+            f"delete={deleted} after={after}",
+        )
+
         if images:
             post_json(f"{api}/api/v1/pro/preview", {}, token)
             _, _, body = post_json(f"{api}/api/v1/chat/conversations", {"workspace_id": boot["active_workspace_id"]}, token)

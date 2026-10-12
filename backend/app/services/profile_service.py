@@ -86,9 +86,11 @@ async def gather_evidence(db: AsyncSession, user_id: uuid.UUID) -> tuple[str, in
         .where(WorkspaceMember.user_id == user_id)
         .scalar_subquery()
     )
+    # Never a temporary chat's words, nor the files attached in one: those
+    # chats promise not to shape the profile.
     conversation_ids = (
         select(Conversation.id)
-        .where(Conversation.workspace_id.in_(workspace_ids))
+        .where(Conversation.workspace_id.in_(workspace_ids), Conversation.temporary.is_(False))
         .scalar_subquery()
     )
 
@@ -107,7 +109,9 @@ async def gather_evidence(db: AsyncSession, user_id: uuid.UUID) -> tuple[str, in
     messages = [c for (c,) in rows.all() if c]
 
     doc_rows = await db.execute(
-        select(Document.filename).where(Document.workspace_id.in_(workspace_ids)).limit(40)
+        select(Document.filename)
+        .where(Document.workspace_id.in_(workspace_ids), Document.conversation_id.is_(None))
+        .limit(40)
     )
     filenames = [f for (f,) in doc_rows.all() if f]
 

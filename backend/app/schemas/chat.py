@@ -8,6 +8,10 @@ from pydantic import BaseModel, Field
 class ConversationCreate(BaseModel):
     workspace_id: uuid.UUID
     title: str | None = None
+    # A temporary chat (see Conversation.temporary). Fixed at creation: a chat
+    # that has been in the history cannot be taken out of it this way, and a
+    # temporary one is not kept by flipping it back.
+    temporary: bool = False
     # Optional, and only ever a starting point: the caller can pick a different
     # mode on the very first message. Lets a "start in Decision" entry point
     # carry that choice into the conversation instead of dropping it at the
@@ -50,6 +54,7 @@ class ConversationOut(BaseModel):
     title: str | None
     default_mode: str | None
     pinned: bool = False
+    temporary: bool = False
     created_at: datetime
     # When something last happened in it (the newest message, else creation).
     # Lists sort by this; a chat continued today is at the top today.

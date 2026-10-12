@@ -87,6 +87,7 @@ from app.services.query_optimizer import optimize_query
 from app.services.search_planner import SearchPlan, needs_live_data, plan_searches
 from app.services.preview_access import daily_limit, is_preview_mode, spend, used_today
 from app.services.retrieval import RetrievedChunk, retrieve_chunks
+from app.services.temporary_chats import discard, sweep_idle
 from app.services.token_meter import meter as token_meter
 from app.services.storage import upload_file
 from app.services.router import InvalidModeError, InvalidReasoningLensError, validate_mode, validate_reasoning_lens
@@ -117,6 +118,7 @@ async def _ingest_attachments(
     workspace_id: uuid.UUID,
     user_id: uuid.UUID,
     attachments: list,
+    temporary_conversation_id: uuid.UUID | None = None,
 ) -> list[RetrievedChunk]:
     """A document attached to a message becomes a workspace document - stored,
     chunked, embedded, committed - and its opening chunks are returned to go
@@ -124,7 +126,11 @@ async def _ingest_attachments(
     starts: the answer's citations point at chunk rows by id.
 
     Images are not documents and are left alone here. A file that cannot be
-    read is a 400 before anything streams, so the composer can say why."""
+    read is a 400 before anything streams, so the composer can say why.
+
+    In a temporary chat the document belongs to the chat instead
+    (`temporary_conversation_id`): out of the workspace's Attachments, out of
+    every other chat's retrieval, and deleted with the chat."""
     documents = [a for a in attachments if a.type == "document"]
     if not documents:
         return []
@@ -149,6 +155,7 @@ async def _ingest_attachments(
             )
         document = Document(
             workspace_id=workspace_id,
+            conversation_id=temporary_conversation_id,
             filename=filename,
             file_type=file_type,
             status="processing",
@@ -286,10 +293,16 @@ async def create_conversation(
 ) -> ConversationOut:
     await require_workspace_member(db, payload.workspace_id, current_user.id)
 
+    if payload.temporary:
+        # Whatever an earlier temporary chat left behind in a closed tab goes
+        # now; see app/services/temporary_chats.py.
+        await sweep_idle(db, current_user.id)
+
     conversation = Conversation(
         workspace_id=payload.workspace_id,
         title=payload.title,
         default_mode=payload.default_mode,
+        temporary=payload.temporary,
     )
     db.add(conversation)
     await db.commit()
@@ -355,7 +368,8 @@ async def list_conversations(
     )
     rows = await db.execute(
         select(Conversation, func.coalesce(last_activity, Conversation.created_at).label("last_activity"))
-        .where(Conversation.workspace_id == workspace_id)
+        # A temporary chat is in no list - that is most of what it is.
+        .where(Conversation.workspace_id == workspace_id, Conversation.temporary.is_(False))
         # Pinned first, most recently pinned at the top of those - pinning is
         # a statement that this chat outranks whatever is merely recent.
         .order_by(
@@ -422,6 +436,10 @@ async def delete_conversation(
     db: AsyncSession = Depends(get_db),
 ) -> None:
     conversation = await get_conversation_for_user(db, conversation_id, current_user.id)
+    if conversation.temporary:
+        # Leaving a temporary chat ends here, and takes its files with it.
+        await discard(db, conversation)
+        return
     await db.delete(conversation)
     await db.commit()
 
@@ -905,6 +923,7 @@ async def send_message(
                 chunks: list[RetrievedChunk] = await retrieve_chunks(
                     rdb, conversation.workspace_id, query, mode,
                     top_k=admin_settings["retrieval_top_k"],
+                    conversation_id=conversation.id,
                 )
         except BaseException:
             if web_task is not None:
@@ -1125,7 +1144,8 @@ async def send_message(
         # same files does not ingest them twice. Named in the turn, so the
         # thread shows what was sent and the model knows what it was given.
         attached_chunks = await _ingest_attachments(
-            db, conversation.workspace_id, current_user.id, payload.attachments
+            db, conversation.workspace_id, current_user.id, payload.attachments,
+            temporary_conversation_id=conversation.id if conversation.temporary else None,
         )
         if attached_chunks:
             names = ", ".join(dict.fromkeys(rc.document.filename for rc in attached_chunks))
@@ -1169,7 +1189,9 @@ async def send_message(
         # every row in the workspace list reads "Untitled chat", which is
         # indistinguishable from the conversation not having been saved at
         # all.
-        if conversation.title is None and not history:
+        # Not a temporary chat: it is in no list for a name to be read from,
+        # and naming it is a model call for nothing.
+        if conversation.title is None and not history and not conversation.temporary:
             conversation.title = _derive_title(effective_content)
             # Placeholder: the first answer names it properly (see below).
             naming_turn = True
@@ -1250,7 +1272,10 @@ async def send_message(
     # domain-scoped screening, they just aren't told to editorialise about it.
     bias_guidance = build_bias_guidance(decision) if mode == "decision" else None
     profile = await get_profile(db, current_user.id)
-    profile_block = profile_prompt_block(profile)
+    # A temporary chat starts from nothing the profile knows. The learning
+    # role below is still read: it is a setting the user chose, not something
+    # inferred about them.
+    profile_block = None if conversation.temporary else profile_prompt_block(profile)
     # Appended rather than folded into the profile: the profile is inferred
     # from what the user wrote, this is inferred from where they connected
     # from, and the two deserve different amounts of trust.
@@ -1486,14 +1511,16 @@ async def send_message(
                 )
             if should_rebuild_memory(total_messages or 0):
                 rebuild_memory_task.delay(str(conversation_id))
-            async with AsyncSessionLocal() as profile_db:
-                # Anything they just said about themselves, captured now
-                # rather than at the next rebuild. This runs after the answer
-                # has gone out, so the small model call behind it is on a
-                # request nobody is waiting on.
-                await capture_stated_facts(profile_db, current_user.id, effective_content)
-                if await should_rebuild_profile(profile_db, current_user.id):
-                    rebuild_profile_task.delay(str(current_user.id))
+            if not conversation.temporary:
+                async with AsyncSessionLocal() as profile_db:
+                    # Anything they just said about themselves, captured now
+                    # rather than at the next rebuild. This runs after the
+                    # answer has gone out, so the small model call behind it
+                    # is on a request nobody is waiting on. Never from a
+                    # temporary chat, which promises not to shape the profile.
+                    await capture_stated_facts(profile_db, current_user.id, effective_content)
+                    if await should_rebuild_profile(profile_db, current_user.id):
+                        rebuild_profile_task.delay(str(current_user.id))
             new_title = await _settle_title(
                 conversation_id, title_task, conversation.title or "", wait_seconds=1.2
             )
@@ -1657,10 +1684,11 @@ async def send_message(
         # The long-term profile spans every conversation, so it's refreshed on
         # its own cadence rather than per-conversation. Checked in the
         # generation session because `db` is closed by this point.
-        async with AsyncSessionLocal() as profile_db:
-            await capture_stated_facts(profile_db, current_user.id, effective_content)
-            if await should_rebuild_profile(profile_db, current_user.id):
-                rebuild_profile_task.delay(str(current_user.id))
+        if not conversation.temporary:
+            async with AsyncSessionLocal() as profile_db:
+                await capture_stated_facts(profile_db, current_user.id, effective_content)
+                if await should_rebuild_profile(profile_db, current_user.id):
+                    rebuild_profile_task.delay(str(current_user.id))
 
         claims = claims_out(analysis)
 

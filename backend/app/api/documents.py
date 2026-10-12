@@ -145,6 +145,11 @@ async def search_attachments(
 
     conditions = [
         Document.workspace_id == workspace_id,
+        # A file attached inside a temporary chat is that chat's alone: found
+        # when auditing one of its answers, never in the room-wide search.
+        or_(Document.conversation_id.is_(None), Document.conversation_id == conversation_id)
+        if conversation_id is not None
+        else Document.conversation_id.is_(None),
         or_(
             DocumentChunk.content.ilike(f"%{term}%"),
             Document.filename.ilike(f"%{term}%"),
@@ -187,7 +192,9 @@ async def list_documents(
 
     rows = await db.execute(
         select(Document)
-        .where(Document.workspace_id == workspace_id)
+        # Not the files attached inside temporary chats: they belong to those
+        # chats, and go with them.
+        .where(Document.workspace_id == workspace_id, Document.conversation_id.is_(None))
         .order_by(Document.created_at.desc())
     )
     return [DocumentOut.model_validate(d) for d in rows.scalars().all()]
