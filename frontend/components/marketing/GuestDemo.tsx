@@ -628,6 +628,9 @@ export function GuestDemo({
          product's own component in the product's own theme; the page behind
          this one stays light. */
       data-theme="dark"
+      // Popovers that portal out of the answer (citation details) render in
+      // here rather than in <body>, where they would open behind this panel.
+      data-portal-root=""
       className="fixed z-50 overflow-hidden transition-all duration-[460ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
       style={{ ...start, background: DARK }}
     >
