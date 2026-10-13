@@ -1,4 +1,5 @@
-"""The administrator's view: who is signed up, and what they are costing.
+"""The administrator's view: who is signed up, what they are costing, and -
+from PostHog - what visitors did in the browser.
 
 Read-only, and gated on an explicit list of addresses in configuration
 (services/admin_access) rather than on being signed in, because every
@@ -16,14 +17,20 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user
 from app.db.session import AsyncSessionLocal, get_db
-from app.models import Conversation, Message, User, Workspace
+from app.models import AdminView, Conversation, Message, User, Workspace
 from app.schemas.admin_dashboard import (
     AdminOverview,
     AdminUserRow,
+    AdminViewCreate,
+    AdminViewOut,
+    AnalyticsDay,
+    AnalyticsOverview,
+    AnalyticsSlice,
     DynamicQueryRequest,
     DynamicQueryResult,
     UsageBucket,
 )
+from app.services import posthog_analytics
 from app.services.admin_access import is_admin
 from app.services.anthropic_client import generate_structured
 
@@ -205,7 +212,8 @@ async def overview(
 
 
 # ---------------------------------------------------------------------------
-# The dynamic view: a question in English, answered from the database.
+# The dynamic view: a question in English, answered from the database (or,
+# since 2026-10-13, from PostHog's analytics events - see _execute).
 #
 # WrenAI does this as a service of its own; running it would mean another
 # deployment, another vector store and another thing to keep upright for a
@@ -305,42 +313,30 @@ def _vet(sql: str) -> str:
     return statement
 
 
-@router.post("/query", response_model=DynamicQueryResult)
-async def dynamic_query(
-    payload: DynamicQueryRequest,
-    _: User = Depends(require_admin),
-) -> DynamicQueryResult:
-    """Ask for a view in English; get rows and a chart suggestion back."""
-    question = payload.question.strip()
-    if not question:
-        raise HTTPException(status_code=400, detail="Ask a question first")
+_HOGQL_TABLES = {"events", "persons", "sessions"}
 
-    plan = await generate_structured(
-        instructions=(
-            "You write one read-only PostgreSQL query answering the "
-            "administrator's question about their own product's usage.\n"
-            f"The only tables and columns available are:\n{_SCHEMA_NOTE}\n"
-            "Rules: a single SELECT (a leading WITH is fine); never any "
-            "statement that writes; never read message content, claim text, "
-            "document filenames, conversation titles or password hashes - "
-            "those hold what users wrote and are off limits; always alias "
-            "computed columns readably; add LIMIT 200 unless the question is "
-            "an aggregate that returns fewer rows. Token usage lives in "
-            "messages.token_usage as jsonb - read it with "
-            "(token_usage->>'total_tokens')::bigint and coalesce it to 0.\n"
-            "Pick the chart that suits the answer: pie for a share of a "
-            "whole, bar for a comparison across categories, line for a series "
-            "over time, table otherwise. Name the label and value columns for "
-            "the chart. Explain in one sentence what the query returns."
-        ),
-        input_text=question,
-        schema=_SQL_SCHEMA,
-        schema_name="dashboard_query",
-        fast=False,
-    )
 
-    statement = _vet(plan.get("sql", ""))
+def _vet_hogql(query: str) -> str:
+    """The analytics side of _vet. HogQL has no statement that writes, so this
+    is about scope: one SELECT, over the event tables, nothing else in the
+    project. PostHog holds no content to protect (see services/posthog_analytics),
+    which is why there is no column list here."""
+    statement = query.strip().rstrip(";").strip()
+    if not statement:
+        raise HTTPException(status_code=400, detail="No query was produced")
+    if _STATEMENT_SPLIT.search(query.strip()):
+        raise HTTPException(status_code=400, detail="Only one statement at a time")
+    if not re.match(r"^(select|with)\b", statement, re.I):
+        raise HTTPException(status_code=400, detail="Only SELECT queries are allowed")
+    lowered = statement.lower()
+    defined = set(re.findall(r"\b([a-z_][a-z0-9_]*)\s+as\s*\(", lowered))
+    for table in re.findall(r"\b(?:from|join)\s+([a-z_][a-z0-9_.]*)", lowered):
+        if table not in _HOGQL_TABLES and table not in defined:
+            raise HTTPException(status_code=400, detail=f"Table {table} is not available here")
+    return statement
 
+
+async def _run_database(statement: str) -> tuple[list[str], list[list]]:
     # A separate session set read-only for the duration, so even a query that
     # slipped past the checks above cannot write. The statement timeout stops
     # a careless cross join taking the instance with it.
@@ -360,16 +356,168 @@ async def dynamic_query(
             ) from exc
         finally:
             await db.rollback()
+    return columns, rows
+
+
+async def _run_analytics(statement: str, *, name: str) -> tuple[list[str], list[list]]:
+    try:
+        columns, rows = await posthog_analytics.run_hogql(statement, name=name)
+    except posthog_analytics.AnalyticsUnavailable as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return columns, rows[:500]
+
+
+_UUID = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", re.I)
+
+
+async def _with_accounts(
+    columns: list[str], rows: list[list], label_column: str | None
+) -> tuple[list[str], list[list], str | None]:
+    """PostHog knows a signed-in visitor only by their account id - that is
+    all the app sends it. Where an analytics answer has a column of those
+    ids, the account's email is put next to it, so a row reads as a person
+    without anything having been copied out of the database into PostHog."""
+    for index in reversed(range(len(columns))):
+        ids = {str(r[index]) for r in rows if r[index] is not None and _UUID.match(str(r[index]))}
+        if not ids:
+            continue
+        async with AsyncSessionLocal() as db:
+            found = dict(
+                (
+                    await db.execute(
+                        select(User.id, User.email).where(User.id.in_([uuid.UUID(i) for i in ids]))
+                    )
+                ).all()
+            )
+        if not found:
+            continue
+        emails = {str(k): v for k, v in found.items()}
+        name = f"{columns[index]}_account"
+        columns = [*columns[: index + 1], name, *columns[index + 1 :]]
+        rows = [[*r[: index + 1], emails.get(str(r[index])), *r[index + 1 :]] for r in rows]
+        if label_column == columns[index]:
+            label_column = name
+    return columns, rows, label_column
+
+
+_DATABASE_INSTRUCTIONS = (
+    "For source 'database', write one read-only PostgreSQL query over our own "
+    "database - accounts, conversations, answers, tokens, feedback, for everyone.\n"
+    f"The only tables and columns available are:\n{_SCHEMA_NOTE}\n"
+    "Rules: a single SELECT (a leading WITH is fine); never any statement "
+    "that writes; never read message content, claim text, document "
+    "filenames, conversation titles or password hashes - those hold what "
+    "users wrote and are off limits; always alias computed columns readably; "
+    "add LIMIT 200 unless the question is an aggregate that returns fewer "
+    "rows. Token usage lives in messages.token_usage as jsonb - read it with "
+    "(token_usage->>'total_tokens')::bigint and coalesce it to 0.\n"
+)
+
+_ANALYTICS_INSTRUCTIONS = (
+    "For source 'analytics', write one HogQL query (PostHog's ClickHouse-flavoured "
+    "SQL) over the product analytics events - what visitors did in the browser, "
+    "only those who allowed analytics.\n"
+    f"{posthog_analytics.HOGQL_NOTE}\n"
+    "Rules: a single SELECT from events; read properties as properties.<name>; "
+    "people are count(DISTINCT distinct_id); days are toDate(timestamp); always "
+    "filter timestamp to a window (the last 30 days unless the question says "
+    "otherwise, e.g. timestamp >= now() - INTERVAL 30 DAY); alias computed "
+    "columns readably; add LIMIT 200.\n"
+)
+
+_CHOOSE_SOURCE = (
+    "Choose the source from the question: 'database' for accounts, sign-ups, "
+    "questions asked, answers, tokens, cost, feedback and anything that must "
+    "count everyone; 'analytics' for what happened in the browser - the "
+    "landing-page demo, gates shown, locked companions tapped, plans opened, "
+    "tours, themes, devices, pages viewed.\n"
+)
+
+
+def _plan_schema(with_source: bool) -> dict:
+    schema = {
+        "type": "object",
+        "properties": dict(_SQL_SCHEMA["properties"]),
+        "required": list(_SQL_SCHEMA["required"]),
+        "additionalProperties": False,
+    }
+    if with_source:
+        schema["properties"]["source"] = {"type": "string", "enum": ["database", "analytics"]}
+        schema["required"].append("source")
+    return schema
+
+
+async def _execute(source: str, query: str, *, name: str) -> tuple[str, list[str], list[list]]:
+    """Check and run one query against the store it was written for."""
+    if source == "analytics":
+        statement = _vet_hogql(query)
+        columns, rows = await _run_analytics(statement, name=name)
+    else:
+        statement = _vet(query)
+        columns, rows = await _run_database(statement)
+    return statement, columns, rows
+
+
+@router.post("/query", response_model=DynamicQueryResult)
+async def dynamic_query(
+    payload: DynamicQueryRequest,
+    _: User = Depends(require_admin),
+) -> DynamicQueryResult:
+    """Ask for a view in English; get rows and a chart suggestion back - from
+    our database, or from PostHog's analytics events, whichever the question
+    is about (or whichever was asked for)."""
+    question = payload.question.strip()
+    if not question:
+        raise HTTPException(status_code=400, detail="Ask a question first")
+
+    analytics_ready = posthog_analytics.configured()
+    if payload.source == "analytics" and not analytics_ready:
+        raise HTTPException(status_code=400, detail="Analytics is not connected yet")
+    choosing = payload.source == "auto" and analytics_ready
+    fixed = None if choosing else ("analytics" if payload.source == "analytics" else "database")
+
+    parts = ["You answer the administrator's question about their own product's usage with one read-only query.\n"]
+    if fixed in (None, "database"):
+        parts.append(_DATABASE_INSTRUCTIONS)
+    if fixed in (None, "analytics"):
+        parts.append(_ANALYTICS_INSTRUCTIONS)
+    if choosing:
+        parts.append(_CHOOSE_SOURCE)
+    else:
+        parts.append(f"The source is '{fixed}'.\n")
+    parts.append(
+        "Pick the chart that suits the answer: pie for a share of a whole, bar "
+        "for a comparison across categories, line for a series over time, table "
+        "otherwise. Name the label and value columns for the chart. Explain in "
+        "one sentence what the query returns."
+    )
+
+    plan = await generate_structured(
+        instructions="".join(parts),
+        input_text=question,
+        schema=_plan_schema(choosing),
+        schema_name="dashboard_query",
+        fast=False,
+    )
+    source = plan.get("source") if choosing else fixed
+    if source not in ("database", "analytics"):
+        source = "database"
+
+    statement, columns, rows = await _execute(source, plan.get("sql", ""), name=question[:80])
+    label_column = plan.get("label_column")
+    if source == "analytics":
+        columns, rows, label_column = await _with_accounts(columns, rows, label_column)
 
     return DynamicQueryResult(
         question=question,
         sql=statement,
         explanation=plan.get("explanation", ""),
         chart=plan.get("chart", "table"),
-        label_column=plan.get("label_column"),
+        label_column=label_column,
         value_column=plan.get("value_column"),
         columns=columns,
         rows=[[_jsonable(v) for v in row] for row in rows],
+        source=source,
     )
 
 
@@ -381,3 +529,137 @@ def _jsonable(value):
     if value is None or isinstance(value, (str, int, float, bool)):
         return value
     return str(value)
+
+
+# ---------------------------------------------------------------------------
+# Analytics: what visitors did in the browser, read from PostHog.
+# ---------------------------------------------------------------------------
+
+
+@router.get("/analytics", response_model=AnalyticsOverview)
+async def analytics_overview(
+    days: int = Query(30, ge=1, le=365),
+    _: User = Depends(require_admin),
+) -> AnalyticsOverview:
+    """The fixed analytics views. Never an error page: not connected, or
+    PostHog not answering, comes back as a state the panel can explain,
+    because the database half of the dashboard does not depend on it."""
+    now = datetime.now(UTC)
+    if not posthog_analytics.configured():
+        return AnalyticsOverview(configured=False, window_days=days, generated_at=now)
+    try:
+        view = await posthog_analytics.overview(days)
+    except posthog_analytics.AnalyticsUnavailable as exc:
+        return AnalyticsOverview(configured=True, error=str(exc), window_days=days, generated_at=now)
+
+    def slices(rows: list[dict]) -> list[AnalyticsSlice]:
+        return [AnalyticsSlice(label=r["label"], value=r["value"]) for r in rows if r["value"] > 0]
+
+    return AnalyticsOverview(
+        configured=True,
+        window_days=days,
+        generated_at=now,
+        visitors=view.visitors,
+        signed_in_visitors=view.signed_in_visitors,
+        events=view.events,
+        by_day=[AnalyticsDay(**d) for d in view.by_day],
+        demo_funnel=[AnalyticsSlice(**r) for r in posthog_analytics.demo_funnel(view)],
+        demo_gated=slices(view.series("guest_demo_gated", people=True)),
+        modes_picked=slices(view.series("mode_picked")),
+        questions_by_mode=slices(view.series("question_asked")),
+        gates=slices(view.series("gate_shown")),
+        locked_modes=slices(view.series("locked_mode_tapped", people=True)),
+        upgrade_interest=slices(
+            [
+                {"label": "Tapped a locked companion", "value": view.total("locked_mode_tapped", people=True)},
+                {"label": "Opened the plans", "value": view.total("plans_opened", people=True)},
+                {"label": "Turned on preview", "value": view.total("preview_opened", people=True)},
+            ]
+        ),
+        feedback=slices(view.series("feedback_given")),
+        devices=slices(view.series("app_opened", people=True)),
+        problems=slices(
+            [
+                {"label": "Answers failed", "value": view.total("answer_failed")},
+                {"label": "Connections dropped", "value": view.total("stream_dropped")},
+            ]
+        ),
+    )
+
+
+# ---------------------------------------------------------------------------
+# Pinned views: the dashboard is whatever the administrator has asked for.
+# ---------------------------------------------------------------------------
+
+
+@router.get("/views", response_model=list[AdminViewOut])
+async def list_views(
+    _: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+) -> list[AdminViewOut]:
+    rows = (await db.execute(select(AdminView).order_by(AdminView.created_at))).scalars().all()
+    return [AdminViewOut.model_validate(v) for v in rows]
+
+
+@router.post("/views", response_model=AdminViewOut, status_code=status.HTTP_201_CREATED)
+async def pin_view(
+    payload: AdminViewCreate,
+    admin: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+) -> AdminViewOut:
+    query = _vet_hogql(payload.query) if payload.source == "analytics" else _vet(payload.query)
+    view = AdminView(
+        title=payload.title.strip(),
+        source=payload.source,
+        query=query,
+        chart=payload.chart,
+        label_column=payload.label_column,
+        value_column=payload.value_column,
+        explanation=payload.explanation,
+        created_by=admin.id,
+    )
+    db.add(view)
+    await db.commit()
+    await db.refresh(view)
+    return AdminViewOut.model_validate(view)
+
+
+@router.delete("/views/{view_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def unpin_view(
+    view_id: uuid.UUID,
+    _: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+) -> None:
+    view = await db.get(AdminView, view_id)
+    if view is None:
+        raise HTTPException(status_code=404, detail="Not found")
+    await db.delete(view)
+    await db.commit()
+
+
+@router.get("/views/{view_id}/result", response_model=DynamicQueryResult)
+async def run_view(
+    view_id: uuid.UUID,
+    _: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+) -> DynamicQueryResult:
+    """Run a pinned view now. No model call: the stored query is checked
+    again and run as it is, so a pinned tile is live and free to refresh."""
+    view = await db.get(AdminView, view_id)
+    if view is None:
+        raise HTTPException(status_code=404, detail="Not found")
+    statement, columns, rows = await _execute(view.source, view.query, name=view.title[:80])
+    label_column = view.label_column
+    if view.source == "analytics":
+        columns, rows, label_column = await _with_accounts(columns, rows, label_column)
+    return DynamicQueryResult(
+        question=view.title,
+        sql=statement,
+        explanation=view.explanation or "",
+        chart=view.chart,
+        label_column=label_column,
+        value_column=view.value_column,
+        columns=columns,
+        rows=[[_jsonable(v) for v in row] for row in rows],
+        source=view.source,
+    )

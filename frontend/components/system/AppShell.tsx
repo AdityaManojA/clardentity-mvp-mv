@@ -1063,6 +1063,7 @@ function Breadcrumbs({
     profile: "Your profile",
     settings: "Settings",
     start: "Opening a chat",
+    admin: "Admin",
   };
 
   const crumbs: Array<{ label: string; href?: string }> = [];

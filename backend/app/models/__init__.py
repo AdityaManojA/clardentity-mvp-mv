@@ -1,4 +1,4 @@
-from app.models.admin import AdminSetting
+from app.models.admin import AdminSetting, AdminView
 from app.models.base import Base
 from app.models.conversation import COGNITIVE_MODES, Conversation
 from app.models.document import Document, DocumentChunk
@@ -31,6 +31,7 @@ __all__ = [
     "DocumentChunk",
     "ConversationMemory",
     "AdminSetting",
+    "AdminView",
     "ProInterest",
     "UserProfile",
 ]

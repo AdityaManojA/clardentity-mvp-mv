@@ -43,7 +43,7 @@
 // v9: smart switching in the demo and the new welcome copy. The demo's
 // client now sends smart_switching and reads a "switched" event; an old
 // bundle would send neither and show neither.
-const CACHE = "clardentity-shell-v17"; // v17: temporary chats
+const CACHE = "clardentity-shell-v18"; // v18: admin analytics and pinned views
 
 // Only things that are content-addressed or genuinely static. HTML is not
 // here on purpose - a stale shell is how a deployed fix fails to reach

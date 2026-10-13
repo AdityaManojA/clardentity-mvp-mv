@@ -134,3 +134,30 @@ a bucket answers it without making each answer individually identifiable.
   there already. Sending it to the same project would put "which modes
   produce well-sourced answers" next to "which modes get used". Needs the
   PostHog Python SDK and a server-side key.
+
+## Reading it back in the admin panel
+
+The admin panel (`/admin`) reads PostHog server-side - the numbers are not
+copied into our database. Two stores, two questions: our database is the
+authority on accounts, usage and cost (everyone, consent or not); PostHog
+holds what only the browser sees, for visitors who allowed analytics. The
+panel says which store every number came from.
+
+- **Product analytics section**: visitors per day, the visitor-demo steps,
+  the account-only controls demo visitors reached for, companions picked,
+  gates shown, interest in paid plans, feedback, devices and problems.
+- **Ask for a view**: a question in English becomes one read-only query
+  against either store (or "wherever fits"); HogQL for PostHog.
+- **Pin to dashboard**: an answer's query is saved (`admin_views`) and re-run
+  every time the page opens, so the dashboard is whatever has been asked for.
+
+Backend environment (Render), both required, neither in the repo:
+
+```
+POSTHOG_PROJECT_ID=304688
+POSTHOG_QUERY_KEY=phx_...   # personal API key, Query: Read, this project only
+```
+
+`POSTHOG_API_HOST` defaults to `https://eu.posthog.com`. Answers are cached
+for five minutes in Redis; PostHog allows three queries at a time per
+project, and the overview spends four.

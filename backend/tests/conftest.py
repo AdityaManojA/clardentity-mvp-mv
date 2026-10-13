@@ -46,3 +46,8 @@ async def _dispose_pools_between_tests():
 
     await guest_redis.aclose()
     await guest_redis.connection_pool.disconnect()
+    # And the admin panel's analytics cache, for the same reason.
+    from app.services.posthog_analytics import _redis as analytics_redis
+
+    await analytics_redis.aclose()
+    await analytics_redis.connection_pool.disconnect()

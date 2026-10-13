@@ -41,6 +41,16 @@ class Settings(BaseSettings):
     # to search through its own tool took 5-20s a round. Optional: with no
     # key, web_research falls back to the model's search tool.
     tavily_api_key: str | None = None
+
+    # PostHog's query API, read by the admin panel's analytics (see
+    # services/posthog_analytics). The project's publishable key (phc_) lives
+    # in the frontend build; this one is a personal API key with Query: Read
+    # on that one project, and a real secret - Render env only. With either
+    # unset the panel says analytics is not connected and nothing else
+    # changes. EU, because the privacy policy says that is where it lives.
+    posthog_api_host: str = "https://eu.posthog.com"
+    posthog_project_id: str | None = None
+    posthog_query_key: str | None = None
     anthropic_model: str = "claude-opus-5"
     # Auxiliary judgements (guidance, clarifier, verification, reviews) run on
     # this one. Every one of them sits between the user and something they are
