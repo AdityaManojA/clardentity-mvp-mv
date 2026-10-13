@@ -207,10 +207,25 @@ def check_security(api: str, app: str) -> None:
     map_status, _, _ = curl([f"{app}{chunks[0]}.map"], 60)
     record("SEC-SOURCEMAPS", map_status in (403, 404), f"{chunks[0]}.map -> {map_status}")
     leaked = set()
+    ph_key = ph_host = None
     for chunk in chunks:
         _, _, js = curl([f"{app}{chunk}"], 60)
         leaked.update(m[:8] + "…" for m in SECRET_PATTERNS.findall(js))
+        ph_key = ph_key or next(iter(re.findall(r"phc_[A-Za-z0-9]{20,}", js)), None)
+        ph_host = ph_host or next(iter(re.findall(r"https://[a-z]+\.i\.posthog\.com", js)), None)
     record("SEC-BUNDLE-SECRETS", not leaked, f"{len(chunks)} chunks scanned; found={sorted(leaked)}")
+
+    # The key and the host must belong to the same PostHog region. A US
+    # project's key sent to the EU host is accepted by its capture endpoint
+    # ("Ok") and silently dropped - which is how two weeks of production
+    # analytics went nowhere (2026-10-13). The flags endpoint is the honest
+    # one: it answers 401 for a key that region does not have.
+    if not ph_key:
+        record("ANALYTICS-REGION", None, "no PostHog key in the bundle (analytics off)")
+    else:
+        host = ph_host or "https://eu.i.posthog.com"
+        status, _, _ = post_json(f"{host}/decide/?v=3", {"api_key": ph_key, "distinct_id": "regression-check"})
+        record("ANALYTICS-REGION", status == 200, f"{ph_key[:8]}… at {host} -> {status}")
 
 
 def check_guest(api: str) -> None:

@@ -124,6 +124,7 @@ Add a row for every feature that ships and every bug found. Retire, never delete
 | SEC-SOURCEMAPS | Source maps are not served | script |
 | L6 | Web search returns topical sources: Tavily is never sent `exclude_domains` (it turns results into dictionary pages); excluded sites are filtered locally. DEMO-FINDER / APP-FINDER fail if most factual claims have no source | test (`test_search_locality.py`) + script |
 | SEC-BUNDLE-SECRETS | No API keys in shipped JS (PostHog's public key is expected) | script |
+| ANALYTICS-REGION | The PostHog key in the shipped bundle belongs to a project in the region the bundle sends to (EU, per the privacy policy) - PostHog's capture endpoint accepts and silently drops a wrong-region key, so only its flags endpoint tells (2026-10-13: the Vercel key was a US project's; nothing was recorded for two weeks) | script |
 | L1 | No CSP violations in the console across landing, demo, login (Google button), chat, images, live call | browser (production build) |
 | L2 | No console errors / failed requests on the main flows | browser |
 | L3 | Service worker serves the current build (`CACHE` bumped) | browser |

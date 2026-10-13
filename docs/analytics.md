@@ -27,7 +27,12 @@ worth the operational cost at this size.
 ## Turning it on
 
 1. Create a project at <https://eu.posthog.com> (choose the EU region -
-   the code defaults to the EU host).
+   the code defaults to the EU host, and the privacy policy says EU).
+   **The key and the host must be from the same region.** A US project's
+   key sent to the EU host is not rejected - the capture endpoint answers
+   "Ok" and the events are dropped - so a mismatch looks exactly like a
+   working setup with no traffic. That is what happened from 2026-09-28 to
+   2026-10-13. The regression smoke row `ANALYTICS-REGION` now checks it.
 2. Copy the **Project API key** (starts with `phc_`). It is a publishable
    key: it identifies the project to the browser and grants nothing but
    the right to send events. It is not a secret and belongs in the client
