@@ -20,8 +20,20 @@ import { useTouchKeyboard } from "@/lib/useTouchKeyboard";
 import { usePhoneLayout } from "@/lib/usePhoneLayout";
 import { track } from "@/lib/analytics";
 
-/** Tallest the composer's textarea grows before it scrolls: about five lines. */
-const COMPOSER_MAX_HEIGHT = 120;
+/** Tallest the composer's textarea grows before it scrolls - about five
+ *  lines on a phone, about eight at the desktop's larger type. Past that it
+ *  scrolls inside, so a pasted page never pushes the thread off the screen. */
+const COMPOSER_MAX_HEIGHT_PHONE = 120;
+const COMPOSER_MAX_HEIGHT_DESKTOP = 220;
+
+/** Size the composer's textarea to its text, up to the cap for this layout. */
+function fitComposer(el: HTMLTextAreaElement | null, phoneLayout: boolean): void {
+  if (!el) return;
+  const cap = phoneLayout ? COMPOSER_MAX_HEIGHT_PHONE : COMPOSER_MAX_HEIGHT_DESKTOP;
+  el.style.height = "auto";
+  el.style.height = `${Math.min(el.scrollHeight, cap)}px`;
+  el.style.overflowY = el.scrollHeight > cap ? "auto" : "hidden";
+}
 
 /** Something the next message carries. An image goes to the model as
  *  vision context; a document is read on the server and its text put in
@@ -231,25 +243,23 @@ export function MessageInput({
     };
   }, [taRef]);
 
-  // Phone layout only: grows with what's typed, up to about five lines, then
-  // scrolls inside. Desktop keeps the drawn one-row box.
-  // It used to stay one row tall whatever the length: a paragraph on a phone
-  // was read through a one-line slot. Measured before paint so the box never
-  // flashes at the old height; the cap keeps the thread above in view.
+  // Grows with what's typed, then scrolls inside past the cap - on every
+  // screen. It used to stay one row tall whatever the length: first on
+  // phones, then (until 2026-10-14) on desktop, where the phone fix had
+  // deliberately left "the drawn one-row box" - and a pasted paragraph was
+  // read through a one-line slot with a scrollbar. The empty box is still the
+  // drawn one: one row inside the card's own height floor. Measured before
+  // paint so the box never flashes at the old height.
   const phoneLayout = usePhoneLayout();
   useLayoutEffect(() => {
-    const el = taRef.current;
-    if (!el) return;
-    if (!phoneLayout) {
-      el.style.height = "";
-      el.style.overflowY = "";
-      return;
-    }
-    el.style.height = "auto";
-    const capped = Math.min(el.scrollHeight, COMPOSER_MAX_HEIGHT);
-    el.style.height = `${capped}px`;
-    el.style.overflowY = el.scrollHeight > COMPOSER_MAX_HEIGHT ? "auto" : "hidden";
+    fitComposer(taRef.current, phoneLayout);
   }, [value, taRef, phoneLayout]);
+  // A narrower window wraps the same text onto more lines.
+  useEffect(() => {
+    const refit = () => fitComposer(taRef.current, phoneLayout);
+    window.addEventListener("resize", refit);
+    return () => window.removeEventListener("resize", refit);
+  }, [taRef, phoneLayout]);
 
   useEffect(() => {
     const pos = pendingCaretRef.current;
