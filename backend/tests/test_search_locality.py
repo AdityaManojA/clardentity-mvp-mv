@@ -10,6 +10,8 @@ import app.services.web_research as wr
 
 
 class _Response:
+    status_code = 200
+
     def __init__(self, captured):
         self._captured = captured
 

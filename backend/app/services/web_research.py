@@ -29,6 +29,7 @@ decorative link under it.
 import asyncio
 import logging
 import re
+import time
 from dataclasses import dataclass, field, replace
 from urllib.parse import urlparse
 
@@ -209,6 +210,17 @@ def _search_tool(max_uses: int) -> dict:
 # ---------------------------------------------------------------------------
 _TAVILY_URL = "https://api.tavily.com/search"
 _TAVILY_TIMEOUT_SECONDS = 8.0
+
+# When Tavily refuses the account rather than the query - out of credits
+# (432/433), key revoked (401/403), rate-limited (429) - every search fails
+# the same way, and until 2026-10-15 each one quietly came back empty: the
+# key was set, so the API path was always taken, and with no sources a
+# Finder answer had nothing to check its claims against. Now the first such
+# refusal sets Tavily aside for a while and searches go to the model's own
+# search tool - slower, but the claims still get sources.
+_TAVILY_ACCOUNT_REFUSALS = {401, 403, 429, 432, 433}
+_TAVILY_COOLDOWN_SECONDS = 600.0
+_tavily_set_aside_until = 0.0
 # Forums and social feeds are where a claim's exact words turn up with no
 # authority behind them; the supervisor would reject them anyway, so they
 # are not worth the result slots.
@@ -249,7 +261,18 @@ def _excluded(host: str | None) -> bool:
 
 
 def tavily_available() -> bool:
-    return bool(settings.tavily_api_key)
+    return bool(settings.tavily_api_key) and time.monotonic() >= _tavily_set_aside_until
+
+
+def _set_tavily_aside(status: int) -> None:
+    global _tavily_set_aside_until
+    if time.monotonic() >= _tavily_set_aside_until:
+        logger.warning(
+            "tavily refused the account (HTTP %s); using the model's search tool for %ds",
+            status,
+            int(_TAVILY_COOLDOWN_SECONDS),
+        )
+    _tavily_set_aside_until = time.monotonic() + _TAVILY_COOLDOWN_SECONDS
 
 
 # Tavily takes a country *name*, and the user record stores a two-letter
@@ -322,6 +345,9 @@ async def _tavily_search(
             res = await client.post(
                 _TAVILY_URL, json=body, headers={"Authorization": f"Bearer {key}"}
             )
+            if res.status_code in _TAVILY_ACCOUNT_REFUSALS:
+                _set_tavily_aside(res.status_code)
+                return []
             res.raise_for_status()
             data = res.json()
     except Exception:  # noqa: BLE001 - a failed search is an empty search
@@ -564,7 +590,11 @@ async def gather_context(
             ),
             return_exceptions=True,
         )
-        return _merge_sources([b for b in batches if isinstance(b, list)], set(), cap=8)
+        merged = _merge_sources([b for b in batches if isinstance(b, list)], set(), cap=8)
+        # Refused just now (see _TAVILY_ACCOUNT_REFUSALS): this turn still
+        # gets a search, from the fallback below.
+        if merged or tavily_available():
+            return merged
     return await _search_round(queries[0], guidance=None, max_uses=CONTEXT_SEARCHES)
 
 
@@ -591,10 +621,11 @@ async def research_claim(
     guidance: str | None = None
     pending_seed = [replace(s) for s in seed] if seed else []
     judged_urls: set[str] = set()
-    use_api = tavily_available()
 
     for round_index in range(MAX_ROUNDS):
         result.rounds_used = round_index + 1
+        # Asked every round: Tavily can be set aside mid-claim.
+        use_api = tavily_available()
 
         if use_api:
             queries = _round_queries(current_claim, guidance, first=round_index == 0)
@@ -604,6 +635,9 @@ async def research_claim(
             )
             found = [b for b in batches if isinstance(b, list)]
             sources = _merge_sources([pending_seed, *found], judged_urls)
+            if not sources and not tavily_available():
+                # Refused just now: this round still gets a search.
+                sources = await _search_round(current_claim, guidance)
         elif pending_seed:
             sources = pending_seed
         else:

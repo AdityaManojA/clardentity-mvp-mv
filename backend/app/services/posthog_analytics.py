@@ -58,7 +58,7 @@ EVENT_CATALOG: dict[str, str] = {
     "mode_switched_automatically": "smart switching moved a question; from, to",
     "mode_switch_reverted": "the user went back after a switch; to, via",
     "quick_answer_tapped": "Quick answer pressed while waiting; mode",
-    "attachment_added": "a file was attached; kind, extension, size_kb",
+    "attachment_added": "a file was attached; kind, extension, size_kb, via ('picker'|'paste'|'drop')",
     "document_uploaded": "a workspace document was uploaded; extension, size_kb",
     "voice_recorded": "dictation used; words (count)",
     "call_started": "a live call started",
