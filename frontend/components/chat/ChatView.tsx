@@ -1024,7 +1024,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
       // answer; this sets up the next question.
       onUseMode={(next) => setMode(next as CognitiveMode)}
       onAskRefined={(question) => handleSend(question, [])}
-      emptyState={temporary ? <TemporaryChatIntro /> : <ChatGreeting />}
+      emptyState={temporary ? <TemporaryChatIntro /> : <ChatGreeting seed={conversationId} />}
       emptyStateAvatar={
         <AvatarPanel
           state={avatarState}

@@ -18,6 +18,7 @@ Add a row for every feature that ships and every bug found. Retire, never delete
 | ID | Proves | Kind |
 |---|---|---|
 | B1 | Opens from the banner, grows out of the stage, curtain behind; welcome reads "Hi, Welcome to Clardentity." with no mention of accounts | browser |
+| B1b | Under the demo's welcome, the companion line names who is listening: "You're with your learning companion." (and "your decision-making companion", "your co-creative companion"...; Thought coach reads "You're with your thought coach.") - changes as the companion is picked (2026-10-16, replacing "You're in Learning.") | browser |
 | B2 | All 8 companions selectable, none locked; composer has attach, call, mic, send, Switching; **no tier chip** | browser |
 | DEMO-FINDER | Finder answer has gist (crux event first), claims with evidence, sources, confidence band; not every claim tagged opinion; budget event last | script |
 | DEMO-DECISION | Decision-making answer has the verdict box (`review` event + `decision_review`), gist, claims | script |
@@ -49,7 +50,7 @@ Add a row for every feature that ships and every bug found. Retire, never delete
 | C1 | Terms unchecked is refused; wrong password refused; forgot-password reachable | browser |
 | C2 | /welcome shows "Welcome to Clardentity, <first name>"; Skip keeps typed answers | browser |
 | C3 | First visit: no "Welcome back" notice; night band says "Hello, night owl" | browser |
-| C4 | Returning visit (>20 min after onboarding): "Welcome back, <name>" notice once per tab; time-of-day heading + "Let's accomplish something today." | browser |
+| C4 | Returning visit (>20 min after onboarding): "Welcome back, <name>" notice once per tab; time-of-day heading + one of the 20 invitation lines (lib/greeting.ts INVITATIONS; was "Let's accomplish something today." until 2026-10-16) - a different line from chat to chat, the same one while you stay in a chat | browser |
 | C5 | Log out → /login; log in → back in | browser |
 
 ## D. Core chat (signed in)
@@ -161,3 +162,4 @@ Add a row for every feature that ships and every bug found. Retire, never delete
 | 2026-10-14 | local | pre-commit (composer height) | D1b: desktop 1280x700 signed in, all 8 modes 1 row -> 5 lines for a 470-character paste, no scrollbar; 6x paste capped at ~8 lines and scrolls inside; Shift+Enter two lines; one row after sending; in a thread the box grows upward and stays on screen; phone keeps its 5-line cap; demo on desktop all 8 modes and on phone | Fixed: the desktop composer never grew (only phones did since the 2026-10-10 mobile pass) |
 | 2026-10-15 | local | pre-commit (paste/drop, Tavily fallback) | 512 tests (10 new; the breaker's removal fails 8); D1c in the demo and signed in: screenshot and Finder-file paste attach, Word text and plain text stay text, .exe refused, drop overlay and drop attach, pasted image answered end to end; L6b: with Tavily refusing (invalid key) APP-FINDER still 6/8 claims sourced via the fallback (78s) | Provider check on prod keys: OpenAI out of credit; Tavily at 1,001/1,000 free credits (refused on 10-14, accepting on 10-15); Anthropic, Gemini, xAI, Resend fine |
 | 2026-10-15 | prod | 853a72f (backend redeployed once the repo was public again) | 22/22 script incl. IMAGE-EDIT-ATTACHED / IMAGE-EDIT-PREVIOUS / IMAGE-SERVED (OpenAI topped up); API round trip: TTS 200, dictation heard the TTS sentence back exactly, document processed in 4s and a grounded question answered from it with citations, live-call session 201. Providers: OpenAI OK; Tavily over its free 1,000 but pay-as-you-go on (cap 5,000); Anthropic, Gemini, xAI, Resend OK | Unblocked: G1, G2, H2, K1/K2 backend paths (were blocked on OpenAI credit since 2026-10-12) |
+| 2026-10-16 | local (real PostHog EU key) | pre-commit (feedback 15/10 points 1 and 3) | B1b: all 8 demo companions read "You're with your ... companion." (Thought coach: "your thought coach"); C4: 5 different invitation lines across 6 new chats, unchanged on re-render and reload, wraps within a phone screen; L7/L8 on real data: 10 visitors, 188 events, 3 demo visitors; "which pages were viewed most" answered from PostHog | PostHog query key now on Render; local OpenAI key replaced and working |

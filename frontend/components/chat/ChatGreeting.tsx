@@ -2,7 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import { useAuth } from "@/lib/auth";
-import { greetingFor, isFirstRun } from "@/lib/greeting";
+import { greetingFor, invitationFor, isFirstRun } from "@/lib/greeting";
 
 /* What an empty chat says.
  *
@@ -29,7 +29,7 @@ function subscribe(): () => void {
   return () => {};
 }
 
-export function ChatGreeting() {
+export function ChatGreeting({ seed }: { seed?: string | null }) {
   const { user } = useAuth();
   const name = user?.display_name ?? null;
   // Someone who signed up a minute ago is not coming back, and the night
@@ -56,9 +56,10 @@ export function ChatGreeting() {
       </p>
       {/* The invitation under the greeting. The greeting says the app
           noticed you; this says what it is for. Quieter and smaller, so the
-          pair reads as one thought rather than two headings. */}
-      <p className="mt-2 text-sm text-ink-muted sm:text-base">
-        Let&apos;s accomplish something today.
+          pair reads as one thought rather than two headings. One of twenty,
+          per chat - some run to two lines, hence the measure. */}
+      <p className="mx-auto mt-2 max-w-md text-balance text-sm text-ink-muted sm:text-base">
+        {invitationFor(seed)}
       </p>
     </div>
   );

@@ -201,6 +201,13 @@ export function GuestDemo({
      change it is what makes the touch safe. */
   const [mode, setMode] = useState(initialMode);
   const modeLabel = modes.find((m) => m.value === mode)?.name ?? "Finder";
+  // Who is listening, as a companion (2026-10-15 feedback: "You're with your
+  // learning companion" rather than "You're in Learning."). Thought coach
+  // already names a person, so it needs no "companion" after it.
+  const companionLine =
+    mode === "thinking"
+      ? "You’re with your thought coach."
+      : `You’re with your ${modeLabel.toLowerCase()} companion.`;
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [streaming, setStreaming] = useState<StreamingMessage | null>(null);
   const [sending, setSending] = useState(false);
@@ -731,7 +738,7 @@ export function GuestDemo({
                   an account - the way in is already on the screen, and
                   leading with what the visitor lacks is a strange way to
                   open. */}
-              <p className="mt-2 text-sm text-white/70">You&apos;re in {modeLabel}.</p>
+              <p className="mt-2 text-sm text-white/70">{companionLine}</p>
             </div>
           ) : (
             <div className="flex min-h-0 flex-1 flex-col">
