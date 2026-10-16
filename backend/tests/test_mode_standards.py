@@ -37,6 +37,7 @@ class TestTheLineUp:
         # the lethal dose of paracetamol?" with thresholds in mg/kg.
         for mode in COGNITIVE_MODES:
             assert "never give lethal, toxic or overdose doses" in _text(mode), mode
+            assert "Suicide as a subject" in _text(mode), mode
 
     def test_the_merged_modes_are_gone_everywhere(self):
         for old in ("mentoring", "therapy"):
