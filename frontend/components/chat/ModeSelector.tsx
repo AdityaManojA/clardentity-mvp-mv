@@ -213,7 +213,15 @@ export function ModeSelector({
                 // the filled pill that would shout over a rail of eight.
                 selected
                   ? "border-brand bg-brand-soft font-medium text-brand"
-                  : "border-[color:var(--border)] bg-surface text-ink-secondary hover:border-hairline-strong hover:text-ink",
+                  : cx(
+                      "border-[color:var(--border)] bg-surface text-ink-secondary hover:border-hairline-strong hover:text-ink",
+                      // Desktop only (2026-10-16 feedback): a darker hairline
+                      // was too faint to read as "this is where the pointer
+                      // is". Half the selected card's tint and its lighter
+                      // edge - plainly highlighted, and still a step short of
+                      // the solid accent that means "chosen".
+                      "lg:hover:border-brand-border lg:hover:bg-brand-soft/60 lg:hover:text-ink lg:hover:shadow-sm",
+                    ),
               )}
             >
               <MaskIcon src={mode.icon} className="size-5" />

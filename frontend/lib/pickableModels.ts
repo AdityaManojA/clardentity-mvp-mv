@@ -20,11 +20,14 @@ export type PickableModel = {
   label: string;
   vendor: string;
   blurb: string;
+  /** False outside the modes where picking is allowed (the server's rule;
+   *  PICKABLE_MODES below mirrors it). */
+  selectable?: boolean;
 };
 
-/** Modes where a picker is shown at all. The server owns this rule too (it
- *  returns an empty list elsewhere); this spares a request in the modes that
- *  will never have one. */
+/** Modes where a named model can be chosen. Elsewhere the picker is shown
+ *  locked (Auto only). The server owns the rule - it flags each model's
+ *  `selectable` and ignores a model sent from any other mode. */
 export const PICKABLE_MODES = new Set(["creative"]);
 
 const CHOICE_KEY = "clardentity.model.choice";

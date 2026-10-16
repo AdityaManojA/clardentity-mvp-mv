@@ -10,6 +10,7 @@ import type {
   Guidance,
   DecisionReviewData,
   GeneratedImage,
+  SafetyCardData,
   ThinkingReviewData,
 } from "@/lib/sse";
 import { ConfidenceBadge } from "@/components/chat/ConfidenceBadge";
@@ -28,6 +29,7 @@ import {
   GeneratedImagePlaceholder,
 } from "@/components/chat/GeneratedImageCard";
 import { ThinkingReview } from "@/components/chat/ThinkingReview";
+import { SafetyCard } from "@/components/chat/SafetyCard";
 import { FeedbackWidget } from "@/components/chat/FeedbackWidget";
 import { ExportFileMenu } from "@/components/chat/ExportFileMenu";
 import { cleanMessageText } from "@/lib/text";
@@ -49,6 +51,9 @@ export type StreamingMessage = {
   generatedImage?: GeneratedImage | null;
   /** True between "a picture is being made" and the picture arriving. */
   makingImage?: boolean;
+  /** The support card, when the safety screen flagged the question. Arrives
+   *  before any text, so it shows over the rabbit. */
+  safety?: SafetyCardData | null;
 };
 
 export function MessageList({
@@ -325,6 +330,7 @@ export function MessageList({
           where="message"
           label={m.role === "user" ? "This message couldn't be shown." : "This answer couldn't be shown."}
         >
+        {m.role === "assistant" && m.safety && <SafetyCard card={m.safety} />}
         <MessageBubble
           key={m.id}
           id={m.id}
@@ -368,6 +374,7 @@ export function MessageList({
           onUseMode={onUseMode}
           onAskRefined={onAskRefined}
           onSubmitEdit={onSubmitEdit}
+          openFully={m.safety?.level === "crisis"}
         />
         </ErrorBoundary>
       ))}
@@ -375,6 +382,7 @@ export function MessageList({
           wait is the rabbit; the body text that streams in meanwhile is
           accumulated (so cancelling mid-way still has it) but never shown
           token by token - the finished answer replaces this all at once. */}
+      {streaming?.safety && <SafetyCard card={streaming.safety} />}
       {busy && !streamingLead && (
         <div className="flex justify-start">
           <div className="rounded-2xl rounded-bl-md border border-hairline bg-surface px-4 py-3">
@@ -401,6 +409,7 @@ export function MessageList({
           makingImage={streaming.makingImage ?? false}
           thinkingReview={streaming.thinkingReview ?? null}
           isStreaming
+          openFully={streaming.safety?.level === "crisis"}
         />
         </ErrorBoundary>
       )}
@@ -683,6 +692,7 @@ function MessageBubble({
   onUseMode,
   onAskRefined,
   onSubmitEdit,
+  openFully = false,
 }: {
   id: string;
   role: string;
@@ -725,6 +735,10 @@ function MessageBubble({
   onUseMode?: (mode: string) => void;
   onAskRefined?: (question: string) => void;
   onSubmitEdit?: (messageId: string, content: string) => void;
+  /** Show the whole answer, not just the gist: a reply to someone who may
+   *  be in danger asks whether they are safe below its first line, and that
+   *  must not wait behind a "Show full answer" they may never press. */
+  openFully?: boolean;
 }) {
   const isUser = role === "user";
 
@@ -767,7 +781,7 @@ function MessageBubble({
   // Collapsed by default, even the first time this message is seen: the
   // whole point of the crux is to make reading the full answer optional,
   // not to show it in full anyway and add a summary on top.
-  const [detailOpen, setDetailOpen] = useState(false);
+  const [detailOpen, setDetailOpen] = useState(openFully);
   // Named for what's actually behind the fold in Thinking/Decision mode -
   // the box above it already carries the verdict, so what's hidden is the
   // reasoning trail that produced it, not "the answer" (the box already is

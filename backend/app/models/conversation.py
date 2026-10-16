@@ -13,11 +13,27 @@ COGNITIVE_MODES = (
     "thinking",
     "decision",
     "learning",
-    "mentoring",
-    "therapy",
     "creative",
+    # Mentoring and Reflect & Relieve, merged on 2026-10-16: one companion
+    # for goals and for how you are doing (see prompt_builder).
+    "guidance",
+    # Health information and navigation, under the regulation suite in
+    # services/regulations.
+    "healthcare",
     "legal",
 )
+
+#: Mode values that no longer exist, and what a stored or remembered one now
+#: means. Read wherever a mode arrives from somewhere older than this code -
+#: a visitor's saved demo conversation, a browser's remembered choice.
+LEGACY_MODES = {"mentoring": "guidance", "therapy": "guidance"}
+
+
+def current_mode(value: str | None) -> str | None:
+    """A mode value as it is today."""
+    if value is None:
+        return None
+    return LEGACY_MODES.get(value, value)
 
 
 class Conversation(Base):

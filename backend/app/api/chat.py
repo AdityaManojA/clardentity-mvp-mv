@@ -18,6 +18,7 @@ from app.api.deps import get_conversation_for_user, get_current_user, require_wo
 from app.core.config import settings
 from app.core.rate_limit import check_rate_limit
 from app.db.session import AsyncSessionLocal, get_db
+from app.models.conversation import current_mode
 from app.models import AudioTranscript, Citation, Conversation, Document, Message, MessageClaim, ClaimEvidence, User
 from app.schemas.chat import (
     ActiveLeafIn,
@@ -86,6 +87,9 @@ from app.services.profile_service import (
 from app.services.query_optimizer import optimize_query
 from app.services.search_planner import SearchPlan, needs_live_data, plan_searches
 from app.services.preview_access import daily_limit, is_preview_mode, spend, used_today
+from app.api.healthcare import needs_consent as needs_health_consent
+from app.services import safety
+from app.services.regulations import jurisdiction_block, profile_for
 from app.services.retrieval import RetrievedChunk, retrieve_chunks
 from app.services.temporary_chats import discard, sweep_idle
 from app.services.token_meter import meter as token_meter
@@ -277,12 +281,40 @@ def _serialize_message(
         thinking_review=message.thinking_review,
         generated_image=message.generated_image,
         feedback=message.feedback,
+        safety=message.safety,
         parent_id=message.parent_id,
         sibling_index=sibling_index,
         sibling_count=sibling_count,
         sibling_ids=sibling_ids or [message.id],
         claims=claims,
     )
+
+
+def _require_healthcare_ready(mode: str, user: User, conversation: Conversation) -> None:
+    """Healthcare's three preconditions, from the regulation suite - checked
+    on the server because a lock that lives only in the client is not one.
+
+    403: not offered where the person is. 428: no current consent - the
+    client shows the consent card. 409: where health conversations may not be
+    stored, they run only as temporary chats - the client opens one."""
+    if mode != "healthcare":
+        return
+    profile = profile_for(user.location_country, user.location_subdivision)
+    if profile.storage == "unavailable":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"Healthcare isn't available in {profile.place}.",
+        )
+    if needs_health_consent(user):
+        raise HTTPException(
+            status_code=status.HTTP_428_PRECONDITION_REQUIRED,
+            detail="Healthcare needs your consent first.",
+        )
+    if profile.storage == "transient" and not conversation.temporary:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"In {profile.place}, Healthcare runs only in a temporary chat.",
+        )
 
 
 @router.post("/conversations", response_model=ConversationOut, status_code=status.HTTP_201_CREATED)
@@ -326,15 +358,15 @@ async def list_models(
     mode: str | None = None,
     current_user: User = Depends(get_current_user),
 ) -> dict:
-    """The models a user may pick from in this mode.
+    """The models this deployment can route to, and whether the user may
+    pick one in this mode.
 
-    Empty in every mode but Co-Creative, where the choice is
-    theirs - the client uses that emptiness to decide whether to show a
-    picker at all, so the rule lives on the server rather than being
-    duplicated in the UI.
-    """
-    if mode is not None and not model_catalog.allows_picking(mode):
-        return {"models": []}
+    Since 2026-10-16 the picker is shown in every mode, with every model but
+    Auto greyed out except where choosing is part of the plan (Co-Creative
+    today) - so the list is the same everywhere and `selectable` says which.
+    The send path enforces the same rule: a model sent from a mode that does
+    not allow picking is ignored, whatever the client shows."""
+    selectable = mode is None or model_catalog.allows_picking(mode)
     return {
         "models": [
             {
@@ -342,6 +374,7 @@ async def list_models(
                 "label": m.label,
                 "vendor": m.vendor,
                 "blurb": m.blurb,
+                "selectable": selectable,
             }
             for m in model_catalog.available()
         ]
@@ -976,6 +1009,7 @@ async def send_message(
             mode = validate_mode(parent_message.mode_used)
         except InvalidModeError as exc:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+        _require_healthcare_ready(mode, current_user, conversation)
         reasoning_lens = parent_message.reasoning_lens
         effective_content = parent_message.content or ""
         attached_chunks: list[RetrievedChunk] = []
@@ -986,6 +1020,11 @@ async def send_message(
         # further back than where the new answer itself attaches.
         history = active_path(all_messages, parent_message.parent_id)[-HISTORY_WINDOW:]
         previous_image = _last_generated_image(history)
+        # Screened again: a regenerated answer to someone at risk must be as
+        # careful as the first one.
+        risk_task = asyncio.create_task(
+            safety.assess(effective_content, [(m.role, m.content or "") for m in history])
+        )
         plan_task = asyncio.create_task(_plan(history, effective_content, mode))
         prefetch_task = asyncio.create_task(_prefetch(plan_task, mode))
         memory_summary = await get_memory_summary(db, conversation_id)
@@ -994,12 +1033,15 @@ async def send_message(
         # reject with exactly 400, not Pydantic's default 422 for a missing
         # field.
         try:
-            mode = validate_mode(payload.mode)
+            # A tab opened before Mentoring and Reflect & Relieve became
+            # Guidance still sends the old ids; they mean Guidance now.
+            mode = validate_mode(current_mode(payload.mode))
             reasoning_lens = validate_reasoning_lens(payload.reasoning_lens)
         except (InvalidModeError, InvalidReasoningLensError) as exc:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
         if not payload.content.strip():
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="content required")
+        _require_healthcare_ready(mode, current_user, conversation)
 
         # The paid-tier companions, opened for testing from the plans dialog.
         # Checked here rather than left to the picker: the lock is the only
@@ -1052,6 +1094,12 @@ async def send_message(
         # already established two turns earlier.
         history = active_path(all_messages, effective_parent_id)[-HISTORY_WINDOW:]
         previous_image = _last_generated_image(history)
+        # Every message, every mode - quick answers included (services/safety).
+        # Alongside the gates' check rather than after it, so an ordinary
+        # turn waits for neither.
+        risk_task = asyncio.create_task(
+            safety.assess(effective_content, [(m.role, m.content or "") for m in history])
+        )
         guidance_task = (
             None if mode == "rapid"
             else asyncio.create_task(
@@ -1077,6 +1125,11 @@ async def send_message(
         # the chosen mode, so it needs nothing from retrieval and runs while
         # the history and memory load.
         guidance = await guidance_task if guidance_task is not None else None
+        risk = await risk_task
+        if risk.flagged:
+            # Nobody who may be at risk is answered with a question about
+            # their question, or offered another companion.
+            guidance = None
         mark("gates")
 
         # One question back, at most, before answering. The client embeds
@@ -1244,7 +1297,10 @@ async def send_message(
     # since before the gates and is normally done.
     review_task: "asyncio.Task[dict | None] | None" = None
     thinking_task: "asyncio.Task[dict | None] | None" = None
-    if mode in ("decision", "thinking"):
+    # No decision or reasoning review on a reply to someone in crisis: the
+    # boxes of biases and framings belong to a question, not to a person who
+    # may be in danger.
+    if mode in ("decision", "thinking") and not (await risk_task).crisis:
         try:
             early_decision = await decision_task
         except Exception:  # noqa: BLE001 - screening scope degrades, nothing fails
@@ -1331,11 +1387,21 @@ async def send_message(
     # with it was the thing being complained about.
     image_only = bool(image_request and image_request.only)
 
+    risk = await risk_task
+    resources = safety.for_turn(current_user.location_country, current_user.location_subdivision)
+    safety_card = safety.card(risk, resources)
     instructions = build_system_instructions(
         mode,
         reasoning_lens,
         bias_guidance,
         profile_block,
+        safety_block=safety.prompt_block(risk, resources),
+        jurisdiction_block=jurisdiction_block(
+            mode,
+            profile_for(current_user.location_country, current_user.location_subdivision),
+            resources,
+        ),
+        crisis=risk.crisis,
         named_model=(chosen_model.label, chosen_model.vendor) if chosen_model else None,
         making_image=bool(image_request),
         companion_name=name_for(current_user.companion_names, mode),
@@ -1359,6 +1425,10 @@ async def send_message(
             input_images.append(data)
     # Which model writes the answer, by mode - see generation_model_for.
     gen_model = generation_model_for(mode, admin_settings)
+    if risk.crisis and mode == "rapid":
+        # The quick path's model is the smallest; a person in crisis gets a
+        # better one whatever button they pressed.
+        gen_model = settings.anthropic_fast_model
     gen_temperature = admin_settings.get("openai_temperature")
 
     def make_generation(input_text: str) -> AsyncIterator[dict]:
@@ -1383,6 +1453,11 @@ async def send_message(
     # The answer itself - writing it, the gist, the verdict box, checking
     # every claim - is the shared pipeline the landing demo also runs. What
     # stays here is what only an account has: the rows it is written to.
+    # Someone who may be in danger is answered now, not after a web
+    # search: nothing a search would add belongs in that reply.
+    if risk.crisis and web_task is not None:
+        web_task.cancel()
+        web_task = None
     run = AnswerRun(
         mode=mode,
         content=effective_content,
@@ -1409,6 +1484,11 @@ async def send_message(
         # Opened around the whole generator rather than the generation call,
         # because the fan-out after the answer is most of the bill.
         turn_usage = token_meter_stack.enter_context(token_meter())
+
+        # The support card first, so the numbers are on screen before the
+        # first word of the answer.
+        if safety_card is not None:
+            yield {"event": "safety", "data": json.dumps(safety_card)}
 
         async for event in run.generate():
             yield event
@@ -1457,6 +1537,7 @@ async def send_message(
                 # from the screen for the whole claim-checking wait and came
                 # back with "final". A reload in that window lost it too.
                 crux_text=crux_text,
+                safety=safety_card,
             )
             answer_db.add(assistant_message)
             await answer_db.flush()
@@ -1489,7 +1570,7 @@ async def send_message(
             else None
         )
 
-        if mode == "rapid":
+        if mode == "rapid" or risk.crisis:
             # That was the whole job. No reflection, no claims, no evidence,
             # no score, no counterfactual - the answer ships as drafted, with
             # no verdict attached, and says so by carrying none. The client
@@ -1511,7 +1592,7 @@ async def send_message(
                 )
             if should_rebuild_memory(total_messages or 0):
                 rebuild_memory_task.delay(str(conversation_id))
-            if not conversation.temporary:
+            if not conversation.temporary and mode != "healthcare":
                 async with AsyncSessionLocal() as profile_db:
                     # Anything they just said about themselves, captured now
                     # rather than at the next rebuild. This runs after the
@@ -1684,7 +1765,7 @@ async def send_message(
         # The long-term profile spans every conversation, so it's refreshed on
         # its own cadence rather than per-conversation. Checked in the
         # generation session because `db` is closed by this point.
-        if not conversation.temporary:
+        if not conversation.temporary and mode != "healthcare":
             async with AsyncSessionLocal() as profile_db:
                 await capture_stated_facts(profile_db, current_user.id, effective_content)
                 if await should_rebuild_profile(profile_db, current_user.id):
@@ -1755,9 +1836,12 @@ async def save_call_transcript(
     # Same 400-not-422 contract as the send endpoint; uncaught this surfaced
     # as a 500 on a request the caller could have fixed.
     try:
-        mode = validate_mode(payload.mode)
+        mode = validate_mode(current_mode(payload.mode))
     except InvalidModeError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    # A call held in Healthcare is health information like any other: the
+    # same consent, and no saved transcript where those chats may not be kept.
+    _require_healthcare_ready(mode, current_user, conversation)
 
     # Chained onto the thread, not dropped beside it. A conversation is a
     # tree and every reader of it walks parent links from the conversation's

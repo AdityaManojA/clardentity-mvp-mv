@@ -1,0 +1,2767 @@
+{
+ "AD": {
+  "ambulance": "116",
+  "confidence": "medium",
+  "country": "Andorra",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Línia Verda",
+   "number": "177"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://esperancaenlinia.org/"
+ },
+ "AE": {
+  "ambulance": "998",
+  "confidence": "low",
+  "country": "United Arab Emirates",
+  "crisis_line": null,
+  "emergency": "999",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "AF": {
+  "ambulance": "112",
+  "confidence": "low",
+  "country": "Afghanistan",
+  "crisis_line": null,
+  "emergency": "119",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "AG": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Antigua and Barbuda",
+  "crisis_line": null,
+  "emergency": "911",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "AI": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Anguilla",
+  "crisis_line": null,
+  "emergency": "911",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "AL": {
+  "ambulance": "127",
+  "confidence": "low",
+  "country": "Albania",
+  "crisis_line": null,
+  "emergency": "129",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "AM": {
+  "ambulance": "",
+  "confidence": "high",
+  "country": "Armenia",
+  "crisis_line": {
+   "hours": "Mon-Fri 09:00-18:00",
+   "name": "Emotional Support Hotline",
+   "number": "0800 00 900"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://hotline.mha.am/"
+ },
+ "AO": {
+  "ambulance": "112",
+  "confidence": "low",
+  "country": "Angola",
+  "crisis_line": null,
+  "emergency": "113",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "AQ": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Antarctica",
+  "crisis_line": null,
+  "emergency": "",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "AR": {
+  "ambulance": "107",
+  "confidence": "high",
+  "country": "Argentina",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Línea nacional de salud mental (Hospital Nacional Laura Bonaparte)",
+   "number": "0800 999 0091"
+  },
+  "emergency": "911",
+  "poison": "",
+  "source": "https://www.argentina.gob.ar/noticias/orientacion-y-apoyo-en-la-urgencia-de-salud-mental"
+ },
+ "AS": {
+  "ambulance": "",
+  "confidence": "medium",
+  "country": "American Samoa",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "988 Suicide & Crisis Lifeline",
+   "number": "988"
+  },
+  "emergency": "911",
+  "poison": "",
+  "source": "https://988lifeline.org/"
+ },
+ "AT": {
+  "ambulance": "144",
+  "confidence": "high",
+  "country": "Austria",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "TelefonSeelsorge",
+   "number": "142"
+  },
+  "emergency": "112",
+  "poison": "01 406 43 43",
+  "source": "https://www.telefonseelsorge.at/"
+ },
+ "AU": {
+  "ambulance": "",
+  "confidence": "high",
+  "country": "Australia",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Lifeline",
+   "number": "13 11 14"
+  },
+  "emergency": "000",
+  "poison": "13 11 26",
+  "source": "https://www.lifeline.org.au/"
+ },
+ "AW": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Aruba",
+  "crisis_line": null,
+  "emergency": "911",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "AX": {
+  "ambulance": "",
+  "confidence": "medium",
+  "country": "Åland Islands",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "MIELI Kriisipuhelin (Finland)",
+   "number": "09 2525 0111"
+  },
+  "emergency": "112",
+  "poison": "0800 147 111",
+  "source": "https://mieli.fi/en/support-and-help/crisis-helpline/"
+ },
+ "AZ": {
+  "ambulance": "103",
+  "confidence": "low",
+  "country": "Azerbaijan",
+  "crisis_line": null,
+  "emergency": "112",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "BA": {
+  "ambulance": "124",
+  "confidence": "low",
+  "country": "Bosnia and Herzegovina",
+  "crisis_line": null,
+  "emergency": "122",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "BB": {
+  "ambulance": "511",
+  "confidence": "low",
+  "country": "Barbados",
+  "crisis_line": null,
+  "emergency": "211",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "BD": {
+  "ambulance": "",
+  "confidence": "medium",
+  "country": "Bangladesh",
+  "crisis_line": {
+   "hours": "daily 15:00-03:00",
+   "name": "Kaan Pete Roi",
+   "number": "09612-119911"
+  },
+  "emergency": "999",
+  "poison": "",
+  "source": "https://findahelpline.com/organizations/kaan-pete-roi"
+ },
+ "BE": {
+  "ambulance": "",
+  "confidence": "high",
+  "country": "Belgium",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Centre de Prévention du Suicide",
+   "number": "0800 32 123"
+  },
+  "emergency": "112",
+  "poison": "070 245 245",
+  "source": "https://www.preventionsuicide.be"
+ },
+ "BF": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Burkina Faso",
+  "crisis_line": null,
+  "emergency": "17",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "BG": {
+  "ambulance": "",
+  "confidence": "medium",
+  "country": "Bulgaria",
+  "crisis_line": {
+   "hours": "daily 09:00-18:00",
+   "name": "Bulgarian Red Cross psychosocial support line",
+   "number": "0800 114 66"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://en.redcross.bg/news/view?nwid=24244"
+ },
+ "BH": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Bahrain",
+  "crisis_line": null,
+  "emergency": "999",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "BI": {
+  "ambulance": "112",
+  "confidence": "low",
+  "country": "Burundi",
+  "crisis_line": null,
+  "emergency": "117",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "BJ": {
+  "ambulance": "112",
+  "confidence": "low",
+  "country": "Benin",
+  "crisis_line": null,
+  "emergency": "117",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "BL": {
+  "ambulance": "18",
+  "confidence": "medium",
+  "country": "Saint Barthélemy",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "3114 (French national suicide prevention line)",
+   "number": "3114"
+  },
+  "emergency": "17",
+  "poison": "",
+  "source": "https://3114.fr/"
+ },
+ "BM": {
+  "ambulance": "",
+  "confidence": "medium",
+  "country": "Bermuda",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Mid-Atlantic Wellness Institute 24-hour Mental Health Crisis Line",
+   "number": "441 239-1111"
+  },
+  "emergency": "911",
+  "poison": "",
+  "source": "https://bermudahospitals.bm/services-listing/mental-health/mid-atlantic-wellness-institute/"
+ },
+ "BN": {
+  "ambulance": "991",
+  "confidence": "high",
+  "country": "Brunei Darussalam",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Talian Harapan",
+   "number": "145"
+  },
+  "emergency": "993",
+  "poison": "",
+  "source": "https://www.moh.gov.bn/"
+ },
+ "BO": {
+  "ambulance": "118",
+  "confidence": "low",
+  "country": "Bolivia, Plurinational State of",
+  "crisis_line": null,
+  "emergency": "110",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "BQ": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Bonaire, Sint Eustatius and Saba",
+  "crisis_line": null,
+  "emergency": "911",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "BR": {
+  "ambulance": "192",
+  "confidence": "high",
+  "country": "Brazil",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "CVV - Centro de Valorização da Vida",
+   "number": "188"
+  },
+  "emergency": "190",
+  "poison": "0800 722 6001",
+  "source": "https://cvv.org.br/"
+ },
+ "BS": {
+  "ambulance": "",
+  "confidence": "medium",
+  "country": "Bahamas",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "The Bahamas Crisis Centre",
+   "number": "242 328-0922"
+  },
+  "emergency": "911",
+  "poison": "",
+  "source": "https://findahelpline.com/organizations/bahamas-crisis-centre"
+ },
+ "BT": {
+  "ambulance": "112",
+  "confidence": "medium",
+  "country": "Bhutan",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "The PEMA Helpline",
+   "number": "1098"
+  },
+  "emergency": "113",
+  "poison": "",
+  "source": "https://thepema.gov.bt/response-services-2/"
+ },
+ "BV": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Bouvet Island",
+  "crisis_line": null,
+  "emergency": "",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "BW": {
+  "ambulance": "997",
+  "confidence": "medium",
+  "country": "Botswana",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Lifeline Botswana",
+   "number": "7552 7590"
+  },
+  "emergency": "999",
+  "poison": "",
+  "source": "https://findahelpline.com/organizations/lifeline-ftmtb-botswana-helpline"
+ },
+ "BY": {
+  "ambulance": "103",
+  "confidence": "medium",
+  "country": "Belarus",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Emergency psychological help line (Minsk)",
+   "number": "8 017 311-00-99"
+  },
+  "emergency": "102",
+  "poison": "",
+  "source": "https://findahelpline.com/organizations/0cf06605-00e3-43a1-84b1-bb99a76cc304"
+ },
+ "BZ": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Belize",
+  "crisis_line": null,
+  "emergency": "911",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "CA": {
+  "ambulance": "",
+  "confidence": "high",
+  "country": "Canada",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "9-8-8: Suicide Crisis Helpline",
+   "number": "988"
+  },
+  "emergency": "911",
+  "poison": "",
+  "source": "https://988.ca/"
+ },
+ "CC": {
+  "ambulance": "",
+  "confidence": "medium",
+  "country": "Cocos (Keeling) Islands",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Lifeline (Australia)",
+   "number": "13 11 14"
+  },
+  "emergency": "000",
+  "poison": "",
+  "source": "https://www.lifeline.org.au/"
+ },
+ "CD": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Congo, Democratic Republic of the",
+  "crisis_line": null,
+  "emergency": "112",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "CF": {
+  "ambulance": "1220",
+  "confidence": "low",
+  "country": "Central African Republic",
+  "crisis_line": null,
+  "emergency": "117",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "CG": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Congo",
+  "crisis_line": null,
+  "emergency": "117",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "CH": {
+  "ambulance": "144",
+  "confidence": "high",
+  "country": "Switzerland",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Die Dargebotene Hand / La Main Tendue / Telefono Amico (Tel 143)",
+   "number": "143"
+  },
+  "emergency": "112",
+  "poison": "145",
+  "source": "https://www.143.ch/"
+ },
+ "CI": {
+  "ambulance": "185",
+  "confidence": "medium",
+  "country": "Côte d'Ivoire",
+  "crisis_line": {
+   "hours": "not stated",
+   "name": "Ligne santé mentale 143",
+   "number": "143"
+  },
+  "emergency": "110",
+  "poison": "",
+  "source": "https://www.sante.gouv.ci/actualite/2129"
+ },
+ "CK": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Cook Islands",
+  "crisis_line": null,
+  "emergency": "999",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "CL": {
+  "ambulance": "131",
+  "confidence": "high",
+  "country": "Chile",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "*4141 Línea de Prevención del Suicidio",
+   "number": "*4141"
+  },
+  "emergency": "133",
+  "poison": "",
+  "source": "https://www.gob.cl/noticias/linea-prevencion-suicidio-4141-24-horas-atencion-balance-cifras/"
+ },
+ "CM": {
+  "ambulance": "119",
+  "confidence": "low",
+  "country": "Cameroon",
+  "crisis_line": null,
+  "emergency": "117",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "CN": {
+  "ambulance": "120",
+  "confidence": "high",
+  "country": "China",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "12356 national psychological assistance hotline",
+   "number": "12356"
+  },
+  "emergency": "110",
+  "poison": "",
+  "source": "https://www.beijing.gov.cn/gate/big5/www.beijing.gov.cn/fuwu/bmfw/jhsyfwzdzx/2025gjjtr/xgxx/202505/t20250508_4084704.html"
+ },
+ "CO": {
+  "ambulance": "125",
+  "confidence": "high",
+  "country": "Colombia",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Línea 106 (Ministry of Health mental health line)",
+   "number": "106"
+  },
+  "emergency": "123",
+  "poison": "",
+  "source": "https://www.minsalud.gov.co/salud/publica/salud-mental/Paginas/Salud-Mental.aspx"
+ },
+ "CR": {
+  "ambulance": "",
+  "confidence": "high",
+  "country": "Costa Rica",
+  "crisis_line": {
+   "hours": "Mon-Fri 14:00-22:00; Sat 09:00-16:00",
+   "name": "Línea Aquí Estoy",
+   "number": "800-273-7869"
+  },
+  "emergency": "911",
+  "poison": "",
+  "source": "https://aquiestoy.cr/"
+ },
+ "CU": {
+  "ambulance": "104",
+  "confidence": "low",
+  "country": "Cuba",
+  "crisis_line": null,
+  "emergency": "106",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "CV": {
+  "ambulance": "130",
+  "confidence": "medium",
+  "country": "Cabo Verde",
+  "crisis_line": null,
+  "emergency": "132",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "CW": {
+  "ambulance": "912",
+  "confidence": "low",
+  "country": "Curaçao",
+  "crisis_line": null,
+  "emergency": "911",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "CX": {
+  "ambulance": "",
+  "confidence": "medium",
+  "country": "Christmas Island",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Lifeline (Australia)",
+   "number": "13 11 14"
+  },
+  "emergency": "000",
+  "poison": "",
+  "source": "https://www.lifeline.org.au/"
+ },
+ "CY": {
+  "ambulance": "",
+  "confidence": "high",
+  "country": "Cyprus",
+  "crisis_line": {
+   "hours": "daily 16:00-24:00",
+   "name": "Cyprus Samaritans",
+   "number": "8000 7773"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://www.cyprussamaritans.org/"
+ },
+ "CZ": {
+  "ambulance": "155",
+  "confidence": "medium",
+  "country": "Czechia",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Linka první psychické pomoci",
+   "number": "116 123"
+  },
+  "emergency": "112",
+  "poison": "224 919 293",
+  "source": "https://findahelpline.com/organizations/linka-prvni-psychicke-pomoci"
+ },
+ "DE": {
+  "ambulance": "",
+  "confidence": "high",
+  "country": "Germany",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "TelefonSeelsorge",
+   "number": "0800 111 0 111"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://www.telefonseelsorge.de/"
+ },
+ "DJ": {
+  "ambulance": "19",
+  "confidence": "low",
+  "country": "Djibouti",
+  "crisis_line": null,
+  "emergency": "17",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "DK": {
+  "ambulance": "",
+  "confidence": "high",
+  "country": "Denmark",
+  "crisis_line": {
+   "hours": "daily 09:00-05:00",
+   "name": "Livslinien",
+   "number": "70 201 201"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://www.livslinien.dk/"
+ },
+ "DM": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Dominica",
+  "crisis_line": null,
+  "emergency": "999",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "DO": {
+  "ambulance": "",
+  "confidence": "medium",
+  "country": "Dominican Republic",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Cuida Tu Salud Mental (SNS)",
+   "number": "809-200-1400"
+  },
+  "emergency": "911",
+  "poison": "",
+  "source": "https://sns.gob.do/"
+ },
+ "DZ": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Algeria",
+  "crisis_line": null,
+  "emergency": "14",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "EC": {
+  "ambulance": "",
+  "confidence": "medium",
+  "country": "Ecuador",
+  "crisis_line": {
+   "hours": "Mon-Fri 07:00-19:00; Sat-Sun 08:00-14:00",
+   "name": "Línea 171 Salud Mental (Ministry of Public Health, option 6)",
+   "number": "171"
+  },
+  "emergency": "911",
+  "poison": "",
+  "source": "https://www.salud.gob.ec/a-traves-de-la-linea-171-msp-ofrece-atencion-en-salud-mental/"
+ },
+ "EE": {
+  "ambulance": "",
+  "confidence": "medium",
+  "country": "Estonia",
+  "crisis_line": {
+   "hours": "daily 10:00-24:00",
+   "name": "Emotsionaalse toe ja hingehoiu telefon",
+   "number": "116 123"
+  },
+  "emergency": "112",
+  "poison": "16662",
+  "source": "https://www.palunabi.ee/en/emotional-support"
+ },
+ "EG": {
+  "ambulance": "123",
+  "confidence": "medium",
+  "country": "Egypt",
+  "crisis_line": {
+   "hours": "not stated",
+   "name": "General Secretariat of Mental Health hotline",
+   "number": "16328"
+  },
+  "emergency": "122",
+  "poison": "",
+  "source": "https://help.unhcr.org/egypt/en/health-services/mental-health/"
+ },
+ "EH": {
+  "ambulance": "15",
+  "confidence": "low",
+  "country": "Western Sahara",
+  "crisis_line": null,
+  "emergency": "19",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "ER": {
+  "ambulance": "114",
+  "confidence": "medium",
+  "country": "Eritrea",
+  "crisis_line": null,
+  "emergency": "112",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "ES": {
+  "ambulance": "",
+  "confidence": "high",
+  "country": "Spain",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Línea 024 (atención a la conducta suicida)",
+   "number": "024"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://www.sanidad.gob.es/linea024/home.htm"
+ },
+ "ET": {
+  "ambulance": "907",
+  "confidence": "low",
+  "country": "Ethiopia",
+  "crisis_line": null,
+  "emergency": "991",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "FI": {
+  "ambulance": "",
+  "confidence": "high",
+  "country": "Finland",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "MIELI Kriisipuhelin (Crisis Helpline)",
+   "number": "09 2525 0111"
+  },
+  "emergency": "112",
+  "poison": "0800 147 111",
+  "source": "https://mieli.fi/en/support-and-help/crisis-helpline/"
+ },
+ "FJ": {
+  "ambulance": "",
+  "confidence": "medium",
+  "country": "Fiji",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Empower Pacific counselling helpline",
+   "number": "5626"
+  },
+  "emergency": "911",
+  "poison": "",
+  "source": "https://findahelpline.com/organizations/empower-pacific-toll-free-24-7-counselling-helpline"
+ },
+ "FK": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Falkland Islands (Malvinas)",
+  "crisis_line": null,
+  "emergency": "999",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "FM": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Micronesia, Federated States of",
+  "crisis_line": null,
+  "emergency": "911",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "FO": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Faroe Islands",
+  "crisis_line": null,
+  "emergency": "112",
+  "poison": "",
+  "source": "https://www.livslinien.dk/"
+ },
+ "FR": {
+  "ambulance": "15",
+  "confidence": "high",
+  "country": "France",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "3114 - Numéro national de prévention du suicide",
+   "number": "3114"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://3114.fr/"
+ },
+ "GA": {
+  "ambulance": "1300",
+  "confidence": "low",
+  "country": "Gabon",
+  "crisis_line": null,
+  "emergency": "1730",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "GB": {
+  "ambulance": "",
+  "confidence": "high",
+  "country": "United Kingdom",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Samaritans",
+   "number": "116 123"
+  },
+  "emergency": "999",
+  "poison": "",
+  "source": "https://www.samaritans.org/how-we-can-help/contact-samaritan/"
+ },
+ "GD": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Grenada",
+  "crisis_line": null,
+  "emergency": "911",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "GE": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Georgia",
+  "crisis_line": null,
+  "emergency": "112",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "GF": {
+  "ambulance": "15",
+  "confidence": "high",
+  "country": "French Guiana",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "3114 (French national suicide prevention line)",
+   "number": "3114"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://3114.fr/"
+ },
+ "GG": {
+  "ambulance": "",
+  "confidence": "high",
+  "country": "Guernsey",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Samaritans",
+   "number": "116 123"
+  },
+  "emergency": "999",
+  "poison": "",
+  "source": "https://www.samaritans.org/branches/guernsey/"
+ },
+ "GH": {
+  "ambulance": "193",
+  "confidence": "medium",
+  "country": "Ghana",
+  "crisis_line": {
+   "hours": "Mon-Fri 09:00-17:00",
+   "name": "National Mental Health and Suicide Prevention Helpline (Mental Health Authority)",
+   "number": "0800 678 678"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://findahelpline.com/organizations/national-mental-health-and-suicide-prevention-helpline"
+ },
+ "GI": {
+  "ambulance": "190",
+  "confidence": "high",
+  "country": "Gibraltar",
+  "crisis_line": {
+   "hours": "daily 18:00-23:00",
+   "name": "GibSams",
+   "number": "116 123"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://www.gibsams.gi/"
+ },
+ "GL": {
+  "ambulance": "",
+  "confidence": "medium",
+  "country": "Greenland",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Tusaannga",
+   "number": "801180"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://tusaannga.gl/"
+ },
+ "GM": {
+  "ambulance": "116",
+  "confidence": "low",
+  "country": "Gambia",
+  "crisis_line": null,
+  "emergency": "117",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "GN": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Guinea",
+  "crisis_line": null,
+  "emergency": "117",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "GP": {
+  "ambulance": "15",
+  "confidence": "high",
+  "country": "Guadeloupe",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "3114 (French national suicide prevention line)",
+   "number": "3114"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://3114.fr/"
+ },
+ "GQ": {
+  "ambulance": "115",
+  "confidence": "low",
+  "country": "Equatorial Guinea",
+  "crisis_line": null,
+  "emergency": "114",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "GR": {
+  "ambulance": "166",
+  "confidence": "medium",
+  "country": "Greece",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Klimaka 1018 - 24h Suicide Intervention Line",
+   "number": "1018"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://www.klimaka.org.gr"
+ },
+ "GS": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "South Georgia and the South Sandwich Islands",
+  "crisis_line": null,
+  "emergency": "",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "GT": {
+  "ambulance": "122",
+  "confidence": "high",
+  "country": "Guatemala",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "1582 Te Escucha",
+   "number": "1582"
+  },
+  "emergency": "110",
+  "poison": "",
+  "source": "https://fundegua.org.gt/linea-1582"
+ },
+ "GU": {
+  "ambulance": "",
+  "confidence": "high",
+  "country": "Guam",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "988 Suicide & Crisis Lifeline",
+   "number": "988"
+  },
+  "emergency": "911",
+  "poison": "",
+  "source": "https://findahelpline.com/organizations/988-suicide-crisis-lifeline-guam"
+ },
+ "GW": {
+  "ambulance": "119",
+  "confidence": "low",
+  "country": "Guinea-Bissau",
+  "crisis_line": null,
+  "emergency": "112",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "GY": {
+  "ambulance": "913",
+  "confidence": "high",
+  "country": "Guyana",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Suicide Prevention Helpline",
+   "number": "915"
+  },
+  "emergency": "911",
+  "poison": "",
+  "source": "https://mentalhealth.gov.gy/suicide-prevention/"
+ },
+ "HK": {
+  "ambulance": "",
+  "confidence": "high",
+  "country": "Hong Kong",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "The Samaritan Befrienders Hong Kong",
+   "number": "2389 2222"
+  },
+  "emergency": "999",
+  "poison": "",
+  "source": "https://sbhk.org.hk/"
+ },
+ "HM": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Heard Island and McDonald Islands",
+  "crisis_line": null,
+  "emergency": "",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "HN": {
+  "ambulance": "",
+  "confidence": "medium",
+  "country": "Honduras",
+  "crisis_line": {
+   "hours": "daily 08:00-20:00",
+   "name": "Teléfono de la Esperanza",
+   "number": "150"
+  },
+  "emergency": "911",
+  "poison": "",
+  "source": "https://findahelpline.com/organizations/asociacion-hondurena-del-telefono-de-la-esperanza"
+ },
+ "HR": {
+  "ambulance": "194",
+  "confidence": "medium",
+  "country": "Croatia",
+  "crisis_line": {
+   "hours": "Mon-Fri 10:00-22:00",
+   "name": "Psihološki centar TESA helpline",
+   "number": "01 48 28 888"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "http://www.tesa.hr/"
+ },
+ "HT": {
+  "ambulance": "116",
+  "confidence": "medium",
+  "country": "Haiti",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Asistans Psikolojik an Ijans (AHPsy)",
+   "number": "2919-9000"
+  },
+  "emergency": "114",
+  "poison": "",
+  "source": "https://ahpsy.org.ht/"
+ },
+ "HU": {
+  "ambulance": "104",
+  "confidence": "high",
+  "country": "Hungary",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Telefonos Lelki Elsősegély-szolgálat",
+   "number": "116 123"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://sos116-123.hu"
+ },
+ "ID": {
+  "ambulance": "119",
+  "confidence": "high",
+  "country": "Indonesia",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Healing119 (Ministry of Health, dial 119 ext. 8)",
+   "number": "119"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://www.healing119.id/"
+ },
+ "IE": {
+  "ambulance": "",
+  "confidence": "high",
+  "country": "Ireland",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Samaritans",
+   "number": "116 123"
+  },
+  "emergency": "112",
+  "poison": "01 809 2166",
+  "source": "https://www.samaritans.org/ireland/samaritans-ireland/"
+ },
+ "IL": {
+  "ambulance": "101",
+  "confidence": "high",
+  "country": "Israel",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "ERAN - Emotional First Aid",
+   "number": "1201"
+  },
+  "emergency": "100",
+  "poison": "",
+  "source": "https://www.eran.org.il/"
+ },
+ "IM": {
+  "ambulance": "",
+  "confidence": "medium",
+  "country": "Isle of Man",
+  "crisis_line": null,
+  "emergency": "999",
+  "poison": "",
+  "source": "https://www.samaritans.org/"
+ },
+ "IN": {
+  "ambulance": "108",
+  "confidence": "high",
+  "country": "India",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Tele-MANAS (national tele mental health)",
+   "number": "14416"
+  },
+  "emergency": "112",
+  "poison": "1800 116 117",
+  "source": "https://telemanas.mohfw.gov.in/home"
+ },
+ "IO": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "British Indian Ocean Territory",
+  "crisis_line": null,
+  "emergency": "999",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "IQ": {
+  "ambulance": "122",
+  "confidence": "low",
+  "country": "Iraq",
+  "crisis_line": null,
+  "emergency": "112",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "IR": {
+  "ambulance": "115",
+  "confidence": "medium",
+  "country": "Iran, Islamic Republic of",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Social Emergency (Ejtemaei) hotline - State Welfare Organisation",
+   "number": "123"
+  },
+  "emergency": "110",
+  "poison": "",
+  "source": "https://findahelpline.com/organizations/social-emergency-hotline"
+ },
+ "IS": {
+  "ambulance": "",
+  "confidence": "high",
+  "country": "Iceland",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Hjálparsími Rauða krossins (Red Cross helpline)",
+   "number": "1717"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://www.1717.is"
+ },
+ "IT": {
+  "ambulance": "118",
+  "confidence": "high",
+  "country": "Italy",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Telefono Amico Italia",
+   "number": "02 2327 2327"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://www.telefonoamico.it/"
+ },
+ "JE": {
+  "ambulance": "",
+  "confidence": "high",
+  "country": "Jersey",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Samaritans",
+   "number": "116 123"
+  },
+  "emergency": "999",
+  "poison": "",
+  "source": "https://www.samaritans.org/branches/jersey/"
+ },
+ "JM": {
+  "ambulance": "110",
+  "confidence": "medium",
+  "country": "Jamaica",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Ministry of Health Mental Health and Suicide Prevention Helpline",
+   "number": "888-639-5433"
+  },
+  "emergency": "119",
+  "poison": "",
+  "source": "https://findahelpline.com/organizations/mental-health-and-suicide-prevention-helpline"
+ },
+ "JO": {
+  "ambulance": "",
+  "confidence": "medium",
+  "country": "Jordan",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "JCPA Hotline (Jordanian Clinical Psychologists Association)",
+   "number": "079 544 0416"
+  },
+  "emergency": "911",
+  "poison": "",
+  "source": "https://findahelpline.com/organizations/jcpa-hotline-jcpa"
+ },
+ "JP": {
+  "ambulance": "119",
+  "confidence": "high",
+  "country": "Japan",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "#Inochi SOS (#いのちSOS)",
+   "number": "0120-061-338"
+  },
+  "emergency": "110",
+  "poison": "072-727-2499",
+  "source": "https://www.lifelink.or.jp/"
+ },
+ "KE": {
+  "ambulance": "",
+  "confidence": "medium",
+  "country": "Kenya",
+  "crisis_line": {
+   "hours": "Mon-Fri 09:00-17:00",
+   "name": "Befrienders Kenya",
+   "number": "0722 178 177"
+  },
+  "emergency": "999",
+  "poison": "",
+  "source": "https://findahelpline.com/organizations/befrienders-kenya-suicide-prevention-helpline"
+ },
+ "KG": {
+  "ambulance": "103",
+  "confidence": "low",
+  "country": "Kyrgyzstan",
+  "crisis_line": null,
+  "emergency": "112",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "KH": {
+  "ambulance": "119",
+  "confidence": "medium",
+  "country": "Cambodia",
+  "crisis_line": {
+   "hours": "daily 08:00-22:00",
+   "name": "TPO Cambodia psychological counselling line",
+   "number": "017 222 372"
+  },
+  "emergency": "117",
+  "poison": "",
+  "source": "https://findahelpline.com/organizations/f19b2b71-15e4-4e4e-86fa-226a185db087"
+ },
+ "KI": {
+  "ambulance": "194",
+  "confidence": "low",
+  "country": "Kiribati",
+  "crisis_line": null,
+  "emergency": "192",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "KM": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Comoros",
+  "crisis_line": null,
+  "emergency": "17",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "KN": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Saint Kitts and Nevis",
+  "crisis_line": null,
+  "emergency": "911",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "KP": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Korea, Democratic People's Republic of",
+  "crisis_line": null,
+  "emergency": "",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "KR": {
+  "ambulance": "119",
+  "confidence": "high",
+  "country": "Korea, Republic of",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Suicide prevention counselling line 109",
+   "number": "109"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://www.mohw.go.kr/"
+ },
+ "KW": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Kuwait",
+  "crisis_line": null,
+  "emergency": "112",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "KY": {
+  "ambulance": "",
+  "confidence": "high",
+  "country": "Cayman Islands",
+  "crisis_line": {
+   "hours": "Mon-Fri 18:00-23:00",
+   "name": "CayMind Mental Health Helpline",
+   "number": "1-800-534-6463"
+  },
+  "emergency": "911",
+  "poison": "",
+  "source": "https://caymanprepared.ky/caymind"
+ },
+ "KZ": {
+  "ambulance": "103",
+  "confidence": "low",
+  "country": "Kazakhstan",
+  "crisis_line": null,
+  "emergency": "112",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "LA": {
+  "ambulance": "195",
+  "confidence": "low",
+  "country": "Lao People's Democratic Republic",
+  "crisis_line": null,
+  "emergency": "191",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "LB": {
+  "ambulance": "140",
+  "confidence": "high",
+  "country": "Lebanon",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Embrace National Lifeline",
+   "number": "1564"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://embracelebanon.org/"
+ },
+ "LC": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Saint Lucia",
+  "crisis_line": null,
+  "emergency": "911",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "LI": {
+  "ambulance": "144",
+  "confidence": "medium",
+  "country": "Liechtenstein",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Die Dargebotene Hand (Tel 143)",
+   "number": "143"
+  },
+  "emergency": "112",
+  "poison": "145",
+  "source": "https://www.143.ch/"
+ },
+ "LK": {
+  "ambulance": "1990",
+  "confidence": "high",
+  "country": "Sri Lanka",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "National Mental Health Helpline (NIMH)",
+   "number": "1926"
+  },
+  "emergency": "119",
+  "poison": "",
+  "source": "https://nimh.health.gov.lk/"
+ },
+ "LR": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Liberia",
+  "crisis_line": null,
+  "emergency": "911",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "LS": {
+  "ambulance": "121",
+  "confidence": "low",
+  "country": "Lesotho",
+  "crisis_line": null,
+  "emergency": "123",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "LT": {
+  "ambulance": "",
+  "confidence": "high",
+  "country": "Lithuania",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Vilties linija (Line of Hope)",
+   "number": "116 123"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://www.viltieslinija.lt/"
+ },
+ "LU": {
+  "ambulance": "",
+  "confidence": "medium",
+  "country": "Luxembourg",
+  "crisis_line": {
+   "hours": "Sun-Thu 11:00-23:00; Fri-Sat 11:00-03:00",
+   "name": "SOS Détresse",
+   "number": "45 45 45"
+  },
+  "emergency": "112",
+  "poison": "8002 5500",
+  "source": "https://454545.lu/"
+ },
+ "LV": {
+  "ambulance": "113",
+  "confidence": "high",
+  "country": "Latvia",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Krīzes tālrunis (crisis line)",
+   "number": "116 123"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://www.skalbes.lv/"
+ },
+ "LY": {
+  "ambulance": "193",
+  "confidence": "low",
+  "country": "Libya",
+  "crisis_line": null,
+  "emergency": "1515",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "MA": {
+  "ambulance": "15",
+  "confidence": "medium",
+  "country": "Morocco",
+  "crisis_line": null,
+  "emergency": "19",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "MC": {
+  "ambulance": "18",
+  "confidence": "low",
+  "country": "Monaco",
+  "crisis_line": null,
+  "emergency": "112",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "MD": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Moldova",
+  "crisis_line": null,
+  "emergency": "112",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "ME": {
+  "ambulance": "124",
+  "confidence": "low",
+  "country": "Montenegro",
+  "crisis_line": null,
+  "emergency": "112",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "MF": {
+  "ambulance": "15",
+  "confidence": "medium",
+  "country": "Saint Martin (French part)",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "3114 (French national suicide prevention line)",
+   "number": "3114"
+  },
+  "emergency": "17",
+  "poison": "",
+  "source": "https://3114.fr/"
+ },
+ "MG": {
+  "ambulance": "124",
+  "confidence": "low",
+  "country": "Madagascar",
+  "crisis_line": null,
+  "emergency": "117",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "MH": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Marshall Islands",
+  "crisis_line": null,
+  "emergency": "911",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "MK": {
+  "ambulance": "194",
+  "confidence": "low",
+  "country": "North Macedonia",
+  "crisis_line": null,
+  "emergency": "112",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "ML": {
+  "ambulance": "15",
+  "confidence": "low",
+  "country": "Mali",
+  "crisis_line": null,
+  "emergency": "17",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "MM": {
+  "ambulance": "192",
+  "confidence": "low",
+  "country": "Myanmar",
+  "crisis_line": null,
+  "emergency": "199",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "MN": {
+  "ambulance": "103",
+  "confidence": "medium",
+  "country": "Mongolia",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "NCMH mental health information line",
+   "number": "1800-2000"
+  },
+  "emergency": "102",
+  "poison": "",
+  "source": "http://ncmh.gov.mn/"
+ },
+ "MO": {
+  "ambulance": "",
+  "confidence": "high",
+  "country": "Macao",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Caritas Life Hope Hotline",
+   "number": "2852 5222"
+  },
+  "emergency": "999",
+  "poison": "",
+  "source": "https://www.caritas.org.mo/youth-and-community-service/213/"
+ },
+ "MP": {
+  "ambulance": "",
+  "confidence": "medium",
+  "country": "Northern Mariana Islands",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "988 Suicide & Crisis Lifeline",
+   "number": "988"
+  },
+  "emergency": "911",
+  "poison": "",
+  "source": "https://988lifeline.org/"
+ },
+ "MQ": {
+  "ambulance": "15",
+  "confidence": "high",
+  "country": "Martinique",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "3114 (French national suicide prevention line)",
+   "number": "3114"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://3114.fr/"
+ },
+ "MR": {
+  "ambulance": "101",
+  "confidence": "low",
+  "country": "Mauritania",
+  "crisis_line": null,
+  "emergency": "117",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "MS": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Montserrat",
+  "crisis_line": null,
+  "emergency": "911",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "MT": {
+  "ambulance": "",
+  "confidence": "medium",
+  "country": "Malta",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Supportline 179",
+   "number": "179"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://fsws.gov.mt/appogg/support-line/"
+ },
+ "MU": {
+  "ambulance": "114",
+  "confidence": "high",
+  "country": "Mauritius",
+  "crisis_line": {
+   "hours": "daily 09:00-21:00",
+   "name": "Befrienders Mauritius",
+   "number": "800 9393"
+  },
+  "emergency": "999",
+  "poison": "",
+  "source": "https://findahelpline.com/organizations/befrienders-mauritius"
+ },
+ "MV": {
+  "ambulance": "",
+  "confidence": "medium",
+  "country": "Maldives",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "National Mental Health Helpline",
+   "number": "1677"
+  },
+  "emergency": "119",
+  "poison": "",
+  "source": "https://findahelpline.com/organizations/national-mental-health-helpline"
+ },
+ "MW": {
+  "ambulance": "998",
+  "confidence": "medium",
+  "country": "Malawi",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Lifeline Malawi (ANPPCAN)",
+   "number": "0999 399 765"
+  },
+  "emergency": "997",
+  "poison": "",
+  "source": "https://lifeline-international.com/member/malawi/"
+ },
+ "MX": {
+  "ambulance": "",
+  "confidence": "high",
+  "country": "Mexico",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Línea de la Vida (CONASAMA)",
+   "number": "800 911 2000"
+  },
+  "emergency": "911",
+  "poison": "",
+  "source": "https://www.gob.mx/conasama/articulos/linea-de-la-vida-800-911-2000"
+ },
+ "MY": {
+  "ambulance": "",
+  "confidence": "high",
+  "country": "Malaysia",
+  "crisis_line": {
+   "hours": "daily 08:00-24:00",
+   "name": "Talian HEAL (Ministry of Health)",
+   "number": "15555"
+  },
+  "emergency": "999",
+  "poison": "",
+  "source": "https://sites.google.com/moh.gov.my/ncemh/talian-sokongan-psikososial?authuser=0"
+ },
+ "MZ": {
+  "ambulance": "117",
+  "confidence": "low",
+  "country": "Mozambique",
+  "crisis_line": null,
+  "emergency": "119",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "NA": {
+  "ambulance": "",
+  "confidence": "medium",
+  "country": "Namibia",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "LifeLine/ChildLine Namibia",
+   "number": "116"
+  },
+  "emergency": "10111",
+  "poison": "",
+  "source": "https://www.lifelinechildline.org.na/index.html"
+ },
+ "NC": {
+  "ambulance": "15",
+  "confidence": "medium",
+  "country": "New Caledonia",
+  "crisis_line": {
+   "hours": "Mon-Fri 09:00-19:00; Sat-Sun 09:00-13:00 and 17:00-19:00",
+   "name": "SOS Écoute",
+   "number": "05 30 30"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://findahelpline.com/organizations/sos-ecoute"
+ },
+ "NE": {
+  "ambulance": "15",
+  "confidence": "low",
+  "country": "Niger",
+  "crisis_line": null,
+  "emergency": "17",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "NF": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Norfolk Island",
+  "crisis_line": null,
+  "emergency": "000",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "NG": {
+  "ambulance": "",
+  "confidence": "high",
+  "country": "Nigeria",
+  "crisis_line": {
+   "hours": "Mon-Fri 08:00-20:00; Sat-Sun 16:00-22:00",
+   "name": "SURPIN (Suicide Research and Prevention Initiative)",
+   "number": "0800 078 7746"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://www.surpinng.com/"
+ },
+ "NI": {
+  "ambulance": "128",
+  "confidence": "low",
+  "country": "Nicaragua",
+  "crisis_line": null,
+  "emergency": "118",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "NL": {
+  "ambulance": "",
+  "confidence": "high",
+  "country": "Netherlands",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "113 Zelfmoordpreventie",
+   "number": "113"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://www.113.nl/"
+ },
+ "NO": {
+  "ambulance": "113",
+  "confidence": "high",
+  "country": "Norway",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Mental Helse Hjelpetelefonen",
+   "number": "116 123"
+  },
+  "emergency": "112",
+  "poison": "22 59 13 00",
+  "source": "https://mentalhelse.no/trenger-du-hjelp/hjelpetelefonen/"
+ },
+ "NP": {
+  "ambulance": "102",
+  "confidence": "medium",
+  "country": "Nepal",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "National Suicide Prevention Helpline (TU Teaching Hospital)",
+   "number": "1166"
+  },
+  "emergency": "100",
+  "poison": "",
+  "source": "https://findahelpline.com/organizations/93f54cce-eb68-49c3-bc22-97b2b2dbff93"
+ },
+ "NR": {
+  "ambulance": "111",
+  "confidence": "low",
+  "country": "Nauru",
+  "crisis_line": null,
+  "emergency": "110",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "NU": {
+  "ambulance": "4202",
+  "confidence": "low",
+  "country": "Niue",
+  "crisis_line": null,
+  "emergency": "4333",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "NZ": {
+  "ambulance": "",
+  "confidence": "high",
+  "country": "New Zealand",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "1737 Need to talk?",
+   "number": "1737"
+  },
+  "emergency": "111",
+  "poison": "0800 764 766",
+  "source": "https://1737.org.nz/"
+ },
+ "OM": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Oman",
+  "crisis_line": null,
+  "emergency": "9999",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "PA": {
+  "ambulance": "",
+  "confidence": "high",
+  "country": "Panama",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Línea 147 - Tu vida importa",
+   "number": "147"
+  },
+  "emergency": "911",
+  "poison": "",
+  "source": "https://www.mides.gob.pa/"
+ },
+ "PE": {
+  "ambulance": "106",
+  "confidence": "high",
+  "country": "Peru",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Línea 113 Salud (option 5, mental health)",
+   "number": "113"
+  },
+  "emergency": "105",
+  "poison": "",
+  "source": "https://www.gob.pe/555-recibir-informacion-y-orientacion-en-salud"
+ },
+ "PF": {
+  "ambulance": "15",
+  "confidence": "low",
+  "country": "French Polynesia",
+  "crisis_line": null,
+  "emergency": "112",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "PG": {
+  "ambulance": "111",
+  "confidence": "medium",
+  "country": "Papua New Guinea",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "1-Tok Kaunselin Helpim Lain",
+   "number": "7150 8000"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://findahelpline.com/organizations/1-tok-kaunselin-helpim-lain"
+ },
+ "PH": {
+  "ambulance": "",
+  "confidence": "medium",
+  "country": "Philippines",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "NCMH Crisis Hotline",
+   "number": "1800-1888-1553"
+  },
+  "emergency": "911",
+  "poison": "",
+  "source": "https://findahelpline.com/organizations/ncmh-crisis-hotline"
+ },
+ "PK": {
+  "ambulance": "1122",
+  "confidence": "medium",
+  "country": "Pakistan",
+  "crisis_line": {
+   "hours": "Mon-Fri approx. 09:00-17:00",
+   "name": "Rozan Counseling Helpline",
+   "number": "0304 111 1741"
+  },
+  "emergency": "15",
+  "poison": "",
+  "source": "https://findahelpline.com/organizations/rozan-counseling-helpline"
+ },
+ "PL": {
+  "ambulance": "999",
+  "confidence": "medium",
+  "country": "Poland",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Kryzysowy Telefon Zaufania",
+   "number": "116 123"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://findahelpline.com/organizations/116sos-pl"
+ },
+ "PM": {
+  "ambulance": "15",
+  "confidence": "medium",
+  "country": "Saint Pierre and Miquelon",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "3114 (French national suicide prevention line)",
+   "number": "3114"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://3114.fr/"
+ },
+ "PN": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Pitcairn",
+  "crisis_line": null,
+  "emergency": "",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "PR": {
+  "ambulance": "",
+  "confidence": "high",
+  "country": "Puerto Rico",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Línea PAS (ASSMCA)",
+   "number": "1-800-981-0023"
+  },
+  "emergency": "911",
+  "poison": "",
+  "source": "https://lineapas.assmca.pr.gov/"
+ },
+ "PS": {
+  "ambulance": "101",
+  "confidence": "high",
+  "country": "Palestine, State of",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Sawa remote counselling line",
+   "number": "164"
+  },
+  "emergency": "100",
+  "poison": "",
+  "source": "https://sawa.ps/"
+ },
+ "PT": {
+  "ambulance": "",
+  "confidence": "medium",
+  "country": "Portugal",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Linha de Prevenção do Suicídio e Apoio Psicológico (SNS)",
+   "number": "1411"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://www.sns24.gov.pt/pt/tema/prevencao-e-cuidados-de-saude/prevencao-do-suicidio/"
+ },
+ "PW": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Palau",
+  "crisis_line": null,
+  "emergency": "911",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "PY": {
+  "ambulance": "141",
+  "confidence": "medium",
+  "country": "Paraguay",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Línea 155 Te Escucha (Ministry of Health)",
+   "number": "155"
+  },
+  "emergency": "911",
+  "poison": "",
+  "source": "https://www.mspbs.gov.py/portal/33805/dia-mundial-para-la-prevencion-del-suicidio.html"
+ },
+ "QA": {
+  "ambulance": "",
+  "confidence": "medium",
+  "country": "Qatar",
+  "crisis_line": {
+   "hours": "Sat-Thu 08:00-18:00 per findahelpline",
+   "name": "HMC National Mental Health Helpline (call 16000, choose language, then option 4)",
+   "number": "16000"
+  },
+  "emergency": "999",
+  "poison": "",
+  "source": "https://www.hamad.qa/"
+ },
+ "RE": {
+  "ambulance": "15",
+  "confidence": "high",
+  "country": "Réunion",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "3114 (French national suicide prevention line)",
+   "number": "3114"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://3114.fr/"
+ },
+ "RO": {
+  "ambulance": "",
+  "confidence": "high",
+  "country": "Romania",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "DepreHUB",
+   "number": "0374 456 420"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://deprehub.ro/"
+ },
+ "RS": {
+  "ambulance": "194",
+  "confidence": "low",
+  "country": "Serbia",
+  "crisis_line": null,
+  "emergency": "112",
+  "poison": "",
+  "source": "https://findahelpline.com/countries/rs"
+ },
+ "RU": {
+  "ambulance": "103",
+  "confidence": "high",
+  "country": "Russian Federation",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "EMERCOM emergency psychological help",
+   "number": "8 495 989-50-50"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://findahelpline.com/organizations/emergency-psychological-assistance-emercom-of-russia"
+ },
+ "RW": {
+  "ambulance": "912",
+  "confidence": "medium",
+  "country": "Rwanda",
+  "crisis_line": null,
+  "emergency": "112",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "SA": {
+  "ambulance": "997",
+  "confidence": "low",
+  "country": "Saudi Arabia",
+  "crisis_line": null,
+  "emergency": "911",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "SB": {
+  "ambulance": "111",
+  "confidence": "low",
+  "country": "Solomon Islands",
+  "crisis_line": null,
+  "emergency": "999",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "SC": {
+  "ambulance": "151",
+  "confidence": "low",
+  "country": "Seychelles",
+  "crisis_line": null,
+  "emergency": "999",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "SD": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Sudan",
+  "crisis_line": null,
+  "emergency": "999",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "SE": {
+  "ambulance": "",
+  "confidence": "medium",
+  "country": "Sweden",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Mind Självmordslinjen",
+   "number": "90101"
+  },
+  "emergency": "112",
+  "poison": "010-456 67 00",
+  "source": "https://mind.se/hitta-hjalp/sjalvmordslinjen/"
+ },
+ "SG": {
+  "ambulance": "995",
+  "confidence": "high",
+  "country": "Singapore",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "national mindline 1771",
+   "number": "1771"
+  },
+  "emergency": "999",
+  "poison": "",
+  "source": "https://www.mindline.sg/fsmh"
+ },
+ "SH": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Saint Helena, Ascension and Tristan da Cunha",
+  "crisis_line": null,
+  "emergency": "999",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "SI": {
+  "ambulance": "",
+  "confidence": "high",
+  "country": "Slovenia",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Zaupni telefon Samarijan",
+   "number": "116 123"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "http://www.telefon-samarijan.si/"
+ },
+ "SJ": {
+  "ambulance": "113",
+  "confidence": "medium",
+  "country": "Svalbard and Jan Mayen",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Mental Helse Hjelpetelefonen (Norway)",
+   "number": "116 123"
+  },
+  "emergency": "112",
+  "poison": "22 59 13 00",
+  "source": "https://mentalhelse.no/trenger-du-hjelp/hjelpetelefonen/"
+ },
+ "SK": {
+  "ambulance": "155",
+  "confidence": "high",
+  "country": "Slovakia",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Linka dôvery Nezábudka",
+   "number": "0800 800 566"
+  },
+  "emergency": "112",
+  "poison": "02 5477 4166",
+  "source": "https://www.linkanezabudka.sk"
+ },
+ "SL": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Sierra Leone",
+  "crisis_line": null,
+  "emergency": "999",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "SM": {
+  "ambulance": "118",
+  "confidence": "low",
+  "country": "San Marino",
+  "crisis_line": null,
+  "emergency": "112",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "SN": {
+  "ambulance": "18",
+  "confidence": "low",
+  "country": "Senegal",
+  "crisis_line": null,
+  "emergency": "17",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "SO": {
+  "ambulance": "999",
+  "confidence": "low",
+  "country": "Somalia",
+  "crisis_line": null,
+  "emergency": "888",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "SR": {
+  "ambulance": "113",
+  "confidence": "low",
+  "country": "Suriname",
+  "crisis_line": null,
+  "emergency": "115",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "SS": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "South Sudan",
+  "crisis_line": null,
+  "emergency": "999",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "ST": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Sao Tome and Principe",
+  "crisis_line": null,
+  "emergency": "112",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "SV": {
+  "ambulance": "132",
+  "confidence": "low",
+  "country": "El Salvador",
+  "crisis_line": null,
+  "emergency": "911",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "SX": {
+  "ambulance": "912",
+  "confidence": "medium",
+  "country": "Sint Maarten (Dutch part)",
+  "crisis_line": {
+   "hours": "not stated",
+   "name": "Mental Health Foundation crisis line",
+   "number": "721 585-5556"
+  },
+  "emergency": "911",
+  "poison": "",
+  "source": "https://www.sintmaartengov.org/news/Pages/CPS-Wednesday-is-World-Suicide-Prevention-Day-Are-You-OK.aspx"
+ },
+ "SY": {
+  "ambulance": "110",
+  "confidence": "low",
+  "country": "Syrian Arab Republic",
+  "crisis_line": null,
+  "emergency": "112",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "SZ": {
+  "ambulance": "977",
+  "confidence": "medium",
+  "country": "Eswatini",
+  "crisis_line": null,
+  "emergency": "999",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "TC": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Turks and Caicos Islands",
+  "crisis_line": null,
+  "emergency": "911",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "TD": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Chad",
+  "crisis_line": null,
+  "emergency": "17",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "TF": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "French Southern Territories",
+  "crisis_line": null,
+  "emergency": "",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "TG": {
+  "ambulance": "8200",
+  "confidence": "low",
+  "country": "Togo",
+  "crisis_line": null,
+  "emergency": "117",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "TH": {
+  "ambulance": "1669",
+  "confidence": "high",
+  "country": "Thailand",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Department of Mental Health hotline 1323",
+   "number": "1323"
+  },
+  "emergency": "191",
+  "poison": "1367",
+  "source": "https://www.dmh.go.th/"
+ },
+ "TJ": {
+  "ambulance": "103",
+  "confidence": "low",
+  "country": "Tajikistan",
+  "crisis_line": null,
+  "emergency": "112",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "TK": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Tokelau",
+  "crisis_line": null,
+  "emergency": "",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "TL": {
+  "ambulance": "110",
+  "confidence": "low",
+  "country": "Timor-Leste",
+  "crisis_line": null,
+  "emergency": "112",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "TM": {
+  "ambulance": "03",
+  "confidence": "low",
+  "country": "Turkmenistan",
+  "crisis_line": null,
+  "emergency": "02",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "TN": {
+  "ambulance": "190",
+  "confidence": "medium",
+  "country": "Tunisia",
+  "crisis_line": null,
+  "emergency": "197",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "TO": {
+  "ambulance": "933",
+  "confidence": "low",
+  "country": "Tonga",
+  "crisis_line": null,
+  "emergency": "911",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "TR": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Türkiye",
+  "crisis_line": null,
+  "emergency": "112",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "TT": {
+  "ambulance": "811",
+  "confidence": "high",
+  "country": "Trinidad and Tobago",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Lifeline Trinidad and Tobago",
+   "number": "800-5588"
+  },
+  "emergency": "999",
+  "poison": "",
+  "source": "https://www.lifelinett.com"
+ },
+ "TV": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Tuvalu",
+  "crisis_line": null,
+  "emergency": "911",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "TW": {
+  "ambulance": "119",
+  "confidence": "high",
+  "country": "Taiwan, Province of China",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "1925 Safe Mind Line (MOHW)",
+   "number": "1925"
+  },
+  "emergency": "110",
+  "poison": "02-2871-7121",
+  "source": "https://www.mohw.gov.tw/cp-16-19209-1.html"
+ },
+ "TZ": {
+  "ambulance": "114",
+  "confidence": "low",
+  "country": "Tanzania, United Republic of",
+  "crisis_line": null,
+  "emergency": "112",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "UA": {
+  "ambulance": "103",
+  "confidence": "medium",
+  "country": "Ukraine",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Lifeline Ukraine",
+   "number": "7333"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://lifelineukraine.com/en"
+ },
+ "UG": {
+  "ambulance": "",
+  "confidence": "medium",
+  "country": "Uganda",
+  "crisis_line": {
+   "hours": "Mon-Fri 08:30-17:00",
+   "name": "Mental Health Uganda helpline",
+   "number": "0800 21 21 21"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://mhu.ug/"
+ },
+ "UM": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "United States Minor Outlying Islands",
+  "crisis_line": null,
+  "emergency": "",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "US": {
+  "ambulance": "",
+  "confidence": "high",
+  "country": "United States of America",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "988 Suicide & Crisis Lifeline",
+   "number": "988"
+  },
+  "emergency": "911",
+  "poison": "1-800-222-1222",
+  "source": "https://988lifeline.org/"
+ },
+ "UY": {
+  "ambulance": "105",
+  "confidence": "high",
+  "country": "Uruguay",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Línea de Prevención del Suicidio (ASSE)",
+   "number": "0800 0767"
+  },
+  "emergency": "911",
+  "poison": "",
+  "source": "https://www.asse.com.uy/contenido/Linea-de-Prevencion-del-Suicidio-0800-0767--0767-12422"
+ },
+ "UZ": {
+  "ambulance": "103",
+  "confidence": "low",
+  "country": "Uzbekistan",
+  "crisis_line": null,
+  "emergency": "102",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "VA": {
+  "ambulance": "",
+  "confidence": "medium",
+  "country": "Holy See (Vatican City)",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Telefono Amico Italia",
+   "number": "02 2327 2327"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://www.telefonoamico.it/"
+ },
+ "VC": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Saint Vincent and the Grenadines",
+  "crisis_line": null,
+  "emergency": "911",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "VE": {
+  "ambulance": "",
+  "confidence": "medium",
+  "country": "Venezuela, Bolivarian Republic of",
+  "crisis_line": {
+   "hours": "Fri-Sun 08:00-20:00",
+   "name": "LAPSI - Federación de Psicólogos de Venezuela",
+   "number": "0424-290-7338"
+  },
+  "emergency": "911",
+  "poison": "",
+  "source": "https://findahelpline.com/organizations/linea-de-ayuda-psicologica-lapsi-de-la-federacion-de-psicologos-de-venezuela"
+ },
+ "VG": {
+  "ambulance": "",
+  "confidence": "low",
+  "country": "Virgin Islands (British)",
+  "crisis_line": null,
+  "emergency": "911",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "VI": {
+  "ambulance": "",
+  "confidence": "medium",
+  "country": "Virgin Islands (U.S.)",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "988 Suicide & Crisis Lifeline",
+   "number": "988"
+  },
+  "emergency": "911",
+  "poison": "",
+  "source": "https://doh.vi.gov/"
+ },
+ "VN": {
+  "ambulance": "115",
+  "confidence": "medium",
+  "country": "Viet Nam",
+  "crisis_line": {
+   "hours": "Wed-Sun 13:00-20:30",
+   "name": "Ngày Mai hotline",
+   "number": "096 306 1414"
+  },
+  "emergency": "113",
+  "poison": "",
+  "source": "https://duongdaynongngaymai.vn/"
+ },
+ "VU": {
+  "ambulance": "112",
+  "confidence": "low",
+  "country": "Vanuatu",
+  "crisis_line": null,
+  "emergency": "111",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "WF": {
+  "ambulance": "15",
+  "confidence": "low",
+  "country": "Wallis and Futuna",
+  "crisis_line": null,
+  "emergency": "15",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ },
+ "WS": {
+  "ambulance": "996",
+  "confidence": "medium",
+  "country": "Samoa",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Samoa Victim Support Group / Lifeline Samoa 24/7 helpline",
+   "number": "800 7874"
+  },
+  "emergency": "999",
+  "poison": "",
+  "source": "https://svsg.org.ws/"
+ },
+ "YE": {
+  "ambulance": "191",
+  "confidence": "medium",
+  "country": "Yemen",
+  "crisis_line": {
+   "hours": "Sat-Thu 08:00-14:00 and 16:00-20:00",
+   "name": "Free remote psychological support line",
+   "number": "8000202"
+  },
+  "emergency": "194",
+  "poison": "",
+  "source": "https://findahelpline.com/organizations/ye"
+ },
+ "YT": {
+  "ambulance": "15",
+  "confidence": "high",
+  "country": "Mayotte",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "3114 (French national suicide prevention line)",
+   "number": "3114"
+  },
+  "emergency": "112",
+  "poison": "",
+  "source": "https://www.mayotte.ars.sante.fr/prevention-et-soutien-en-sante-mentale"
+ },
+ "ZA": {
+  "ambulance": "10177",
+  "confidence": "high",
+  "country": "South Africa",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "SADAG Suicide Crisis Helpline",
+   "number": "0800 567 567"
+  },
+  "emergency": "10111",
+  "poison": "0861 555 777",
+  "source": "https://www.sadag.org/"
+ },
+ "ZM": {
+  "ambulance": "",
+  "confidence": "medium",
+  "country": "Zambia",
+  "crisis_line": {
+   "hours": "24/7",
+   "name": "Lifeline Zambia",
+   "number": "933"
+  },
+  "emergency": "999",
+  "poison": "",
+  "source": "https://clzambia.org/"
+ },
+ "ZW": {
+  "ambulance": "994",
+  "confidence": "medium",
+  "country": "Zimbabwe",
+  "crisis_line": null,
+  "emergency": "999",
+  "poison": "",
+  "source": "https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers"
+ }
+}

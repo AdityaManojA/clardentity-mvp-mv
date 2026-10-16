@@ -1,0 +1,645 @@
+{
+ "AE": {
+  "name": "United Arab Emirates",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "transient",
+  "storage_reason": "UAE health-data law may require health information to stay in the UAE. Our servers are in the US, so Healthcare chats here are answered but not saved.",
+  "laws": [
+   {
+    "name": "Federal Law No. 2 of 2019 on the Use of ICT in Health Fields (ICT Health Law)",
+    "citation": "Art. 13 bars storing or processing health data outside the UAE except as allowed; Art. 16 no non-health use without written consent",
+    "url": "https://www.dha.gov.ae/uploads/112021/8af22f1c-ebe4-4e20-b157-743ac93bb20b.pdf"
+   },
+   {
+    "name": "Federal Decree-Law No. 45 of 2021 on the Protection of Personal Data (PDPL)",
+    "citation": "Art. 1 health data is sensitive; Art. 2(1)(c) reach over foreign controllers; Art. 2(2)(e) health-law carve-out; Art. 23(1)(b) express-consent transfers",
+    "url": "https://assets.u.ae/api/public/content/954629a06cc64fd887771ce3273d6154?v=21d88839"
+   },
+   {
+    "name": "Ministerial Decision No. 51 of 2021 (exceptions to ICT Health Law Art. 13)",
+    "citation": "In force 16 May 2021; ties Art. 13 to services by UAE health facilities; Exemption 10 (written approval, encryption, UAE copy)",
+    "url": "https://www.dha.gov.ae/uploads/072022/Ministerial%20Decision%20no2022711250.pdf"
+   },
+   {
+    "name": "DoH Standard on Tele-Medicine (2020) and Standard of Care for Tele-Mental Health Services (June 2026)",
+    "citation": "Tele-consultation includes triage, diagnosis, tele-mental health and self-care recommendations; DoH licence required",
+    "url": "https://www.doh.gov.ae/-/media/7778F3B9E23246EB83C5D66466EEC95F.ashx"
+   }
+  ],
+  "healthcare_rules": [
+   "Keep self-care information general (what usually helps with this kind of symptom), not a plan for the person's own condition; Abu Dhabi's Tele-Medicine Standard counts triage and self-care recommendations as licensed tele-consultation.",
+   "Never write or offer sick notes, sick-leave letters or medical reports, even as a draft; in the UAE only licensed providers may issue them.",
+   "On outbreaks, epidemics and vaccines, stick to official MOHAP, DoH or DHA guidance and do not speculate; UAE Cabinet Resolution 24/2020 bans health misinformation and unauthorised epidemic information."
+  ],
+  "guidance_rules": [
+   "Describe these chats as mentoring and wellbeing support, never as counselling, a psychological assessment or tele-mental health; in the UAE those are licensed services (Federal Law 10/2023, DoH Tele-Mental Health Standard 2026)."
+  ],
+  "regulator": "UAE Data Office (https://u.ae/en/about-the-uae/digital-uae/data/data-protection-laws); health: MOHAP (https://mohap.gov.ae), DoH Abu Dhabi (https://www.doh.gov.ae), DHA (https://www.dha.gov.ae)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://assets.u.ae/api/public/content/954629a06cc64fd887771ce3273d6154?v=21d88839",
+   "https://www.dha.gov.ae/uploads/112021/8af22f1c-ebe4-4e20-b157-743ac93bb20b.pdf",
+   "https://www.dha.gov.ae/uploads/072022/Ministerial%20Decision%20no2022711250.pdf",
+   "https://www.doh.gov.ae/-/media/7778F3B9E23246EB83C5D66466EEC95F.ashx",
+   "https://www.lw.com/en/insights/2021/08/UAE-Decision-on-Health-Data-Law-Provides-Clarity",
+   "https://www.tamimi.com/law-update-articles/you-are-in-my-system-the-implementing-regulations-on-federal-law-regulating-the-use-of-ict-in-the-uae-healthcare-sector/"
+  ],
+  "notes": "Transient as the research recommends: ICT Health Law Art. 13 keeps health data in the UAE; MD 51/2021 arguably limits it to UAE facilities, untested. Research allows saved history on a separate express opt-in naming US processors (PDPL Art. 23(1)(b)); the schema can't express that, so counsel may move to persist. PDPL Executive Regulations unpublished. Age 18 relies on a reported, unverified 2025 change to 18 Gregorian years; otherwise majority is 21 lunar years. Guidance disclosures are sensitive data too."
+ },
+ "SA": {
+  "name": "Saudi Arabia",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "unavailable",
+  "storage_reason": "Saudi rules on sending sensitive data abroad give us no clear way to handle health conversations on our US servers, so Healthcare isn't available in Saudi Arabia yet.",
+  "laws": [
+   {
+    "name": "Personal Data Protection Law (PDPL)",
+    "citation": "Royal Decree M/19 (2021), amended M/148 (2023); Art. 1(11), 1(13) health data is sensitive; Art. 2(1) reach; Art. 29 transfers",
+    "url": "https://sdaia.gov.sa/en/SDAIA/about/Documents/Personal%20Data%20English%20V2-23April2023-%20Reviewed-.pdf"
+   },
+   {
+    "name": "Regulation on Personal Data Transfer outside the Kingdom",
+    "citation": "Version 2.0, Aug 2024; Art. 4(2)(D) service exemption excludes sensitive data; consent is not a transfer mechanism; Art. 7 risk assessment",
+    "url": "https://sdaia.gov.sa/Documents/RegulationonPersonalDataEN.pdf"
+   },
+   {
+    "name": "Implementing Regulation of the PDPL",
+    "citation": "SDAIA 2023; Art. 11(2) explicit consent for sensitive data; Art. 26 health-data controls",
+    "url": "https://sdaia.gov.sa/en/SDAIA/about/Documents/ImplementingRegulation.pdf"
+   },
+   {
+    "name": "SFDA Guidance on AI/ML-based Medical Devices (MDS-G010)",
+    "citation": "v1.0, 29 Nov 2022; AI that diagnoses, manages or predicts disease from medical data needs an MDMA",
+    "url": "https://www.sfda.gov.sa/sites/default/files/2023-01/MDS-G010ML.pdf"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Saudi Data & AI Authority, SDAIA (https://sdaia.gov.sa); medical devices: SFDA (https://www.sfda.gov.sa); Ministry of Health (https://www.moh.gov.sa)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://sdaia.gov.sa/Documents/RegulationonPersonalDataEN.pdf",
+   "https://sdaia.gov.sa/en/SDAIA/about/Documents/Personal%20Data%20English%20V2-23April2023-%20Reviewed-.pdf",
+   "https://sdaia.gov.sa/en/SDAIA/about/Documents/ImplementingRegulation.pdf",
+   "https://sdaia.gov.sa/Documents/StandardContractualClausesForPersonalDataTransferEN.pdf",
+   "https://www.sfda.gov.sa/sites/default/files/2023-01/MDS-G010ML.pdf",
+   "https://www.moh.gov.sa/en/Ministry/Rules/Documents/Executive-Regulations-Health-Profession-1.pdf"
+  ],
+  "notes": "Unavailable: Transfer Regulation v2.0 gives no route for continuous sensitive-data transfer to the non-adequate US (Art. 4(2)(D) excludes sensitive data, SCCs only cover limited, group or research transfers, consent is not a basis), and even transient US processing is a transfer, so transient does not help. Of the research's options (in-Kingdom hosting, SDAIA legal opinion, geo-disable) we take geo-disable, for Guidance too (psychological data is health data). Art. 4(2)(D) reading needs Saudi counsel; watch for an SDAIA adequacy list."
+ },
+ "QA": {
+  "name": "Qatar",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "transient",
+  "storage_reason": "In Qatar, processing health data needs a permit from the National Cyber Security Agency. We don't hold one yet, so Healthcare chats here are answered but not saved.",
+  "laws": [
+   {
+    "name": "Personal Data Privacy Protection Law (PDPPL)",
+    "citation": "Law No. 13 of 2016; Art. 16 health is special-nature data, Art. 16(3) prior permit; Art. 15 cross-border; Art. 24 fines up to QAR 5m",
+    "url": "https://database.cyberpolicyportal.org/api/files/1676833786171f3yskpqxl38.pdf"
+   },
+   {
+    "name": "MoPH Telemedicine Regulation",
+    "citation": "DHP Circular DHP/2024/04, 6 Feb 2024; remote consultation, diagnosis, treatment plans and counselling/therapy reserved to Qatar-licensed practitioners; no sick leave via telemedicine",
+    "url": "https://dhp.moph.gov.qa/en/QCHPCirculars/Eng-Circular.pdf"
+   },
+   {
+    "name": "NCSA PDPPL Guidelines (Special Nature Processing, Permitted Reasons, DPIA)",
+    "citation": "NCSA / PDPPD guidance, restated Jan 2026",
+    "url": "https://ncsa.gov.qa/shared/document_library/94787172324409/33000/10207/1.0~fc4efdb1-0710-4db9-a751-c48e068c9509?mimetype=application%2Fpdf&filename=Presentation+-+Data+Privacy+in+Medical+Research+-+IDPD+2026+%282%29.pdf"
+   }
+  ],
+  "healthcare_rules": [
+   "Never write or offer sick notes, sick-leave letters or medical certificates; in Qatar sick leave cannot be issued remotely even by licensed doctors (DHP Circular 2024/04).",
+   "Do not call this a consultation or telemedicine, and when the person needs care point them to a practitioner or facility licensed in Qatar; Qatar reserves remote consultation, diagnosis and treatment plans to them."
+  ],
+  "guidance_rules": [
+   "Do not offer therapy exercises, a treatment plan or a course of sessions for a mental-health problem; Qatar treats remote counselling and therapy as telemedicine reserved to Qatar-licensed practitioners (DHP Circular 2024/04)."
+  ],
+  "regulator": "National Cyber Security Agency, Personal Data Privacy Protection Department (https://www.ncsa.gov.qa); health: MoPH Department of Healthcare Professions (https://dhp.moph.gov.qa)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://database.cyberpolicyportal.org/api/files/1676833786171f3yskpqxl38.pdf",
+   "https://ncsa.gov.qa/shared/document_library/94787172324409/33000/10207/1.0~fc4efdb1-0710-4db9-a751-c48e068c9509?mimetype=application%2Fpdf&filename=Presentation+-+Data+Privacy+in+Medical+Research+-+IDPD+2026+%282%29.pdf",
+   "https://dhp.moph.gov.qa/en/QCHPCirculars/Eng-Circular.pdf",
+   "https://practiceguides.chambers.com/practice-guides/data-protection-privacy-2026/qatar",
+   "https://www.clydeco.com/en/insights/2021/03/new-regulatory-guidelines-on-the-qatar-persona-1",
+   "http://www.glaco.com/wp-content/uploads/Data-Privacy-Qatar-Practice-Guide-2024.pdf"
+  ],
+  "notes": "Transient: Art. 16(3) needs a prior NCSA PDPPD permit (form, DPIA, RoPA) to process special-nature data, which covers health and psychological condition, so Guidance emotional content too. The permit covers any processing, not just storage; the research allows geo-restricting or not storing until granted, so transient is the arguable minimum. NCSA (Jan 2026) flags a growing expectation that such data be stored in Qatar; a permit could add localisation. PDPPL text is an unofficial English translation; majority 18 not fetched."
+ },
+ "OM": {
+  "name": "Oman",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "transient",
+  "storage_reason": "In Oman, processing health data needs a permit from the communications ministry (MTCIT). We don't hold one yet, so Healthcare chats here are answered but not saved.",
+  "laws": [
+   {
+    "name": "Personal Data Protection Law (PDPL)",
+    "citation": "Royal Decree 6/2022; Art. 5 health data only with an MTCIT permit; Art. 10 explicit consent; Art. 23 transfers; Art. 28 fines",
+    "url": "https://decree.om/2022/rd20220006/"
+   },
+   {
+    "name": "Amendment to the PDPL",
+    "citation": "Royal Decree 68/2026, in force 7 Sep 2026; new health-data definition, reach over processing outside Oman, Art. 14 objection to automated processing, Art. 15 erasure",
+    "url": "https://decree.om/2026/rd20260068/"
+   },
+   {
+    "name": "Executive Regulation of the PDPL",
+    "citation": "MTCIT Ministerial Decision 34/2024; transfer equivalence assessment and explicit transfer consent",
+    "url": "https://www.trowers.com/insights/2024/february/omans-data-protection-law---new-regulations"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Ministry of Transport, Communications and Information Technology, MTCIT (https://www.mtcit.gov.om); health: Ministry of Health (https://www.moh.gov.om)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://decree.om/2022/rd20220006/",
+   "https://decree.om/2026/rd20260068/",
+   "https://blog.decree.om/2026/new-amendments-to-the-personal-data-protection-law",
+   "https://www.bakermckenzie.com/en/insight/publications/2026/09/oman-strengthening-its-data-protection-regime",
+   "https://www.trowers.com/insights/2024/february/omans-data-protection-law---new-regulations",
+   "https://cms.law/en/omn/legal-updates/oman-personal-data-protection-law-entering-the-enforcement-phase"
+  ],
+  "notes": "Transient: Art. 5 bars processing health data (incl. mental and psychological, so Guidance too) without an MTCIT permit; MTCIT has 45 days and silence is refusal. The research allows geo-restricting or not storing until granted; the permit covers processing, so transient is the arguable minimum. RD 68/2026 (7 Sep 2026) adds reach over processing outside Oman and a right to object to automated outputs and get human review (Art. 14), so support needs that route. US transfer: explicit consent plus equivalence assessment; Cyber Defence Centre approval may apply."
+ },
+ "BH": {
+  "name": "Bahrain",
+  "health_data": "sensitive",
+  "consent_age": 21,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Personal Data Protection Law (PDPL)",
+    "citation": "Law No. 30 of 2018, in force 1 Aug 2019; health data is sensitive and needs express consent; reaches non-residents using means in Bahrain",
+    "url": "https://www.dlapiperdataprotection.com/guide.pdf?c=BH"
+   },
+   {
+    "name": "PDPL implementing resolutions",
+    "citation": "Ministerial Resolutions of 17 Mar 2022: No. 42 adequacy list (includes the US), No. 43 breach, No. 44 prior authorisation, No. 48 consent",
+    "url": "https://trowers.com/insights/2022/may/bahrain-enhances-its-data-protection-regime"
+   },
+   {
+    "name": "NHRA Medical Devices Registration Guideline v9.1 and Decision (48) of 2020",
+    "citation": "Medical-purpose software is SaMD; no marketing before registration; registration deadlines 30 Apr and 31 Jul 2027 (Circular 19/2026)",
+    "url": "https://www.nhra.bh/Departments/MDR/MediaHandler/GenericHandler/documents/departments/MDR/guidelines/MDR_Guideline_Medical%20Device%20Registration_%20Ver%209.1.pdf"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Personal Data Protection Authority, run on an interim basis by the Ministry of Justice, Islamic Affairs and Waqf (https://www.pdp.gov.bh); health: NHRA (https://www.nhra.bh)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/guide.pdf?c=BH",
+   "https://trowers.com/insights/2022/may/bahrain-enhances-its-data-protection-regime",
+   "https://www.nhra.bh/Departments/MDR/MediaHandler/GenericHandler/documents/departments/MDR/guidelines/MDR_Guideline_Medical%20Device%20Registration_%20Ver%209.1.pdf",
+   "https://www.nhra.bh/Departments/MDR/?page=1312"
+  ],
+  "notes": "Persist: the US is on the Resolution 42/2022 adequacy list, so express consent plus disclosure of US processing is enough. Consent age 21 is the Civil Code majority from background knowledge, not fetched; PDPL consent depends on legal capacity, so under-21s need a guardian. Open: whether PDPL prior notification to the PDPA applies to us (failing to notify is a criminal offence). PDPA site returned 403; law read via DLA Piper (Feb 2026) and Trowers (2022). A Bahrain AI law is reportedly under consideration (unverified)."
+ },
+ "KW": {
+  "name": "Kuwait",
+  "health_data": "personal",
+  "consent_age": 21,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "MoH administrative decision and guide on AI language tools and LLMs in healthcare",
+    "citation": "11 Aug 2026; AI output supplementary, not definitive; public-facing health-advice or triage AI needs MoH accreditation",
+    "url": "https://kuwaittimes.com/article/47977/kuwait/other-news/moh-issues-guide-regulating-ai-use-in-healthcare/"
+   },
+   {
+    "name": "CITRA Data Privacy Protection Regulation",
+    "citation": "CITRA Resolution No. 26 of 2024 (replacing No. 42 of 2021); now applies only to CITRA-licensed telecom/ICT providers",
+    "url": "https://accesspartnership.com/access-alert-kuwaiti-regulator-introduces-new-data-protection-regulation"
+   },
+   {
+    "name": "CITRA Data Classification Policy v2.3",
+    "citation": "Medical records are Tier 3 'Private Sensitive Data'",
+    "url": "https://www.citra.gov.kw/sites/en/LegalReferences/Data_Classification_Policy.pdf"
+   },
+   {
+    "name": "CITRA Cloud Computing Regulatory Framework v2.4",
+    "citation": "Art. 4.2.1.1: Tier 3 and 4 data not hosted outside Kuwait; binds public-sector subscribers and hosts of government data",
+    "url": "https://www.citra.gov.kw/sites/en/LegalReferences/Cloud_Computing_Regulatory_Framework.pdf"
+   }
+  ],
+  "healthcare_rules": [
+   "Do not claim or imply that Kuwait's Ministry of Health has approved, accredited or partnered with this service; its Aug 2026 guide requires MoH accreditation for public-facing AI health-advice tools."
+  ],
+  "guidance_rules": [],
+  "regulator": "No data protection authority; CITRA (https://www.citra.gov.kw) for ICT licensees and data classification; health: Ministry of Health (https://www.moh.gov.kw)",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.citra.gov.kw/sites/en/LegalReferences/Data_Classification_Policy.pdf",
+   "https://www.citra.gov.kw/sites/en/LegalReferences/Cloud_Computing_Regulatory_Framework.pdf",
+   "https://www.citra.gov.kw/sites/en/LegalReferences/Data_Privacy_Protection_Regulation.pdf",
+   "https://kuwaittimes.com/article/47977/kuwait/other-news/moh-issues-guide-regulating-ai-use-in-healthcare/",
+   "https://accesspartnership.com/access-alert-kuwaiti-regulator-introduces-new-data-protection-regulation",
+   "https://www.consentstack.io/regulations/kw-dppr"
+  ],
+  "notes": "Persist: no comprehensive data law; DPPR 26/2024 now covers only CITRA licensees (text not read; scope from secondary sources, and GLA says it may be widened back) and cloud residency rules cover government data, so nothing restricts US processing. Consent age 21 is the Civil Code majority from background knowledge; the research suggested 18 for health and 21 for paid plans, and SPEC takes the higher. A 2025-26 PDP decree-law could not be checked; Law 70/2020 and the mental health law are unverified. Verify before launch."
+ },
+ "JO": {
+  "name": "Jordan",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Personal Data Protection Law (PDPL)",
+    "citation": "Law No. 24 of 2023, in force 17 Mar 2024; health data sensitive; explicit documented consent; transfer to an inadequate country on explicit informed consent",
+    "url": "https://securiti.ai/jordan-personal-data-protection-law-of-2023/"
+   },
+   {
+    "name": "Medical and Health Liability Law",
+    "citation": "Law No. 25 of 2018"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Personal Data Protection Council and Unit, Ministry of Digital Economy and Entrepreneurship (https://www.modee.gov.jo)",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://securiti.ai/jordan-personal-data-protection-law-of-2023/",
+   "https://www.consentstack.io/regulations/jo-pdpl",
+   "https://ksandk.com/privacy-review/map/jordan/",
+   "https://flexyconsent.com/blog/jordan-pdpl-law-24-cookie-consent-compliance-guide/"
+  ],
+  "notes": "Persist on low confidence: only vendor and secondary sources, no official text. US processing reportedly allowed on explicit consent after telling the user protection may be lower (no adequacy list verified), so the consent card should say so. One vendor source says sensitive-data controllers must register with the Council and get a licence (unverified); if true, storage should become transient. DPO required (sensitive data, transfers abroad). Sources conflict on regulator status and fines (JOD 1,000-10,000 vs JOD 1m). Verify against the Arabic Official Gazette."
+ },
+ "LB": {
+  "name": "Lebanon",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "transient",
+  "storage_reason": "In Lebanon, processing health data needs a licence from the Ministry of Economy and Trade. We don't hold one yet, so Healthcare chats here are answered but not saved.",
+  "laws": [
+   {
+    "name": "Law on Electronic Transactions and Personal Data",
+    "citation": "Law No. 81 of 10 Oct 2018; health, genetic and sexual-life data need a prior MoET licence on a Minister of Public Health decision; no transfer rules",
+    "url": "https://www.dlapiperdataprotection.com/?c=LB&t=law"
+   },
+   {
+    "name": "Law No. 288 of 1994 on Medical Ethics (amended 2012)",
+    "citation": "Practice of medicine reserved to registered physicians"
+   },
+   {
+    "name": "Law No. 574 of 2004 on Patients' Rights and Informed Consent",
+    "citation": "Confidentiality and consent duties of health professionals"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Ministry of Economy and Trade (https://www.economy.gov.lb) for licences and declarations; no data protection authority, enforcement through the courts",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/?c=LB&t=law",
+   "https://www.consentstack.io/regulations/lb-law81",
+   "https://alp.unescwa.org/legislations/law-81-2018-electronic-transactions-and-personal-data"
+  ],
+  "notes": "Transient by applying SPEC consistently: Law 81/2018 requires a prior MoET licence (on a Minister of Public Health decision) to process health data and we hold none. The research recommended no storage policy and says the licence route is rarely used or enforced; counsel may accept persist after filing. Mental-health disclosures in Guidance are health data too. No transfer restriction or breach duty. Official text not retrieved (DLA Piper summary last reviewed 2022); health-law numbers from background knowledge."
+ },
+ "IL": {
+  "name": "Israel",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Protection of Privacy Law, 5741-1981, as amended by Amendment No. 13",
+    "citation": "Amendment 13 in force 14 Aug 2025; health data and personality assessments are information of special sensitivity",
+    "url": "https://www.gov.il/en/departments/the_privacy_protection_authority"
+   },
+   {
+    "name": "Privacy Protection (Transfer of Data to Databases Abroad) Regulations, 5761-2001",
+    "citation": "Reg. 2 consent or contractual route; Reg. 3 recipient undertaking, no onward transfer; PPA position paper 13 Apr 2026",
+    "url": "https://www.gov.il/BlobFolder/legalinfo/legislation/en/Privacy-ProtectionTransferofDataabroadRegulationsun.pdf"
+   },
+   {
+    "name": "Psychologists Law, 5737-1977",
+    "citation": "Psychological diagnosis and treatment reserved to licensed psychologists"
+   },
+   {
+    "name": "Medical Equipment (Devices) Law, 5772-2012",
+    "citation": "Software with a clinical diagnostic or treatment intended use must be registered with AMAR",
+    "url": "https://practiceguides.chambers.com/practice-guides/digital-healthcare-2026/israel"
+   }
+  ],
+  "healthcare_rules": [
+   "Do not claim your answers are clinically accurate or validated, or that they can replace triage or a clinician's assessment; in Israel a clinical intended use makes the tool a medical device needing AMAR registration."
+  ],
+  "guidance_rules": [
+   "Never call these conversations psychological treatment, a psychological diagnosis or therapy; Israel's Psychologists Law reserves them to licensed psychologists.",
+   "Do not give the person a personality assessment or tell them what their core personality traits are; Israeli privacy law (Amendment 13) treats personality assessments as information of special sensitivity."
+  ],
+  "regulator": "Privacy Protection Authority, Ministry of Justice (https://www.gov.il/en/departments/the_privacy_protection_authority); medical devices: Ministry of Health AMAR",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.gov.il/en/departments/the_privacy_protection_authority",
+   "https://www.gov.il/BlobFolder/legalinfo/legislation/en/Privacy-ProtectionTransferofDataabroadRegulationsun.pdf",
+   "https://ebnlaw.co.il/wp-content/uploads/2024/09/Amendment-13-Israeli-Privacy-Law-non-formal-translation.docx",
+   "https://practiceguides.chambers.com/practice-guides/data-protection-privacy-2026/israel",
+   "https://practiceguides.chambers.com/practice-guides/digital-healthcare-2026/israel",
+   "https://www.pearlcohen.com/israel-new-draft-guidelines-on-the-application-of-privacy-law-to-ai/"
+  ],
+  "notes": "Persist: no localisation; US transfer allowed on user consent plus processor contracts binding them to Israeli-equivalent terms with no onward transfer (Transfer Regs 2(4), 3), no PPA filing. Whether those regulations reach a US controller collecting directly is unclear; the PPA's 2026 position argues for complying. PPA AI guidance still draft (Mar 2026). Amendment 13 read in unofficial English; official PPA pages returned 403. Notify the PPA once ISS on 100,000+ Israelis is held; report severe breaches immediately."
+ },
+ "EG": {
+  "name": "Egypt",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "transient",
+  "storage_reason": "In Egypt, handling health data and sending it abroad need licences from the Personal Data Protection Centre. We don't hold them yet, so Healthcare chats here are answered but not saved.",
+  "laws": [
+   {
+    "name": "Personal Data Protection Law (PDPL)",
+    "citation": "Law No. 151 of 2020; Art. 1 health data is sensitive"
+   },
+   {
+    "name": "Executive Regulations of the PDPL",
+    "citation": "Minister of Communications and IT Decree No. 816 of 2025 (Nov 2025); PDPC licence plus explicit written consent for sensitive data; licence to transfer, store or process data outside Egypt; grace period to about 1 Nov 2026",
+    "url": "https://www.mondaq.com/privacy-protection/1768986/the-issuance-of-the-executive-regulations-of-the-data-protection-law-in-egypt-and-the-establishment-of-the-data-protection-centre"
+   },
+   {
+    "name": "Law No. 415 of 1954 on the Practice of Medicine",
+    "citation": "Practising medicine needs an Egyptian licence and Medical Syndicate registration"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Personal Data Protection Centre (PDPC), under the Minister of Communications and IT (website not verified)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.mondaq.com/privacy-protection/1768986/the-issuance-of-the-executive-regulations-of-the-data-protection-law-in-egypt-and-the-establishment-of-the-data-protection-centre",
+   "https://www.tamimi.com/law_update_articles/from-policy-to-practice-egypt-issues-executive-regulations-of-the-personal-data-protection-law/",
+   "https://digitalpolicyalert.org/event/36521-executive-regulations-of-the-personal-data-protection-law-decision-no-816-of-2025-including-operational-license-requirement-entered-into-force",
+   "https://www.mondaq.com/privacy-protection/1731130/the-issuance-of-the-executive-regulations-of-the-data-protection-law-and-the-establishment-of-the-data-protection-centre",
+   "https://ppc.land/egypt-finally-implements-data-protection-law-after-five-year-delay/"
+  ],
+  "notes": "Transient: Decree 816/2025 needs a PDPC sensitive-data licence and a cross-border licence before health data is processed, stored or accessed outside Egypt, plus a PDPC-approved local representative. The research allows geofencing or not storing until licensed, but the licence also covers processing abroad, so transient is weak once the grace period ends (about 1 Nov 2026): decide then between licensing and geo-disabling both modes. Decree text not read (law-firm summaries); in-force date given as 1, 2 or 10 Nov 2025. Digital consent age 15 is overridden by the 18 floor."
+ },
+ "TR": {
+  "name": "Türkiye",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Law on the Protection of Personal Data No. 6698 (KVKK)",
+    "citation": "Art. 6 health is special-category data, explicit consent; Art. 9 transfers (amended by Law No. 7499, in force 1 Jun 2024); Art. 11(1)(g) objection to automated results",
+    "url": "https://www.kvkk.gov.tr/Icerik/6649/Personal-Data-Protection-Law"
+   },
+   {
+    "name": "Regulation on the Provision of Remote Health Services",
+    "citation": "Official Gazette 10 Feb 2022 No. 31746; remote health services only by Ministry-permitted facilities and professionals authorised in Turkey",
+    "url": "https://www.resmigazete.gov.tr/eskiler/2022/02/20220210-2.htm"
+   },
+   {
+    "name": "Medical Device Regulation (Tibbi Cihaz Yonetmeligi)",
+    "citation": "Official Gazette 2 Jun 2021, aligned with EU MDR 2017/745; Rule 11 software for diagnosis, prediction or treatment is a device",
+    "url": "https://www.titck.gov.tr/"
+   },
+   {
+    "name": "Law No. 1219 on the Practice of Medicine and Medical Sciences",
+    "citation": "Diagnosis, treatment, prescribing, clinical psychology and psychotherapy reserved to licensed professionals"
+   }
+  ],
+  "healthcare_rules": [
+   "Do not call this telehealth, a teleconsultation or a remote health service; in Turkey those need a Ministry of Health permit and professionals authorised to practise there (Remote Health Services Regulation 2022).",
+   "When asked which treatment suits them, describe the usual options in general terms and say their physician decides; do not pick or rank treatments for this person, which makes software a medical device under Turkey's MDR-aligned rules."
+  ],
+  "guidance_rules": [
+   "Never describe these conversations as psychotherapy, counselling treatment or a psychological diagnosis; in Turkey those are reserved to psychiatrists and clinical psychologists."
+  ],
+  "regulator": "Personal Data Protection Authority, KVKK (https://www.kvkk.gov.tr); Ministry of Health (https://www.saglik.gov.tr); medical devices: TITCK (https://www.titck.gov.tr)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.kvkk.gov.tr/Icerik/6649/Personal-Data-Protection-Law",
+   "https://www.resmigazete.gov.tr/eskiler/2022/02/20220210-2.htm",
+   "https://www.resmigazete.gov.tr/eskiler/2019/06/20190621-3.htm",
+   "https://www.kvkk.gov.tr/Icerik/5362/Veri-Ihlali-Bildirimi",
+   "https://koksal.av.tr/en/knowledge-centre/how-to-compliantly-transfer-data-abroad-from-turkiye/",
+   "https://iapp.org/news/a/the-long-awaited-amendments-in-turkish-data-protection-law"
+  ],
+  "notes": "Persist, needs review: explicit consent covers health processing, but since 1 Jun 2024 it cannot justify regular transfers abroad; routine US transfers need KVKK standard contracts notified within 5 business days, which presuppose a Turkish-side exporter. Whether direct collection by a US service is an Art. 9 transfer is disputed; the KVKK guide's view is unverified. Also open: Turkish representative and VERBIS registration (exemption likely unavailable). Unlawful transfer can be a crime (Penal Code Art. 135-136). Whether 15-17s can consent is unsettled; we use 18."
+ },
+ "IR": {
+  "name": "Iran",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "unavailable",
+  "storage_reason": "Clardentity can't offer Healthcare in Iran: US sanctions apply and our AI model providers don't support use there.",
+  "laws": [
+   {
+    "name": "Iranian Transactions and Sanctions Regulations and OFAC General License D-2",
+    "citation": "31 CFR Part 560; GL D-2 of 23 Sep 2022 (87 FR 62003) covers internet communications services, excludes the Government of Iran",
+    "url": "https://ofac.treasury.gov/media/928871/download?inline"
+   },
+   {
+    "name": "Electronic Commerce Law (2004)",
+    "citation": "Arts. 58-59 express consent for health data; Art. 71 penalties"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "No data protection authority; Ministry of ICT (https://ict.gov.ir); health: MoHME (https://behdasht.gov.ir); US side: OFAC (https://ofac.treasury.gov)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://ofac.treasury.gov/sanctions-programs-and-country-information/iran-sanctions",
+   "https://ofac.treasury.gov/media/928871/download?inline",
+   "https://ofac.treasury.gov/media/932886/download?inline",
+   "https://www.anthropic.com/supported-countries",
+   "https://developers.openai.com/api/docs/supported-countries"
+  ],
+  "notes": "Unavailable (settled): Iran is not on Anthropic's (12 May 2026) or OpenAI's supported lists, and comprehensive OFAC sanctions apply; GL D-2 coverage of an AI health or mental-health assistant is doubtful. The research says geo-block the whole service, not only these modes (sign-up, login, guest demo, payments) and screen against the SDN list. Local law (E-Commerce Law Art. 58, express consent) is from general knowledge; the PDP bill is still a draft. Any plan to serve Iran needs written OFAC advice and a vendor that allows it."
+ },
+ "IQ": {
+  "name": "Iraq",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Constitution of the Republic of Iraq (2005)",
+    "citation": "Art. 17 personal privacy; Art. 40 secrecy of communications",
+    "url": "https://www.constituteproject.org/constitution/Iraq_2005"
+   },
+   {
+    "name": "Penal Code",
+    "citation": "Law No. 111 of 1969, Art. 437 professional secrecy"
+   },
+   {
+    "name": "Public Health Law",
+    "citation": "Law No. 89 of 1981; medical practice reserved to licensed physicians"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "No data protection authority; Communications and Media Commission (https://cmc.iq/ar/); health: federal and Kurdistan Region Ministries of Health",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.constituteproject.org/constitution/Iraq_2005",
+   "https://www.anthropic.com/supported-countries",
+   "https://developers.openai.com/api/docs/supported-countries",
+   "https://cmc.iq/ar/"
+  ],
+  "notes": "Persist: no data protection law, no transfer restriction or localisation found, and both vendors support Iraq. Low confidence: no primary texts retrieved, statute numbers from general knowledge, and the draft PDP and cybercrime bills were not checked (Oct 2026). Same treatment assumed for the Kurdistan Region (no separate regime found). Re-assess if a federal data protection law is enacted."
+ },
+ "MA": {
+  "name": "Morocco",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "transient",
+  "storage_reason": "In Morocco, processing health data and sending it abroad need prior authorisation from the CNDP. We don't hold it yet, so Healthcare chats here are answered but not saved.",
+  "laws": [
+   {
+    "name": "Law No. 09-08 on the protection of natural persons with regard to the processing of personal data",
+    "citation": "Dahir 1-09-15 of 18 Feb 2009; Art. 1(3) health data sensitive; Arts. 12, 21 prior CNDP authorisation; Arts. 43-44 transfers; Art. 57 penalties",
+    "url": "https://www.cndp.ma/loi-09-08/"
+   },
+   {
+    "name": "CNDP Deliberation D-941-2025 (health-data processing authorisation model)",
+    "citation": "28 Nov 2025; s.11 no transfer abroad without prior CNDP authorisation",
+    "url": "https://www.cndp.ma/wp-content/uploads/2025/12/Deliberation-n%c2%b0-D-941-2025-du-28112025-relative-au-modele-de-demande-dautorisation-type-pour-les-traitements-de-suivi-des-patients-20251203.pdf"
+   },
+   {
+    "name": "CNDP Deliberation No. 236-2015 (adequate countries)",
+    "citation": "18 Dec 2015; the US is not on the list",
+    "url": "https://www.cndp.ma/wp-content/uploads/2023/12/deliberation-n-236-2015-18-12-2015.pdf"
+   },
+   {
+    "name": "Law No. 131-13 on the practice of medicine",
+    "citation": "Dahir 1-15-26 of 19 Feb 2015; Arts. 99-102 telemedicine reserved to authorised physicians"
+   }
+  ],
+  "healthcare_rules": [
+   "Do not call this a consultation, teleconsultation, tele-expertise or tele-assistance; in Morocco these are medical acts reserved to authorised physicians (Law 131-13, Arts. 99-102)."
+  ],
+  "guidance_rules": [],
+  "regulator": "CNDP, Commission Nationale de controle de la protection des Donnees a caractere Personnel (https://www.cndp.ma)",
+  "confidence": "high",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.id4africa.com/main/files/Morocco_Loi_09_08.pdf",
+   "https://www.cndp.ma/wp-content/uploads/2025/12/Deliberation-n%c2%b0-D-941-2025-du-28112025-relative-au-modele-de-demande-dautorisation-type-pour-les-traitements-de-suivi-des-patients-20251203.pdf",
+   "https://www.cndp.ma/wp-content/uploads/2023/12/deliberation-n-236-2015-18-12-2015.pdf",
+   "https://www.cndp.ma/fr/",
+   "https://cms.law/en/int/expert-guides/cms-expert-guide-to-data-protection-and-cyber-security-laws/morocco",
+   "https://www.fnh.ma/article/alaune/telemedecine-un-nouveau-projet-de-loi-pour-mieux-proteger-les-donnees-a-caractere-personnel"
+  ],
+  "notes": "Transient: health data (incl. mental-health disclosures in Guidance) needs prior CNDP authorisation given on express consent (Arts. 12, 21), and D-941-2025 s.11 bars transfers abroad without prior authorisation; the US is not adequate. The research says file both requests (CNDP-FORMS) before enabling the modes at all, so even transient answering is only arguable. Show the authorisation reference in the notice once granted. Health data without express consent is a crime (Art. 57). Art. 2 reach over a US app is arguable but the CNDP asserts it."
+ },
+ "TN": {
+  "name": "Tunisia",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "unavailable",
+  "storage_reason": "Tunisian law lets only doctors or people bound by professional secrecy handle health data, and requires a controller based in Tunisia, so Healthcare isn't available here.",
+  "laws": [
+   {
+    "name": "Organic Law No. 2004-63 on the protection of personal data",
+    "citation": "27 Jul 2004; Art. 63 health data only by physicians or persons bound by professional secrecy; Art. 22 Tunisian-resident controller and processors; Art. 52 INPDP authorisation for every transfer",
+    "url": "https://legislation-securite.tn/wp-content/uploads/sites/5/2023/11/Loi-n%C2%B0-2004-63-du-27-Juillet-2004-Fr.pdf"
+   },
+   {
+    "name": "Draft organic law on personal data protection",
+    "citation": "GDPR-style bill before the ARP Rights and Freedoms Committee since Feb 2026; not adopted as of Oct 2026",
+    "url": "https://en.africanmanager.com/personal-data-protection-tunisian-parliament-moves-to-curb-ai-and-algorithm-risks/"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "INPDP, Instance Nationale de Protection des Donnees Personnelles (https://www.inpdp.tn)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://legislation-securite.tn/wp-content/uploads/sites/5/2023/11/Loi-n%C2%B0-2004-63-du-27-Juillet-2004-Fr.pdf",
+   "https://www.ins.tn/sites/default/files/2020-04/Loi%2063-2004%20Fr.pdf",
+   "https://en.africanmanager.com/personal-data-protection-tunisian-parliament-moves-to-curb-ai-and-algorithm-risks/",
+   "https://trendsnafrica.com/tunisias-parliament-advances-comprehensive-personal-data-protection-reform/",
+   "https://dataprotection.gi/jurisdictions/tunisia/"
+  ],
+  "notes": "Unavailable, departing from the research (which allowed ephemeral, non-stored answers if offered at all): SPEC makes 'only licensed professionals may process health data' unavailable, and Art. 63 limits processing, not just storage, to physicians or secrecy-bound persons (2 years' prison, Art. 87). Art. 22 also needs a Tunisian-national, resident controller representative and processors; Art. 52 an INPDP authorisation per transfer. Mental-health disclosures are health data, so Guidance is caught. INPDP mandate may have lapsed (Apr 2024, unverified)."
+ },
+ "DZ": {
+  "name": "Algeria",
+  "health_data": "sensitive",
+  "consent_age": 19,
+  "storage": "transient",
+  "storage_reason": "In Algeria, processing health data and sending it abroad need authorisation from the ANPDP. We don't hold it yet, so Healthcare chats here are answered but not saved.",
+  "laws": [
+   {
+    "name": "Law No. 18-07 on the protection of natural persons in the processing of personal data",
+    "citation": "10 Jun 2018; Art. 18 health data sensitive; Arts. 12-17 prior declaration or authorisation; Arts. 44-45 transfers need ANPDP authorisation",
+    "url": "https://www.joradp.dz/FTP/jo-francais/2018/F2018034.pdf"
+   },
+   {
+    "name": "Law No. 25-11 amending Law 18-07",
+    "citation": "24 Jul 2025; Arts. 41 bis to 41 bis 3 DPO, records and processing logs",
+    "url": "https://www.joradp.dz/FTP/jo-francais/2025/F2025048.pdf"
+   },
+   {
+    "name": "Health Law No. 18-11",
+    "citation": "2 Jul 2018; Art. 186 illegal practice includes diagnosis or treatment by verbal or written consultation; Art. 212 software as a medical device",
+    "url": "https://www.joradp.dz/FTP/jo-francais/2018/F2018046.pdf"
+   }
+  ],
+  "healthcare_rules": [
+   "Do not call your answers a medical consultation, even a written one; Algeria's Health Law (Art. 186) treats diagnosis or treatment by verbal or written consultation from an unqualified person as illegal practice of medicine."
+  ],
+  "guidance_rules": [],
+  "regulator": "ANPDP, Autorite Nationale de Protection des Donnees a caractere Personnel (https://anpdp.dz)",
+  "confidence": "high",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.joradp.dz/FTP/jo-francais/2018/F2018034.pdf",
+   "https://www.joradp.dz/FTP/jo-francais/2025/F2025048.pdf",
+   "https://www.joradp.dz/FTP/jo-francais/2018/F2018046.pdf",
+   "https://anpdp.dz/",
+   "https://www.dlapiperdataprotection.com/index.html?t=law&c=DZ",
+   "https://cms.law/en/int/expert-guides/cms-expert-guide-to-data-protection-and-cyber-security-laws/algeria2"
+  ],
+  "notes": "Transient: every processing needs a prior ANPDP declaration, health (incl. mental-state, so Guidance) data needs ANPDP authorisation in practice, and Art. 44 makes ANPDP authorisation the main transfer route; an Art. 45(1) express-consent derogation exists but the research advises filing. The ANPDP has 2 months and silence is refusal. Consent age 19 is the civil majority (Civil Code Art. 40). Law 25-11's DPIA, 5-day breach and automated-decision articles sit in the law-enforcement title. A local representative may be needed."
+ }
+}

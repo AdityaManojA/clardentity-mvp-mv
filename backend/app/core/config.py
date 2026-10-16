@@ -68,7 +68,7 @@ class Settings(BaseSettings):
     # quality gate is the verification that follows, not the generator's
     # deliberation. Decision joins them: its verdict box is a separate call,
     # and the flagship spent 17s writing a three-operator comparison body.
-    # Thinking, Mentoring and Reflect stay on the flagship. Comma-separated,
+    # Thinking, Guidance and Healthcare stay on the flagship. Comma-separated,
     # env-overridable.
     fast_generation_modes: str = "knowing,learning,creative,decision,legal"
     # The companions a paid tier would open. Locked in the picker; a signed-in
@@ -86,7 +86,7 @@ class Settings(BaseSettings):
     # The version of the terms and privacy notice currently in force. Bump it
     # when either document changes materially; stored against each account at
     # sign-up so a later revision knows who has agreed to what.
-    terms_version: str = "2026-09-28"
+    terms_version: str = "2026-10-16"
     # Who may open /admin. Comma-separated emails; empty means nobody, which
     # is the right default for a deployment that never sets it.
     admin_emails: str = "admin@clardentity.ai"
@@ -96,7 +96,7 @@ class Settings(BaseSettings):
     # overwrites an existing account's password.
     admin_bootstrap_email: str = "admin@clardentity.ai"
     admin_bootstrap_password: str = ""
-    preview_modes: str = "mentoring,therapy,creative,legal"
+    preview_modes: str = "guidance,healthcare,creative,legal"
 
     #: The landing page's try-it-here box, which anyone can use without an
     #: account. The per-visitor allowance is the product rule (5,000 tokens,

@@ -7,6 +7,7 @@ import { DeleteAccount } from "@/components/profile/DeleteAccount";
 import { InstallAppButton } from "@/components/system/InstallAppButton";
 import { UpgradeDialog } from "@/components/chat/UpgradeDialog";
 import { ProfileSection } from "@/components/profile/ProfileSection";
+import { HealthcareConsent } from "@/components/settings/HealthcareConsent";
 
 /* How the app behaves, and the account it belongs to.
  *
@@ -65,6 +66,13 @@ export function SettingsView() {
               </>
             }
           />
+
+          <ProfileSection
+            title="Healthcare"
+            description="Your consent for Healthcare to use your health information, and how to take it back."
+          >
+            <HealthcareConsent />
+          </ProfileSection>
 
           <ProfileSection
             title="Account Termination"

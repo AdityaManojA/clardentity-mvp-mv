@@ -96,6 +96,9 @@ HOGQL_NOTE = (
     "distinct_id is the account's UUID for a signed-in visitor (the same id as users.id "
     "in the database), otherwise an anonymous id. Every row comes from a visitor who "
     "allowed analytics; nothing holds what anyone wrote.\n"
+    "Wherever a property names a mode (mode, from, to, suggested), Guidance and "
+    "Healthcare are recorded as 'sensitive' - which of the two is never sent - so "
+    "count 'sensitive' as one bucket covering both, never as a third companion.\n"
     "Events and their properties:\n"
     + "\n".join(f"- {name}: {meaning}" for name, meaning in EVENT_CATALOG.items())
 )

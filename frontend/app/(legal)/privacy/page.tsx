@@ -10,8 +10,8 @@ export const metadata: Metadata = {
 /* Kept in step with backend settings.terms_version: the account row records
    which version was accepted, and that is only meaningful if the number here
    is the one people saw. */
-const VERSION = "2026-09-28";
-const UPDATED = "28 September 2026";
+const VERSION = "2026-10-16";
+const UPDATED = "16 October 2026";
 const CONTACT = "hello@clardentity.ai";
 
 export default function PrivacyPage() {
@@ -66,9 +66,19 @@ export default function PrivacyPage() {
               "To turn speech into the question you asked",
             ],
             [
+              "Health information",
+              "Symptoms, test results, conditions and medicines you ask about in Healthcare",
+              "Only to answer you, and only after your explicit consent - see section 6",
+            ],
+            [
+              "Safety screening",
+              "Whether a message suggests someone may be in danger (a level such as \u201cconcern\u201d, not the message), kept with the answer it changed",
+              "To show local emergency and crisis numbers when someone may need them",
+            ],
+            [
               "Approximate location",
               "City and country, derived from your IP address at sign-in. We do not store the IP address itself or any coordinates",
-              "So regional questions get regional answers (prices, rules, weather)",
+              "So regional questions get regional answers (prices, rules, weather), and so Healthcare follows the health-data rules and gives the emergency numbers for where you are",
             ],
             [
               "Language and time zone",
@@ -82,15 +92,16 @@ export default function PrivacyPage() {
             ],
             [
               "Product analytics",
-              "Named events such as “a question was asked in Finder mode”, with no content in them - see section 7",
+              "Named events such as “a question was asked in Finder mode”, with no content in them - see section 8",
               "To learn which features are used and where people get stuck",
             ],
           ]}
         />
         <p>
-          We do not ask for, and ask that you do not send, government identifiers, payment card
-          numbers, or health records. We do not knowingly collect anything from children under
-          16.
+          We do not ask for, and ask that you do not send, government identifiers or payment card
+          numbers - or health information anywhere except Healthcare, which asks for your consent
+          first. Healthcare is for adults: 18, or older where the age of majority where you live
+          is higher. We do not knowingly collect anything from children under 16.
         </p>
       </Section>
 
@@ -100,7 +111,9 @@ export default function PrivacyPage() {
           needed to run your account and answer your questions; <strong>legitimate interests</strong>
           {" "}for keeping the service secure and diagnosing faults; and{" "}
           <strong>consent</strong> for product analytics, which you can give or refuse in the
-          banner and change at any time. Under India&apos;s DPDP Act we rely on the consent you
+          banner and change at any time. Health information is special-category data, and for it
+          we rely on your <strong>explicit consent</strong> (Article 9(2)(a)), asked separately
+          before your first Healthcare conversation. Under India&apos;s DPDP Act we rely on the consent you
           give when you create an account and on the legitimate uses that Act permits for
           providing a service you asked for.
         </p>
@@ -123,7 +136,7 @@ export default function PrivacyPage() {
             ["Vercel", "Serves the web app; sees requests for pages, not your conversations", "Global edge"],
             ["Upstash", "Rate-limit counters and background job queue - identifiers, not content", "Configured region"],
             ["Resend", "Your email address, to send password resets and welcome mail", "United States"],
-            ["PostHog", "Analytics events with no content, only if you consent (section 7)", "European Union"],
+            ["PostHog", "Analytics events with no content, only if you consent (section 8)", "European Union"],
           ]}
         />
         <p>
@@ -140,17 +153,53 @@ export default function PrivacyPage() {
         </p>
       </Section>
 
-      <Section n={6} title="How long we keep it">
+      <Section n={6} title="Health information and support">
+        <p>
+          <strong>Healthcare asks before it answers.</strong> Before your first health
+          conversation it shows what will happen to what you share, under the rules for where you
+          are, and asks for your explicit consent. We record when you gave it and which version
+          of that text you saw; if the text changes, it asks again. You can withdraw consent at
+          any time in Settings → Healthcare, and choose to delete every chat that has a
+          Healthcare message in it at the same time.
+        </p>
+        <p>
+          <strong>The rules of where you are apply.</strong> We work out your country (and, in
+          some countries, your state or province) from your connection, and Healthcare follows
+          that place&apos;s health-data rules. Where those rules do not allow health information
+          to be stored outside the country, Healthcare runs only as a temporary chat - nothing is
+          kept once you leave it. Where they do not allow the service at all, Healthcare is not
+          offered there.
+        </p>
+        <p>
+          <strong>Used to answer you, and for nothing else.</strong> Health information is sent
+          to the same AI providers as any question (section 4), under the same contracts. It is
+          never used to build your profile or memory, never used for advertising, and never
+          sent to analytics. A Healthcare conversation in the free demo on our home page is kept
+          only in your browser and is not carried into an account when you sign up.
+        </p>
+        <p>
+          <strong>Safety screening.</strong> Every message, in every mode, is checked by an AI
+          model for signs that someone may be in danger. When a message is flagged, the answer
+          puts their safety first and shows emergency and crisis numbers for your country,
+          taken from a table we maintain - never made up by the model. We keep only the level
+          (&quot;concern&quot; or &quot;crisis&quot;) with that answer, so the numbers are still
+          there when you come back to it. Clardentity is not a crisis service and does not
+          contact anyone on your behalf.
+        </p>
+      </Section>
+
+      <Section n={7} title="How long we keep it">
         <p>
           Your account, conversations and files stay until you delete them. Deleting a chat
           removes its messages, claims and citations. Deleting your account (Profile → delete
           account) removes the account, its workspaces, conversations, documents, uploaded files
-          and memory - immediately and irreversibly. Server logs are kept for up to 30 days.
+          and memory - immediately and irreversibly. Temporary chats, including Healthcare
+          where it runs only that way, are deleted when you leave them. Server logs are kept for up to 30 days.
           Analytics events, if you consented, are kept for up to 12 months.
         </p>
       </Section>
 
-      <Section n={7} title="Analytics and cookies">
+      <Section n={8} title="Analytics and cookies">
         <p>
           We store one thing on your device without asking: the tokens that keep you signed in.
           Without them the app cannot work, so they are strictly necessary and carry no consent
@@ -161,14 +210,16 @@ export default function PrivacyPage() {
           you accept, we record named events - a question was asked, in which mode, whether a
           file was attached, roughly how long the answer took - through PostHog on its European
           servers. These events never contain your questions, your answers, chat names, file
-          names or your email address; you appear as a random account identifier. Session
+          names or your email address; you appear as a random account identifier. For Guidance
+          and Healthcare not even the mode is recorded - those events say only
+          &quot;sensitive&quot;. Session
           recording and automatic click-capture are switched off in our code, not merely in a
           setting. You can change your mind at any time from the link in the footer of the
           banner or by clearing site data.
         </p>
       </Section>
 
-      <Section n={8} title="Your rights">
+      <Section n={9} title="Your rights">
         <p>
           You can ask us to give you a copy of your data, correct it, delete it, restrict or
           object to how we use it, or hand it to another provider. Two of these you can do
@@ -184,7 +235,7 @@ export default function PrivacyPage() {
         </p>
       </Section>
 
-      <Section n={9} title="Security">
+      <Section n={10} title="Security">
         <p>
           Traffic is encrypted in transit. Passwords are stored as one-way hashes and never in
           readable form. Access to the production database is limited to the people who operate
@@ -193,7 +244,7 @@ export default function PrivacyPage() {
         </p>
       </Section>
 
-      <Section n={10} title="Changes">
+      <Section n={11} title="Changes">
         <p>
           If we change this policy materially we will raise the version number, show the change
           when you next sign in, and ask you to accept it again where the law requires. The

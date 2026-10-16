@@ -122,6 +122,7 @@ export function MessageInput({
   textareaRef,
   onStartCall,
   trailing,
+  onModelLocked,
   mode,
   isGenerating,
   onStop,
@@ -159,6 +160,9 @@ export function MessageInput({
    *  call button needs nothing here: it already does whatever `onStartCall`
    *  says, and the demo passes an invitation. */
   gated?: (feature: "attach" | "voice" | "model") => void;
+  /** A greyed model was tapped in a mode where picking one is not part of
+   *  the plan - the caller shows the plans. Gets the model's name. */
+  onModelLocked?: (label: string) => void;
 }) {
   const touchKeyboard = useTouchKeyboard();
   const [attachments, setAttachments] = useState<PendingAttachment[]>([]);
@@ -555,7 +559,10 @@ export function MessageInput({
           />
 
           <div className="ml-auto flex min-w-0 items-center gap-1 max-lg:gap-4">
-            {mode && PICKABLE_MODES.has(mode) ? (
+            {/* Every mode since 2026-10-16. Where choosing is not part of
+                the plan the menu still shows what exists, greyed, rather
+                than hiding it - the choice is an upgrade, not a secret. */}
+            {mode ? (
               gated ? (
                 // The chip, without the menu behind it. Same shape and the
                 // same place, so the foot of the card reads as it does in
@@ -573,8 +580,12 @@ export function MessageInput({
                   </svg>
                 </button>
               ) : (
-                // The one mode where the user picks the model by name.
-                <VendorModelPicker mode={mode} disabled={disabled} />
+                <VendorModelPicker
+                  mode={mode}
+                  disabled={disabled}
+                  locked={!PICKABLE_MODES.has(mode)}
+                  onLocked={onModelLocked}
+                />
               )
             ) : null}
             {trailing}

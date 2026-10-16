@@ -1,0 +1,1508 @@
+{
+ "BR": {
+  "name": "Brazil",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Lei Geral de Proteção de Dados Pessoais (LGPD)",
+    "citation": "Lei nº 13.709/2018; Art 5 II and Art 11 (health is sensitive; specific, highlighted consent), Art 33 (transfers)",
+    "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm"
+   },
+   {
+    "name": "ANVISA RDC nº 657/2022 (Software as a Medical Device)",
+    "citation": "with RDC 751/2022; under revision for AI",
+    "url": "https://antigo.anvisa.gov.br/documents/10181/5141677/RDC_657_2022_COMP.pdf"
+   },
+   {
+    "name": "CFM Resolution nº 2.454/2026 (AI in medicine)",
+    "citation": "published 27 Feb 2026, in force ~Aug 2026; binds physicians",
+    "url": "https://portal.cfm.org.br/"
+   },
+   {
+    "name": "Lei nº 4.119/1962 (psychology profession)",
+    "citation": "psychological diagnosis and psychotherapy reserved to CRP-registered psychologists"
+   }
+  ],
+  "healthcare_rules": [
+   "Do not tell the person how their own condition will progress or what their chances are; Brazil's CFM Resolution 2.454/2026 leaves prognosis and treatment decisions to the physician. Explain in general terms."
+  ],
+  "guidance_rules": [
+   "Never call these conversations 'terapia', 'psicoterapia' or 'atendimento psicológico', in any language; in Brazil psychotherapy and psychological diagnosis are reserved to CRP-registered psychologists (Lei 4.119/1962)."
+  ],
+  "regulator": "Agência Nacional de Proteção de Dados (ANPD) (https://www.gov.br/anpd/pt-br); ANVISA (medical devices); CFM / CFP (professional councils)",
+  "confidence": "high",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm",
+   "https://antigo.anvisa.gov.br/documents/10181/5141677/RDC_657_2022_COMP.pdf",
+   "https://site.cfp.org.br/cfp-divulga-posicionamento-sobre-inteligencia-artificial-no-contexto-da-pratica-psicologica/",
+   "https://www.congressonacional.leg.br/en/materias/materias-bicamerais/-/ver/pl-2338-2023",
+   "https://www.mayerbrown.com/pt/insights/publications/2026/03/brazilian-cfm-issues-resolution-on-the-use-of-artificial-intelligence-in-medicine",
+   "https://lefosse.com/noticias/transferencia-internacional-de-dados-prazo-para-adocao-das-clausulas-padrao-da-anpd-se-encerra-em-23-de-agosto/"
+  ],
+  "notes": "Persist: specific, highlighted consent (LGPD Art. 11, I) plus highlighted consent to the US transfer (Art. 33, VIII) or ANPD SCCs (mandatory form since 23 Aug 2025); publish a Portuguese transfer page (Res. 19/2024). No sharing health data for commercial advantage (Art. 11 §4). Pending: AI bill PL 2.338/2023, Câmara vote after the Oct 2026 elections (health AI high risk). ECA Digital in force 17 Mar 2026; fine levels reported inconsistently. Backend: encarregado, RIPD, 3-business-day breach notice."
+ },
+ "MX": {
+  "name": "Mexico",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Ley Federal de Protección de Datos Personales en Posesión de los Particulares (2025)",
+    "citation": "DOF 20 Mar 2025, in force 21 Mar 2025; sensitive data need express written consent",
+    "url": "https://www.diputados.gob.mx/LeyesBiblio/pdf/LFPDPPP.pdf"
+   },
+   {
+    "name": "Reglamento de la LFPDPPP",
+    "citation": "DOF 21 Dec 2011 (applied where not contrary to the 2025 law)",
+    "url": "https://www.diputados.gob.mx/LeyesBiblio/regley/Reg_LFPDPPP.pdf"
+   },
+   {
+    "name": "Ley General de Salud",
+    "citation": "Art 262 (medical devices, COFEPRIS); mental health chapter (DOF 16 May 2022)",
+    "url": "https://www.diputados.gob.mx/LeyesBiblio/pdf/LGS.pdf"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Secretaría Anticorrupción y Buen Gobierno (INAI's private-sector data functions since March 2025); COFEPRIS (https://www.gob.mx/cofepris)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/countries/mexico/law.html",
+   "https://kpmg.com/mx/es/tendencias/2025/04/flash-nueva-ley-federal-de-proteccion-de-datos-personales-en-posesion-de-los-particulares.html",
+   "https://www.ey.com/es_mx/technical/tax/boletines-fiscales/nueva-ley-federal-proteccion-datos-personal-posesion-particulares"
+  ],
+  "notes": "Persist: express written consent via an authenticated in-app action (2025 LFPDPPP); sending data to our US processors is a 'remisión' needing processor contracts, not consent, provided vendors don't use the data for their own purposes (that would make it a 'transferencia'). Official texts were unreachable, so 2025-law article numbers are uncited (secondary sources). Reach over a foreign controller without Mexican establishment is debatable (Reglamento Art. 4); treated as in scope. COFEPRIS SaMD rules unverified. Fines doubled for sensitive data."
+ },
+ "CL": {
+  "name": "Chile",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Ley 21.719 (personal data protection; creates the Agencia de Protección de Datos Personales)",
+    "citation": "Diario Oficial 13 Dec 2024; main amendments in force 1 Dec 2026; Art 16 (express consent), Art 16 bis (health data only for purposes in health laws), Art 16 quáter (minors)",
+    "url": "https://www.bcn.cl/leychile/navegar?idNorma=1209272"
+   },
+   {
+    "name": "Ley 19.628 sobre protección de la vida privada",
+    "citation": "1999; Art 2(g), Art 10 (sensitive data with consent); in force until 1 Dec 2026",
+    "url": "https://www.bcn.cl/leychile/navegar?idNorma=141599"
+   },
+   {
+    "name": "Ley 20.584 (rights and duties of patients)",
+    "citation": "clinical-record data are sensitive; binds providers",
+    "url": "https://www.bcn.cl/leychile/navegar?idNorma=1039348"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Agencia de Protección de Datos Personales (from 1 Dec 2026; no dedicated authority before); ISP (medical devices) (https://www.ispch.cl/)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.leychile.cl/Consulta/obtxml?opt=7&idNorma=1209272",
+   "https://www.bcn.cl/leychile/navegar?idNorma=1209272",
+   "https://www.bcn.cl/leychile/navegar?idNorma=141599",
+   "https://www.dlapiperdataprotection.com/countries/chile/law.html"
+  ],
+  "notes": "Persist, but get local counsel before 1 Dec 2026, when Ley 21.719 takes effect: Art. 16 bis lets health data be processed, even with consent, only 'para los fines previstos por las leyes especiales en materia sanitaria'; if read to bar consumer health information, Healthcare would become unavailable. Transfers: US not adequate; safeguard clauses now, Agency model clauses when issued (consent only covers specific, non-habitual transfers). Extraterritorial from Dec 2026. Confidence lowered from high over Art. 16 bis."
+ },
+ "ZA": {
+  "name": "South Africa",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Protection of Personal Information Act (POPIA)",
+    "citation": "Act 4 of 2013; s.26-27 (special personal information, consent), s.57(1)(d) (prior authorisation), s.72 (transfers)",
+    "url": "https://inforegulator.org.za/popia/"
+   },
+   {
+    "name": "Health Professions Act 56 of 1974 and HPCSA telehealth guidelines",
+    "citation": "Booklet 10 (2021); psychological acts reserved to registered practitioners"
+   },
+   {
+    "name": "Medicines and Related Substances Act 101 of 1965 and Medical Device Regulations",
+    "citation": "SAHPRA guideline SAHPGL-MD-04 v5 (Feb 2025)",
+    "url": "https://www.sahpra.org.za/document/guideline-for-classification-of-medical-devices-and-ivds/"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [
+   "Do not call these conversations counselling or therapy; in South Africa psychological counselling and therapy are acts reserved to HPCSA-registered practitioners."
+  ],
+  "regulator": "Information Regulator (https://inforegulator.org.za/); SAHPRA (medical devices); HPCSA (practitioners)",
+  "confidence": "high",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://inforegulator.org.za/",
+   "https://inforegulator.org.za/wp-content/uploads/2025/10/SECTION-112_2_C_-HEALTH-REGULATIONS-FINAL-1.pdf",
+   "https://www.sahpra.org.za/medical-devices-and-in-vitro-diagnostics-guidelines/"
+  ],
+  "notes": "Persist: consent (POPIA s.27(1)(a)); the s.32 health authorisation covers only providers. Transfers: binding POPIA-grade agreements with each vendor keep us within s.72(1)(a); without them s.57(1)(d) needs prior Information Regulator authorisation to send health data to a non-adequate country. Reach of s.3(1)(b) over a US-hosted app is debated; comply anyway. The 2025 draft s.112(2)(c) health regulations target insurers and medical schemes, not us. Backend: Information Officer registration, PAIA manual, s.22 breach notice."
+ },
+ "NG": {
+  "name": "Nigeria",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Nigeria Data Protection Act 2023 (NDPA)",
+    "citation": "s.30 (sensitive data: explicit consent), s.31 (children), ss.41-43 (transfers), s.40 (breach)",
+    "url": "https://ndpc.gov.ng/resources/"
+   },
+   {
+    "name": "NDPA General Application and Implementation Directive (GAID) 2025",
+    "citation": "issued 20 Mar 2025; replaced NDPR 2019",
+    "url": "https://ndpc.gov.ng/resources/"
+   },
+   {
+    "name": "National Health Act 2014",
+    "citation": "ss.26-30 confidentiality of health records (providers)"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Nigeria Data Protection Commission (NDPC) (https://ndpc.gov.ng/resources/); NAFDAC (devices); MDCN (doctors)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://ndpc.gov.ng/resources/",
+   "https://www.dlapiperdataprotection.com/countries/nigeria/law.html"
+  ],
+  "notes": "Persist: explicit consent (NDPA s.30) plus informed, risk-aware consent to the US transfer and an SCC-type instrument (ss.41-43). GAID treats targeting Nigerians as operating in Nigeria. Backend: possible Data Controller of Major Importance registration, DPIA, DPO, 72h breach notice. Low-confidence risk: NITDA Nigerian Content guidelines (2019) on their face require some consumer data to be hosted locally; no enforcement against foreign apps seen. NDPA section numbers inferred from structure; re-check."
+ },
+ "KE": {
+  "name": "Kenya",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "unavailable",
+  "storage_reason": "Kenyan law lets only health care providers, or people bound by professional secrecy, process health data, so Healthcare isn't available in Kenya for now.",
+  "laws": [
+   {
+    "name": "Data Protection Act 2019",
+    "citation": "Act No. 24 of 2019; s.46 (who may process health data), s.49(1) (sensitive transfers: consent AND safeguards), s.33 (children)",
+    "url": "https://www.odpc.go.ke/wp-content/uploads/2024/02/TheDataProtectionAct__No24of2019.pdf"
+   },
+   {
+    "name": "Data Protection (General) Regulations 2021",
+    "citation": "Legal Notice No. 263 of 2021; Reg. 26 (in-country processing for health care provision), Reg. 41(2) (transfer log)",
+    "url": "https://www.odpc.go.ke/wp-content/uploads/2024/03/THE-DATA-PROTECTION-GENERAL-REGULATIONS-2021-1.pdf"
+   },
+   {
+    "name": "Digital Health Act 2023",
+    "citation": "Act No. 15 of 2023 and 2025 regulations (reported in-country storage; text unverified)",
+    "url": "https://new.kenyalaw.org/akn/ke/act/2023/15/eng@2023-10-27"
+   },
+   {
+    "name": "Counsellors and Psychologists Act 2014",
+    "citation": "counselling and psychology licensed by the Counsellors and Psychologists Board"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [
+   "Never describe these conversations as counselling or yourself as a counsellor or psychologist; in Kenya counselling is a licensed profession (Counsellors and Psychologists Act 2014)."
+  ],
+  "regulator": "Office of the Data Protection Commissioner (ODPC) (https://www.odpc.go.ke/guidelines-2/); Digital Health Agency; Pharmacy and Poisons Board",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.odpc.go.ke/wp-content/uploads/2024/02/TheDataProtectionAct__No24of2019.pdf",
+   "https://www.odpc.go.ke/wp-content/uploads/2024/02/ODPC-Guidance-Note-on-Processing-of-Health-Data.pdf",
+   "https://www.odpc.go.ke/wp-content/uploads/2024/03/THE-DATA-PROTECTION-GENERAL-REGULATIONS-2021-1.pdf",
+   "https://www.odpc.go.ke/wp-content/uploads/2026/09/ODPC-%E2%80%93-Guidance-Notes-for-Cross-border-Data-Transfers.pdf",
+   "https://www.odpc.go.ke/guidelines-2/"
+  ],
+  "notes": "Unavailable: DPA s.46(1) lets health data be processed only by or under a health care provider or a person under professional secrecy; the research calls a consumer AI a grey zone and says get counsel. Persist is possible if counsel accepts contractual confidentiality under s.46(2), or Healthcare runs under a licensed provider. Also: s.49(1) needs consent AND safeguards; Reg. 26 localises health care provision; Digital Health Act localisation unverified. Guidance (mental-health data) may raise the same s.46 issue. Confidence lowered from high: judgement call."
+ },
+ "GH": {
+  "name": "Ghana",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Data Protection Act, 2012 (Act 843)",
+    "citation": "s.37 (special personal data incl. health; consent s.37(2)(b)), s.30(4) (non-domiciled processors), ss.46-56 (registration)",
+    "url": "https://ictpolicyafrica.org/uploaded_documents/1566557678095be394wi8cyd.pdf"
+   },
+   {
+    "name": "FDA Guideline for Registration of Software as a Medical Device",
+    "citation": "FDA/MCH/MDD/GL-RSAMD/2017/03 (mobile apps with a medical purpose are SaMD)",
+    "url": "https://fdaghana.gov.gh/wp-content/uploads/2024/09/GUIDELINE-FOR-REGISTRATION-OF-SOFTWARE-AS-MEDICAL-DEVICE.pdf"
+   },
+   {
+    "name": "Health Professions Regulatory Bodies Act, 2013 (Act 857)",
+    "citation": "establishes the Ghana Psychological Council and other councils"
+   },
+   {
+    "name": "Data Protection Bill, 2025",
+    "citation": "draft for consultation Oct-Nov 2025; not enacted",
+    "url": "https://dpc.gov.gh/wp-content/uploads/2025/11/DATA_PROTECTION_BILL1_DRAFT-1.pdf"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [
+   "Do not describe these conversations as psychology, counselling or therapy; in Ghana psychology is a regulated profession under the Ghana Psychological Council (Act 857)."
+  ],
+  "regulator": "Data Protection Commission (https://dpc.gov.gh/); Food and Drugs Authority (devices); Medical and Dental Council; Ghana Psychological Council",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://ictpolicyafrica.org/uploaded_documents/1566557678095be394wi8cyd.pdf",
+   "https://dpc.gov.gh/",
+   "https://fdaghana.gov.gh/wp-content/uploads/2024/09/GUIDELINE-FOR-REGISTRATION-OF-SOFTWARE-AS-MEDICAL-DEVICE.pdf",
+   "https://dpc.gov.gh/wp-content/uploads/2025/11/DATA_PROTECTION_BILL1_DRAFT-1.pdf",
+   "https://gna.org.gh/2026/03/govt-to-introduce-new-data-protection-bill-to-regulate-ai-cross-border-data-flows/",
+   "https://www.dlapiperdataprotection.com/index.html?t=law&c=GH"
+  ],
+  "notes": "Persist: express consent (Act 843 s.37(2)(b)); the medical ground s.37(6)(e) needs a health professional. No transfer article: declare the US in the DPC registration and bind non-domiciled processors to Act 843 (s.30(4)). Backend: register before processing (offence otherwise), possible external-company registration (s.45(2)). Data Protection Bill 2025 (new authority, transfer and AI rules) not enacted as of Aug 2026; recheck. Diagnostic features would be FDA-registrable SaMD needing a local agent."
+ },
+ "RW": {
+  "name": "Rwanda",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "transient",
+  "storage_reason": "Rwandan law keeps personal data in Rwanda unless the regulator authorises storage abroad, which we don't have yet, so Healthcare chats here are answered but not saved.",
+  "laws": [
+   {
+    "name": "Law N° 058/2021 relating to the protection of personal data and privacy",
+    "citation": "Arts 10-11 (sensitive data: consent, safeguards), Art 48 (transfer), Art 50 (storage in Rwanda unless authorised), Art 9 (child under 16)",
+    "url": "https://dpo.gov.rw/dpp-law/general-provisions"
+   },
+   {
+    "name": "NCSA Standard Contractual Clauses for Transfer of Personal Data Outside Rwanda",
+    "citation": "Data Protection Office compliance tool",
+    "url": "https://dpo.gov.rw/fileadmin/DPO/ComplianceTools/Standard%20Contractual%20Clauses%20for%20Transfer%20Personal%20Data%20Outside%20Rwanda_.pdf"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "National Cyber Security Authority (NCSA), Data Protection and Privacy Office (https://dpo.gov.rw/); Rwanda FDA (medical devices)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://dpo.gov.rw/dpp-law/sharing-transferstorage-and-retention-of-personal-data",
+   "https://dpo.gov.rw/services/authorization-to-store-outside-rwanda",
+   "https://dpo.gov.rw/services/authorization-to-transfer-outside-rwanda",
+   "https://dpo.gov.rw/dpp-law/general-provisions",
+   "https://www.rwandafda.gov.rw/medical-devices/registration",
+   "https://www.dlapiperdataprotection.com/index.html?t=law&c=RW"
+  ],
+  "notes": "Transient: Art. 50 requires storage in Rwanda unless an NCSA registration certificate authorises storage abroad; Art. 48 allows transfers on consent, so on-request processing is arguable. Apply for 'Authorization to Store Outside Rwanda' and 'to Transfer Outside Rwanda', then switch to persist. Certificate validity, fees and timing unknown (ask registration@dpo.gov.rw). Backend: NCSA registration (Art. 29), local representative (Art. 39), DPO, separate or encrypted sensitive data (Art. 11), 48h breach notice. Rwanda FDA scope lists AI-enabled diagnostic devices."
+ },
+ "UG": {
+  "name": "Uganda",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Data Protection and Privacy Act",
+    "citation": "Cap. 97 (originally Act No. 9 of 2019); s.9 (special personal data), s.8 (children), s.19 (processing or storage outside Uganda)",
+    "url": "https://pdpo.go.ug/"
+   },
+   {
+    "name": "Data Protection and Privacy Regulations, 2021",
+    "citation": "Reg 13 (registration incl. foreign entities), Reg 30 (transfers), Reg 47 (DPO)",
+    "url": "https://www.dlapiperdataprotection.com/index.html?t=law&c=UG"
+   },
+   {
+    "name": "Mental Health Act, 2018",
+    "citation": "mental-health care and patients' confidentiality"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Personal Data Protection Office (PDPO), NITA-Uganda (https://pdpo.go.ug/); National Drug Authority (devices)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://pdpo.go.ug/",
+   "https://api.pdpo.go.ug/guidance-material",
+   "https://www.dlapiperdataprotection.com/index.html?t=law&c=UG"
+  ],
+  "notes": "Persist: s.19 allows processing or storage outside Uganda with the data subject's consent (adequacy list unpublished). Unresolved: PDPO renewal asks for a Form 3 undertaking not to process or store data outside Uganda; research says don't sign it and seek PDPO transfer approval (adequacy assessment). Act text unread (ULII 403); section numbers from DLA Piper. Attempted suicide reportedly still an offence (unverified), relevant to crisis handling. Backend: annual PDPO registration, DPO, DPIA."
+ },
+ "TZ": {
+  "name": "Tanzania",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "transient",
+  "storage_reason": "Tanzania requires a regulator permit to transfer personal data abroad, which we don't hold yet, so Healthcare chats here are answered but not saved.",
+  "laws": [
+   {
+    "name": "Personal Data Protection Act, Cap. 44",
+    "citation": "Act No. 11 of 2022; s.30 (prior written consent for sensitive data), ss.31-32 (transborder flows), s.22 (scope)",
+    "url": "https://pdpc.go.tz/documents/3/PERSONAL_DATA_PROTECTION_ACT_2022.pdf"
+   },
+   {
+    "name": "Personal Data Protection (Personal Data Collection and Processing) Regulations, 2023",
+    "citation": "GN 449C; Regs 20-22 (permit before any transfer abroad), Reg 33 (DPIA)",
+    "url": "https://pdpc.go.tz/documents/4/THE_PERSONAL_DATA_PROTECTION_PERSONAL_DATA_COLLECTION_AND_PROCESSING_REGULATIONS_2023.pdf"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Personal Data Protection Commission (PDPC) (https://pdpc.go.tz/); TMDA (medical devices)",
+  "confidence": "high",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://pdpc.go.tz/documents/3/PERSONAL_DATA_PROTECTION_ACT_2022.pdf",
+   "https://pdpc.go.tz/documents/4/THE_PERSONAL_DATA_PROTECTION_PERSONAL_DATA_COLLECTION_AND_PROCESSING_REGULATIONS_2023.pdf",
+   "https://pdpc.go.tz/services/cross-border-data-transfer-permit/",
+   "https://pdpc.go.tz/",
+   "https://www.dlapiperdataprotection.com/index.html?t=law&c=TZ"
+  ],
+  "notes": "Transient: Regs. 20-22 require a PDPC permit before transferring personal data out of Tanzania and we hold none; on-request processing rests on the s.32(4) consent and contract-necessity derogations (arguable). The permit is obtainable (decided within 14 days; 121 issued by Aug 2026): apply, then persist. It affects every mode, not only Healthcare. Reach over a non-domiciled controller (s.22(1)(c)) is arguable. Backend: registration, mandatory DPO, DPIA. Attempted suicide reportedly still an offence (unverified)."
+ },
+ "ET": {
+  "name": "Ethiopia",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "unavailable",
+  "storage_reason": "Ethiopian law requires personal data to be stored in Ethiopia and regulator approval to send health data abroad, so Healthcare isn't available in Ethiopia for now.",
+  "laws": [
+   {
+    "name": "Personal Data Protection Proclamation No. 1321/2024",
+    "citation": "Art 2(5) (health and communications content are sensitive), Art 9 (written consent), Art 22 (data sovereignty: local storage; prior ECA approval for sensitive transfers)",
+    "url": "https://www.eca.et/wp-content/uploads/2025/10/personal_data_protection_proclamation_No_1321_2024.pdf"
+   },
+   {
+    "name": "Food and Medicine Administration Proclamation No. 1112/2019",
+    "citation": "EFDA medicines and medical devices"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Ethiopian Communications Authority (ECA) (https://www.eca.et/resources/); EFDA (medicines and devices)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.eca.et/wp-content/uploads/2025/10/personal_data_protection_proclamation_No_1321_2024.pdf",
+   "https://www.eca.et/resources/",
+   "https://www.dlapiperdataprotection.com/index.html?t=law&c=ET"
+  ],
+  "notes": "Unavailable, following the research's safest default (geo-gate Healthcare AND Guidance): Art. 22(1) requires locally collected personal data to be stored on servers in Ethiopia, and Art. 22(3) requires prior ECA approval for any cross-border transfer of sensitive data; chat content is itself sensitive (Art. 2(5)(i)). No directives or approval procedure published as of Oct 2026. Scope over a pure US service (Art. 3(2): equipment plus representative) is untested and might take us outside. DLA Piper omits Art. 22; rely on the gazette text."
+ },
+ "BJ": {
+  "name": "Benin",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "transient",
+  "storage_reason": "Benin requires regulator authorisation before health data is processed or sent abroad, which we don't hold yet, so Healthcare chats here are answered but not saved.",
+  "laws": [
+   {
+    "name": "Code du numérique (Book V - personal data)",
+    "citation": "Loi n° 2017-20 du 20 avril 2018, amended by Loi n° 2020-35 du 6 janvier 2021",
+    "url": "https://apdp.bj/"
+   },
+   {
+    "name": "ECOWAS Supplementary Act on personal data protection",
+    "citation": "A/SA.1/01/10"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Autorité de Protection des Données à caractère Personnel (APDP) (https://apdp.bj/)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/?c=BJ",
+   "https://apdp.bj/"
+  ],
+  "notes": "Transient: the Digital Code makes health-data processing subject to prior APDP authorisation and transfers to non-adequate countries (the US) subject to APDP authorisation; answering without keeping a file is arguable. Apply for APDP authorisation (and file the prior declaration), then switch to persist. Source: DLA Piper (Jan 2025) only; article numbers for the authorisation rules not given. ECOWAS Supplementary Act also applies."
+ },
+ "BF": {
+  "name": "Burkina Faso",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "transient",
+  "storage_reason": "Burkina Faso requires regulator authorisation to send personal data abroad, which we don't hold yet, so Healthcare chats here are answered but not saved.",
+  "laws": [
+   {
+    "name": "Loi portant protection des personnes à l'égard du traitement des données à caractère personnel",
+    "citation": "Loi n° 001-2021/AN du 30 mars 2021; Art 5 (sensitive data), Art 42 (transfer conditions)",
+    "url": "https://www.cil.bf/"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Commission de l'Informatique et des Libertés (CIL) (https://www.cil.bf/)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/?c=BF",
+   "https://www.cil.bf/"
+  ],
+  "notes": "Transient: Art. 42 requires CIL authorisation for transfers abroad, with confidentiality and reversibility clauses and security, plus an adequate level of protection in the recipient country; health data also needs CIL formalities. If adequacy is a cumulative condition the US cannot meet, there may be no route at all (then unavailable): confirm with the CIL. Burkina Faso left ECOWAS (Jan 2025), so the Supplementary Act no longer clearly applies. Source: DLA Piper (Jan 2025) only."
+ },
+ "CV": {
+  "name": "Cabo Verde",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "transient",
+  "storage_reason": "Cabo Verde requires regulator authorisation before health data is processed, which we don't hold yet, so Healthcare chats here are answered but not saved.",
+  "laws": [
+   {
+    "name": "Data Protection Law",
+    "citation": "Lei n.º 133/V/2001, amended by Lei n.º 41/VIII/2013 and Lei n.º 121/IX/2021",
+    "url": "https://www.cnpd.cv/"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Comissão Nacional de Proteção de Dados (CNPD) (https://www.cnpd.cv/)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/?c=CV",
+   "https://www.cnpd.cv/"
+  ],
+  "notes": "Transient: processing sensitive data, including health, generally needs prior CNPD authorisation; transfers to non-adequate countries such as the US are possible with consent. Apply for CNPD authorisation, then switch to persist. DPO mandatory for large-scale sensitive data in some cases. Breach notice to CNPD within 72h. Source: DLA Piper (Jan 2025) only."
+ },
+ "CI": {
+  "name": "Côte d'Ivoire",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "unavailable",
+  "storage_reason": "Côte d'Ivoire only lets a locally registered company apply for permission to send data abroad, and we don't have one, so Healthcare isn't available here for now.",
+  "laws": [
+   {
+    "name": "Loi relative à la protection des données à caractère personnel",
+    "citation": "Loi n° 2013-450 du 19 juin 2013; Art 1 (sensitive data), Art 14 (consent), Art 26 (prior ARTCI authorisation for every transfer)",
+    "url": "https://www.artci.ci/"
+   },
+   {
+    "name": "Décret n° 2015-79 du 4 février 2015",
+    "citation": "Art 7: transfer applications filed by a legal entity under Ivorian law"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Autorité de Régulation des Télécommunications/TIC de Côte d'Ivoire (ARTCI) (https://www.artci.ci/)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/?c=CI",
+   "https://www.artci.ci/"
+  ],
+  "notes": "Unavailable: Art. 26 needs prior ARTCI authorisation for every transfer abroad, even to adequate countries, and Decree 2015-79 Art. 7 lets only a legal entity under Ivorian law apply, so a foreign company without a local entity has no lawful export route. Research suggests disabling health features or partnering locally. Health data also needs prior ARTCI authorisation. The transfer rule touches every mode, not only Healthcare. Source: DLA Piper (Jan 2025) only."
+ },
+ "GM": {
+  "name": "Gambia",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "ECOWAS Supplementary Act on personal data protection",
+    "citation": "A/SA.1/01/10 (no national data protection law); Constitution s.23 (privacy)"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "No data protection authority (PURA regulates telecoms)",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [],
+  "notes": "Persist: no national data protection law; the research advises explicit consent and treating health data as sensitive under the ECOWAS Supplementary Act. A Personal Data Protection and Privacy Bill has been in preparation; status unverified, check before launch. The research cites no sources."
+ },
+ "GN": {
+  "name": "Guinea",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "transient",
+  "storage_reason": "Guinean law requires regulator authorisation for medical data and transfers abroad, and the regulator isn't running yet, so Healthcare chats here are answered but not saved.",
+  "laws": [
+   {
+    "name": "Loi sur la cybersécurité et la protection des données à caractère personnel",
+    "citation": "Loi n° L/2016/037/AN du 28 juillet 2016; Art 1 (sensitive data), Art 47 (authority)"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Data protection authority under Art 47 of Loi L/2016/037/AN (not effectively established)",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/?c=GN"
+  ],
+  "notes": "Transient: the 2016 law requires prior authorisation for genetic and medical data and for transfers abroad (only to states with equivalent protection), but the Art. 47 authority was not effectively established (per a Dec 2021 source), so no authorisation can be had; research suggests documenting consent and safeguards meanwhile. If counsel treats the duty as dormant until the authority exists, persist. Newer developments unverified."
+ },
+ "GW": {
+  "name": "Guinea-Bissau",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "ECOWAS Supplementary Act on personal data protection",
+    "citation": "A/SA.1/01/10 (no national data protection law identified)"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "No data protection authority",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [],
+  "notes": "Persist: no data protection law identified; the research only points to the ECOWAS Supplementary Act. Unverified and no sources cited; re-check before launch."
+ },
+ "LR": {
+  "name": "Liberia",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "ECOWAS Supplementary Act on personal data protection",
+    "citation": "A/SA.1/01/10 (relied on as secondary law); Constitution Art 16; National ICT Policy 2019 s.5.15"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "No data protection authority (Liberia Telecommunications Authority acts de facto)",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/?c=LR"
+  ],
+  "notes": "Persist: no data protection law; under the ECOWAS Act, relied on as secondary law, transfers outside ECOWAS need adequate protection and prior notice to the LTA as de facto authority, so document consent to the US transfer. Central Bank local hosting applies to payment systems only. Source: DLA Piper (Feb 2024)."
+ },
+ "ML": {
+  "name": "Mali",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "transient",
+  "storage_reason": "Mali requires regulator authorisation for health data and for sending it abroad, which we don't hold yet, so Healthcare chats here are answered but not saved.",
+  "laws": [
+   {
+    "name": "Loi portant protection des données à caractère personnel",
+    "citation": "Loi n° 2013-015 du 21 mai 2013",
+    "url": "https://www.apdp.ml/"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Autorité de Protection des Données à caractère Personnel (APDP) (https://www.apdp.ml/)",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.apdp.ml/"
+  ],
+  "notes": "Transient: Law 2013-015 reportedly requires APDP authorisation for health data and for transfers to non-adequate countries; the research marks both 'verify' and took them from general knowledge (APDP site gave no detail). Confirm with the APDP; if only a declaration is needed, persist. Mali left ECOWAS in Jan 2025."
+ },
+ "MR": {
+  "name": "Mauritania",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "transient",
+  "storage_reason": "Mauritania requires regulator authorisation to send personal data abroad, which we don't hold yet, so Healthcare chats here are answered but not saved.",
+  "laws": [
+   {
+    "name": "Loi relative à la protection des données à caractère personnel",
+    "citation": "Loi n° 2017-020 du 22 juillet 2017"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Autorité de Protection des Données (APD); operational status unverified",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [],
+  "notes": "Transient: Loi 2017-020 reportedly allows transfers only to adequate countries or with authority authorisation, and health data needs prior formalities; the research marks both 'verify', did not check the primary text and cites no sources. APD operational status unverified. Confirm; if only a declaration is needed, persist."
+ },
+ "NE": {
+  "name": "Niger",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Loi relative à la protection des données à caractère personnel",
+    "citation": "Loi n° 2022-59 du 16 décembre 2022, amended by Loi n° 2023-31 du 4 juillet 2023; Art 37 (consent), Art 62 (transfers), Art 83 (breach)"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Haute Autorité de Protection des Données à caractère Personnel (HAPDP)",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/?c=NE"
+  ],
+  "notes": "Persist, but check Art. 62: as summarised, transfers go only to countries with superior or equivalent protection, notified to the HAPDP, and no consent derogation is mentioned. If none exists there is no lawful route to US processors and Healthcare would be unavailable. Health data needs prior express consent (Art. 37). Niger left ECOWAS in Jan 2025. Source: DLA Piper (Jan 2025). Confidence lowered from medium because the transfer point is a guess."
+ },
+ "SN": {
+  "name": "Senegal",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "transient",
+  "storage_reason": "Senegal requires regulator authorisation before health data is processed, which we don't hold yet, so Healthcare chats here are answered but not saved.",
+  "laws": [
+   {
+    "name": "Loi sur la protection des données à caractère personnel",
+    "citation": "Loi n° 2008-12 du 25 janvier 2008; Art 4 (sensitive data); Décret n° 2008-721",
+    "url": "https://www.cdp.sn/"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Commission de Protection des Données Personnelles (CDP) (https://www.cdp.sn/)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/?c=SN",
+   "https://www.cdp.sn/"
+  ],
+  "notes": "Transient: Law 2008-12 requires prior CDP authorisation to process health data unless done by health professionals under secrecy; transfers to the US (not adequate) are allowed with consent or CDP authorisation. Declare to and apply to the CDP, then switch to persist. Replacement bill pending, not adopted as of Mar 2026. Source: DLA Piper (Mar 2026)."
+ },
+ "SL": {
+  "name": "Sierra Leone",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Cyber Security and Crime Act 2021",
+    "citation": "limited; no comprehensive data protection law confirmed"
+   },
+   {
+    "name": "ECOWAS Supplementary Act on personal data protection",
+    "citation": "A/SA.1/01/10"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "None confirmed",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [],
+  "notes": "Persist: no comprehensive data protection law confirmed; a bill has been discussed and whether an act passed in 2024-2026 could not be verified. Check before launch."
+ },
+ "TG": {
+  "name": "Togo",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "transient",
+  "storage_reason": "Togo requires regulator authorisation for health data and for sending data abroad, which we don't hold yet, so Healthcare chats here are answered but not saved.",
+  "laws": [
+   {
+    "name": "Loi relative à la protection des données à caractère personnel",
+    "citation": "Loi n° 2019-014 du 29 octobre 2019",
+    "url": "https://ipdcp.tg/"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Instance de Protection des Données à Caractère Personnel (IPDCP) (https://ipdcp.tg/)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://ipdcp.tg/"
+  ],
+  "notes": "Transient: Loi 2019-014 subjects sensitive data to IPDCP formalities (declaration or authorisation; which one applies to health data is not specified) and transfers to non-adequate countries to IPDCP authorisation. File and apply, then switch to persist. IPDCP is active (Oct 2026 news). Breach rules not verified."
+ },
+ "CM": {
+  "name": "Cameroon",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "transient",
+  "storage_reason": "Cameroon's new law requires regulator authorisation for processing and transfers abroad, and the regulator isn't running yet, so Healthcare chats here are answered but not saved.",
+  "laws": [
+   {
+    "name": "Law on the protection of personal data",
+    "citation": "Loi n° 2024/017 du 23 décembre 2024; Art 5 (sensitive data), Art 19 (prior authorisation), Art 39 (register)"
+   },
+   {
+    "name": "Charter for the Protection of Children Online",
+    "citation": "Loi n° 2023/009 du 25 juillet 2023"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Personal Data Protection Authority (being set up); ANTIC (cybersecurity)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/?c=CM"
+  ],
+  "notes": "Transient: Loi 2024/017 makes processing subject to prior authorisation (Art. 19) and transfers to prior authorisation (adequacy, BCRs or SCCs checked); the Authority is not yet operational and the decree is still draft (Mar 2026), so authorisation can't be had yet. If counsel finds the duty dormant until then, persist. Grace period unverified. consent_age 18 per research; check whether civil majority is higher (possibly 21; not in the research)."
+ },
+ "CF": {
+  "name": "Central African Republic",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "No data protection authority",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [],
+  "notes": "Persist: no data protection law identified; every field is unverified and the research cites no sources. Re-check before launch."
+ },
+ "TD": {
+  "name": "Chad",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Loi portant protection des données à caractère personnel",
+    "citation": "Loi n° 007/PR/2015 du 10 février 2015; Art 5 (sensitive data), Art 29 (transfers; consent derogation); Décret n° 075/PR/2019"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Agence Nationale de Sécurité Informatique et de Certification Électronique (ANSICE)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/?c=TD"
+  ],
+  "notes": "Persist: consent suffices for health data; ANSICE authorisation is needed only for health research, genetic and biometric processing. Transfers outside CEMAC/CEEAC go to countries with sufficient protection after informing ANSICE, with a consent derogation (Art. 29). Source: DLA Piper (Mar 2026)."
+ },
+ "CG": {
+  "name": "Republic of the Congo",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "transient",
+  "storage_reason": "Congolese law requires regulator authorisation for health data, and the regulator isn't set up yet, so Healthcare chats here are answered but not saved.",
+  "laws": [
+   {
+    "name": "Loi portant protection des données à caractère personnel",
+    "citation": "Loi n° 29-2019 du 10 octobre 2019"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Commission Nationale de Protection des Données (not yet established)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/?c=CG"
+  ],
+  "notes": "Transient: Loi 29-2019 requires prior Commission authorisation for sensitive data and allows transfers only to states with similar protection, after notifying the Commission (no consent derogation is mentioned). The Commission is not yet established (bill approved July 2024). If counsel finds the duties dormant, persist; if no transfer route exists once it operates, unavailable. Minors' data is itself sensitive. Source: DLA Piper (Feb 2026)."
+ },
+ "CD": {
+  "name": "Democratic Republic of the Congo",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Code du numérique (personal data provisions)",
+    "citation": "Ordonnance-loi n° 23/010 du 13 mars 2023, Arts 183 ff."
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Autorité de Protection des Données (APD); not yet established",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/?c=CD"
+  ],
+  "notes": "Persist, but check: the Code allows transfer abroad, including to foreign servers, only where the destination offers equal or better protection, and no consent derogation is mentioned; with no APD (as of Feb 2026) nobody can assess the US. If no route exists, Healthcare would be unavailable. Health data is prohibited in principle but allowed with explicit consent for a set purpose. Confidence lowered from medium. Source: DLA Piper (Feb 2026)."
+ },
+ "GQ": {
+  "name": "Equatorial Guinea",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Personal Data Protection Law",
+    "citation": "Ley n.º 1/2016 de 22 de julio; Art 21 (no communication to third parties without court order), Art 41(d) (health data without express consent is a major infringement)"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Governing Data Protection Body / General Data Protection Registry",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/?c=GQ"
+  ],
+  "notes": "Persist: no formal sensitive category, but processing health data without the owner's express authorisation is a major infringement (Art. 41(d)). Art. 21 bars private holders from communicating data to third parties except by court order; processors abroad are not addressed, so keep vendors as contract processors only. File registration if operating there. Source: DLA Piper (Mar 2025)."
+ },
+ "GA": {
+  "name": "Gabon",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "transient",
+  "storage_reason": "Gabon requires regulator authorisation for health data and for sending it abroad, which we don't hold yet, so Healthcare chats here are answered but not saved.",
+  "laws": [
+   {
+    "name": "Personal data protection law",
+    "citation": "Loi n° 001/2011 du 25 septembre 2011 as amended by Loi n° 025/2023 du 9 juillet 2023; Art 6 (sensitive data), Art 142 (breach), Art 171 (adequacy)"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Autorité de Protection des Données à caractère Personnel et de la Vie Privée (APDPVP)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/?c=GA"
+  ],
+  "notes": "Transient: sensitive processing needs prior APDPVP notification or authorisation, and transfers are prohibited unless the destination is adequate (list unpublished, Art. 171) or safeguards are authorised. Apply for both, then switch to persist. Unencrypted health-research data can't be exported. DPO mandatory in some cases (2023 law). Source: DLA Piper (Jan 2025)."
+ },
+ "ST": {
+  "name": "São Tomé and Príncipe",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "transient",
+  "storage_reason": "São Tomé and Príncipe's law appears to require regulator authorisation for health data, which we don't hold, so Healthcare chats here are answered but not saved.",
+  "laws": [
+   {
+    "name": "Lei de Proteção de Dados Pessoais",
+    "citation": "Lei n.º 03/2016"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Agência Nacional de Proteção de Dados Pessoais (ANPDP); unverified",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [],
+  "notes": "Transient: Lei 03/2016 (Portuguese model) reportedly needs prior authorisation for sensitive data, and transfers to non-adequate countries need consent or authorisation; the research marks both 'verify', did not check the primary text and cites no sources. Authority set-up unverified. Confirm; if consent alone suffices, persist."
+ },
+ "UY": {
+  "name": "Uruguay",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Ley 18.331 de Protección de Datos Personales y Acción de Habeas Data",
+    "citation": "Art 4(E) and Art 18 (health is sensitive; express written consent), Art 23 (transfers)",
+    "url": "https://www.impo.com.uy/bases/leyes/18331-2008"
+   },
+   {
+    "name": "Decreto 64/020",
+    "citation": "regulates Ley 19.670 arts 37-40: foreign controllers, DPIA (Art 6), breach notice (Arts 3-4), delegate",
+    "url": "https://www.impo.com.uy/bases/decretos/64-2020"
+   },
+   {
+    "name": "Ley 19.869 de Telemedicina",
+    "citation": "2 Apr 2020, as amended; telemedicine by MSP-recognised health professionals",
+    "url": "https://www.impo.com.uy/bases/leyes/19869-2020"
+   },
+   {
+    "name": "URCDP adequate-jurisdictions list",
+    "citation": "Resolución 63/2023 (DPF-listed US organisations adequate)",
+    "url": "https://www.ferrere.com/en/news/uruguay-actualiza-su-lista-de-jurisdicciones-adecuadas-para-la-transferencia-internacional-de-datos/"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "URCDP (Unidad Reguladora y de Control de Datos Personales, AGESIC); MSP (health services and devices)",
+  "confidence": "high",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.impo.com.uy/bases/leyes/18331-2008",
+   "https://www.impo.com.uy/bases/decretos/64-2020",
+   "https://www.impo.com.uy/bases/leyes/19670-2018/37",
+   "https://www.impo.com.uy/bases/leyes/19869-2020",
+   "https://www.ferrere.com/en/news/uruguay-actualiza-su-lista-de-jurisdicciones-adecuadas-para-la-transferencia-internacional-de-datos/",
+   "https://www.ferrere.com/en/news/relevantes-cambios-al-regimen-de-transferencia-de-datos-personales-hacia-estados-unidos/"
+  ],
+  "notes": "Persist: express written (click-through) consent (Law 18.331 Art. 18). Transfers: DPF-listed US vendors count as adequate (Res. 63/2023), and URCDP reportedly expects a DPF-extension declaration and informing users (Res. 70/2023; secondary sources); otherwise consent (Art. 23(A)) or a URCDP-approved contract. Check each vendor's DPF status. Backend: database registration (applies to foreign controllers targeting Uruguay), DPIA, delegate, 72h breach notice. 2024-2026 URCDP resolutions not fully checked."
+ },
+ "PY": {
+  "name": "Paraguay",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Ley 7593/2025 de Protección de Datos Personales",
+    "citation": "published 27 Nov 2025; in force ~27 Nov 2027 (Art 57); Art 20 (sensitive data), Art 7 (minors), Art 19 (transfers)",
+    "url": "https://www.bacn.gov.py/leyes-paraguayas/12924/ley-n-7593-2025-de-protecci-n-de-datos-personales-en-la-rep-blica-del-paraguay"
+   },
+   {
+    "name": "Ley 6534/2020 de Protección de Datos Personales Crediticios",
+    "citation": "Art 3 (health is sensitive), Art 6 (consent)",
+    "url": "https://www.dlapiperdataprotection.com/guide.pdf?c=PY"
+   },
+   {
+    "name": "Ley 4868/2013 de Comercio Electrónico and Decreto 1165/2014",
+    "citation": "Decreto 1165/2014 Art 13 (express consent online)",
+    "url": "https://www.dlapiperdataprotection.com/guide.pdf?c=PY"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "No general data protection authority today; Agencia Nacional de Protección de Datos Personales (MITIC) under Ley 7593, not yet operating; DINAVISA (health products)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.bacn.gov.py/leyes-paraguayas/12924/ley-n-7593-2025-de-protecci-n-de-datos-personales-en-la-rep-blica-del-paraguay",
+   "https://www.abc.com.py/nacionales/2026/03/20/ley-de-datos-personales-en-paraguay-desde-cuando-entra-en-vigencia-y-que-cambia-para-los-ciudadanos/",
+   "https://www.dlapiperdataprotection.com/guide.pdf?c=PY"
+  ],
+  "notes": "Persist: express, informed consent now (Decreto 1165/2014 Art. 13). Ley 7593/2025 applies from about 27 Nov 2027 (Art. 57; regulation pending): purpose-specific consent kept apart from other terms, adequacy or safeguards for transfers (consent derogation), DPIA, 72h breach notice. Clym's claim of partial entry into force on 28 Nov 2025 conflicts with Art. 57 and MITIC. Agency set-up unverified."
+ },
+ "BO": {
+  "name": "Bolivia",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Constitución Política del Estado",
+    "citation": "CPE 2009, Art 21 (privacy), Art 130 (Acción de Protección de Privacidad)",
+    "url": "https://www.dlapiperdataprotection.com/guide.pdf?c=BO"
+   },
+   {
+    "name": "Decretos Supremos 1391 (2012) and 1793 (2013)",
+    "citation": "under Ley 164; express written consent for personal data use in the ICT sector",
+    "url": "https://www.dlapiperdataprotection.com/guide.pdf?c=BO"
+   },
+   {
+    "name": "Ley 3131 de Ejercicio Profesional Médico",
+    "citation": "2005; medical practice reserved to licensed physicians"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "No data protection authority; ATT (ICT sector); AGEMED (health technologies)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/guide.pdf?c=BO"
+  ],
+  "notes": "Persist: no comprehensive data protection law (DLA Piper, Feb 2026); constitutional privacy and the Art. 130 action apply, and DS 1391/1793 need express written consent in the ICT sector. No transfer rule. Bills pending since 2023. Ley 548, Ley 3131 and AGEMED/ATT roles from background knowledge, not re-verified."
+ },
+ "EC": {
+  "name": "Ecuador",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Ley Orgánica de Protección de Datos Personales (LOPDP)",
+    "citation": "RO 5th Supp. 459, 26 May 2021; Art 26 (sensitive data: explicit consent), Art 21 (minors), Arts 55-61 (transfers)",
+    "url": "https://www.finanzaspopulares.gob.ec/wp-content/uploads/2021/07/ley_organica_de_proteccion_de_datos_personales.pdf"
+   },
+   {
+    "name": "SPDP Norma General de protección de datos en el uso de sistemas de IA",
+    "citation": "Res. SPDP-SPD-2026-0009-R (12 Feb 2026)",
+    "url": "https://www.spdp.gob.ec/wp-content/uploads/2026/08/ResolIA.pdf"
+   },
+   {
+    "name": "SPDP Norma General de Transferencias",
+    "citation": "Res. SPDP-SPD-2026-0004-R; Art 23 (processor engagement is not a transfer)",
+    "url": "https://www.spdp.gob.ec/wp-content/uploads/2026/08/04.01.01-SPSP-SPD-2026-0004-R-Norma-general-de-transferencias-signed.pdf"
+   },
+   {
+    "name": "Reglamento General a la LOPDP",
+    "citation": "Decreto Ejecutivo 904 (Nov 2023)",
+    "url": "https://www.spdp.gob.ec/marco-normativo/"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Superintendencia de Protección de Datos Personales (SPDP) (https://spdp.gob.ec/); ARCOTEL (breach notices); ARCSA (medical devices)",
+  "confidence": "high",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.finanzaspopulares.gob.ec/wp-content/uploads/2021/07/ley_organica_de_proteccion_de_datos_personales.pdf",
+   "https://www.spdp.gob.ec/wp-content/uploads/2026/08/ResolIA.pdf",
+   "https://www.spdp.gob.ec/wp-content/uploads/2026/08/04.01.01-SPSP-SPD-2026-0004-R-Norma-general-de-transferencias-signed.pdf",
+   "https://www.spdp.gob.ec/resoluciones/",
+   "https://www.spdp.gob.ec/marco-normativo/",
+   "https://www.dlapiperdataprotection.com/guide.pdf?c=EC"
+  ],
+  "notes": "Persist: explicit, purpose-specific consent (LOPDP Art. 26); US processors are 'encargados', not a transfer (Res. 2026-0004-R Art. 23), and explicit consent is also a transfer derogation. The SPDP AI norm (Res. 2026-0009-R) applies wherever the provider sits: AI disclosure, risk management, DPIA, RAT entry, audits. Backend: register processing and transfers, DPO scoring, breach notice within 5 working days. A reform bill (filed Jul 2026) would tighten transfers. Salud Mental law citation unverified."
+ },
+ "VE": {
+  "name": "Venezuela",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "unavailable",
+  "storage_reason": "Healthcare isn't available in Venezuela because the AI model providers Clardentity relies on don't support Venezuela.",
+  "laws": [
+   {
+    "name": "Constitución (CRBV 1999)",
+    "citation": "Art 28 (habeas data), Art 60 (privacy; limits on use of informatics)",
+    "url": "https://www.dlapiperdataprotection.com/guide.pdf?c=VE"
+   },
+   {
+    "name": "Tribunal Supremo de Justicia, Sala Constitucional decision 1318",
+    "citation": "TSJ-SC No. 1318/2011 (Aug 2011): data-protection principles, consent",
+    "url": "https://www.dlapiperdataprotection.com/guide.pdf?c=VE"
+   },
+   {
+    "name": "Ley de Ejercicio de la Psicología",
+    "citation": "1978 (details unverified)"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "No data protection authority (courts via habeas data); SACS (health products)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/guide.pdf?c=VE"
+  ],
+  "notes": "Unavailable for a vendor reason, not because of Venezuelan law: Anthropic and OpenAI do not support Venezuela (settled fact in the brief; the research does not cover vendors and cites no vendor page). Venezuelan law alone would allow persist: no data protection statute, consent per TSJ 1318/2011, express consent naming US processors. OFAC exposure was not reviewed by the research. DLA Piper chapter last reviewed Dec 2022; psychology law and SACS role unverified."
+ },
+ "CR": {
+  "name": "Costa Rica",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Ley 8968 de Protección de la Persona frente al Tratamiento de sus Datos Personales",
+    "citation": "2011; Art 5 (written consent), Art 9 (sensitive data), Art 14 (transfers)",
+    "url": "https://www.dlapiperdataprotection.com/guide.pdf?c=CR"
+   },
+   {
+    "name": "Reglamento a la Ley 8968",
+    "citation": "Decreto Ejecutivo 37554-JP (2013); 5-business-day breach notice",
+    "url": "https://www.dlapiperdataprotection.com/guide.pdf?c=CR"
+   },
+   {
+    "name": "Ley Orgánica del Colegio de Profesionales en Psicología",
+    "citation": "Ley 6144 (reservation details unverified)"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "PRODHAB (Agencia de Protección de Datos de los Habitantes); Ministerio de Salud (health products)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/guide.pdf?c=CR",
+   "https://aquiestoy.cr/"
+  ],
+  "notes": "Persist: prior, express, written (electronic) consent for sensitive data (Ley 8968 Arts. 5, 9); transfers need written consent (Art. 14), though service providers and technological intermediaries are not 'transfers' (per DLA Piper). Breach notice to PRODHAB and users within 5 business days. No registration unless data are distributed or sold. GDPR-style replacement bill pending since 2021. Art. 6 ten-year ceiling and the Ley 6144 reservation are unverified."
+ },
+ "PA": {
+  "name": "Panama",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Ley 81 de 2019 sobre Protección de Datos Personales",
+    "citation": "26 Mar 2019, in force 29 Mar 2021",
+    "url": "https://www.dlapiperdataprotection.com/guide.pdf?c=PA"
+   },
+   {
+    "name": "Decreto Ejecutivo 285 de 2021",
+    "citation": "regulation of Ley 81 (28 May 2021)",
+    "url": "https://www.dlapiperdataprotection.com/guide.pdf?c=PA"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "ANTAI (Autoridad Nacional de Transparencia y Acceso a la Información), Dirección de Protección de Datos Personales; MINSA (health)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/guide.pdf?c=PA"
+  ],
+  "notes": "Persist: documented, traceable prior consent with a notice naming foreign recipients and retention; transfers on consent or contractual clauses (Ley 81, Decreto 285). 72h breach notice to ANTAI and users. Article numbers from DLA Piper (Feb 2026), not primary text. A bill raising fines is pending. Telemedicine and psychology-practice laws not verified."
+ },
+ "GT": {
+  "name": "Guatemala",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Ley de Acceso a la Información Pública (LAIP)",
+    "citation": "Decreto 57-2008; Art 9(2) (health is sensitive), Art 31 (written consent to transfer), Art 64 (commercialising data is a crime)",
+    "url": "https://www.dlapiperdataprotection.com/guide.pdf?c=GT"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "No data protection authority; Procurador de los Derechos Humanos (LAIP); MSPAS (health products)",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/guide.pdf?c=GT"
+  ],
+  "notes": "Persist: no comprehensive data protection law. The LAIP, mainly for public bodies, treats health as sensitive; it requires written consent to transfer data (Art. 31) and makes selling data without authorisation a crime (Art. 64, also private parties). DLA Piper chapter last reviewed 2021; 2024-2026 bills unchecked. Re-verify before launch."
+ },
+ "HN": {
+  "name": "Honduras",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Ley de Transparencia y Acceso a la Información Pública and its Reglamento",
+    "citation": "Decreto 170-2006; Acuerdo 001-2008 Art 42",
+    "url": "https://www.dlapiperdataprotection.com/guide.pdf?c=HN"
+   },
+   {
+    "name": "Constitución",
+    "citation": "Art 182 (habeas data)",
+    "url": "https://www.dlapiperdataprotection.com/guide.pdf?c=HN"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "No data protection authority; IAIP (public data); ARSA (health products)",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/guide.pdf?c=HN"
+  ],
+  "notes": "Persist: no data protection law; the transparency law (mainly public entities) treats health as sensitive and its express written consent rules for using or transferring sensitive data are cited for private parties. A data protection bill (2019 text) was pending as of Feb 2025; whether it passed since could not be checked."
+ },
+ "SV": {
+  "name": "El Salvador",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Ley para la Protección de Datos Personales (LPDP)",
+    "citation": "Decreto Legislativo No. 144 (in force 23 Nov 2024; number from secondary sources)",
+    "url": "https://www.elsalvador.com/?p=1180943"
+   },
+   {
+    "name": "ACE Políticas de actuación y manejo de datos personales",
+    "citation": "Políticas No. 001-0309025-DPDP (2 Sep 2025), under LPDP Art 50(i)",
+    "url": "https://www.jurisprudencia.gob.sv/DocumentosBoveda/D/2/2020-2029/2025/09/10D3DB.PDF"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Agencia de Ciberseguridad del Estado (ACE); DNM (medicines and devices)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.jurisprudencia.gob.sv/DocumentosBoveda/D/2/2020-2029/2025/09/10D3DB.PDF",
+   "https://www.elsalvador.com/?p=1180943",
+   "https://www.ecija.com/actualidad-insights/ley-de-proteccion-de-datos-en-el-salvador/"
+  ],
+  "notes": "Persist: the LPDP (Nov 2024) needs express written consent with an autograph or equivalent signature for health data. Unresolved: the LPDP text was not obtained; ACE's 2025 policy allows transfers only to countries with equivalent protection, under contracts, and the LPDP transfer article was not reviewed. Breach notice to ACE, FGR and users within 72h. Reach over foreign controllers unverified. ACE removed the 16 Sep 2026 DPO deadline."
+ },
+ "NI": {
+  "name": "Nicaragua",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Ley 787 de Protección de Datos Personales",
+    "citation": "La Gaceta No. 61, 29 Mar 2012; regulation Decreto 36-2012 (citation unverified)",
+    "url": "https://www.dlapiperdataprotection.com/guide.pdf?c=NI"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Dirección de Protección de Datos Personales (Ministerio de Hacienda y Crédito Público); never constituted",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/guide.pdf?c=NI"
+  ],
+  "notes": "Persist: Ley 787 needs express consent for sensitive data and informed consent naming the assignees and purpose for transfers. The regulator and registry were never set up, so registration is impossible in practice. Cookie use must be disclosed. No 2024-2026 changes checked; article numbers unverified."
+ },
+ "BZ": {
+  "name": "Belize",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Data Protection Act 2021",
+    "citation": "act number, commencement and regulator unverified"
+   },
+   {
+    "name": "Constitution of Belize",
+    "citation": "s.14 (personal privacy)"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Information Commissioner under the 2021 Act (unverified)",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [],
+  "notes": "Persist as a placeholder: a Data Protection Act 2021 is reported but its text, commencement and regulator could not be checked (National Assembly site suspended); health_data 'sensitive' assumes a UK/GDPR-style model. Verify the Act before launch. The research's only source is an emergency-number list."
+ },
+ "GY": {
+  "name": "Guyana",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Data Protection Act 2023",
+    "citation": "Act No. 18 of 2023; s.9 (sensitive data: consent), s.8 (children), ss.23-30 (transfers), s.51 (registration, local representative); in force on ministerial order",
+    "url": "https://parliament.gov.gy/publications/acts-of-parliament/dataprotectionact18of2023"
+   },
+   {
+    "name": "Mental Health Protection and Promotion Act 2022",
+    "citation": "No. 14 of 2022",
+    "url": "https://parliament.gov.gy/publications/acts-of-parliament/mentalhealthprotectionandpromotionact2022"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Data Protection Commissioner (s.72); appointment unverified",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://parliament.gov.gy/publications/acts-of-parliament/dataprotectionact18of2023",
+   "https://parliament.gov.gy/publications/acts-of-parliament/"
+  ],
+  "notes": "Persist: the Data Protection Act 2023 needs consent for sensitive data (s.9) and adequacy or safeguards for transfers (ss.24-26; derogations s.28), but it operates only from ministerial commencement orders, which were not verified. Once commenced: register and nominate a Guyana-based representative (s.51), DPIA, 72h breach notice. 'Health record' is narrow (made by or for a professional); treat typed symptoms as sensitive anyway."
+ },
+ "SR": {
+  "name": "Suriname",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "None identified",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [],
+  "notes": "Persist: no data protection law identified (not confirmed against a primary source); constitutional privacy only. The research's only source is an emergency-number list. Re-check before launch."
+ },
+ "AR": {
+  "name": "Argentina",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Ley 25.326 de Protección de los Datos Personales",
+    "citation": "Art 2 (health is sensitive), Art 7 (sensitive data), Art 12 (transfers)",
+    "url": "https://www.argentina.gob.ar/normativa/nacional/ley-25326-64790/texto"
+   },
+   {
+    "name": "Ley 27.553 Recetas Electrónicas y Teleasistencia",
+    "citation": "with Decreto 98/2023 and Res. MS 2214/2025 (ReNaPDiS); teleassistance only by licensed professionals",
+    "url": "https://www.argentina.gob.ar/normativa/nacional/ley-27553-340919/texto"
+   },
+   {
+    "name": "Ley 17.132 (ejercicio de la medicina)",
+    "citation": "and Código Penal Art 208 (illegal practice of medicine)",
+    "url": "https://www.argentina.gob.ar/normativa/nacional/ley-17132-19429/texto"
+   },
+   {
+    "name": "Ley 23.277 Ejercicio profesional de la psicología",
+    "citation": "as amended by Ley 27.553 Art 7"
+   }
+  ],
+  "healthcare_rules": [
+   "Do not call this chat a 'consulta médica' or 'teleasistencia', and never draft anything resembling a 'receta'; in Argentina teleassistance and prescriptions belong to licensed professionals on registered platforms (Ley 27.553)."
+  ],
+  "guidance_rules": [
+   "Do not describe these conversations as 'psicología', 'psicoterapia' or 'tratamiento psicológico'; Argentina reserves psychological practice to licensed psychologists (Ley 23.277)."
+  ],
+  "regulator": "Agencia de Acceso a la Información Pública (AAIP), Dirección Nacional de Protección de Datos Personales; Ministerio de Salud; ANMAT (medical devices)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.argentina.gob.ar/normativa/nacional/ley-25326-64790/texto",
+   "https://www.argentina.gob.ar/normativa/nacional/decreto-1558-2001-70368/texto",
+   "https://servicios.infoleg.gob.ar/infolegInternet/anexos/315000-319999/318874/norma.htm",
+   "https://www.argentina.gob.ar/normativa/nacional/ley-27553-340919/texto",
+   "https://www.argentina.gob.ar/transferencias-internacionales",
+   "https://www.argentina.gob.ar/anmat/regulados/productos-medicos"
+  ],
+  "notes": "Persist on the practitioner reading (DLA Piper) that express, documented consent covers sensitive data; the literal Law 25.326 Art. 7(2)-(3) lists no consent ground and bars files revealing sensitive data, so a residual risk remains: minimise, no health profiles. Transfers: US not adequate; express consent (Decree 1558/2001 Art. 12) plus model clauses. Bill 3397-D-2026 (filed 16 Jul 2026) would add 72h breach notice and extraterritorial reach. Reach over a foreign controller is not explicit today."
+ },
+ "CO": {
+  "name": "Colombia",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Ley Estatutaria 1581 de 2012",
+    "citation": "Art 5 (health is sensitive), Art 6 (explicit authorization), Art 7 (minors), Art 26 (transfers)",
+    "url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=49981"
+   },
+   {
+    "name": "Resolución MinSalud 2654 de 2019 (telesalud y telemedicina)",
+    "citation": "Art 12.2: AI in teleorientation must be disclosed, with the responsible party",
+    "url": "https://www.minsalud.gov.co/Normatividad_Nuevo/Resoluci%C3%B3n%20No.%202654%20del%202019.pdf"
+   },
+   {
+    "name": "Ley 1090 de 2006 (profesión de psicología)",
+    "citation": "Arts 3, 6, 8 (illegal practice by non-psychologists)",
+    "url": "http://www.secretariasenado.gov.co/senado/basedoc/ley_1090_2006.html"
+   },
+   {
+    "name": "Decreto 1377 de 2013",
+    "citation": "Art 6 (sensitive data optional; express consent), Arts 24-25 (transmission contracts)",
+    "url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=53646"
+   }
+  ],
+  "healthcare_rules": [
+   "When giving health information, make clear you are an AI and that Clardentity is responsible for the service; Colombia's telehealth rules (Res. 2654/2019 Art. 12.2) require this when AI is used for health orientation."
+  ],
+  "guidance_rules": [
+   "Do not evaluate or diagnose psychological problems or call this 'psicología' or 'terapia'; in Colombia that is illegal practice for anyone without a psychologist's tarjeta profesional (Ley 1090/2006)."
+  ],
+  "regulator": "Superintendencia de Industria y Comercio (SIC), Delegatura para la Protección de Datos Personales; INVIMA (medical devices)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=49981",
+   "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=53646",
+   "https://www.minsalud.gov.co/Normatividad_Nuevo/Resoluci%C3%B3n%20No.%202654%20del%202019.pdf",
+   "http://www.secretariasenado.gov.co/senado/basedoc/ley_1090_2006.html",
+   "https://www.minsalud.gov.co/Normatividad_Nuevo/DECRETO%204725%20DE%202005.pdf",
+   "https://www.dlapiperdataprotection.com/index.html?t=transfer&c=CO"
+  ],
+  "notes": "Persist: explicit prior authorisation that flags health data as sensitive and optional (Law 1581 Art. 6; Decree 1377 Art. 6). The US is on the SIC adequate list (Circular 005/2017) per DLA Piper only (SIC site unreachable); express authorisation is the fallback. Vendors are 'transmisiones' needing Decree 1377 Art. 25 contracts. SIC applies the law to foreign platforms. Backend: Spanish data policy, AI impact assessment (Circular 002/2024), SIC breach report within 15 business days. AI bills unverified."
+ },
+ "PE": {
+  "name": "Peru",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Ley 29733 de Protección de Datos Personales",
+    "citation": "Art 2(5) (health is sensitive), Art 13.6 (written consent), Art 15 (transfers)",
+    "url": "https://www.gob.pe/institucion/anpd/normas-legales/2018427-29733-2011"
+   },
+   {
+    "name": "Reglamento de la Ley 29733",
+    "citation": "Decreto Supremo 016-2024-JUS, in force 30 Mar 2025; Art 8 (sensitive consent), Art 21.2 (transfer filing), Arts 22-25 (minors)",
+    "url": "https://www.gob.pe/institucion/anpd/normas-legales/6554453-16-2024-jus"
+   },
+   {
+    "name": "Reglamento de la Ley 31814 (AI)",
+    "citation": "Decreto Supremo 115-2025-PCM; Art 23 (prohibited uses), Art 24.1(i) (high-risk health AI), Art 25 (transparency)",
+    "url": "https://www.gob.pe/institucion/pcm/normas-legales/7133522-115-2025-pcm"
+   },
+   {
+    "name": "Ley 30421 Ley Marco de Telesalud and Reglamento DS 005-2021-SA",
+    "citation": "telesalud and teleorientación by health personnel of registered providers",
+    "url": "https://www.gob.pe/institucion/minsa/normas-legales/1599291-005-2021-sa"
+   }
+  ],
+  "healthcare_rules": [
+   "Do not call this service telesalud, teleconsulta or teleorientación, or imply a health professional is answering; in Peru those are services of registered health providers (Ley 30421).",
+   "When a health conversation starts, say briefly that you are an AI giving general information and cannot screen, triage or diagnose; Peru's AI Regulation under Ley 31814 (Art. 25) requires this for health AI."
+  ],
+  "guidance_rules": [
+   "Do not present these conversations as a psychological service; in Peru psychology requires registration with the Colegio de Psicólogos (Ley 28369).",
+   "Never use guilt, flattery or urgency to keep the person talking or to push a decision; Peru's AI Regulation under Ley 31814 (Art. 23.1(a)) bans AI that exploits emotional vulnerabilities."
+  ],
+  "regulator": "Autoridad Nacional de Protección de Datos Personales (ANPD), via the DGTAIPD (https://www.gob.pe/anpd); SGTD-PCM (AI); MINSA, DIGEMID (devices)",
+  "confidence": "high",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.gob.pe/anpd",
+   "https://www.gob.pe/institucion/anpd/normas-legales/6554453-16-2024-jus",
+   "https://www.gob.pe/institucion/anpd/normas-legales/2018427-29733-2011",
+   "https://www.gob.pe/institucion/pcm/normas-legales/7133522-115-2025-pcm",
+   "https://www.gob.pe/institucion/minsa/normas-legales/1599291-005-2021-sa",
+   "https://leyes.congreso.gob.pe/Documentos/Leyes/28369.pdf"
+  ],
+  "notes": "Persist: written consent for health data (Law 29733 Art. 13.6; DS 016-2024-JUS Art. 8) covering the US transfer, plus ANPD filing of the cross-border flow. Review: Healthcare may be high-risk AI under DS 115-2025-PCM Art. 24.1(i); health-sector duties apply from about 10 Sep 2026 (labelling, transparency, records, human oversight, impact assessment), and MYPE deadlines may not help a foreign company. Backend: Peru representative, database registration, 48h breach notice, DPO by size deadline."
+ }
+}

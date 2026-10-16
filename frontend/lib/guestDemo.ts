@@ -1,3 +1,4 @@
+import { sessionHealthConsent } from "@/lib/healthConsent";
 import { API_BASE_URL } from "@/lib/apiClient";
 import { consumeChatStream, type ChatStreamHandlers } from "@/lib/sse";
 
@@ -85,6 +86,8 @@ export async function streamGuestMessage(
         context_rounds: body.contextRounds ?? 0,
         regenerate: body.regenerate ?? false,
         last_image_id: body.lastImageId ?? null,
+        // Healthcare's consent, agreed to in this browser session (or not).
+        health_consent: sessionHealthConsent(),
       }),
       signal,
     });

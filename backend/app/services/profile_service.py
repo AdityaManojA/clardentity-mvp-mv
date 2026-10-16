@@ -68,6 +68,10 @@ _INSTRUCTIONS = (
     "religion, health, or family structure that is not evidenced. An empty roles list is "
     "a correct answer when nothing is clearly indicated.\n"
     "- Never state a sensitive attribute as fact on weak evidence; omit it instead.\n"
+    "- Never record health of any kind - physical or mental conditions, symptoms, "
+    "medicines, pregnancy, disability, addiction - nor emotional state, sexual life, "
+    "or experiences of harm, even when the evidence states them plainly. They were "
+    "shared to get help, not to be kept as a description of the person.\n"
     "- For each role, give a short `evidence` phrase quoting or paraphrasing what "
     "indicated it, so the person can check your reasoning.\n\n"
     "Respond with ONLY a JSON object, no markdown fencing:\n"
@@ -94,15 +98,25 @@ async def gather_evidence(db: AsyncSession, user_id: uuid.UUID) -> tuple[str, in
         .scalar_subquery()
     )
 
+    # Never a Healthcare message either: health information is special
+    # category data, consented to for answering - not for profiling.
     total = await db.scalar(
         select(func.count())
         .select_from(Message)
-        .where(Message.conversation_id.in_(conversation_ids), Message.role == "user")
+        .where(
+            Message.conversation_id.in_(conversation_ids),
+            Message.role == "user",
+            Message.mode_used != "healthcare",
+        )
     )
 
     rows = await db.execute(
         select(Message.content)
-        .where(Message.conversation_id.in_(conversation_ids), Message.role == "user")
+        .where(
+            Message.conversation_id.in_(conversation_ids),
+            Message.role == "user",
+            Message.mode_used != "healthcare",
+        )
         .order_by(desc(Message.created_at))
         .limit(_MESSAGE_WINDOW)
     )

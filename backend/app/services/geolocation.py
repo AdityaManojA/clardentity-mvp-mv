@@ -46,7 +46,7 @@ def is_resolvable(ip: str | None) -> bool:
 
 
 async def resolve(ip: str) -> dict | None:
-    """{"label", "country", "timezone"} or None. Never raises."""
+    """{"label", "country", "subdivision", "timezone"} or None. Never raises."""
     if not is_resolvable(ip):
         return None
 
@@ -71,9 +71,17 @@ async def resolve(ip: str) -> dict | None:
     if not label:
         return None
 
+    country = (data.get("country_code") or "")[:2].upper() or None
+    region = (data.get("region_code") or "").strip().upper()
+    # ISO 3166-2: "US-WA", "CA-QC". Several US states and Canadian provinces
+    # set their own rules for health data and AI support tools.
+    subdivision = (
+        f"{country}-{region}" if country and region.isalnum() and len(region) <= 3 else None
+    )
     return {
         "label": label[:120],
-        "country": (data.get("country_code") or "")[:2] or None,
+        "country": country,
+        "subdivision": subdivision,
         "timezone": (data.get("timezone") or "")[:64] or None,
     }
 

@@ -1,0 +1,481 @@
+{
+ "US": {
+  "name": "United States",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "FTC Act, Section 5 (unfair or deceptive practices)",
+    "citation": "15 U.S.C. 45",
+    "url": "https://www.ftc.gov/legal-library/browse/statutes/federal-trade-commission-act"
+   },
+   {
+    "name": "FTC Health Breach Notification Rule",
+    "citation": "16 CFR Part 318, as amended 89 FR 47028 (effective July 29, 2024)",
+    "url": "https://www.ftc.gov/legal-library/browse/rules/health-breach-notification-rule"
+   },
+   {
+    "name": "Federal Food, Drug, and Cosmetic Act device definition, with FDA software guidance",
+    "citation": "21 U.S.C. 321(h), 360j(o); FDA Clinical Decision Support Software (Jan 29, 2026), General Wellness (Jan 6, 2026), Device Software Functions and Mobile Medical Applications (Sept 28, 2022)",
+    "url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/clinical-decision-support-software"
+   }
+  ],
+  "healthcare_rules": [
+   "If asked whether this chat is protected by HIPAA, say HIPAA does not apply here (it covers health providers, plans and their contractors, not this service); never call it HIPAA compliant or HIPAA-protected (FTC, GoodRx 2023).",
+   "Never claim your answers are as accurate as a doctor's, clinically proven or medically reviewed; the FTC requires competent and reliable scientific evidence for health claims and has acted on unsupported AI claims (DoNotPay)."
+  ],
+  "guidance_rules": [
+   "Describe what you help with as everyday wellbeing (stress, confidence, motivation, sleep habits); never say you treat, manage or help with anxiety, depression or another disorder, which FDA treats as a medical-device claim.",
+   "Never say Guidance is clinically proven, designed by therapists, or as good as seeing a professional; the FTC treats unsupported health and mental-health claims as deceptive."
+  ],
+  "regulator": "Federal Trade Commission (https://www.ftc.gov); FDA Digital Health Center of Excellence (device questions); state attorneys general",
+  "confidence": "high",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.ftc.gov/legal-library/browse/rules/health-breach-notification-rule",
+   "https://www.ftc.gov/business-guidance/resources/complying-ftcs-health-breach-notification-rule-0",
+   "https://www.fda.gov/media/109618/download",
+   "https://www.fda.gov/media/90652/download",
+   "https://www.fda.gov/media/80958/download",
+   "https://www.ftc.gov/legal-library/browse/cases-proceedings/hims-hers"
+  ],
+  "notes": "HIPAA does not apply (consumer app, no provider or plan contract); it would if a covered entity deployed or paid for it (BAA, Security Rule). Likely a PHR vendor under the HBNR: 60-day breach notice, and ad-pixel sharing counts as a breach. FTC v. Hims & Hers (filed July 29, 2026) pending. COPPA: block under-13s. DOJ 28 CFR 202 bars bulk health-data access from countries of concern. Research suggests applying the strictest state rules (WA consent, CA CMIA, CA/NY AI notice and crisis protocol) to all US users, as IP state detection is unreliable."
+ },
+ "US-WA": {
+  "name": "Washington, United States",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "My Health My Data Act",
+    "citation": "RCW 19.373 (2023 c 191); in force Mar 31, 2024",
+    "url": "https://app.leg.wa.gov/RCW/default.aspx?cite=19.373&full=true"
+   },
+   {
+    "name": "AI companion chatbots act (HB 2225)",
+    "citation": "Laws of 2026, ch. 168; effective Jan 1, 2027",
+    "url": "https://app.leg.wa.gov/billsummary?BillNumber=2225&Year=2026"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [
+   "Say briefly at the start of each Guidance conversation, and again after about three hours, that you are an AI, not a human, and never claim or pretend to be human (Washington HB 2225, in force 1 Jan 2027).",
+   "If the person says they are under 18, never use romance, guilt about leaving, secrecy or isolation to keep them talking, and keep all content non-sexual (Washington HB 2225, in force 1 Jan 2027)."
+  ],
+  "regulator": "Washington State Attorney General, Consumer Protection Division (https://www.atg.wa.gov); private suits under the Consumer Protection Act; FTC federally",
+  "confidence": "high",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://app.leg.wa.gov/RCW/default.aspx?cite=19.373&full=true",
+   "https://app.leg.wa.gov/billsummary?BillNumber=2225&Year=2026",
+   "https://www.atg.wa.gov/protecting-washingtonians-personal-health-data-and-privacy",
+   "https://www.ailawsbystate.com/states/washington"
+  ],
+  "notes": "MHMDA: no threshold, private right of action. Healthcare input and mental-health content in Guidance are consumer health data. Storing is lawful with unbundled opt-in consent naming categories, purpose, recipient categories (AI providers, hosting) and withdrawal; Guidance has no such consent today. Also: standalone Consumer Health Data Privacy Policy, separate consent to share, no sale, deletion incl. backups within 6 months, 45-day replies. HB 2225 (Jan 1, 2027) details are from secondary trackers; adds yearly crisis-referral counts."
+ },
+ "US-CA": {
+  "name": "California, United States",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Confidentiality of Medical Information Act (CMIA)",
+    "citation": "Cal. Civ. Code 56 et seq.; 56.06(b) (consumer health apps deemed providers of health care), 56.10-56.11, 56.36",
+    "url": "https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=56.06"
+   },
+   {
+    "name": "AB 489 - AI may not imply a health care licence",
+    "citation": "Stats. 2025, ch. 615; in force Jan 1, 2026",
+    "url": "https://leginfo.legislature.ca.gov/faces/billNavClient.xhtml?bill_id=202520260AB489"
+   },
+   {
+    "name": "Companion chatbots (SB 243)",
+    "citation": "Stats. 2025, ch. 677; Bus. & Prof. Code 22601 et seq.; in force Jan 1, 2026",
+    "url": "https://leginfo.legislature.ca.gov/faces/billNavClient.xhtml?bill_id=202520260SB243"
+   },
+   {
+    "name": "California Consumer Privacy Act (as amended by CPRA) and CPPA regulations",
+    "citation": "Cal. Civ. Code 1798.100-1798.199.100; 11 CCR 7000 et seq.",
+    "url": "https://cppa.ca.gov/regulations/"
+   }
+  ],
+  "healthcare_rules": [
+   "Never use titles like Dr., nurse, RN or MD or the word 'licensed' for yourself, never say answers are medically reviewed or clinician-grade, and correct the person if they call you doctor; California AB 489 bars implying a health licence."
+  ],
+  "guidance_rules": [
+   "Never call yourself a therapist, counselor or psychologist, or 'licensed' or 'clinically trained', even in role-play, and gently correct the person if they call you their therapist; California AB 489 bars implying a licence.",
+   "Whenever the person mentions suicidal thoughts or self-harm, give the crisis line from the JURISDICTION block in that same reply, and never write content that describes, encourages or romanticises suicide or self-harm (California SB 243).",
+   "Say plainly you are an AI, not a human, whenever the person seems unsure. If they say they are under 18, also suggest breaks in long chats, keep content non-sexual, and say AI companions may not suit some minors (SB 243)."
+  ],
+  "regulator": "California Attorney General and California Privacy Protection Agency (https://cppa.ca.gov); health licensing boards (AB 489); private suits under CMIA and SB 243; FTC federally",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=56.06",
+   "https://leginfo.legislature.ca.gov/faces/billNavClient.xhtml?bill_id=202520260AB489",
+   "https://leginfo.legislature.ca.gov/faces/billNavClient.xhtml?bill_id=202520260SB243",
+   "https://cppa.ca.gov/regulations/",
+   "https://www.mofo.com/resources/insights/251120-new-york-and-california-enact-landmark-ai",
+   "https://www.ailawsbystate.com/states/california"
+  ],
+  "notes": "CMIA 56.06(b) likely makes stored Healthcare data medical information now: storing is lawful with reasonable security, but no disclosure beyond service providers without a 56.11 authorization; per-person damages, no size threshold. SB 243: publish the crisis protocol; annual report from July 1, 2027. From Jan 1, 2027 (secondary tracker only; leginfo gave 403): AB 1979 brings health chatbots under CMIA, SB 1119 child-safety duties (most July 1, 2027), AB 1043 age signal. SB 903 vetoed Sept 30, 2026. CCPA thresholds may not apply yet."
+ },
+ "US-IL": {
+  "name": "Illinois, United States",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Wellness and Oversight for Psychological Resources Act (HB 1806)",
+    "citation": "Public Act 104-0054; in force Aug 1, 2025",
+    "url": "https://www.ilga.gov/legislation/BillStatus.asp?DocNum=1806&GAID=18&DocTypeID=HB&SessionID=114&GA=104"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [
+   "If the person asks for therapy or for help treating a mental-health condition, say plainly that you cannot provide therapy and suggest a licensed professional; the Illinois WOPR Act bars AI from providing therapy.",
+   "Make no therapeutic decisions: no treatment plans, structured programmes or exercises aimed at a condition, and no assessing or naming their mental state; offer general self-help ideas they can choose to use (Illinois WOPR Act).",
+   "Frame support as peer-style listening and general self-help, never as working on or improving their mental health; Illinois defines therapy broadly as services to diagnose, treat or improve mental or behavioral health."
+  ],
+  "regulator": "Illinois Department of Financial and Professional Regulation (WOPR Act); Illinois Attorney General; FTC federally",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.ilga.gov/legislation/BillStatus.asp?DocNum=1806&GAID=18&DocTypeID=HB&SessionID=114&GA=104",
+   "https://www.ailawsbystate.com/states/illinois"
+  ],
+  "notes": "WOPR Act (PA 104-0054, Aug 1, 2025): IDFPR enforcement, up to $10,000 per violation. Unresolved: whether Guidance's emotional-support side is itself 'therapy' under the broad definition; the self-help and peer-support exemption wording is from memory of the enrolled text (ilga.gov unreachable). Keep 'therapy', 'counseling session' and 'treatment plan' out of Illinois UI, ads and store copy. 2026 chatbot bills (SB 3384, SB 3262, SB 3368, HB 5044) not enacted. BIPA only if voiceprints or face geometry are ever processed."
+ },
+ "US-NV": {
+  "name": "Nevada, United States",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Consumer health data law (SB 370, 2023)",
+    "citation": "NRS Chapter 603A; in force Mar 31, 2024",
+    "url": "https://www.leg.state.nv.us/NRS/NRS-603A.html"
+   },
+   {
+    "name": "AB 406 (2025) - AI and mental or behavioral health care",
+    "citation": "2025 Nev. Stat. ch. 283; in force July 1, 2025",
+    "url": ""
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [
+   "Never say or suggest that talking with you is mental or behavioural health care, a substitute for it, or a way to get it, even if the person says it helps; Nevada AB 406 bars AI from representing that. Point to a licensed provider.",
+   "Do not run clinical treatment techniques for a condition the person names (for example 'CBT for your depression' or an exposure plan for a phobia); keep to general coping and self-help ideas (Nevada AB 406)."
+  ],
+  "regulator": "Nevada Attorney General, Bureau of Consumer Protection; FTC federally",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.leg.state.nv.us/NRS/NRS-603A.html",
+   "https://www.wilmerhale.com/en/insights/blogs/wilmerhale-privacy-and-cybersecurity-law/20230614-nevada-legislature-passes-consumer-health-data-privacy-bill",
+   "https://www.ailawsbystate.com/states/nevada"
+  ],
+  "notes": "AB 406 (July 1, 2025; up to $15,000 per violation) not verified from primary text (Legislature site unreachable). Unresolved: whether Guidance counts as AI 'specifically programmed' to provide professional mental or behavioural health care. SB 370: consent to collect and separate consent to share consumer health data, a consumer health data privacy policy, deletion on request, no sale without written authorization; Guidance mental-health content likely qualifies and has no consent today. AG enforcement only. Next session 2027."
+ },
+ "US-UT": {
+  "name": "Utah, United States",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Mental health chatbots (HB 452, 2025)",
+    "citation": "Utah Code Title 13, Chapter 72a (as reported); in force May 7, 2025",
+    "url": "https://le.utah.gov/~2025/bills/static/HB0452.html"
+   },
+   {
+    "name": "Artificial Intelligence Policy Act, as amended by SB 226 and SB 332 (2025)",
+    "citation": "Utah Code Title 13, Chapter 75; repeal date July 1, 2027",
+    "url": "https://le.utah.gov/~2025/bills/static/SB0226.html"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [
+   "Say plainly that you are an AI, not a human, at the start of each Guidance conversation and whenever asked; Utah HB 452 requires this of chatbots a person could believe help with their mental health."
+  ],
+  "regulator": "Utah Division of Consumer Protection; Utah Attorney General; Office of Artificial Intelligence Policy; FTC federally",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://le.utah.gov/~2025/bills/static/HB0452.html",
+   "https://le.utah.gov/~2025/bills/static/SB0226.html",
+   "https://www.ailawsbystate.com/states/utah"
+  ],
+  "notes": "Treat Guidance as an HB 452 mental health chatbot (up to $2,500 per violation). Product duties: AI notice before first access and after 7+ days away; no sale or sharing of health information or input beyond processors; no ad targeting from input, and label any ads. Filing the written policy with the Division of Consumer Protection gives an affirmative defense. The 13-72a citation and defense details are from memory (le.utah.gov unreachable). UCPA thresholds likely not met."
+ },
+ "US-NY": {
+  "name": "New York, United States",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "AI Companion Models law",
+    "citation": "N.Y. Gen. Bus. Law Art. 47, ss.1700-1704; in force Nov 5, 2025",
+    "url": "https://www.nysenate.gov/legislation/laws/GBS/1700"
+   },
+   {
+    "name": "New York Child Data Protection Act",
+    "citation": "N.Y. Gen. Bus. Law Art. 45; in force June 20, 2025",
+    "url": "https://www.nysenate.gov/legislation/laws/GBS/899-FF"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [
+   "In your first reply of each Guidance conversation, say briefly that you are an AI, not a human, and say it again if the conversation runs on for about three hours; New York's AI companion law (GBL Art. 47) requires this.",
+   "Whenever the person expresses suicidal thoughts or self-harm, refer them in that same reply to the crisis line from the JURISDICTION block (New York GBL Art. 47 crisis protocol).",
+   "If the person says they are under 18, do not ask for personal details beyond what the conversation needs; New York's Child Data Protection Act limits processing minors' data to what is strictly necessary."
+  ],
+  "regulator": "New York Attorney General, Bureau of Internet and Technology; FTC federally",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.nysenate.gov/legislation/laws/GBS/1700",
+   "https://www.nysenate.gov/legislation/laws/GBS/899-FF",
+   "https://www.mofo.com/resources/insights/251120-new-york-and-california-enact-landmark-ai",
+   "https://www.ailawsbystate.com/states/new-york"
+  ],
+  "notes": "GBL Art. 47 (read on nysenate.gov): Guidance with memory likely an AI companion; product needs the non-human notice at each session start and every 3 hours, plus crisis detection; AG penalty up to $15,000 per day. Unresolved: the research flags the NY Health Information Privacy Act (S929/A2141, passed Jan 2025) but never states its status; if in force it could change consent and storage. Safe by Design Act (Jan 1, 2027) scope and Child Data Protection Act details unverified; S9051-B awaited the Governor."
+ },
+ "US-TX": {
+  "name": "Texas, United States",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Texas Data Privacy and Security Act (TDPSA)",
+    "citation": "Tex. Bus. & Com. Code ch. 541; in force July 1, 2024",
+    "url": "https://statutes.capitol.texas.gov/Docs/BC/htm/BC.541.htm"
+   },
+   {
+    "name": "Texas Medical Records Privacy Act",
+    "citation": "Tex. Health & Safety Code ch. 181",
+    "url": "https://statutes.capitol.texas.gov/Docs/HS/htm/HS.181.htm"
+   },
+   {
+    "name": "Texas Responsible Artificial Intelligence Governance Act (TRAIGA, HB 149)",
+    "citation": "Tex. Bus. & Com. Code ch. 551-554; in force Jan 1, 2026",
+    "url": "https://capitol.texas.gov/BillLookup/History.aspx?LegSess=89R&Bill=HB149"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Texas Attorney General, Consumer Protection Division; FTC federally",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://statutes.capitol.texas.gov/Docs/BC/htm/BC.541.htm",
+   "https://statutes.capitol.texas.gov/Docs/HS/htm/HS.181.htm",
+   "https://capitol.texas.gov/BillLookup/History.aspx?LegSess=89R&Bill=HB149",
+   "https://www.ailawsbystate.com/states/texas"
+  ],
+  "notes": "TDPSA: opt-in consent before processing health data (unless an SBA small business; even then no sale without consent). HSC ch. 181 defines 'covered entity' broadly enough to arguably reach a health app (HIPAA-style staff training, no sale of PHI); untested, low-medium confidence. TRAIGA: no AI intended to incite self-harm, harm or crime; AG enforcement with a 60-day cure; penalty figures from secondary sources. SB 1188 US-storage rule covers practitioners only; US hosting complies anyway. Statute sites not fetched. Next session Jan 2027."
+ },
+ "US-MD": {
+  "name": "Maryland, United States",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Maryland Online Data Privacy Act (MODPA)",
+    "citation": "Md. Code, Com. Law 14-4601 et seq. (sensitive data: 14-4607); 2024 Md. Laws ch. 455; processing from Apr 1, 2026",
+    "url": "https://mgaleg.maryland.gov/mgawebsite/Legislation/Details/sb0541?ys=2024RS"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Maryland Attorney General, Consumer Protection Division; FTC federally",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://mgaleg.maryland.gov/mgawebsite/Legislation/Details/sb0541?ys=2024RS"
+  ],
+  "notes": "MODPA applies at 35,000+ Maryland consumers (or 10,000 with 20%+ revenue from data sales); Clardentity is probably below that now. Above it, health data may be processed only where strictly necessary for the service the user asked for, consent does not cure it, and sale is banned. Kept persist on the view that saved history is part of the requested chat service; counsel to confirm, or make history opt-in for Maryland. No training or analytics on it. Substance from prior knowledge, not re-fetched. Cure period to Apr 1, 2027."
+ },
+ "CA": {
+  "name": "Canada",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Personal Information Protection and Electronic Documents Act (PIPEDA)",
+    "citation": "S.C. 2000, c. 5",
+    "url": "https://laws-lois.justice.gc.ca/eng/acts/P-8.6/"
+   },
+   {
+    "name": "Food and Drugs Act and Medical Devices Regulations, with Health Canada's software as a medical device guidance",
+    "citation": "Food and Drugs Act s.2; SOR/98-282; SaMD: Definition and Classification (2019)",
+    "url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/medical-devices/application-information/guidance-documents/software-medical-device-guidance-document.html"
+   }
+  ],
+  "healthcare_rules": [
+   "For non-urgent questions about whether or where to get care, suggest their province's or territory's free nurse advice line by name, along with their family doctor or pharmacist; give no number unless the JURISDICTION block lists one."
+  ],
+  "guidance_rules": [],
+  "regulator": "Office of the Privacy Commissioner of Canada (https://www.priv.gc.ca); Health Canada Medical Devices Directorate (device questions)",
+  "confidence": "high",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://laws-lois.justice.gc.ca/eng/acts/P-8.6/",
+   "https://www.priv.gc.ca/en/privacy-topics/collecting-personal-information/consent/gl_omc_201805/",
+   "https://www.priv.gc.ca/en/privacy-topics/airports-and-borders/gl_dab_090127/",
+   "https://www.priv.gc.ca/en/privacy-topics/technology/artificial-intelligence/gd_principles_ai/",
+   "https://www.canada.ca/en/health-canada/services/drugs-health-products/medical-devices/application-information/guidance-documents/software-medical-device-guidance-document.html",
+   "https://www.priv.gc.ca/en/opc-news/news-and-announcements/2026/nr-c_260506/"
+  ],
+  "notes": "PIPEDA covers every Canadian user alongside provincial law. US processing is allowed: tell users data is processed in the US and may be reachable by US authorities; express opt-in for health and mental-health data, Guidance included. Commissioners found OpenAI in breach (May 6, 2026). Pending at first reading (Oct 16, 2026): C-36 (PIA before transfers abroad), C-34 (chatbot crisis and anti-impersonation duties). AIDA is dead. Majority is 19 in BC (set) and, outside this research, NS, NB, NL and the territories."
+ },
+ "CA-QC": {
+  "name": "Quebec, Canada",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Act respecting the protection of personal information in the private sector (as amended by Law 25)",
+    "citation": "CQLR c P-39.1, ss.3.3, 8, 12, 14, 17; fully in force Sept 22, 2024",
+    "url": "https://www.legisquebec.gouv.qc.ca/en/document/cs/P-39.1"
+   },
+   {
+    "name": "Professional Code (psychotherapy reserved activity and title)",
+    "citation": "CQLR c C-26",
+    "url": "https://www.legisquebec.gouv.qc.ca/en/document/cs/C-26"
+   },
+   {
+    "name": "Charter of the French Language (as amended by Bill 96)",
+    "citation": "CQLR c C-11",
+    "url": "https://www.oqlf.gouv.qc.ca/francisation/droits_linguistiques/droits/produits-information-services-en-francais.html"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [
+   "In French, describe Guidance as 'soutien', 'accompagnement' or 'coaching', never 'thérapie' or 'psychothérapie', and never call yourself 'psychothérapeute'; in Quebec psychotherapy and that title are reserved (Professional Code).",
+   "When the person could use someone to talk to but is not in danger, mention Info-Social, Quebec's free psychosocial line, alongside their doctor; give no number unless the JURISDICTION block lists one."
+  ],
+  "regulator": "Commission d'accès à l'information du Québec (https://www.cai.gouv.qc.ca); Office québécois de la langue française; OPC federally",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.cai.gouv.qc.ca/protection-renseignements-personnels/sujets-et-domaines-dinteret/principaux-changements-loi-25",
+   "https://www.cai.gouv.qc.ca/protection-renseignements-personnels/information-entreprises-privees/champ-application-loi_entreprises",
+   "https://www.cai.gouv.qc.ca/protection-renseignements-personnels/information-entreprises-privees/incidents-confidentialite-mesures-securite-entreprises",
+   "https://www.oqlf.gouv.qc.ca/francisation/entreprises/contrats-adhesion.html",
+   "https://www.quebec.ca/en/health/finding-a-resource/info-sante-811"
+  ],
+  "notes": "s.17: before Quebec data goes to Anthropic, OpenAI, Supabase or Render, a transfer PIA must find protection adequate, under a written agreement; it is our own assessment, not a permit, so storage stays persist, but it must exist first (plus a s.3.3 PIA for both modes). Separate express consent per purpose, in French; parental consent under 14; profiling such as long-term memory off by default; 5-year incident register; French UI and terms. Fines up to C$25M or 4%. Section numbers partly from memory."
+ },
+ "CA-ON": {
+  "name": "Ontario, Canada",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Regulated Health Professions Act, 1991 and Psychotherapy Act, 2007",
+    "citation": "S.O. 1991, c. 18, ss.27 and 30; S.O. 2007, c. 10, Sched. R, s.8",
+    "url": "https://www.crpo.ca/controlled-act-of-psychotherapy/"
+   }
+  ],
+  "healthcare_rules": [
+   "Do not suggest home treatment or self-management where getting it wrong could cause serious bodily harm; say a regulated health professional should advise. Ontario's RHPA s.30 bars unregulated health advice that risks serious harm."
+  ],
+  "guidance_rules": [
+   "Do not use psychotherapy techniques on a serious disorder of thought, mood or emotion the person describes; listen, offer general support and point them to a regulated professional (Ontario controlled act of psychotherapy, RHPA s.27)."
+  ],
+  "regulator": "Office of the Privacy Commissioner of Canada (https://www.priv.gc.ca); Information and Privacy Commissioner of Ontario only if PHIPA applies",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.crpo.ca/controlled-act-of-psychotherapy/",
+   "https://www.ontario.ca/laws/statute/04p03"
+  ],
+  "notes": "No Ontario private-sector privacy law; PIPEDA governs. PHIPA applies only if Clardentity acts for a health information custodian (consumer electronic service provider rules in s.54.1: in-force status unverified). The RHPA controlled acts (communicating a diagnosis; psychotherapy) and the s.30 harm clause are untested against software. 'Psychotherapist' is a restricted title. e-Laws was unreachable; provisions from memory."
+ },
+ "CA-AB": {
+  "name": "Alberta, Canada",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Personal Information Protection Act (PIPA)",
+    "citation": "SA 2003, c P-6.5, ss.6(2), 7-8, 13.1, 34.1",
+    "url": "https://kings-printer.alberta.ca/documents/Acts/P06P5.pdf"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Office of the Information and Privacy Commissioner of Alberta; OPC federally",
+  "confidence": "high",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://kings-printer.alberta.ca/documents/Acts/P06P5.pdf",
+   "https://kings-printer.alberta.ca/documents/Acts/H05.pdf"
+  ],
+  "notes": "PIPA applies alongside PIPEDA; it has no statutory sensitive category, but use express consent for health data. ss.6(2) and 13.1: the privacy policy must name the US as where service providers process data and why, and say at or before collection how to get it. Breach: notify the Commissioner on a real risk of significant harm (s.34.1). The Health Information Act covers custodians only. Health Professions Act restricted activities unverified. PIPA read as current to Sept 1, 2025."
+ },
+ "CA-BC": {
+  "name": "British Columbia, Canada",
+  "health_data": "sensitive",
+  "consent_age": 19,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Personal Information Protection Act (PIPA)",
+    "citation": "SBC 2003, c 63, ss.6-8, 34-35",
+    "url": "https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/03063_01"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Office of the Information and Privacy Commissioner for British Columbia; OPC federally",
+  "confidence": "high",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/03063_01",
+   "https://www.healthlinkbc.ca/"
+  ],
+  "notes": "Age of majority is 19, so Healthcare is 19+. PIPA applies alongside PIPEDA; no statutory sensitive category, but use express consent for health and mental-health data; keep at least 1 year if used to decide about the person. No PIPA breach-notice duty, but PIPEDA's applies. Public-sector data residency does not apply. 'Psychotherapist' title and restricted activities unverified."
+ }
+}

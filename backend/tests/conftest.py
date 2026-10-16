@@ -5,6 +5,22 @@ from app.db.session import engine, worker_engine
 
 
 @pytest.fixture(autouse=True)
+def _quiet_safety_screen(monkeypatch, request):
+    """The safety screen is a real model call on every chat turn. Tests that
+    stream a turn are about something else, so it answers "none" for them
+    without a network call; tests/test_safety.py exercises the real thing
+    (with the model faked) by marking itself `real_safety`."""
+    if request.node.get_closest_marker("real_safety"):
+        return
+    from app.services import safety
+
+    async def _none(message, history=None):
+        return safety.NONE
+
+    monkeypatch.setattr(safety, "assess", _none)
+
+
+@pytest.fixture(autouse=True)
 async def _clear_rate_limits():
     """Rate limiting is infrastructure these tests run through, not the thing
     under test. The counters are per-IP and every test arrives from the same

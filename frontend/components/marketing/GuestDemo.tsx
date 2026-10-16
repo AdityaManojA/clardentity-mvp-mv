@@ -11,6 +11,9 @@ import { MessageInput } from "@/components/chat/MessageInput";
 import { MessageList, type StreamingMessage } from "@/components/chat/MessageList";
 import { ModeSelector, type CognitiveMode } from "@/components/chat/ModeSelector";
 import { ContextQuestionCard } from "@/components/chat/ContextQuestionCard";
+import { HealthConsentCard } from "@/components/chat/HealthConsentCard";
+import { ModeDisclosure } from "@/components/chat/ChatGreeting";
+import { rememberSessionHealthConsent } from "@/lib/healthConsent";
 import { RefinedQuestionCard } from "@/components/chat/RefinedQuestionCard";
 import { ClarifyingOptionsCard } from "@/components/chat/ClarifyingOptionsCard";
 import { ModeSwitchToast } from "@/components/chat/ModeSwitchToast";
@@ -22,6 +25,7 @@ import type {
   GeneratedImage,
   RefinedQuestionSuggestion,
   ThinkingReviewData,
+  HealthConsentState,
 } from "@/lib/sse";
 
 /* Try it here, without signing up.
@@ -163,6 +167,7 @@ function stashOf(messages: ChatMessage[]): StashedTurn[] {
       decision_review: m.decision_review,
       thinking_review: m.thinking_review,
       generated_image: m.generated_image,
+      safety: m.safety ?? null,
     }));
 }
 
@@ -224,6 +229,13 @@ export function GuestDemo({
   /* The pre-answer questions, held exactly as ChatView holds them: the
      accumulated send so far, so an answer is appended rather than replacing
      what was asked. */
+  // Healthcare asked for the visitor's consent before answering (the app's
+  // card, kept for this browser session - lib/healthConsent).
+  const [pendingHealth, setPendingHealth] = useState<{
+    state: HealthConsentState;
+    content: string;
+    mode: string;
+  } | null>(null);
   const [pendingContext, setPendingContext] = useState<{
     question: string;
     content: string;
@@ -348,6 +360,8 @@ export function GuestDemo({
       setError(null);
       setGate(null);
       setPendingContext(null);
+    setPendingHealth(null);
+      setPendingHealth(null);
       setPendingRefined(null);
       setPendingClarifying(null);
       setPhase((p) => (p === "inviting" ? "talking" : p));
@@ -431,6 +445,9 @@ export function GuestDemo({
                 : prev,
             );
           },
+          onSafety: (card) => {
+            setStreaming((prev) => (prev ? { ...prev, safety: card } : prev));
+          },
           onImage: (image) => {
             earlyImageRef.current = image;
             setStreaming((prev) => (prev ? { ...prev, generatedImage: image } : prev));
@@ -485,6 +502,10 @@ export function GuestDemo({
             setValidatingId(null);
             setStreaming(null);
             setSending(false);
+          },
+          onHealthConsent: (state) => {
+            rollBack();
+            setPendingHealth({ state, content: message, mode: sendMode });
           },
           onContextQuestion: (asked) => {
             rollBack();
@@ -739,6 +760,10 @@ export function GuestDemo({
                   leading with what the visitor lacks is a strange way to
                   open. */}
               <p className="mt-2 text-sm text-white/70">{companionLine}</p>
+              <ModeDisclosure
+                mode={mode}
+                className="mx-auto mt-2 max-w-md text-balance text-xs text-white/55"
+              />
             </div>
           ) : (
             <div className="flex min-h-0 flex-1 flex-col">
@@ -767,6 +792,24 @@ export function GuestDemo({
           {/* The pre-answer questions, between the thread and the composer,
               exactly where the app puts them and with the app's cards. */}
           <div className="scroll-slim max-h-[calc(var(--app-vh)*45)] shrink-0 overflow-y-auto">
+            {pendingHealth && (
+              <div className="mb-3">
+                <HealthConsentCard
+                  state={pendingHealth.state}
+                  onAgree={() => {
+                    const { state, content, mode: healthMode } = pendingHealth;
+                    rememberSessionHealthConsent(state.version);
+                    setPendingHealth(null);
+                    track("consent_choice", { choice: "health_granted_demo" });
+                    void send(content, healthMode);
+                  }}
+                  onDecline={() => {
+                    setPendingHealth(null);
+                    setDraft(pendingHealth.content);
+                  }}
+                />
+              </div>
+            )}
             {pendingContext && (
               <ContextQuestionCard
                 key={pendingContext.rounds}

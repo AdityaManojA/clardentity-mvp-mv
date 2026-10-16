@@ -3,7 +3,7 @@
 import { apiFetch } from "@/lib/apiClient";
 import { getAccessToken } from "@/lib/auth";
 import type { GuestTurn } from "@/lib/guestDemo";
-import type { DecisionReviewData, GeneratedImage, ThinkingReviewData } from "@/lib/sse";
+import type { DecisionReviewData, GeneratedImage, SafetyCardData, ThinkingReviewData } from "@/lib/sse";
 
 /* Carrying the demo conversation into a new account.
  *
@@ -38,6 +38,8 @@ export type StashedTurn = GuestTurn & {
   decision_review?: DecisionReviewData | null;
   thinking_review?: ThinkingReviewData | null;
   generated_image?: GeneratedImage | null;
+  /** The support card the demo showed - the server rebuilds its numbers. */
+  safety?: SafetyCardData | null;
 };
 
 export type StashedTranscript = {

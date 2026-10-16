@@ -2,7 +2,7 @@
 this build, behind a daily message cap.
 
 Billing does not exist yet, so the tier locks in the picker are the only
-thing standing between a tester and Mentoring, Reflect & Relieve,
+thing standing between a tester and Guidance, Healthcare,
 Co-Creative and Legal. Refusing them outright means the modes we most need
 feedback on are the ones nobody can reach. The grant is the middle: anyone
 signed in can open them from the plans dialog ("Skip for now"), and every

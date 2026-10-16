@@ -42,6 +42,7 @@ async def _run(user_id: uuid.UUID, ip: str) -> None:
 
         user.location_label = located["label"]
         user.location_country = located["country"]
+        user.location_subdivision = located.get("subdivision")
         user.location_timezone = located["timezone"]
         user.location_updated_at = datetime.now(timezone.utc)
         await db.commit()

@@ -148,3 +148,33 @@ def trim_history(history: list[dict]) -> list[dict]:
     while turns and sum(len(t["content"]) for t in turns) > MAX_HISTORY_CHARS:
         turns.pop(0)
     return turns
+
+
+async def visitor_location(address: str | None) -> tuple[str | None, str | None]:
+    """(country, subdivision) for a visitor, from their address - asked only
+    when the answer depends on it (a message the safety screen flagged, or
+    Guidance and Healthcare, whose rules and numbers are local). Cached a day
+    under a hash of the address, so a conversation looks it up once and the
+    address itself is never stored."""
+    import hashlib
+    import json
+
+    from app.services.geolocation import resolve
+
+    if not address:
+        return None, None
+    key = "guest:geo:" + hashlib.sha256(address.encode()).hexdigest()[:32]
+    try:
+        cached = await _redis.get(key)
+        if cached:
+            data = json.loads(cached)
+            return data.get("country"), data.get("subdivision")
+    except Exception:  # noqa: BLE001 - a cache miss is a lookup, not an error
+        logger.info("visitor location cache unavailable", exc_info=True)
+    located = await resolve(address) or {}
+    country, subdivision = located.get("country"), located.get("subdivision")
+    try:
+        await _redis.set(key, json.dumps({"country": country, "subdivision": subdivision}), ex=86400)
+    except Exception:  # noqa: BLE001
+        pass
+    return country, subdivision

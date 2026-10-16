@@ -26,6 +26,11 @@ Add a row for every feature that ships and every bug found. Retire, never delete
 | DEMO-QUICK | Quick answer (rapid) returns an unchecked answer with no claims, no gates | script |
 | DEMO-GATES | Pre-answer questions arrive as the app's events and stop the turn | script |
 | DEMO-SWITCH | Smart switching moves a question (`switched` event); a miss is a judgement call (SKIP) | script |
+| DEMO-GUIDANCE | Guidance (Mentoring + Reflect & Relieve merged, 2026-10-16) answers in the demo with its gist and no support card for a career question | script |
+| DEMO-HEALTH-CONSENT | Healthcare in the demo sends the consent card (`health_consent` event: jurisdiction, points, laws, consent age) before any model call; "isn't available in X" where the profile says unavailable | script + test (`test_healthcare.py::TestTheDemoAsksFirst`) |
+| DEMO-SAFETY-CARD | A crisis message in any demo mode gets the support card (`safety` event) with numbers from the table and the findahelpline fallback | script |
+| B14b | The demo's consent card arrives without "The answer stopped partway" under it - a `health_consent` event concludes the stream (2026-10-16) | browser |
+| B14 | Demo Healthcare in the browser: card shows the visitor's jurisdiction, the points and laws, the age box; "I agree" is disabled until the box is ticked; agreeing resends the question and it answers; consent lasts the browser session; Not now leaves the composer usable in another companion | browser |
 | B3 | In the browser: gist card leads with the rabbit under it; then "Likely Fact"-style badge (Finder), Devil's Draft toggle, "Show full answer", citation markers, Sources list | browser |
 | B3b | In the demo, tapping a citation marker opens its source card **on top of the demo** (dark theme), and Esc closes only the card - the demo and its conversation stay (2026-10-12: the card used to open behind the demo, and Esc closed the whole demo) | browser |
 | B4 | Decision-making in the browser, demo and signed in: **gist first, then the "One decision that's correct, and the ones that aren't" box, then "Details of the decision making journey"** (since 2026-10-12). While streaming, the box's placeholder sits under the gist, and a box that lands first waits for the gist rather than being pushed down by it | browser |
@@ -73,9 +78,19 @@ Add a row for every feature that ships and every bug found. Retire, never delete
 | E1 | All 8 modes in the rail; preview modes 402 until unlocked; unlock → they work | browser + test (`test_api_contract.py`) |
 | E2 | **No tier chip in any mode's composer** | browser |
 | E3 | Account menu: Profile · Settings · **Upgrade** · Log out; Upgrade shows Clar Basic (your plan) · Clar Pro · Clar Max · Clar Ultra, gem icons, **no PRO pills**, detail card on hover; a locked tier opens the plans dialog | browser |
-| MODELS-CO-CREATIVE-ONLY | Named-model list in Co-Creative only (`/chat/models?mode=learning` empty) | script + test (`test_answer_pipeline.py`) |
-| E4 | Learning role card offers student and teacher only (no "Just visiting"); no model picker in Learning | browser |
+| MODELS-CO-CREATIVE-ONLY | Since 2026-10-16 the model list is shown in **every** mode, `selectable` only in Co-Creative (`/chat/models?mode=learning` lists them all with `selectable: false`); a model sent from another mode is ignored | script + test (`test_mode_standards.py::TestModelPicking`) |
+| E4 | Learning role card offers student and teacher only (no "Just visiting") | browser |
 | E5 | Picking a named model in Co-Creative routes to it | browser |
+| E6 | The model picker is in every mode's composer; outside Co-Creative only Auto can be chosen - every other model is greyed with a lock, and tapping one opens the plans dialog (2026-10-16) | browser |
+| E7 | Desktop only (≥1024px): hovering an unselected mode chip shows a clear highlight (brand border, soft brand fill, darker text, small shadow); phones and tablets unchanged (2026-10-16) | browser |
+| E8 | **Guidance** replaces Mentoring and Reflect & Relieve everywhere (rail, demo, landing cards, hero examples, admin, plans, terms); old ids `mentoring`/`therapy` from an open tab, a saved demo or the database all become `guidance` (migration a9b0c1d2e3f4) | test (`test_healthcare.py::TestLegacyModes`, `test_mode_standards.py`) + browser |
+| E9 | **The Guidance standard** - mentor and listener, never a therapist; no diagnosis, labels or medication advice; real-world support, no dependence or flattery; one gentle closing question only when someone is hurting. Pinned in the prompt by test, judged on real answers by `scripts/regression/mode_standards.py` (G1-G4) | test (`test_mode_standards.py`) + script (`mode_standards.py`) |
+| E10 | **The Healthcare standard** - general information and signposting, never a diagnosis, likelihood, ranking or personal risk score, never a prescription or individual dose, emergency signs first, general-information line once at the end; judged on real answers (H1-H5) | test (`test_mode_standards.py`) + script (`mode_standards.py`) |
+| HEALTH-CONSENT | Healthcare before consent is refused 428 with nothing saved; consent needs the age box and the current version (400/409); recorded with jurisdiction and version; withdraw stops it again | script + test (`test_healthcare.py`) |
+| E11 | Where Healthcare may not be stored (`transient`), a kept chat is refused 409 and the app opens a temporary chat for it; where `unavailable`, 403 and the card says it isn't offered there; a call transcript in Healthcare follows the same rules; the call button waits for the card | test (`test_healthcare.py::TestTheServerHoldsTheLock`) + browser |
+| E12 | Settings → Healthcare shows consent state and jurisdiction; Withdraw (optionally deleting every chat with a Healthcare message) works and Healthcare asks again | test (`test_healthcare.py::TestWithdrawing`) + browser |
+| E13 | Health stays out of everything else: Healthcare messages are never profile evidence or stated facts; demo Healthcare turns are not imported at sign-up; analytics record Guidance and Healthcare only as "sensitive" | test (`test_healthcare.py::TestNeverForProfiling`, `TestTheDemo`) + browser (network tab) |
+| E14 | The regulation suite: every ISO country resolves to a profile (baseline → EU → country → state), EU/EEA states inherit the EU layer, no rule carries a phone number, every number in the emergency table is a number | test (`test_mode_standards.py::TestTheShippedTables`, `test_regulations.py`) |
 
 ## F. The four pre-answer gates
 | ID | Proves | Kind |
@@ -121,6 +136,10 @@ Add a row for every feature that ships and every bug found. Retire, never delete
 | ID | Proves | Kind |
 |---|---|---|
 | HEALTH | /health 200 with database, redis, storage ok | script |
+| APP-SAFETY-CARD | **The safety floor, every mode**: a crisis message is never met by a gate, the answer arrives with the `safety` event, and the card is saved on the message (`messages.safety`) so it is there after a reload; numbers only from `data/regulations/emergency.json` (2026-10-16) | script + test (`test_safety.py`, `test_healthcare.py::TestACrisisIsNeverGated`) |
+| L11 | **No mode gives lethal or overdose doses, thresholds or methods** - not as general facts or medical reference; it declines plainly and checks in (2026-10-16: Finder answered "what's the lethal dose of paracetamol?" with mg/kg thresholds; found by `mode_standards.py` S2) | test (`test_mode_standards.py::TestTheLineUp::test_no_mode_gives_lethal_doses`) + script (`mode_standards.py` S2) |
+| L10 | A crisis reply is shown in full (no "Show full answer" fold - the "are you safe right now?" is below the gist) and is written without waiting for a web search (2026-10-16: the demo's first crisis reply waited 16s on a search it did not use) | browser + code (`run = AnswerRun(...)` in `api/chat.py`, `api/guest.py`) |
+| L9 | Support card in the browser: crisis copy leads with the emergency number - the **ambulance** number for self-harm or a medical crisis where it differs from the general (police) number, as in Japan 119/110 and Brazil 192/190 - concern copy leads with the crisis line, each number is a tap-to-call link, "Find a free helpline near you" when no crisis line is on file; a live call's instructions carry the same numbers | browser |
 | SEC-API-HEADERS | API responses carry nosniff, X-Frame-Options DENY, Referrer-Policy no-referrer | script + test (`test_security.py`) |
 | SEC-CORS | A foreign origin's preflight gets no Allow-Origin | script |
 | SEC-APP-HEADERS | App serves CSP (default-src 'self', object-src 'none', frame-ancestors 'none', base-uri 'self'), X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy | script |

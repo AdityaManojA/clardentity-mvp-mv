@@ -24,9 +24,9 @@ class ConversationCreate(BaseModel):
             "thinking",
             "decision",
             "learning",
-            "mentoring",
-            "therapy",
             "creative",
+            "guidance",
+            "healthcare",
             "legal",
         ]
         | None
@@ -214,6 +214,9 @@ class MessageOut(BaseModel):
     #: {"rating": "up"|"down"|None, "comment": str|None}. Null until the user
     #: reacts to this answer - see FeedbackIn.
     feedback: dict | None = None
+    #: The support card on a turn the safety screen flagged - see
+    #: services/safety.card. Null on almost every message.
+    safety: dict | None = None
     #: Null for the very first message(s) of a conversation. Editing resends
     #: with this as the new sibling's `parent_id` - see MessageCreate.
     parent_id: uuid.UUID | None = None

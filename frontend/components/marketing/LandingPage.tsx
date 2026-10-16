@@ -91,10 +91,9 @@ type Mode = {
   blurbTop: number;
 };
 
-/* Names and one-liners are the design's. "Reflect & Relieve" uses the
- * ampersand in both places - the hero pill in Figma still reads "Reflect and
- * Relieve", and the client asked for the ampersand, which is also what the
- * product itself calls the mode. */
+/* Names and one-liners are the design's. Guidance (Mentoring and Reflect &
+ * Relieve, merged 2026-10-16) and Healthcare (new that day) are written to
+ * the same pattern - a few words on what it is for. */
 const MODES: Mode[] = [
   {
     name: "Finder",
@@ -142,21 +141,21 @@ const MODES: Mode[] = [
     blurbTop: 258.48,
   },
   {
-    name: "Mentoring",
-    value: "mentoring",
-    blurb: "Guidance on a skill or a career.",
-    icon: "/landing/icon-card-mentoring.svg",
-    heroIcon: "/landing/icon-hero-mentoring.svg",
-    blurbWidth: 143.449,
+    name: "Guidance",
+    value: "guidance",
+    blurb: "Direction for your goals, support when it's hard.",
+    icon: "/landing/icon-card-guidance.svg",
+    heroIcon: "/landing/icon-hero-guidance.svg",
+    blurbWidth: 176,
     blurbTop: 258.48,
   },
   {
-    name: "Reflect & Relieve",
-    value: "therapy",
-    blurb: "A calm place to think through how you feel.",
-    icon: "/landing/icon-card-reflect.svg",
-    heroIcon: "/landing/icon-hero-reflect.svg",
-    blurbWidth: 164.098,
+    name: "Healthcare",
+    value: "healthcare",
+    blurb: "Understand your health, and when to get care.",
+    icon: "/landing/icon-card-healthcare.svg",
+    heroIcon: "/landing/icon-hero-healthcare.svg",
+    blurbWidth: 176,
     blurbTop: 258.48,
   },
   {

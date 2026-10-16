@@ -116,6 +116,10 @@ class Message(Base):
     # lives in object storage and is served by id; this is the pointer.
     generated_image: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     feedback: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    # The support card for a turn the safety screen flagged (services/safety):
+    # level, kind and the verified numbers for where the person was. On the
+    # assistant's row, so the numbers are still there when the chat reopens.
+    safety: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     token_usage: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 

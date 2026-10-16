@@ -473,16 +473,16 @@ class TestADemoAnswerIsTheProductsAnswer:
     async def test_smart_switching_moves_the_question_and_says_so(self, monkeypatch):
         await self._available()
         self._fake_pipeline(
-            monkeypatch, guidance={"suggested_mode": "therapy", "mode_reason": "Feelings."}
+            monkeypatch, guidance={"suggested_mode": "guidance", "mode_reason": "Feelings."}
         )
         res = await self._ask(mode="knowing", message="I can't stop replaying the argument")
         events = _frames(res.text)
-        assert events[0] == ("switched", {"from": "knowing", "to": "therapy"})
-        assert dict(events)["final"]["message"]["mode_used"] == "therapy"
+        assert events[0] == ("switched", {"from": "knowing", "to": "guidance"})
+        assert dict(events)["final"]["message"]["mode_used"] == "guidance"
 
     async def test_manual_switching_never_moves_it(self, monkeypatch):
         await self._available()
-        self._fake_pipeline(monkeypatch, guidance={"suggested_mode": "therapy"})
+        self._fake_pipeline(monkeypatch, guidance={"suggested_mode": "guidance"})
         res = await self._ask(
             mode="knowing", message="I can't stop replaying it", smart_switching=False
         )

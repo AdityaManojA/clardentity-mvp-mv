@@ -35,8 +35,8 @@ const QUESTION_BY_MODE: Record<string, string> = {
   "Thought Coach": "Help me think through whether to go back to study.",
   Learning: "Explain the Krebs cycle for a Class 10 student.",
   "Co-Creative": "Draft a one-page proposal for a community library.",
-  Mentoring: "How do I get from junior to lead in two years?",
-  "Reflect & Relieve": "I keep second-guessing myself at work.",
+  Guidance: "How do I get from junior to lead in two years?",
+  Healthcare: "What does a high LDL on my blood test mean?",
   Legal: "What does my tenancy agreement actually oblige me to do?",
 };
 

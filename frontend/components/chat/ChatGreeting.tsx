@@ -79,3 +79,25 @@ export function TemporaryChatIntro() {
     </div>
   );
 }
+
+/** The line Guidance and Healthcare open with, under the greeting: that this
+ *  is an AI, and what it is not. Said once, plainly, before anything is
+ *  asked - which is what California's companion-chatbot law (SB 243) and
+ *  the EU AI Act's transparency duty ask for, and what anyone would want to
+ *  know before telling a machine about their health or their worst week. */
+export const MODE_DISCLOSURE: Record<string, string> = {
+  guidance:
+    "Guidance is an AI companion - not a therapist, counsellor or crisis service. If you're in danger, call your local emergency number.",
+  healthcare:
+    "Healthcare is an AI giving general health information - not a doctor, and not for emergencies.",
+};
+
+export function ModeDisclosure({ mode, className }: { mode: string | null; className?: string }) {
+  const text = mode ? MODE_DISCLOSURE[mode] : undefined;
+  if (!text) return null;
+  return (
+    <p className={className ?? "mx-auto mt-3 max-w-md text-balance text-center text-xs text-ink-muted"}>
+      {text}
+    </p>
+  );
+}

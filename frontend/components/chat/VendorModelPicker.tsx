@@ -13,22 +13,34 @@ import {
   type PickableModel,
 } from "@/lib/pickableModels";
 
-/* Pick the model by name - Co-Creative only.
+/* Pick the model by name.
  *
- * Everywhere else the composer shows no model control at all: the identity
- * rules forbid naming the model, and the capability tiers live under Upgrade
- * in the account menu, as plans rather than as a per-message switch.
- * Co-Creative is the deliberate exception: here the user is picking a tool
- * rather than consulting a companion, so the real names are shown and the
- * system prompt is relaxed to match. A product that refuses to say which model it is
- * while a dropdown three inches away names it isn't protecting anything.
+ * Shown in every mode since 2026-10-16, but only Co-Creative lets you pick:
+ * there the user is choosing a tool rather than consulting a companion, so
+ * the real names are live and the system prompt is relaxed to match.
+ * Everywhere else the list is shown `locked` - Auto selectable, every named
+ * model greyed - because choosing one there is part of a paid plan, and a
+ * greyed row says so where hiding the menu said nothing. Tapping one opens
+ * the plans (`onLocked`). The companion itself still never names its model
+ * in those modes; the server ignores a model sent from them.
  *
  * Grouped by vendor, the way Cursor does it, because the vendor is most of
  * what the name means to someone choosing. "Auto" leads and is the default:
  * the point is to allow a choice, not to require one.
  */
 
-export function VendorModelPicker({ mode, disabled }: { mode: string; disabled?: boolean }) {
+export function VendorModelPicker({
+  mode,
+  disabled,
+  locked = false,
+  onLocked,
+}: {
+  mode: string;
+  disabled?: boolean;
+  /** Named models are shown greyed and cannot be chosen here. */
+  locked?: boolean;
+  onLocked?: (label: string) => void;
+}) {
   const version = useSyncExternalStore(subscribe, () => getModels(), getServerSnapshot);
   const models = version ?? [];
   const chosen = useSyncExternalStore(
@@ -63,7 +75,8 @@ export function VendorModelPicker({ mode, disabled }: { mode: string; disabled?:
   // empty menu.
   if (!models.length) return null;
 
-  const current = models.find((m) => m.id === chosen);
+  // A choice remembered from before a mode was locked does not count.
+  const current = locked ? undefined : models.find((m) => m.id === chosen);
   const byVendor = models.reduce<Record<string, PickableModel[]>>((acc, m) => {
     (acc[m.vendor] ??= []).push(m);
     return acc;
@@ -83,7 +96,11 @@ export function VendorModelPicker({ mode, disabled }: { mode: string; disabled?:
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        title="Choose which model answers in this mode"
+        title={
+          locked
+            ? "Clardentity picks the model in this mode - choosing one comes with a paid plan"
+            : "Choose which model answers in this mode"
+        }
         className="flex items-center gap-1 rounded-md px-2 py-1 text-sm text-ink-muted transition-colors hover:bg-surface-hover hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
       >
         <span className="max-w-[9rem] truncate">{current ? current.label : "Auto"}</span>
@@ -103,9 +120,15 @@ export function VendorModelPicker({ mode, disabled }: { mode: string; disabled?:
           <Row
             label="Auto"
             blurb="Clardentity picks for each question."
-            selected={!chosen}
+            selected={!current}
             onClick={() => choose(null)}
           />
+          {locked && (
+            <p className="mx-2.5 mb-1 mt-1.5 rounded-md bg-surface-muted px-2 py-1.5 text-xs leading-snug text-ink-muted">
+              Choosing a model yourself is part of Co-Creative today, and comes to the
+              other companions with a paid plan.
+            </p>
+          )}
           {Object.entries(byVendor).map(([vendor, entries]) => (
             <div key={vendor}>
               <p className="px-2.5 pb-1 pt-2 text-xs font-medium uppercase tracking-wide text-ink-muted">
@@ -116,8 +139,17 @@ export function VendorModelPicker({ mode, disabled }: { mode: string; disabled?:
                   key={m.id}
                   label={m.label}
                   blurb={m.blurb}
-                  selected={chosen === m.id}
-                  onClick={() => choose(m.id)}
+                  selected={!locked && chosen === m.id}
+                  locked={locked}
+                  onClick={() => {
+                    if (locked) {
+                      setOpen(false);
+                      track("locked_mode_tapped", { mode, via: "model_picker" });
+                      onLocked?.(m.label);
+                      return;
+                    }
+                    choose(m.id);
+                  }}
                 />
               ))}
             </div>
@@ -132,11 +164,14 @@ function Row({
   label,
   blurb,
   selected,
+  locked = false,
   onClick,
 }: {
   label: string;
   blurb: string;
   selected: boolean;
+  /** Shown, greyed, and a door to the plans rather than a choice. */
+  locked?: boolean;
   onClick: () => void;
 }) {
   return (
@@ -144,14 +179,25 @@ function Row({
       type="button"
       role="menuitemradio"
       aria-checked={selected}
+      aria-disabled={locked || undefined}
+      title={locked ? `${label} - included in a paid plan` : undefined}
       onClick={onClick}
       className={cx(
-        "flex w-full flex-col items-start rounded-[8px] px-2.5 py-1.5 text-left transition-colors hover:bg-surface-hover",
+        "flex w-full flex-col items-start rounded-[8px] px-2.5 py-1.5 text-left transition-colors",
+        locked ? "cursor-not-allowed opacity-45 hover:opacity-60" : "hover:bg-surface-hover",
         selected && "bg-surface-hover",
       )}
     >
       <span className="flex w-full items-center justify-between gap-2">
         <span className="truncate text-sm text-ink">{label}</span>
+        {locked && (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+            strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"
+            className="size-3.5 shrink-0 text-ink-muted">
+            <rect x="5" y="11" width="14" height="10" rx="2" />
+            <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+          </svg>
+        )}
         {selected && (
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"
             strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"

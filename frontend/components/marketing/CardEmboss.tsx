@@ -125,23 +125,20 @@ const SHAPES: Record<string, React.ReactNode> = {
       <Spark cx={50} cy={50} r={7} w={2} />
     </>
   ),
-  // Mentoring - guidance: a guiding star, and a path down to you.
-  mentoring: (
+  // Guidance (Mentoring's mark, kept when it became Guidance): a guiding
+  // star, and a path down to you.
+  guidance: (
     <>
       <Spark cx={50} cy={24} r={18} />
       <path d="M50 48 V80" style={line} strokeWidth={2.4} strokeDasharray="2 6" strokeLinecap="round" />
       <Ring cx={50} cy={86} r={4.5} w={2.4} />
     </>
   ),
-  // Reflect & Relieve: a spark, a few quiet steps, and a star - from a
-  // flicker of a feeling to something settled (Aditya's outline sketch).
-  therapy: (
+  // Healthcare: a heart with a pulse running through it.
+  healthcare: (
     <>
-      <path d="M20 30C22 40.6667 27.3333 47.3333 36 50C27.3333 52.6667 22 59.3333 20 70C18 59.3333 12.6667 52.6667 4 50C12.6667 47.3333 18 40.6667 20 30Z" style={line} strokeWidth={2.4} strokeLinejoin="round" />
-      <circle cx={43.4} cy={50.4} r={2.4} style={{ fill: EDGE }} />
-      <circle cx={53.4} cy={50.4} r={2.4} style={{ fill: EDGE }} />
-      <circle cx={63.4} cy={50.4} r={2.4} style={{ fill: EDGE }} />
-      <path d="M89.1 33L93.8 45.5L107.2 46.1L96.7 54.5L100.3 67.4L89.1 60L77.9 67.4L81.5 54.5L71 46.1L84.4 45.5L89.1 33Z" style={line} strokeWidth={2.4} strokeLinejoin="round" />
+      <path d="M50 84C22 64 10 49 10 34C10 21 19 13 30 13C39 13 46 18 50 26C54 18 61 13 70 13C81 13 90 21 90 34C90 49 78 64 50 84Z" style={line} strokeWidth={LINE} strokeLinejoin="round" />
+      <path d="M17 46H35L41 34L51 60L58 46H83" style={line} strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" />
     </>
   ),
   // Legal: balanced scales, with a small star at the top.
@@ -155,7 +152,7 @@ const SHAPES: Record<string, React.ReactNode> = {
 };
 
 /** Drawn in a 111 x 100 box rather than a square. */
-const WIDE = new Set(["therapy"]);
+const WIDE = new Set<string>([]);
 
 /** `shape`: a mode value ("knowing", "decision"...) or a step word ("Ask.").
  *  `center`: where to sit before the card has been measured, in card px.

@@ -47,10 +47,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sse_starlette.sse import EventSourceResponse
 
 from app.api.deps import get_current_user
+from app.api.healthcare import CONSENT_VERSION, consent_state
+from app.core.config import settings
 from app.core.rate_limit import check_rate_limit
 from app.db.session import AsyncSessionLocal, get_db
 from app.models import Conversation, Message, User, Workspace, WorkspaceMember
+from app.models.conversation import current_mode
+from app.services import safety
 from app.services.admin_settings_service import get_all_settings
+from app.services.regulations import jurisdiction_block, profile_for
 from app.services.anthropic_client import stream_generation
 from app.services.answer_pipeline import (
     AnswerRun,
@@ -76,6 +81,7 @@ from app.services.guest_demo import (
     over_global_budget,
     spent,
     trim_history,
+    visitor_location,
 )
 from app.services.guidance import MAX_CONTEXT_ROUNDS, propose_guidance
 from app.services.image_generation import ImageRequest, reference_images
@@ -129,6 +135,9 @@ class GuestRequest(BaseModel):
     clarifying_confirmed: bool = False
     context_acknowledged: bool = False
     context_rounds: int = Field(default=0, ge=0, le=10)
+    #: The visitor agreed to the Healthcare consent card in this browser
+    #: session (the version they agreed to). Healthcare asks first otherwise.
+    health_consent: str | None = None
     #: Another answer to a question already asked and settled: no gate asks
     #: about it a second time, exactly as with the app's regenerate.
     regenerate: bool = False
@@ -159,6 +168,7 @@ def _message_payload(
     generated_image: dict | None = None,
     avatar: tuple[str | None, str | None] = (None, None),
     message_id: str | None = None,
+    safety: dict | None = None,
 ) -> dict:
     """A demo message in exactly the shape the app's MessageOut has, so the
     landing page renders it with the same components and the same code
@@ -188,6 +198,7 @@ def _message_payload(
         "thinking_review": thinking_review,
         "generated_image": generated_image,
         "feedback": None,
+        "safety": safety,
         "parent_id": None,
         "sibling_index": 0,
         "sibling_count": 1,
@@ -223,7 +234,9 @@ async def guest_chat(payload: GuestRequest, request: Request) -> EventSourceResp
     await check_rate_limit(f"guest:{address}", max_requests=30, window_seconds=600)
 
     # "rapid" is the Quick answer button: the app offers it when an answer
-    # is slow to start, and so does the demo.
+    # is slow to start, and so does the demo. A page cached from before the
+    # Guidance merge may still send an old mode name; it means Guidance.
+    payload.mode = current_mode(payload.mode)
     if payload.mode not in MODE_INSTRUCTIONS:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Unknown mode"
@@ -258,6 +271,24 @@ async def guest_chat(payload: GuestRequest, request: Request) -> EventSourceResp
         # charged the answer alone (see `answer_usage` below).
         with meter() as usage:
             mode = payload.mode
+            # Healthcare asks for consent before anything is processed, and
+            # is not offered where its rules do not allow it - the app's rule,
+            # held for a visitor in their browser session instead of on an
+            # account. Before any spending: a consent card costs nothing.
+            if mode == "healthcare":
+                country, subdivision = await visitor_location(address)
+                health = consent_state(country, subdivision)
+                if not health["available"]:
+                    yield {
+                        "event": "error",
+                        "data": json.dumps(
+                            {"detail": f"Healthcare isn't available in {health['jurisdiction']['name']}."}
+                        ),
+                    }
+                    return
+                if payload.health_consent != CONSENT_VERSION:
+                    yield {"event": "health_consent", "data": json.dumps(health)}
+                    return
             started = time.monotonic()
             marks: list[str] = []
 
@@ -290,6 +321,9 @@ async def guest_chat(payload: GuestRequest, request: Request) -> EventSourceResp
                 if payload.regenerate or rapid
                 else asyncio.create_task(propose_guidance(content, mode, pairs))
             )
+            # Every message, every mode, quick answers and regenerates
+            # included - the app's rule (services/safety).
+            risk_task = asyncio.create_task(safety.assess(content, pairs))
             image_request: ImageRequest | None = None
             previous_image = (
                 {"owner": session_id, "id": str(payload.last_image_id)}
@@ -302,6 +336,9 @@ async def guest_chat(payload: GuestRequest, request: Request) -> EventSourceResp
                 )
 
             guidance = await guidance_task if guidance_task is not None else None
+            risk = await risk_task
+            if risk.flagged:
+                guidance = None
             mark("gates")
             answered_a_gate = "(Clardentity asked:" in content
             settled = payload.regenerate
@@ -361,7 +398,7 @@ async def guest_chat(payload: GuestRequest, request: Request) -> EventSourceResp
             decision_task = asyncio.create_task(classify())
             decision = NO_DECISION
             review_task = thinking_task = None
-            if mode in ("decision", "thinking"):
+            if mode in ("decision", "thinking") and not risk.crisis:
                 try:
                     decision = await decision_task
                 except Exception:  # noqa: BLE001 - screening scope degrades
@@ -398,14 +435,29 @@ async def guest_chat(payload: GuestRequest, request: Request) -> EventSourceResp
                 if image_request
                 else None
             )
+            # Where the visitor is, only when the answer depends on it.
+            country, subdivision = (
+                await visitor_location(address)
+                if risk.flagged or mode in ("guidance", "healthcare")
+                else (None, None)
+            )
+            resources = safety.for_turn(country, subdivision)
+            safety_card = safety.card(risk, resources)
             instructions = build_system_instructions(
                 mode,
                 None,
                 build_bias_guidance(decision) if mode == "decision" else None,
                 None,
                 making_image=bool(image_request),
+                safety_block=safety.prompt_block(risk, resources),
+                jurisdiction_block=jurisdiction_block(
+                    mode, profile_for(country, subdivision), resources
+                ),
+                crisis=risk.crisis,
             )
             gen_model = generation_model_for(mode, admin_settings)
+            if risk.crisis and mode == "rapid":
+                gen_model = settings.anthropic_fast_model
             gen_temperature = admin_settings.get("openai_temperature")
 
             def make_generation(input_text: str) -> AsyncIterator[dict]:
@@ -416,6 +468,11 @@ async def guest_chat(payload: GuestRequest, request: Request) -> EventSourceResp
                     temperature=gen_temperature,
                 )
 
+            # Someone who may be in danger is answered now, not after a web
+            # search: nothing a search would add belongs in that reply.
+            if risk.crisis and web_task is not None:
+                web_task.cancel()
+                web_task = None
             run = AnswerRun(
                 mode=mode,
                 content=content,
@@ -438,6 +495,8 @@ async def guest_chat(payload: GuestRequest, request: Request) -> EventSourceResp
             # The answer metered on its own, so the visitor's allowance can be
             # counted in the conversation rather than in the apparatus around
             # it - see _conversation_tokens.
+            if safety_card is not None:
+                yield {"event": "safety", "data": json.dumps(safety_card)}
             with meter() as answer_usage:
                 async for event in run.generate():
                     yield event
@@ -464,13 +523,14 @@ async def guest_chat(payload: GuestRequest, request: Request) -> EventSourceResp
                             mode,
                             crux_text=run.crux_text,
                             message_id=answer_id,
+                            safety=safety_card,
                         ),
                         "user_message": user_payload,
                     }
                 ),
             }
 
-            if mode == "rapid":
+            if mode == "rapid" or risk.crisis:
                 # That was the whole job: the answer ships as drafted, with no
                 # verdict attached, and says so by carrying none - exactly the
                 # app's quick answer.
@@ -483,6 +543,7 @@ async def guest_chat(payload: GuestRequest, request: Request) -> EventSourceResp
                     crux_text=run.crux_text,
                     avatar=(avatar.expression, avatar.gesture),
                     message_id=answer_id,
+                    safety=safety_card,
                 )
                 used = await charge(
                     session_id,
@@ -674,6 +735,20 @@ class ImportTurn(BaseModel):
     decision_review: dict | None = None
     thinking_review: dict | None = None
     generated_image: ImportedImage | None = None
+    #: The support card the demo showed. Only its level, kind and country are
+    #: read - the numbers are rebuilt here from the verified table, never
+    #: taken from the browser.
+    safety: dict | None = None
+
+
+def _rebuilt_card(raw: dict | None) -> dict | None:
+    if not isinstance(raw, dict):
+        return None
+    level, kind = raw.get("level"), raw.get("kind")
+    if level not in ("concern", "crisis") or kind not in safety.KINDS:
+        return None
+    country = raw.get("country") if isinstance(raw.get("country"), str) else None
+    return safety.card(safety.Assessment(level=level, kind=kind), safety.for_turn(country))
 
 
 class ImportRequest(BaseModel):
@@ -708,9 +783,25 @@ async def import_guest_conversation(
     verification badge is the one thing in the product that must never be
     something a client can write. The answers are saved unscored.
     """
-    if payload.mode not in MODE_INSTRUCTIONS or payload.mode == "rapid":
+    # A demo conversation saved before Mentoring and Reflect & Relieve became
+    # Guidance still carries the old names - sitting in a visitor's browser
+    # until they sign up, which can be weeks later. It imports as Guidance.
+    payload_mode = current_mode(payload.mode)
+    if payload_mode not in MODE_INSTRUCTIONS or payload_mode == "rapid":
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Unknown mode"
+        )
+    # Health conversations from the demo stay in the demo. Carrying them into
+    # an account would store health information that was given before any
+    # consent to storing it - Healthcare asks for that consent in the app,
+    # and the person can ask again there.
+    payload.turns = [
+        t for t in payload.turns if (current_mode(t.mode) or payload_mode) != "healthcare"
+    ]
+    if not payload.turns:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail="Health conversations from the demo are not carried into an account.",
         )
 
     # The reviews are free-form JSON from the browser; they count towards
@@ -753,7 +844,7 @@ async def import_guest_conversation(
     conversation = Conversation(
         workspace_id=workspace_id,
         title=await name_conversation(first_question, first_answer, fallback),
-        default_mode=payload.mode,
+        default_mode=payload_mode,
     )
     db.add(conversation)
     await db.flush()
@@ -765,7 +856,9 @@ async def import_guest_conversation(
     parent_id: uuid.UUID | None = None
     saved: list[Message] = []
     for turn in payload.turns:
-        turn_mode = turn.mode if turn.mode in MODE_INSTRUCTIONS else payload.mode
+        turn_mode = current_mode(turn.mode)
+        if turn_mode not in MODE_INSTRUCTIONS:
+            turn_mode = payload_mode
         assistant = turn.role == "assistant"
         message = Message(
             conversation_id=conversation.id,
@@ -781,6 +874,7 @@ async def import_guest_conversation(
                 if assistant and turn.generated_image
                 else None
             ),
+            safety=_rebuilt_card(turn.safety) if assistant else None,
         )
         db.add(message)
         await db.flush()
