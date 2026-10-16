@@ -23,7 +23,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel, Field
 
-from app.api.deps import get_current_user
+from app.services.user_location import get_located_user
 from app.core.config import settings
 from app.core.rate_limit import check_rate_limit
 from app.db.session import get_db
@@ -133,7 +133,7 @@ def _accent_instructions(user: User, context: CallContext) -> str | None:
 @router.post("/session", status_code=status.HTTP_201_CREATED)
 async def create_realtime_session(
     context: CallContext | None = None,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_located_user),
     db: AsyncSession = Depends(get_db),
 ) -> dict:
     """A single-use client secret for one call.

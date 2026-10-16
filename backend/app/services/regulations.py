@@ -115,6 +115,8 @@ class HealthProfile:
     #: Jurisdiction-specific rules for the model in Guidance.
     guidance_rules: tuple[str, ...] = ()
     regulator: str = ""
+    #: Who to complain to, as it reads after "you can complain to".
+    complaints_to: str = ""
     confidence: str = "medium"
     needs_review: bool = False
     as_of: str = ""
@@ -205,6 +207,7 @@ def profile_for(country: str | None, subdivision: str | None = None) -> HealthPr
         healthcare_rules=tuple(dict.fromkeys(merged.get("healthcare_rules", []))),
         guidance_rules=tuple(dict.fromkeys(merged.get("guidance_rules", []))),
         regulator=merged.get("regulator", ""),
+        complaints_to=merged.get("complaints_to", ""),
         confidence=merged.get("confidence", "medium"),
         needs_review=bool(merged.get("needs_review", False)),
         as_of=merged.get("as_of", ""),

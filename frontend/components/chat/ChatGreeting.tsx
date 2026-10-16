@@ -89,7 +89,7 @@ export const MODE_DISCLOSURE: Record<string, string> = {
   guidance:
     "Guidance is an AI companion - not a therapist, counsellor or crisis service. If you're in danger, call your local emergency number.",
   healthcare:
-    "Healthcare is an AI giving general health information - not a doctor, and not for emergencies.",
+    "Healthcare is an AI giving general health information - not a doctor or a diagnosis, it can be wrong, and it is not for emergencies.",
 };
 
 export function ModeDisclosure({ mode, className }: { mode: string | null; className?: string }) {

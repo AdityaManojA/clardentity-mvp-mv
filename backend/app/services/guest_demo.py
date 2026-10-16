@@ -150,31 +150,17 @@ def trim_history(history: list[dict]) -> list[dict]:
     return turns
 
 
-async def visitor_location(address: str | None) -> tuple[str | None, str | None]:
+async def visitor_location(
+    address: str | None, timezone: str | None = None
+) -> tuple[str | None, str | None]:
     """(country, subdivision) for a visitor, from their address - asked only
     when the answer depends on it (a message the safety screen flagged, or
     Guidance and Healthcare, whose rules and numbers are local). Cached a day
-    under a hash of the address, so a conversation looks it up once and the
-    address itself is never stored."""
-    import hashlib
-    import json
+    under a hash of the address (geolocation.resolve_cached); the browser's
+    time zone names the country when the lookup cannot."""
+    from app.services.geolocation import country_from_timezone, resolve_cached
 
-    from app.services.geolocation import resolve
-
-    if not address:
-        return None, None
-    key = "guest:geo:" + hashlib.sha256(address.encode()).hexdigest()[:32]
-    try:
-        cached = await _redis.get(key)
-        if cached:
-            data = json.loads(cached)
-            return data.get("country"), data.get("subdivision")
-    except Exception:  # noqa: BLE001 - a cache miss is a lookup, not an error
-        logger.info("visitor location cache unavailable", exc_info=True)
-    located = await resolve(address) or {}
-    country, subdivision = located.get("country"), located.get("subdivision")
-    try:
-        await _redis.set(key, json.dumps({"country": country, "subdivision": subdivision}), ex=86400)
-    except Exception:  # noqa: BLE001
-        pass
-    return country, subdivision
+    located = await resolve_cached(address) or {}
+    if located.get("country"):
+        return located["country"], located.get("subdivision")
+    return country_from_timezone(timezone), None

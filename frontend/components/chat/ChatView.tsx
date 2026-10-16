@@ -373,12 +373,12 @@ export function ChatView({ conversationId }: { conversationId: string }) {
   const healthBlocked =
     mode === "healthcare" && healthConsent !== null && (!healthConsent.available || !healthConsent.given);
 
-  async function agreeToHealthcare() {
+  async function agreeToHealthcare(language: string) {
     if (!healthConsent) return;
     setHealthBusy(true);
     setHealthError(null);
     try {
-      const state = await giveHealthConsent(healthConsent.version);
+      const state = await giveHealthConsent(healthConsent.version, language);
       setHealthConsent(state);
       track("consent_choice", { choice: "health_granted" });
       if (state.storage === "transient" && !temporary) await openHealthcareTemporaryChat();
@@ -1241,7 +1241,7 @@ export function ChatView({ conversationId }: { conversationId: string }) {
           <div className="mb-3">
             <HealthConsentCard
               state={healthConsent}
-              onAgree={() => void agreeToHealthcare()}
+              onAgree={(language) => void agreeToHealthcare(language)}
               onDecline={() => setMode(DEFAULT_MODE)}
               busy={healthBusy}
               error={healthError}
@@ -1609,6 +1609,13 @@ export function ChatView({ conversationId }: { conversationId: string }) {
               ) : undefined
             }
           />
+          {/* Once a conversation is under way the greeting's disclosure has
+              scrolled away; in the two companions where it matters it stays
+              under the box (India's telemedicine and DPDP guidance both ask
+              for a label that stays on screen). */}
+          {messages.length > 0 && (
+            <ModeDisclosure mode={mode} className="mt-1.5 px-2 text-center text-xs text-ink-muted" />
+          )}
         </div>
         {/* On a new chat the design does not sit the composer on the floor:
             the rail and the box are centred in the space under the topbar,

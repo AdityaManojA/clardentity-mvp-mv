@@ -1,5 +1,5 @@
 import { sessionHealthConsent } from "@/lib/healthConsent";
-import { API_BASE_URL } from "@/lib/apiClient";
+import { API_BASE_URL, clientTimezoneHeader } from "@/lib/apiClient";
 import { consumeChatStream, type ChatStreamHandlers } from "@/lib/sse";
 
 /* The landing page's try-it-here conversation.
@@ -72,7 +72,7 @@ export async function streamGuestMessage(
   try {
     response = await fetch(`${API_BASE_URL}/guest/chat`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...clientTimezoneHeader() },
       body: JSON.stringify({
         session_id: body.sessionId,
         mode: body.mode,

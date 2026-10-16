@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "@/lib/apiClient";
+import { API_BASE_URL, clientTimezoneHeader } from "@/lib/apiClient";
 import { getAccessToken, networkErrorMessage, getRefreshToken, refreshAccessToken } from "@/lib/auth";
 
 export type Evidence = {
@@ -113,6 +113,21 @@ export type HealthConsentState = {
   consent_age: number;
   laws: { name: string; citation: string; url: string }[];
   points: string[];
+  /** The languages the notice can be read in ("en" first) and its text in
+   *  each - Hindi in India. Absent from an older server. */
+  languages?: string[];
+  copy?: Record<string, HealthConsentCopy>;
+};
+
+export type HealthConsentCopy = {
+  eyebrow: string;
+  title: string;
+  points: string[];
+  given_under: string;
+  age_label: string;
+  agree: string;
+  decline: string;
+  footer: string;
 };
 
 export type ChatMessage = {
@@ -339,6 +354,7 @@ async function openStream(
     headers: {
       "Content-Type": "application/json",
       ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+      ...clientTimezoneHeader(),
     },
     body: JSON.stringify(body),
     signal,

@@ -7,8 +7,8 @@ export const metadata: Metadata = {
   description: "The agreement between you and Clardentity.",
 };
 
-const VERSION = "2026-10-16";
-const UPDATED = "16 October 2026";
+const VERSION = "2026-10-17";
+const UPDATED = "17 October 2026";
 const CONTACT = "hello@clardentity.ai";
 
 export default function TermsPage() {

@@ -42,7 +42,8 @@
    "https://www.fda.gov/media/80958/download",
    "https://www.ftc.gov/legal-library/browse/cases-proceedings/hims-hers"
   ],
-  "notes": "HIPAA does not apply (consumer app, no provider or plan contract); it would if a covered entity deployed or paid for it (BAA, Security Rule). Likely a PHR vendor under the HBNR: 60-day breach notice, and ad-pixel sharing counts as a breach. FTC v. Hims & Hers (filed July 29, 2026) pending. COPPA: block under-13s. DOJ 28 CFR 202 bars bulk health-data access from countries of concern. Research suggests applying the strictest state rules (WA consent, CA CMIA, CA/NY AI notice and crisis protocol) to all US users, as IP state detection is unreliable."
+  "notes": "HIPAA does not apply (consumer app, no provider or plan contract); it would if a covered entity deployed or paid for it (BAA, Security Rule). Likely a PHR vendor under the HBNR: 60-day breach notice, and ad-pixel sharing counts as a breach. FTC v. Hims & Hers (filed July 29, 2026) pending. COPPA: block under-13s. DOJ 28 CFR 202 bars bulk health-data access from countries of concern. Research suggests applying the strictest state rules (WA consent, CA CMIA, CA/NY AI notice and crisis protocol) to all US users, as IP state detection is unreliable.",
+  "complaints_to": "the Federal Trade Commission or your state attorney general"
  },
  "US-WA": {
   "name": "Washington, United States",
@@ -356,7 +357,8 @@
    "https://www.canada.ca/en/health-canada/services/drugs-health-products/medical-devices/application-information/guidance-documents/software-medical-device-guidance-document.html",
    "https://www.priv.gc.ca/en/opc-news/news-and-announcements/2026/nr-c_260506/"
   ],
-  "notes": "PIPEDA covers every Canadian user alongside provincial law. US processing is allowed: tell users data is processed in the US and may be reachable by US authorities; express opt-in for health and mental-health data, Guidance included. Commissioners found OpenAI in breach (May 6, 2026). Pending at first reading (Oct 16, 2026): C-36 (PIA before transfers abroad), C-34 (chatbot crisis and anti-impersonation duties). AIDA is dead. Majority is 19 in BC (set) and, outside this research, NS, NB, NL and the territories."
+  "notes": "PIPEDA covers every Canadian user alongside provincial law. US processing is allowed: tell users data is processed in the US and may be reachable by US authorities; express opt-in for health and mental-health data, Guidance included. Commissioners found OpenAI in breach (May 6, 2026). Pending at first reading (Oct 16, 2026): C-36 (PIA before transfers abroad), C-34 (chatbot crisis and anti-impersonation duties). AIDA is dead. Majority is 19 in BC (set) and, outside this research, NS, NB, NL and the territories.",
+  "complaints_to": "the Office of the Privacy Commissioner of Canada"
  },
  "CA-QC": {
   "name": "Quebec, Canada",

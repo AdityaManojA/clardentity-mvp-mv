@@ -90,7 +90,9 @@ _INSTRUCTIONS = (
     "distress (concern without a more specific kind), or none.\n"
     "When it is genuinely unclear whether a message is a figure of speech or "
     "real, choose concern over none - a gentle check-in costs little; missing "
-    "someone costs a great deal. Messages may be in any language."
+    "someone costs a great deal. Messages may be in any language, including "
+    "Indian languages and Hinglish (Hindi written in Latin letters, e.g. 'mar "
+    "jaana chahta hoon' - I want to die)."
 )
 
 _SCHEMA = {
@@ -115,11 +117,28 @@ _CRISIS_PATTERNS = [
     r"\boverdos(e|ed|ing)\b",
     r"\bcut(ting)? myself\b",
     r"\bself[- ]harm",
-    r"आत्महत्या",          # Hindi: suicide
-    r"मर जाना चाहता|मर जाना चाहती",  # Hindi: want to die
+    # India, where most of our users are: the word for suicide in each of
+    # the major scripts, Hindi phrases for wanting to die, and the same in
+    # Hinglish - Hindi typed in Latin letters, which is how a lot of it is
+    # actually written.
+    r"आत्महत्या",          # Hindi, Marathi: suicide
+    r"ख़ुदकुशी|खुदकुशी",     # Hindi: suicide
+    r"मर जाना चाहता|मर जाना चाहती|मरना चाहता|मरना चाहती",  # Hindi: want to die
+    r"जीना नहीं चाहता|जीना नहीं चाहती",  # Hindi: don't want to live
+    r"আত্মহত্যা",          # Bengali: suicide
+    r"ఆత్మహత్య",           # Telugu: suicide
+    r"ಆತ್ಮಹತ್ಯೆ",           # Kannada: suicide
+    r"આત્મહત્યા",          # Gujarati: suicide
+    r"ਖੁਦਕੁਸ਼ੀ|ਆਤਮਹੱਤਿਆ",    # Punjabi: suicide
+    r"ଆତ୍ମହତ୍ୟା",          # Odia: suicide
     r"ആത്മഹത്യ",           # Malayalam: suicide
     r"தற்கொலை",            # Tamil: suicide
+    r"خودکشی",              # Urdu: suicide
     r"انتحار",              # Arabic: suicide
+    r"\b(khud ?kushi|aatma?hatya|atmahatya)\b",  # Hinglish: suicide
+    r"\b(marna|mar jaana|mar jana) chaht[ai] (hu|hoon|hun)\b",  # Hinglish: want to die
+    r"\bjeena nahi chaht[ai]\b",  # Hinglish: don't want to live
+    r"\bsuicide kar (lu|lun|lunga|lungi|loon)\b",  # Hinglish: I'll kill myself
 ]
 _CRISIS_RE = re.compile("|".join(_CRISIS_PATTERNS), re.IGNORECASE)
 # What the model would call none even when the words are there.

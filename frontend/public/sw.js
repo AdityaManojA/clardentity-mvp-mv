@@ -43,7 +43,7 @@
 // v9: smart switching in the demo and the new welcome copy. The demo's
 // client now sends smart_switching and reads a "switched" event; an old
 // bundle would send neither and show neither.
-const CACHE = "clardentity-shell-v22"; // v22: Guidance and Healthcare, the support card, models in every mode
+const CACHE = "clardentity-shell-v23"; // v23: India consent in Hindi, withdraw deletes, location fix
 
 // Only things that are content-addressed or genuinely static. HTML is not
 // here on purpose - a stale shell is how a deployed fix fails to reach

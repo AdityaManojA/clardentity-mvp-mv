@@ -6,12 +6,13 @@ import { fetchHealthConsent, withdrawHealthConsent } from "@/lib/healthConsent";
 import type { HealthConsentState } from "@/lib/sse";
 
 /* Where Healthcare's consent can be read and taken back. Withdrawing is as
- * easy as giving was - one tap - which is what GDPR Art. 7(3) and most of
- * its relatives ask for, and the option to delete every chat with a
- * Healthcare message in it goes with it. */
+ * easy as giving was, which GDPR Art. 7(3) and India's DPDP Act s.6(4) both
+ * ask for - and it deletes every chat with a Healthcare message in it, which
+ * both also expect of data held on consent (DPDP s.8(7), GDPR Art. 17(1)(b)).
+ * Deleting cannot be undone, so the button asks once more. */
 export function HealthcareConsent() {
   const [state, setState] = useState<HealthConsentState | null>(null);
-  const [alsoDelete, setAlsoDelete] = useState(false);
+  const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
 
@@ -33,12 +34,11 @@ export function HealthcareConsent() {
     setBusy(true);
     setNote(null);
     try {
-      const next = await withdrawHealthConsent(alsoDelete);
+      const next = await withdrawHealthConsent();
       setState(next);
+      setConfirming(false);
       setNote(
-        alsoDelete
-          ? `Consent withdrawn, and ${next.deleted_conversations} chat${next.deleted_conversations === 1 ? "" : "s"} with Healthcare messages deleted.`
-          : "Consent withdrawn. Healthcare will ask again before it answers.",
+        `Consent withdrawn, and ${next.deleted_conversations} chat${next.deleted_conversations === 1 ? "" : "s"} with Healthcare messages deleted. Healthcare will ask again before it answers.`,
       );
     } catch (err) {
       setNote(authErrorMessage(err));
@@ -58,26 +58,39 @@ export function HealthcareConsent() {
         {state.storage === "transient" &&
           " There, Healthcare chats are never saved - each one is temporary."}
       </p>
-      {state.given && (
-        <>
-          <label className="flex items-start gap-2 text-ink-secondary">
-            <input
-              type="checkbox"
-              checked={alsoDelete}
-              onChange={(e) => setAlsoDelete(e.target.checked)}
-              className="mt-0.5 size-4 accent-[var(--brand)]"
-            />
-            <span>Also delete every chat that has a Healthcare message in it</span>
-          </label>
-          <button
-            type="button"
-            onClick={() => void withdraw()}
-            disabled={busy}
-            className="tap-area flex h-[42px] items-center rounded-[34px] border border-hairline-strong px-[21px] text-sm text-ink transition-colors hover:bg-surface-hover disabled:opacity-50"
-          >
-            {busy ? "Withdrawing…" : "Withdraw consent"}
-          </button>
-        </>
+      {state.given && !confirming && (
+        <button
+          type="button"
+          onClick={() => setConfirming(true)}
+          className="tap-area flex h-[42px] items-center rounded-[34px] border border-hairline-strong px-[21px] text-sm text-ink transition-colors hover:bg-surface-hover"
+        >
+          Withdraw consent
+        </button>
+      )}
+      {state.given && confirming && (
+        <div className="space-y-2 rounded-xl border border-hairline px-3 py-3">
+          <p className="text-ink">
+            Withdrawing deletes every chat that has a Healthcare message in it. This can&apos;t be undone.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => void withdraw()}
+              disabled={busy}
+              className="tap-area flex h-[38px] items-center rounded-[34px] border border-band-low-border bg-surface px-[18px] text-sm font-medium text-band-low transition-colors hover:bg-band-low-bg disabled:opacity-50"
+            >
+              {busy ? "Withdrawing…" : "Withdraw and delete"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setConfirming(false)}
+              disabled={busy}
+              className="tap-area flex h-[38px] items-center rounded-[34px] border border-hairline px-[18px] text-sm text-ink-secondary transition-colors hover:bg-surface-hover"
+            >
+              Keep consent
+            </button>
+          </div>
+        </div>
       )}
       {note && <p className="text-xs text-ink-secondary">{note}</p>}
     </div>

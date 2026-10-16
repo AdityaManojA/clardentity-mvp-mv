@@ -44,7 +44,8 @@
    "https://www.mayerbrown.com/pt/insights/publications/2026/03/brazilian-cfm-issues-resolution-on-the-use-of-artificial-intelligence-in-medicine",
    "https://lefosse.com/noticias/transferencia-internacional-de-dados-prazo-para-adocao-das-clausulas-padrao-da-anpd-se-encerra-em-23-de-agosto/"
   ],
-  "notes": "Persist: specific, highlighted consent (LGPD Art. 11, I) plus highlighted consent to the US transfer (Art. 33, VIII) or ANPD SCCs (mandatory form since 23 Aug 2025); publish a Portuguese transfer page (Res. 19/2024). No sharing health data for commercial advantage (Art. 11 §4). Pending: AI bill PL 2.338/2023, Câmara vote after the Oct 2026 elections (health AI high risk). ECA Digital in force 17 Mar 2026; fine levels reported inconsistently. Backend: encarregado, RIPD, 3-business-day breach notice."
+  "notes": "Persist: specific, highlighted consent (LGPD Art. 11, I) plus highlighted consent to the US transfer (Art. 33, VIII) or ANPD SCCs (mandatory form since 23 Aug 2025); publish a Portuguese transfer page (Res. 19/2024). No sharing health data for commercial advantage (Art. 11 §4). Pending: AI bill PL 2.338/2023, Câmara vote after the Oct 2026 elections (health AI high risk). ECA Digital in force 17 Mar 2026; fine levels reported inconsistently. Backend: encarregado, RIPD, 3-business-day breach notice.",
+  "complaints_to": "the ANPD (Autoridade Nacional de Proteção de Dados)"
  },
  "MX": {
   "name": "Mexico",
@@ -154,7 +155,8 @@
    "https://inforegulator.org.za/wp-content/uploads/2025/10/SECTION-112_2_C_-HEALTH-REGULATIONS-FINAL-1.pdf",
    "https://www.sahpra.org.za/medical-devices-and-in-vitro-diagnostics-guidelines/"
   ],
-  "notes": "Persist: consent (POPIA s.27(1)(a)); the s.32 health authorisation covers only providers. Transfers: binding POPIA-grade agreements with each vendor keep us within s.72(1)(a); without them s.57(1)(d) needs prior Information Regulator authorisation to send health data to a non-adequate country. Reach of s.3(1)(b) over a US-hosted app is debated; comply anyway. The 2025 draft s.112(2)(c) health regulations target insurers and medical schemes, not us. Backend: Information Officer registration, PAIA manual, s.22 breach notice."
+  "notes": "Persist: consent (POPIA s.27(1)(a)); the s.32 health authorisation covers only providers. Transfers: binding POPIA-grade agreements with each vendor keep us within s.72(1)(a); without them s.57(1)(d) needs prior Information Regulator authorisation to send health data to a non-adequate country. Reach of s.3(1)(b) over a US-hosted app is debated; comply anyway. The 2025 draft s.112(2)(c) health regulations target insurers and medical schemes, not us. Backend: Information Officer registration, PAIA manual, s.22 breach notice.",
+  "complaints_to": "the Information Regulator"
  },
  "NG": {
   "name": "Nigeria",
@@ -188,7 +190,8 @@
    "https://ndpc.gov.ng/resources/",
    "https://www.dlapiperdataprotection.com/countries/nigeria/law.html"
   ],
-  "notes": "Persist: explicit consent (NDPA s.30) plus informed, risk-aware consent to the US transfer and an SCC-type instrument (ss.41-43). GAID treats targeting Nigerians as operating in Nigeria. Backend: possible Data Controller of Major Importance registration, DPIA, DPO, 72h breach notice. Low-confidence risk: NITDA Nigerian Content guidelines (2019) on their face require some consumer data to be hosted locally; no enforcement against foreign apps seen. NDPA section numbers inferred from structure; re-check."
+  "notes": "Persist: explicit consent (NDPA s.30) plus informed, risk-aware consent to the US transfer and an SCC-type instrument (ss.41-43). GAID treats targeting Nigerians as operating in Nigeria. Backend: possible Data Controller of Major Importance registration, DPIA, DPO, 72h breach notice. Low-confidence risk: NITDA Nigerian Content guidelines (2019) on their face require some consumer data to be hosted locally; no enforcement against foreign apps seen. NDPA section numbers inferred from structure; re-check.",
+  "complaints_to": "the Nigeria Data Protection Commission"
  },
  "KE": {
   "name": "Kenya",
@@ -232,7 +235,8 @@
    "https://www.odpc.go.ke/wp-content/uploads/2026/09/ODPC-%E2%80%93-Guidance-Notes-for-Cross-border-Data-Transfers.pdf",
    "https://www.odpc.go.ke/guidelines-2/"
   ],
-  "notes": "Unavailable: DPA s.46(1) lets health data be processed only by or under a health care provider or a person under professional secrecy; the research calls a consumer AI a grey zone and says get counsel. Persist is possible if counsel accepts contractual confidentiality under s.46(2), or Healthcare runs under a licensed provider. Also: s.49(1) needs consent AND safeguards; Reg. 26 localises health care provision; Digital Health Act localisation unverified. Guidance (mental-health data) may raise the same s.46 issue. Confidence lowered from high: judgement call."
+  "notes": "Unavailable: DPA s.46(1) lets health data be processed only by or under a health care provider or a person under professional secrecy; the research calls a consumer AI a grey zone and says get counsel. Persist is possible if counsel accepts contractual confidentiality under s.46(2), or Healthcare runs under a licensed provider. Also: s.49(1) needs consent AND safeguards; Reg. 26 localises health care provision; Digital Health Act localisation unverified. Guidance (mental-health data) may raise the same s.46 issue. Confidence lowered from high: judgement call.",
+  "complaints_to": "the Office of the Data Protection Commissioner"
  },
  "GH": {
   "name": "Ghana",

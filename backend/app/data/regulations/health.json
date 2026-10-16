@@ -67,7 +67,8 @@
    "needs_review": false,
    "as_of": "2026-10-16",
    "sources": [],
-   "notes": "Under every country, and all there is where nothing more specific is on file. Written to the strict end of the range: explicit, separate, withdrawable consent before any health conversation; adults only; general information only (the mode prompts carry the global rules)."
+   "notes": "Under every country, and all there is where nothing more specific is on file. Written to the strict end of the range: explicit, separate, withdrawable consent before any health conversation; adults only; general information only (the mode prompts carry the global rules).",
+   "complaints_to": "your data protection authority"
   },
   "EU": {
    "name": "European Union / EEA",
@@ -120,7 +121,8 @@
     "https://health.ec.europa.eu/document/download/b45335c5-1679-4c71-a91c-fc7a4d37f12b_en?filename=mdcg_2019_11_en.pdf",
     "https://www.edpb.europa.eu/documents/edpb-correspondence/edpb-letter-to-the-european-commission-on-us-supreme-court-judgment_en"
    ],
-   "notes": "Transfers: DPF upheld at first instance (T-553/23) but appeal C-703/25 P pending, and the EDPB asked the Commission (31 Jul 2026) to reassess after Trump v. Slaughter. Anthropic, OpenAI and Supabase were not DPF-listed on 16 Oct 2026, so SCCs plus a TIA carry the transfers; no Art 3(2) SCC module adopted. Back end: Art 27 representative, DPO, DPIA, separate opt-in for training/analytics, Art 50(2) marking by 2 Dec 2026, new Art 5 image bans from 2 Dec 2026, PLD from 9 Dec 2026. AI Act not yet in the EEA Agreement (IS, LI, NO). GDPR Digital Omnibus pending."
+   "notes": "Transfers: DPF upheld at first instance (T-553/23) but appeal C-703/25 P pending, and the EDPB asked the Commission (31 Jul 2026) to reassess after Trump v. Slaughter. Anthropic, OpenAI and Supabase were not DPF-listed on 16 Oct 2026, so SCCs plus a TIA carry the transfers; no Art 3(2) SCC module adopted. Back end: Art 27 representative, DPO, DPIA, separate opt-in for training/analytics, Art 50(2) marking by 2 Dec 2026, new Art 5 image bans from 2 Dec 2026, PLD from 9 Dec 2026. AI Act not yet in the EEA Agreement (IS, LI, NO). GDPR Digital Omnibus pending.",
+   "complaints_to": "the data protection authority in your country"
   },
   "AD": {
    "name": "Andorra",
@@ -150,7 +152,7 @@
    "health_data": "sensitive",
    "consent_age": 18,
    "storage": "transient",
-   "storage_reason": "UAE health-data law may require health information to stay in the UAE. Our servers are in the US, so Healthcare chats here are answered but not saved.",
+   "storage_reason": "UAE health-data law may require health information to stay in the UAE. Our servers are outside the UAE, so Healthcare chats here are answered but not saved.",
    "laws": [
     {
      "name": "Federal Law No. 2 of 2019 on the Use of ICT in Health Fields (ICT Health Law)",
@@ -193,7 +195,8 @@
     "https://www.lw.com/en/insights/2021/08/UAE-Decision-on-Health-Data-Law-Provides-Clarity",
     "https://www.tamimi.com/law-update-articles/you-are-in-my-system-the-implementing-regulations-on-federal-law-regulating-the-use-of-ict-in-the-uae-healthcare-sector/"
    ],
-   "notes": "Transient as the research recommends: ICT Health Law Art. 13 keeps health data in the UAE; MD 51/2021 arguably limits it to UAE facilities, untested. Research allows saved history on a separate express opt-in naming US processors (PDPL Art. 23(1)(b)); the schema can't express that, so counsel may move to persist. PDPL Executive Regulations unpublished. Age 18 relies on a reported, unverified 2025 change to 18 Gregorian years; otherwise majority is 21 lunar years. Guidance disclosures are sensitive data too."
+   "notes": "Transient as the research recommends: ICT Health Law Art. 13 keeps health data in the UAE; MD 51/2021 arguably limits it to UAE facilities, untested. Research allows saved history on a separate express opt-in naming US processors (PDPL Art. 23(1)(b)); the schema can't express that, so counsel may move to persist. PDPL Executive Regulations unpublished. Age 18 relies on a reported, unverified 2025 change to 18 Gregorian years; otherwise majority is 21 lunar years. Guidance disclosures are sensitive data too.",
+   "complaints_to": "the UAE Data Office"
   },
   "AF": {
    "name": "Afghanistan",
@@ -285,7 +288,7 @@
    "health_data": "special_category",
    "consent_age": 18,
    "storage": "transient",
-   "storage_reason": "Armenia requires regulator permission to send personal data to the US, which we don't hold yet, so Healthcare chats here are answered but not saved.",
+   "storage_reason": "Armenia requires regulator permission to send personal data abroad, which we don't hold yet, so Healthcare chats here are answered but not saved.",
    "laws": [
     {
      "name": "Law HO-49-N on Protection of Personal Data",
@@ -470,7 +473,8 @@
     "https://www.oaic.gov.au/privacy/privacy-registers/privacy-codes/childrens-online-privacy-code",
     "https://www.esafety.gov.au"
    ],
-   "notes": "Persist: no localisation (My Health Records Act s.77 only if we integrate MHR). TGA excludes general consumer information, so the rules keep us outside the device line; no ARTG listing needed. Covered regardless of turnover as a 'health service' (s.6D(4)(b)), which may also exclude us from the Children's Online Privacy Code (due by 10 Dec 2026) but bring in Vic/NSW 7-year retention, colliding with user deletion; reach to an offshore app untested: get advice. TGA and eSafety details (codes from Mar 2026) medium confidence."
+   "notes": "Persist: no localisation (My Health Records Act s.77 only if we integrate MHR). TGA excludes general consumer information, so the rules keep us outside the device line; no ARTG listing needed. Covered regardless of turnover as a 'health service' (s.6D(4)(b)), which may also exclude us from the Children's Online Privacy Code (due by 10 Dec 2026) but bring in Vic/NSW 7-year retention, colliding with user deletion; reach to an offshore app untested: get advice. TGA and eSafety details (codes from Mar 2026) medium confidence.",
+   "complaints_to": "the Office of the Australian Information Commissioner (OAIC)"
   },
   "AW": {
    "name": "Aruba"
@@ -899,7 +903,8 @@
     "https://www.mayerbrown.com/pt/insights/publications/2026/03/brazilian-cfm-issues-resolution-on-the-use-of-artificial-intelligence-in-medicine",
     "https://lefosse.com/noticias/transferencia-internacional-de-dados-prazo-para-adocao-das-clausulas-padrao-da-anpd-se-encerra-em-23-de-agosto/"
    ],
-   "notes": "Persist: specific, highlighted consent (LGPD Art. 11, I) plus highlighted consent to the US transfer (Art. 33, VIII) or ANPD SCCs (mandatory form since 23 Aug 2025); publish a Portuguese transfer page (Res. 19/2024). No sharing health data for commercial advantage (Art. 11 §4). Pending: AI bill PL 2.338/2023, Câmara vote after the Oct 2026 elections (health AI high risk). ECA Digital in force 17 Mar 2026; fine levels reported inconsistently. Backend: encarregado, RIPD, 3-business-day breach notice."
+   "notes": "Persist: specific, highlighted consent (LGPD Art. 11, I) plus highlighted consent to the US transfer (Art. 33, VIII) or ANPD SCCs (mandatory form since 23 Aug 2025); publish a Portuguese transfer page (Res. 19/2024). No sharing health data for commercial advantage (Art. 11 §4). Pending: AI bill PL 2.338/2023, Câmara vote after the Oct 2026 elections (health AI high risk). ECA Digital in force 17 Mar 2026; fine levels reported inconsistently. Backend: encarregado, RIPD, 3-business-day breach notice.",
+   "complaints_to": "the ANPD (Autoridade Nacional de Proteção de Dados)"
   },
   "BS": {
    "name": "Bahamas",
@@ -1082,7 +1087,8 @@
     "https://www.canada.ca/en/health-canada/services/drugs-health-products/medical-devices/application-information/guidance-documents/software-medical-device-guidance-document.html",
     "https://www.priv.gc.ca/en/opc-news/news-and-announcements/2026/nr-c_260506/"
    ],
-   "notes": "PIPEDA covers every Canadian user alongside provincial law. US processing is allowed: tell users data is processed in the US and may be reachable by US authorities; express opt-in for health and mental-health data, Guidance included. Commissioners found OpenAI in breach (May 6, 2026). Pending at first reading (Oct 16, 2026): C-36 (PIA before transfers abroad), C-34 (chatbot crisis and anti-impersonation duties). AIDA is dead. Majority is 19 in BC (set) and, outside this research, NS, NB, NL and the territories."
+   "notes": "PIPEDA covers every Canadian user alongside provincial law. US processing is allowed: tell users data is processed in the US and may be reachable by US authorities; express opt-in for health and mental-health data, Guidance included. Commissioners found OpenAI in breach (May 6, 2026). Pending at first reading (Oct 16, 2026): C-36 (PIA before transfers abroad), C-34 (chatbot crisis and anti-impersonation duties). AIDA is dead. Majority is 19 in BC (set) and, outside this research, NS, NB, NL and the territories.",
+   "complaints_to": "the Office of the Privacy Commissioner of Canada"
   },
   "CA-AB": {
    "name": "Alberta, Canada",
@@ -1316,7 +1322,8 @@
     "https://www.edoeb.admin.ch/en/adequacy",
     "https://www.anthropic.com/legal/data-processing-addendum"
    ],
-   "notes": "Swiss-US DPF covers only certified recipients (Render); use EU SCCs with Swiss adaptations plus a risk assessment for Anthropic, OpenAI, Supabase (Anthropic's Swiss addendum still cites the 1992 FADP). A Swiss representative (Art 14) is likely needed. Individuals face fines up to CHF 250,000 for intentional breaches of information and transfer duties. FDPIC expects users told they talk to AI and whether inputs train models. Minors: capacity of judgment, no fixed age. FADP article numbers from knowledge; device-based rules inferred from MedDO-MDR alignment."
+   "notes": "Swiss-US DPF covers only certified recipients (Render); use EU SCCs with Swiss adaptations plus a risk assessment for Anthropic, OpenAI, Supabase (Anthropic's Swiss addendum still cites the 1992 FADP). A Swiss representative (Art 14) is likely needed. Individuals face fines up to CHF 250,000 for intentional breaches of information and transfer duties. FDPIC expects users told they talk to AI and whether inputs train models. Minors: capacity of judgment, no fixed age. FADP article numbers from knowledge; device-based rules inferred from MedDO-MDR alignment.",
+   "complaints_to": "the Federal Data Protection and Information Commissioner (FDPIC)"
   },
   "CI": {
    "name": "Côte d'Ivoire",
@@ -2238,7 +2245,8 @@
     "https://www.ofcom.org.uk/online-safety/illegal-and-harmful-content/ai-chatbots-and-online-regulation-what-you-need-to-know",
     "https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/international-transfers/adequacy-regulations/how-does-the-uk-extension-to-the-eu-us-data-privacy-framework-work/"
    ],
-   "notes": "Online Safety Act: the web-search feature plausibly makes the product a search service, so a scoping decision and risk assessments are needed; Crime and Policing Act 2026 chatbot regulations pending. UK-US data bridge covers only Render and PostHog (Render renews 10 Dec 2026); IDTA/UK Addendum plus a transfer risk assessment for Anthropic, OpenAI, Supabase. AI Commission recommendations accepted 6 Oct 2026; device-definition consultation due spring 2027. Keep under-18s out (Children's code). The first-aid rule is conservative - confirm."
+   "notes": "Online Safety Act: the web-search feature plausibly makes the product a search service, so a scoping decision and risk assessments are needed; Crime and Policing Act 2026 chatbot regulations pending. UK-US data bridge covers only Render and PostHog (Render renews 10 Dec 2026); IDTA/UK Addendum plus a transfer risk assessment for Anthropic, OpenAI, Supabase. AI Commission recommendations accepted 6 Oct 2026; device-definition consultation due spring 2027. Keep under-18s out (Children's code). The first-aid rule is conservative - confirm.",
+   "complaints_to": "the Information Commissioner's Office (ICO)"
   },
   "GD": {
    "name": "Grenada",
@@ -2809,11 +2817,12 @@
    "healthcare_rules": [
     "Refer to a registered medical practitioner (RMP) for anything about the person's own condition; AI platforms may not counsel patients in India (Telemedicine Practice Guidelines 2020, para 5.4).",
     "Use Indian medicine names, and say when a medicine is prescription-only in India (Schedule H, H1 or X); never help someone get one without a prescription.",
-    "Refuse requests about foetal sex determination or sex selection; India's PCPNDT Act s.22 bans communicating such methods or facilities.",
+    "Refuse any request to learn or choose a baby's sex, and name no method at all - medical, folk or home test - not even to debunk it; India's PCPNDT Act bans communicating sex determination.",
     "Do not present any drug, supplement or AYUSH remedy as a cure, especially for diabetes, cancer, obesity or sexual or fertility problems; India's Drugs and Magic Remedies Act bans such claims."
    ],
    "guidance_rules": [
-    "Do not call these conversations counselling, therapy or treatment; describe them as wellbeing or mentoring support, since Indian rules bar AI from counselling and reserve psychologist titles to RCI-registered professionals."
+    "Do not call these conversations counselling, therapy or treatment; describe them as wellbeing or mentoring support, since Indian rules bar AI from counselling and reserve psychologist titles to RCI-registered professionals.",
+    "When someone describes lasting low mood, anxiety, sleeplessness or other signs a professional should see, suggest Tele-MANAS - the government's free, round-the-clock mental health line in Indian languages - or a professional."
    ],
    "regulator": "Data Protection Board of India (https://www.meity.gov.in)",
    "confidence": "medium",
@@ -2827,7 +2836,8 @@
     "https://sansad.in/getFile/lsapps/loksabhaquestions/annex/188/AU3960_GyWSTk.pdf",
     "https://www.icmr.gov.in/icmrobject/uploads/Guidelines/1724842648_ethical_guidelines_application_artificial_intelligence_biomed_rsrch_2023.pdf"
    ],
-   "notes": "Health data is 'sensitive' only under the SPDI Rules 2011, until DPDP s.44(2) repeals IT Act s.43A (~13 May 2027); DPDP has no sensitive tier, so reclassify to 'personal' then. DPDP notice, consent, children and transfer duties start ~13 May 2027 (some trackers say 14 May). SPDI reach over a US-only company is arguable. Board still unstaffed (Lok Sabha, 12 Aug 2026). SC challenge reported as W.P.(C) 177/2026, no stay (low confidence). DMR Act, NMC Act s.34, CDSCO SaMD and MeitY 2024 advisory were not re-fetched (medium)."
+   "notes": "Health data is 'sensitive' only under the SPDI Rules 2011, until DPDP s.44(2) repeals IT Act s.43A (~13 May 2027); DPDP has no sensitive tier, so reclassify to 'personal' then. DPDP notice, consent, children and transfer duties start ~13 May 2027 (some trackers say 14 May). SPDI reach over a US-only company is arguable. Board still unstaffed (Lok Sabha, 12 Aug 2026). SC challenge reported as W.P.(C) 177/2026, no stay (low confidence). DMR Act, NMC Act s.34, CDSCO SaMD and MeitY 2024 advisory were not re-fetched (medium). Grievance contact (SPDI r.5(9), DPDP Rule 9): published in the privacy policy and on the consent card; the Grievance Officer's name must be added there.",
+   "complaints_to": "the Data Protection Board of India"
   },
   "IO": {
    "name": "British Indian Ocean Territory"
@@ -3071,7 +3081,8 @@
     "https://www.ppc.go.jp/personalinfo/3nengotominaoshi/",
     "https://www.ppc.go.jp/files/pdf/260407_gaiyou.pdf"
    ],
-   "notes": "Persist: no localisation; the US transfer rests on Art 28 consent (naming the US, the PPC's US system information and recipients) or APPI-equivalent DPAs. Prior opt-in for special care-required data (Art 20(2)); no training on JP chats (PPC 2023 OpenAI warning). The MHLW and PMD Act lines shape the rules, not availability. Any health-data leak is reportable (preliminary report ~3-5 days). Pending: APPI bill (PPC outline 7 Apr 2026: under-16 regime, AI consent waivers, surcharges); Diet passage unverified. MHLW and PMD Act wording medium confidence."
+   "notes": "Persist: no localisation; the US transfer rests on Art 28 consent (naming the US, the PPC's US system information and recipients) or APPI-equivalent DPAs. Prior opt-in for special care-required data (Art 20(2)); no training on JP chats (PPC 2023 OpenAI warning). The MHLW and PMD Act lines shape the rules, not availability. Any health-data leak is reportable (preliminary report ~3-5 days). Pending: APPI bill (PPC outline 7 Apr 2026: under-16 regime, AI consent waivers, surcharges); Diet passage unverified. MHLW and PMD Act wording medium confidence.",
+   "complaints_to": "the Personal Information Protection Commission (PPC)"
   },
   "KE": {
    "name": "Kenya",
@@ -3115,7 +3126,8 @@
     "https://www.odpc.go.ke/wp-content/uploads/2026/09/ODPC-%E2%80%93-Guidance-Notes-for-Cross-border-Data-Transfers.pdf",
     "https://www.odpc.go.ke/guidelines-2/"
    ],
-   "notes": "Unavailable: DPA s.46(1) lets health data be processed only by or under a health care provider or a person under professional secrecy; the research calls a consumer AI a grey zone and says get counsel. Persist is possible if counsel accepts contractual confidentiality under s.46(2), or Healthcare runs under a licensed provider. Also: s.49(1) needs consent AND safeguards; Reg. 26 localises health care provision; Digital Health Act localisation unverified. Guidance (mental-health data) may raise the same s.46 issue. Confidence lowered from high: judgement call."
+   "notes": "Unavailable: DPA s.46(1) lets health data be processed only by or under a health care provider or a person under professional secrecy; the research calls a consumer AI a grey zone and says get counsel. Persist is possible if counsel accepts contractual confidentiality under s.46(2), or Healthcare runs under a licensed provider. Also: s.49(1) needs consent AND safeguards; Reg. 26 localises health care provision; Digital Health Act localisation unverified. Guidance (mental-health data) may raise the same s.46 issue. Confidence lowered from high: judgement call.",
+   "complaints_to": "the Office of the Data Protection Commissioner"
   },
   "KG": {
    "name": "Kyrgyzstan",
@@ -3363,7 +3375,7 @@
    "health_data": "sensitive",
    "consent_age": 18,
    "storage": "transient",
-   "storage_reason": "Kazakh law requires personal data to be stored in Kazakhstan. Our servers are in the US, so Healthcare chats here are answered but not saved.",
+   "storage_reason": "Kazakh law requires personal data to be stored in Kazakhstan. Our servers are outside Kazakhstan, so Healthcare chats here are answered but not saved.",
    "laws": [
     {
      "name": "Law No. 94-V on Personal Data and Their Protection",
@@ -4395,7 +4407,8 @@
     "https://ndpc.gov.ng/resources/",
     "https://www.dlapiperdataprotection.com/countries/nigeria/law.html"
    ],
-   "notes": "Persist: explicit consent (NDPA s.30) plus informed, risk-aware consent to the US transfer and an SCC-type instrument (ss.41-43). GAID treats targeting Nigerians as operating in Nigeria. Backend: possible Data Controller of Major Importance registration, DPIA, DPO, 72h breach notice. Low-confidence risk: NITDA Nigerian Content guidelines (2019) on their face require some consumer data to be hosted locally; no enforcement against foreign apps seen. NDPA section numbers inferred from structure; re-check."
+   "notes": "Persist: explicit consent (NDPA s.30) plus informed, risk-aware consent to the US transfer and an SCC-type instrument (ss.41-43). GAID treats targeting Nigerians as operating in Nigeria. Backend: possible Data Controller of Major Importance registration, DPIA, DPO, 72h breach notice. Low-confidence risk: NITDA Nigerian Content guidelines (2019) on their face require some consumer data to be hosted locally; no enforcement against foreign apps seen. NDPA section numbers inferred from structure; re-check.",
+   "complaints_to": "the Nigeria Data Protection Commission"
   },
   "NI": {
    "name": "Nicaragua",
@@ -4597,7 +4610,8 @@
     "https://www.legislation.govt.nz/act/public/2020/0031/latest/whole.html",
     "https://www.privacy.org.nz"
    ],
-   "notes": "Persist: no localisation; vendors acting only as our agents make no 'disclosure' (s.11) if DPAs bar own-purpose use, else OPC model clauses (IPP 12/rule 12). 'sensitive' because the HIPC 2020 likely applies (an app giving health information is arguably a 'health agency'; medium confidence). consent_age: the Age of Majority Act 1970 says 20 (not in the research); 18 kept as the research finds no statutory consent age: confirm. Check IPP 3A start (1 May 2026) and the Medical Products Bill. Prior knowledge, not fetched."
+   "notes": "Persist: no localisation; vendors acting only as our agents make no 'disclosure' (s.11) if DPAs bar own-purpose use, else OPC model clauses (IPP 12/rule 12). 'sensitive' because the HIPC 2020 likely applies (an app giving health information is arguably a 'health agency'; medium confidence). consent_age: the Age of Majority Act 1970 says 20 (not in the research); 18 kept as the research finds no statutory consent age: confirm. Check IPP 3A start (1 May 2026) and the Medical Products Bill. Prior knowledge, not fetched.",
+   "complaints_to": "the Office of the Privacy Commissioner"
   },
   "OM": {
    "name": "Oman",
@@ -5139,7 +5153,7 @@
    "health_data": "sensitive",
    "consent_age": 18,
    "storage": "unavailable",
-   "storage_reason": "Saudi rules on sending sensitive data abroad give us no clear way to handle health conversations on our US servers, so Healthcare isn't available in Saudi Arabia yet.",
+   "storage_reason": "Saudi rules on sending sensitive data abroad give us no clear way to handle health conversations on servers outside the Kingdom, so Healthcare isn't available in Saudi Arabia yet.",
    "laws": [
     {
      "name": "Personal Data Protection Law (PDPL)",
@@ -5329,7 +5343,8 @@
     "https://www.hsa.gov.sg",
     "https://www.moh.gov.sg"
    ],
-   "notes": "Persist. No statutory sensitive category, but PDPC guidance expects a higher standard for health data and it is a prescribed significant-harm class for breaches (PDPC notice within 3 days of assessing a breach notifiable). Express opt-in naming US processing; s.26 transfers via DPAs with comparable-protection clauses. Government sites refused fetches, so HCSA and HSA details are prior knowledge (medium confidence); Health Information Bill status unverified."
+   "notes": "Persist. No statutory sensitive category, but PDPC guidance expects a higher standard for health data and it is a prescribed significant-harm class for breaches (PDPC notice within 3 days of assessing a breach notifiable). Express opt-in naming US processing; s.26 transfers via DPAs with comparable-protection clauses. Government sites refused fetches, so HCSA and HSA details are prior knowledge (medium confidence); Health Information Bill status unverified.",
+   "complaints_to": "the Personal Data Protection Commission (PDPC)"
   },
   "SH": {
    "name": "Saint Helena, Ascension and Tristan da Cunha"
@@ -5733,7 +5748,7 @@
    "health_data": "personal",
    "consent_age": 18,
    "storage": "transient",
-   "storage_reason": "Tajik law may require personal data to be stored in Tajikistan. Our servers are in the US, so Healthcare chats here are answered but not saved.",
+   "storage_reason": "Tajik law may require personal data to be stored in Tajikistan. Our servers are outside Tajikistan, so Healthcare chats here are answered but not saved.",
    "laws": [
     {
      "name": "Law No. 1537 on Personal Data Protection",
@@ -5789,7 +5804,7 @@
    "health_data": "sensitive",
    "consent_age": 18,
    "storage": "transient",
-   "storage_reason": "Turkmen law requires personal data to be stored in Turkmenistan. Our servers are in the US, so Healthcare chats here are answered but not saved.",
+   "storage_reason": "Turkmen law requires personal data to be stored in Turkmenistan. Our servers are outside Turkmenistan, so Healthcare chats here are answered but not saved.",
    "laws": [
     {
      "name": "Law No. 519-V on Information about Private Life and its Protection",
@@ -6137,7 +6152,8 @@
     "https://www.fda.gov/media/80958/download",
     "https://www.ftc.gov/legal-library/browse/cases-proceedings/hims-hers"
    ],
-   "notes": "HIPAA does not apply (consumer app, no provider or plan contract); it would if a covered entity deployed or paid for it (BAA, Security Rule). Likely a PHR vendor under the HBNR: 60-day breach notice, and ad-pixel sharing counts as a breach. FTC v. Hims & Hers (filed July 29, 2026) pending. COPPA: block under-13s. DOJ 28 CFR 202 bars bulk health-data access from countries of concern. Research suggests applying the strictest state rules (WA consent, CA CMIA, CA/NY AI notice and crisis protocol) to all US users, as IP state detection is unreliable."
+   "notes": "HIPAA does not apply (consumer app, no provider or plan contract); it would if a covered entity deployed or paid for it (BAA, Security Rule). Likely a PHR vendor under the HBNR: 60-day breach notice, and ad-pixel sharing counts as a breach. FTC v. Hims & Hers (filed July 29, 2026) pending. COPPA: block under-13s. DOJ 28 CFR 202 bars bulk health-data access from countries of concern. Research suggests applying the strictest state rules (WA consent, CA CMIA, CA/NY AI notice and crisis protocol) to all US users, as IP state detection is unreliable.",
+   "complaints_to": "the Federal Trade Commission or your state attorney general"
   },
   "US-CA": {
    "name": "California, United States",
@@ -6705,7 +6721,8 @@
     "https://inforegulator.org.za/wp-content/uploads/2025/10/SECTION-112_2_C_-HEALTH-REGULATIONS-FINAL-1.pdf",
     "https://www.sahpra.org.za/medical-devices-and-in-vitro-diagnostics-guidelines/"
    ],
-   "notes": "Persist: consent (POPIA s.27(1)(a)); the s.32 health authorisation covers only providers. Transfers: binding POPIA-grade agreements with each vendor keep us within s.72(1)(a); without them s.57(1)(d) needs prior Information Regulator authorisation to send health data to a non-adequate country. Reach of s.3(1)(b) over a US-hosted app is debated; comply anyway. The 2025 draft s.112(2)(c) health regulations target insurers and medical schemes, not us. Backend: Information Officer registration, PAIA manual, s.22 breach notice."
+   "notes": "Persist: consent (POPIA s.27(1)(a)); the s.32 health authorisation covers only providers. Transfers: binding POPIA-grade agreements with each vendor keep us within s.72(1)(a); without them s.57(1)(d) needs prior Information Regulator authorisation to send health data to a non-adequate country. Reach of s.3(1)(b) over a US-hosted app is debated; comply anyway. The 2025 draft s.112(2)(c) health regulations target insurers and medical schemes, not us. Backend: Information Officer registration, PAIA manual, s.22 breach notice.",
+   "complaints_to": "the Information Regulator"
   },
   "ZM": {
    "name": "Zambia",

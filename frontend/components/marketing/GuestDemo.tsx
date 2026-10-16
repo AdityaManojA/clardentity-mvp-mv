@@ -1060,6 +1060,9 @@ export function GuestDemo({
                   </button>
                 }
               />
+              {messages.length > 0 && (
+                <ModeDisclosure mode={mode} className="mt-1.5 px-2 text-center text-xs text-white/55" />
+              )}
             </div>
           )}
         </div>

@@ -31,18 +31,17 @@ export function fetchHealthConsent(): Promise<HealthConsentState> {
   return apiFetch<HealthConsentState>("/healthcare/consent", { fresh: true });
 }
 
-export function giveHealthConsent(version: string): Promise<HealthConsentState> {
+/** Give consent to the version on the card, in the language it was read in
+ *  (recorded with the consent). */
+export function giveHealthConsent(version: string, language = "en"): Promise<HealthConsentState> {
   return apiFetch<HealthConsentState>("/healthcare/consent", {
     method: "POST",
-    body: { version, age_confirmed: true },
+    body: { version, age_confirmed: true, language },
   });
 }
 
-export function withdrawHealthConsent(
-  deleteConversations: boolean,
-): Promise<HealthConsentState & { deleted_conversations: number }> {
-  return apiFetch("/healthcare/consent/withdraw", {
-    method: "POST",
-    body: { delete_conversations: deleteConversations },
-  });
+/** Withdraw consent - which also deletes every chat with a Healthcare
+ *  message in it (see backend api/healthcare.py). */
+export function withdrawHealthConsent(): Promise<HealthConsentState & { deleted_conversations: number }> {
+  return apiFetch("/healthcare/consent/withdraw", { method: "POST", body: {} });
 }

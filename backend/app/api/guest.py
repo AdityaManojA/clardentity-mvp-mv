@@ -46,6 +46,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sse_starlette.sse import EventSourceResponse
 
+from app.core.client_ip import client_ip, client_timezone
 from app.api.deps import get_current_user
 from app.api.healthcare import CONSENT_VERSION, consent_state
 from app.core.config import settings
@@ -106,10 +107,7 @@ def _address(request: Request) -> str:
     for everybody. The forwarded header is the real address - and it is
     spoofable, which is exactly why the global ceiling above it exists.
     """
-    forwarded = request.headers.get("x-forwarded-for", "")
-    if forwarded:
-        return forwarded.split(",")[0].strip()
-    return request.client.host if request.client else "unknown"
+    return client_ip(request)
 
 
 class GuestTurn(BaseModel):
@@ -225,6 +223,7 @@ async def guest_chat(payload: GuestRequest, request: Request) -> EventSourceResp
     the app's own stream reader.
     """
     address = _address(request)
+    timezone = client_timezone(request)
     session_id = str(payload.session_id)
 
     # Two different refusals, and they are not the same event. One is "you
@@ -276,8 +275,8 @@ async def guest_chat(payload: GuestRequest, request: Request) -> EventSourceResp
             # held for a visitor in their browser session instead of on an
             # account. Before any spending: a consent card costs nothing.
             if mode == "healthcare":
-                country, subdivision = await visitor_location(address)
-                health = consent_state(country, subdivision)
+                country, subdivision = await visitor_location(address, timezone)
+                health = consent_state(country, subdivision, demo=True)
                 if not health["available"]:
                     yield {
                         "event": "error",
@@ -437,7 +436,7 @@ async def guest_chat(payload: GuestRequest, request: Request) -> EventSourceResp
             )
             # Where the visitor is, only when the answer depends on it.
             country, subdivision = (
-                await visitor_location(address)
+                await visitor_location(address, timezone)
                 if risk.flagged or mode in ("guidance", "healthcare")
                 else (None, None)
             )

@@ -157,6 +157,8 @@ MODE_INSTRUCTIONS: dict[str, str] = {
         "one that fits best, and keep the rest for later in the conversation. When "
         "they are hurting, the whole reply is short - a few short paragraphs, and "
         "no list of tips.\n"
+        "Whichever the register, one reply carries at most three concrete steps - "
+        "the ones that matter most; the rest can come later in the conversation.\n"
         "Read which the person needs. When someone is upset, steady first and "
         "practical second: do not jump to fixes or a five-point plan while they "
         "are still telling you what happened.\n\n"
@@ -303,7 +305,10 @@ _GUIDANCE_CLOSING = (
     "When the person is hurting, the <crux> sentence below is the exception to "
     "'the direct conclusion': it says, warmly, what you understood about how "
     "they are - never advice, never 'it's worth seeing a professional'. The "
-    "advice comes after, in the answer.\n\n"
+    "advice comes after, in the answer.\n"
+    "And in Guidance, the claim count below is a ceiling, not a target: at most "
+    "three concrete steps in one reply, and when the person is struggling, no "
+    "bulleted list of techniques - one or two things, in plain sentences.\n\n"
 )
 
 # No instruction to ask anything. Clarifying questions are a separate

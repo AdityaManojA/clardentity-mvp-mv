@@ -10,8 +10,8 @@ export const metadata: Metadata = {
 /* Kept in step with backend settings.terms_version: the account row records
    which version was accepted, and that is only meaningful if the number here
    is the one people saw. */
-const VERSION = "2026-10-16";
-const UPDATED = "16 October 2026";
+const VERSION = "2026-10-17";
+const UPDATED = "17 October 2026";
 const CONTACT = "hello@clardentity.ai";
 
 export default function PrivacyPage() {
@@ -131,8 +131,8 @@ export default function PrivacyPage() {
             ["Anthropic", "Your question, the recent conversation, any attached text, to generate an answer", "United States"],
             ["OpenAI", "The same, when used as a fallback; audio for transcription; text for embeddings", "United States"],
             ["Tavily", "Search queries derived from your question - not the question verbatim", "United States"],
-            ["Supabase", "The database: accounts, conversations, documents, claims", "Configured region"],
-            ["Render", "The application servers that process every request", "United States"],
+            ["Supabase", "The database and file storage: accounts, conversations, documents, claims", "South Korea (Seoul)"],
+            ["Render", "The application servers that process every request", "Singapore"],
             ["Vercel", "Serves the web app; sees requests for pages, not your conversations", "Global edge"],
             ["Upstash", "Rate-limit counters and background job queue - identifiers, not content", "Configured region"],
             ["Resend", "Your email address, to send password resets and welcome mail", "United States"],
@@ -147,9 +147,13 @@ export default function PrivacyPage() {
 
       <Section n={5} title="International transfers">
         <p>
-          Some of the processors above are outside the UK, EU and India. Where personal data
-          leaves those areas we rely on the transfer mechanisms our providers offer - Standard
-          Contractual Clauses and, where applicable, the EU-US Data Privacy Framework.
+          Our servers are in Singapore, our database is in South Korea, and the AI models that
+          write answers run in the United States - so what you send leaves the UK, the EU and
+          India. Where personal data leaves those areas we rely on the transfer mechanisms our
+          providers offer - Standard Contractual Clauses and, where applicable, the EU-US Data
+          Privacy Framework (and, for South Korea, the EU&apos;s adequacy decision). India&apos;s
+          Digital Personal Data Protection Act allows transfers to any country the Government
+          has not restricted; none of these is.
         </p>
       </Section>
 
@@ -158,9 +162,10 @@ export default function PrivacyPage() {
           <strong>Healthcare asks before it answers.</strong> Before your first health
           conversation it shows what will happen to what you share, under the rules for where you
           are, and asks for your explicit consent. We record when you gave it and which version
-          of that text you saw; if the text changes, it asks again. You can withdraw consent at
-          any time in Settings → Healthcare, and choose to delete every chat that has a
-          Healthcare message in it at the same time.
+          of that text you saw, and in which language (in India it can be read in English or
+          Hindi); if the text changes, it asks again. You can withdraw consent at any time in
+          Settings → Healthcare, and withdrawing deletes every chat that has a Healthcare message
+          in it.
         </p>
         <p>
           <strong>The rules of where you are apply.</strong> We work out your country (and, in
@@ -232,6 +237,15 @@ export default function PrivacyPage() {
           If you think we have handled your data badly, you may complain to your local
           supervisory authority - the Information Commissioner&apos;s Office in the UK, your
           national authority in the EU, or the Data Protection Board of India.
+        </p>
+        <p>
+          <strong>Grievances (India).</strong> Under India&apos;s Information Technology
+          (Reasonable Security Practices and Procedures and Sensitive Personal Data or
+          Information) Rules, 2011 and the Digital Personal Data Protection Act, 2023, write to
+          our Grievance Officer at{" "}
+          <a className="text-brand hover:underline" href={`mailto:${CONTACT}`}>{CONTACT}</a>. We
+          acknowledge every grievance and resolve it within one month. If we do not, you can
+          complain to the Data Protection Board of India.
         </p>
       </Section>
 

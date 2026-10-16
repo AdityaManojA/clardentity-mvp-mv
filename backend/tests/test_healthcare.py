@@ -286,7 +286,9 @@ class TestWithdrawing:
         finally:
             await _cleanup(user_id)
 
-    async def test_without_deleting_the_chats_stay(self):
+    async def test_withdrawing_always_deletes_even_when_an_old_client_says_not_to(self):
+        # India's DPDP Act s.8(7) and GDPR Art. 17(1)(b): data held on consent
+        # goes when the consent does. Clients before 2026-10-16 sent this flag.
         headers, user_id, kept, _ = await _account("XP", consented=True)
         try:
             await _say(kept, "My knee hurts", "healthcare")
@@ -294,9 +296,11 @@ class TestWithdrawing:
                 res = await c.post(
                     f"{API}/healthcare/consent/withdraw", json={"delete_conversations": False}, headers=headers
                 )
-            assert res.json()["deleted_conversations"] == 0
+                bare = await c.post(f"{API}/healthcare/consent/withdraw", headers=headers)
+            assert res.json()["deleted_conversations"] == 1
+            assert bare.status_code == 200, "a body is not required"
             async with AsyncSessionLocal() as db:
-                assert await db.get(Conversation, kept) is not None
+                assert await db.get(Conversation, kept) is None
         finally:
             await _cleanup(user_id)
 
@@ -487,7 +491,7 @@ class TestTheDemoAsksFirst:
         await self._redis()
         called = []
 
-        async def where(address):
+        async def where(address, timezone=None):
             return "XT", None
 
         async def guidance(*a, **k):
@@ -509,7 +513,7 @@ class TestTheDemoAsksFirst:
 
         await self._redis()
 
-        async def where(address):
+        async def where(address, timezone=None):
             return "XU", None
 
         monkeypatch.setattr(guest_api, "visitor_location", where)

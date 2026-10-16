@@ -71,12 +71,57 @@ withdrawable consent before processing**, so that is the global floor.
 |---|---|
 | **Consent first** | Healthcare does nothing until the person has agreed on the consent card: where they are, what happens to their conversation there, the laws it is given under, and an age box. Recorded with the time, the jurisdiction and the text version (`CONSENT_VERSION` in `backend/app/api/healthcare.py`); a new version asks again. |
 | **Adults only** | 18, or the local age of majority where it is higher (19 in Korea and Algeria, 20 in Thailand, 21 in Bahrain and Kuwait). |
-| **Withdrawable** | Settings → Healthcare. Optionally deletes every chat with a Healthcare message in it (the whole chat - a conversation is one thread). |
+| **Withdrawable** | Settings → Healthcare, with one confirmation. Withdrawing deletes every chat with a Healthcare message in it (the whole chat - a conversation is one thread), as India's DPDP Act and GDPR Art. 17 expect. |
 | **Stored, temporary, or not offered** | Per jurisdiction (`storage`): `persist` - kept in history; `transient` - Healthcare runs only as a temporary chat, deleted when left (where health data may not be stored abroad, or storing it needs a regulator permit we do not hold); `unavailable` - not offered (US sanctions, no AI-provider support, or no lawful route to process health data abroad at all). |
 | **Never profiled** | Healthcare messages are never evidence for the profile; stated-fact capture never records health, emotional, sexual-life, religious or harm data in any mode. |
 | **Never in analytics** | Events record Guidance and Healthcare only as `"sensitive"`. |
 | **Demo** | Consent is held for the browser session; demo Healthcare turns are never carried into an account at sign-up. |
 | **Enforced on the server** | 428 without consent, 409 for a kept chat where only temporary is allowed, 403 where unavailable - on new messages, regenerations and live-call transcripts alike. |
+
+### India in detail
+
+India is where most users are, so it is held to everything its rules ask of
+a consumer health information service today (the IT Act's SPDI Rules 2011)
+and to what the DPDP Act and Rules 2025 add from May 2027:
+
+- **The notice** names what is collected and why, who processes it and
+  where (Anthropic and OpenAI in the US; our servers in Singapore; the
+  database in South Korea), that withdrawing deletes, the grievance contact,
+  and that a complaint can go to the Data Protection Board of India. It can
+  be read in **English or Hindi**, and the language it was agreed in is
+  recorded with the consent, along with the version, time, jurisdiction and
+  purposes (DPDP s.6(10) puts the burden of proof on us).
+- **Withdrawing deletes** every chat with a Healthcare message in it (DPDP
+  s.6(6), s.8(7)).
+- **18+** (DPDP s.9: under-18s need verifiable parental consent).
+- **The model** refers anything about the person's own condition to a
+  registered medical practitioner (Telemedicine Practice Guidelines 2020,
+  para 5.4: AI may not counsel patients), uses Indian medicine names and says
+  when something is Schedule H/H1/X, never presents a drug or AYUSH remedy as
+  a cure (Drugs and Magic Remedies Act), and refuses any request to learn a
+  baby's sex without naming a method, even to debunk it (PCPNDT Act).
+  Guidance never calls itself counselling or therapy and points to
+  **Tele-MANAS** when symptoms have lasted.
+- **Numbers**, each verified on an official page: 112 (ERSS), 108
+  (ambulance - first on a crisis card for self-harm or a medical emergency),
+  Tele-MANAS 14416 (24/7, Indian languages), National Poisons Information
+  Centre (AIIMS) 1800 116 117.
+- **Finding India**: the address the request really came from (the
+  forwarded header - the proxy's own address said nothing, and until
+  2026-10-17 no signed-in user had a location at all), looked up when needed
+  and kept; when the lookup service cannot answer, the browser's time zone
+  (Asia/Kolkata, or the Asia/Calcutta Chrome reports) names the country.
+- **The safety backstop** reads the word for suicide in Hindi, Marathi,
+  Bengali, Telugu, Kannada, Gujarati, Punjabi, Odia, Malayalam, Tamil and
+  Urdu, and Hinglish phrases such as "jeena nahi chahta".
+- **Graded** by `mode_standards.py` IN1-IN5 (prescription-only antibiotics,
+  sex determination, a Hinglish crisis, exam anxiety, "Ayurvedic cure for
+  diabetes").
+
+Still to do for India: the Grievance Officer's **name** must be published
+(SPDI r.5(9)); the notice in the other Eighth Schedule languages on request
+(DPDP s.5(3), from May 2027); a 6-hour CERT-In incident path and DPAs with
+the processors are operational, not code.
 
 ### The regulation suite
 

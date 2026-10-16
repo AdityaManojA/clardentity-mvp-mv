@@ -75,9 +75,21 @@ class TestAssess:
         await safety.assess("and tonight it's worse", [("user", "I haven't slept in days"), ("assistant", "...")])
         assert "I haven't slept in days" in calls[0]["input_text"]
 
-    @pytest.mark.parametrize("phrase", ["आत्महत्या", "ആത്മഹത്യ", "தற்கொலை", "انتحار"])
+    @pytest.mark.parametrize(
+        "phrase",
+        [
+            "आत्महत्या", "ख़ुदकुशी", "मैं मर जाना चाहता हूँ", "अब जीना नहीं चाहती",
+            "আত্মহত্যা", "ఆత్మహత్య", "ಆತ್ಮಹತ್ಯೆ", "આત્મહત્યા", "ਖੁਦਕੁਸ਼ੀ", "ଆତ୍ମହତ୍ୟା",
+            "ആത്മഹത്യ", "தற்கொலை", "خودکشی", "انتحار",
+            "main mar jaana chahta hoon", "ab jeena nahi chahti", "suicide kar lunga", "khudkushi",
+        ],
+    )
     def test_the_backstop_reads_our_users_languages(self, phrase):
         assert safety.lexical(f"... {phrase} ...").flagged
+
+    @pytest.mark.parametrize("phrase", ["mar gaya yaar, kitna kaam hai", "is exam ne maar diya", "marna hai kya"])
+    def test_everyday_hinglish_is_not_a_crisis(self, phrase):
+        assert not safety.lexical(phrase).flagged
 
 
 class TestWhatIsSaid:

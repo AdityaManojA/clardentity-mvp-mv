@@ -52,7 +52,7 @@
   "health_data": "special_category",
   "consent_age": 18,
   "storage": "transient",
-  "storage_reason": "Armenia requires regulator permission to send personal data to the US, which we don't hold yet, so Healthcare chats here are answered but not saved.",
+  "storage_reason": "Armenia requires regulator permission to send personal data abroad, which we don't hold yet, so Healthcare chats here are answered but not saved.",
   "laws": [
    {
     "name": "Law HO-49-N on Protection of Personal Data",
@@ -179,7 +179,7 @@
   "health_data": "sensitive",
   "consent_age": 18,
   "storage": "transient",
-  "storage_reason": "Kazakh law requires personal data to be stored in Kazakhstan. Our servers are in the US, so Healthcare chats here are answered but not saved.",
+  "storage_reason": "Kazakh law requires personal data to be stored in Kazakhstan. Our servers are outside Kazakhstan, so Healthcare chats here are answered but not saved.",
   "laws": [
    {
     "name": "Law No. 94-V on Personal Data and Their Protection",
@@ -371,7 +371,7 @@
   "health_data": "personal",
   "consent_age": 18,
   "storage": "transient",
-  "storage_reason": "Tajik law may require personal data to be stored in Tajikistan. Our servers are in the US, so Healthcare chats here are answered but not saved.",
+  "storage_reason": "Tajik law may require personal data to be stored in Tajikistan. Our servers are outside Tajikistan, so Healthcare chats here are answered but not saved.",
   "laws": [
    {
     "name": "Law No. 1537 on Personal Data Protection",
@@ -398,7 +398,7 @@
   "health_data": "sensitive",
   "consent_age": 18,
   "storage": "transient",
-  "storage_reason": "Turkmen law requires personal data to be stored in Turkmenistan. Our servers are in the US, so Healthcare chats here are answered but not saved.",
+  "storage_reason": "Turkmen law requires personal data to be stored in Turkmenistan. Our servers are outside Turkmenistan, so Healthcare chats here are answered but not saved.",
   "laws": [
    {
     "name": "Law No. 519-V on Information about Private Life and its Protection",

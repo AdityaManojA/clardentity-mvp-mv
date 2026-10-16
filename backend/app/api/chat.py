@@ -92,6 +92,7 @@ from app.services import safety
 from app.services.regulations import jurisdiction_block, profile_for
 from app.services.retrieval import RetrievedChunk, retrieve_chunks
 from app.services.temporary_chats import discard, sweep_idle
+from app.services.user_location import get_located_user
 from app.services.token_meter import meter as token_meter
 from app.services.storage import upload_file
 from app.services.router import InvalidModeError, InvalidReasoningLensError, validate_mode, validate_reasoning_lens
@@ -851,7 +852,7 @@ async def _store_counterfactual(message_id: uuid.UUID, pending: "asyncio.Task[st
 async def send_message(
     conversation_id: uuid.UUID,
     payload: MessageCreate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_located_user),
     db: AsyncSession = Depends(get_db),
 ) -> EventSourceResponse:
     await check_rate_limit(f"chat:send:{current_user.id}", max_requests=20, window_seconds=60)
@@ -1820,7 +1821,7 @@ async def send_message(
 async def save_call_transcript(
     conversation_id: uuid.UUID,
     payload: CallTranscript,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_located_user),
     db: AsyncSession = Depends(get_db),
 ) -> list[MessageOut]:
     """Write a finished call into the conversation.

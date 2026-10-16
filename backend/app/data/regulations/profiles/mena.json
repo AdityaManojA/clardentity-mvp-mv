@@ -4,7 +4,7 @@
   "health_data": "sensitive",
   "consent_age": 18,
   "storage": "transient",
-  "storage_reason": "UAE health-data law may require health information to stay in the UAE. Our servers are in the US, so Healthcare chats here are answered but not saved.",
+  "storage_reason": "UAE health-data law may require health information to stay in the UAE. Our servers are outside the UAE, so Healthcare chats here are answered but not saved.",
   "laws": [
    {
     "name": "Federal Law No. 2 of 2019 on the Use of ICT in Health Fields (ICT Health Law)",
@@ -47,14 +47,15 @@
    "https://www.lw.com/en/insights/2021/08/UAE-Decision-on-Health-Data-Law-Provides-Clarity",
    "https://www.tamimi.com/law-update-articles/you-are-in-my-system-the-implementing-regulations-on-federal-law-regulating-the-use-of-ict-in-the-uae-healthcare-sector/"
   ],
-  "notes": "Transient as the research recommends: ICT Health Law Art. 13 keeps health data in the UAE; MD 51/2021 arguably limits it to UAE facilities, untested. Research allows saved history on a separate express opt-in naming US processors (PDPL Art. 23(1)(b)); the schema can't express that, so counsel may move to persist. PDPL Executive Regulations unpublished. Age 18 relies on a reported, unverified 2025 change to 18 Gregorian years; otherwise majority is 21 lunar years. Guidance disclosures are sensitive data too."
+  "notes": "Transient as the research recommends: ICT Health Law Art. 13 keeps health data in the UAE; MD 51/2021 arguably limits it to UAE facilities, untested. Research allows saved history on a separate express opt-in naming US processors (PDPL Art. 23(1)(b)); the schema can't express that, so counsel may move to persist. PDPL Executive Regulations unpublished. Age 18 relies on a reported, unverified 2025 change to 18 Gregorian years; otherwise majority is 21 lunar years. Guidance disclosures are sensitive data too.",
+  "complaints_to": "the UAE Data Office"
  },
  "SA": {
   "name": "Saudi Arabia",
   "health_data": "sensitive",
   "consent_age": 18,
   "storage": "unavailable",
-  "storage_reason": "Saudi rules on sending sensitive data abroad give us no clear way to handle health conversations on our US servers, so Healthcare isn't available in Saudi Arabia yet.",
+  "storage_reason": "Saudi rules on sending sensitive data abroad give us no clear way to handle health conversations on servers outside the Kingdom, so Healthcare isn't available in Saudi Arabia yet.",
   "laws": [
    {
     "name": "Personal Data Protection Law (PDPL)",

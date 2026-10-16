@@ -89,6 +89,11 @@ class TestGuidance:
         assert text.index("the <crux> sentence below is the exception") < text.index("direct conclusion or bottom line")
         assert "the <crux> sentence below is the exception" not in _text("knowing")
 
+    def test_steps_are_capped_where_the_formatting_rules_are_read(self):
+        text = _text("guidance")
+        assert "at most three concrete steps in one reply" in text
+        assert "no bulleted list of techniques" in text
+
     def test_only_guidance_may_close_with_a_question(self):
         assert "in Guidance only" in _text("guidance")
         assert "in Guidance only" not in _text("knowing")

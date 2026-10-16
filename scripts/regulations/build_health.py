@@ -44,6 +44,9 @@ PARENTS = {
 
 KEYS = {"name", "health_data", "consent_age", "storage", "storage_reason", "laws", "healthcare_rules",
         "guidance_rules", "regulator", "confidence", "needs_review", "as_of", "sources", "notes"}
+#: Who to complain to, as it reads in "you can complain to ..." on the
+#: consent card. Optional: where it is missing the baseline's applies.
+OPTIONAL = {"complaints_to"}
 PHONE = re.compile(r"(?i)(?:\b(?:call|dial|ring|phone|text|contact)\s+(?:on\s+)?\+?\d{2,})|"
                    r"(?:(?<![\w./])\+?\d(?:[\s-]?\d){5,}(?![\w/]))")
 
@@ -56,9 +59,11 @@ def check(code: str, p: dict) -> list[str]:
 
     if not re.fullmatch(r"[A-Z]{2}(-[A-Z0-9]{1,3})?|EU|baseline", code):
         err("key must be ISO 3166-1 alpha-2, XX-SUB, EU or baseline")
-    if KEYS - set(p) or set(p) - KEYS:
-        err(f"keys: missing {sorted(KEYS - set(p))} unknown {sorted(set(p) - KEYS)}")
+    if KEYS - set(p) or set(p) - KEYS - OPTIONAL:
+        err(f"keys: missing {sorted(KEYS - set(p))} unknown {sorted(set(p) - KEYS - OPTIONAL)}")
         return errors
+    if "complaints_to" in p and (not isinstance(p["complaints_to"], str) or len(p["complaints_to"]) > 120):
+        err("complaints_to: a short phrase naming who to complain to")
     if p["health_data"] not in ("special_category", "sensitive", "personal"):
         err("health_data")
     if not isinstance(p["consent_age"], int) or not 18 <= p["consent_age"] <= 21:

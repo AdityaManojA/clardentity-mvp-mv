@@ -50,7 +50,8 @@
    "https://health.ec.europa.eu/document/download/b45335c5-1679-4c71-a91c-fc7a4d37f12b_en?filename=mdcg_2019_11_en.pdf",
    "https://www.edpb.europa.eu/documents/edpb-correspondence/edpb-letter-to-the-european-commission-on-us-supreme-court-judgment_en"
   ],
-  "notes": "Transfers: DPF upheld at first instance (T-553/23) but appeal C-703/25 P pending, and the EDPB asked the Commission (31 Jul 2026) to reassess after Trump v. Slaughter. Anthropic, OpenAI and Supabase were not DPF-listed on 16 Oct 2026, so SCCs plus a TIA carry the transfers; no Art 3(2) SCC module adopted. Back end: Art 27 representative, DPO, DPIA, separate opt-in for training/analytics, Art 50(2) marking by 2 Dec 2026, new Art 5 image bans from 2 Dec 2026, PLD from 9 Dec 2026. AI Act not yet in the EEA Agreement (IS, LI, NO). GDPR Digital Omnibus pending."
+  "notes": "Transfers: DPF upheld at first instance (T-553/23) but appeal C-703/25 P pending, and the EDPB asked the Commission (31 Jul 2026) to reassess after Trump v. Slaughter. Anthropic, OpenAI and Supabase were not DPF-listed on 16 Oct 2026, so SCCs plus a TIA carry the transfers; no Art 3(2) SCC module adopted. Back end: Art 27 representative, DPO, DPIA, separate opt-in for training/analytics, Art 50(2) marking by 2 Dec 2026, new Art 5 image bans from 2 Dec 2026, PLD from 9 Dec 2026. AI Act not yet in the EEA Agreement (IS, LI, NO). GDPR Digital Omnibus pending.",
+  "complaints_to": "the data protection authority in your country"
  },
  "AT": {
   "name": "Austria",
@@ -980,7 +981,8 @@
    "https://www.ofcom.org.uk/online-safety/illegal-and-harmful-content/ai-chatbots-and-online-regulation-what-you-need-to-know",
    "https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/international-transfers/adequacy-regulations/how-does-the-uk-extension-to-the-eu-us-data-privacy-framework-work/"
   ],
-  "notes": "Online Safety Act: the web-search feature plausibly makes the product a search service, so a scoping decision and risk assessments are needed; Crime and Policing Act 2026 chatbot regulations pending. UK-US data bridge covers only Render and PostHog (Render renews 10 Dec 2026); IDTA/UK Addendum plus a transfer risk assessment for Anthropic, OpenAI, Supabase. AI Commission recommendations accepted 6 Oct 2026; device-definition consultation due spring 2027. Keep under-18s out (Children's code). The first-aid rule is conservative - confirm."
+  "notes": "Online Safety Act: the web-search feature plausibly makes the product a search service, so a scoping decision and risk assessments are needed; Crime and Policing Act 2026 chatbot regulations pending. UK-US data bridge covers only Render and PostHog (Render renews 10 Dec 2026); IDTA/UK Addendum plus a transfer risk assessment for Anthropic, OpenAI, Supabase. AI Commission recommendations accepted 6 Oct 2026; device-definition consultation due spring 2027. Keep under-18s out (Children's code). The first-aid rule is conservative - confirm.",
+  "complaints_to": "the Information Commissioner's Office (ICO)"
  },
  "CH": {
   "name": "Switzerland",
@@ -1029,6 +1031,7 @@
    "https://www.edoeb.admin.ch/en/adequacy",
    "https://www.anthropic.com/legal/data-processing-addendum"
   ],
-  "notes": "Swiss-US DPF covers only certified recipients (Render); use EU SCCs with Swiss adaptations plus a risk assessment for Anthropic, OpenAI, Supabase (Anthropic's Swiss addendum still cites the 1992 FADP). A Swiss representative (Art 14) is likely needed. Individuals face fines up to CHF 250,000 for intentional breaches of information and transfer duties. FDPIC expects users told they talk to AI and whether inputs train models. Minors: capacity of judgment, no fixed age. FADP article numbers from knowledge; device-based rules inferred from MedDO-MDR alignment."
+  "notes": "Swiss-US DPF covers only certified recipients (Render); use EU SCCs with Swiss adaptations plus a risk assessment for Anthropic, OpenAI, Supabase (Anthropic's Swiss addendum still cites the 1992 FADP). A Swiss representative (Art 14) is likely needed. Individuals face fines up to CHF 250,000 for intentional breaches of information and transfer duties. FDPIC expects users told they talk to AI and whether inputs train models. Minors: capacity of judgment, no fixed age. FADP article numbers from knowledge; device-based rules inferred from MedDO-MDR alignment.",
+  "complaints_to": "the Federal Data Protection and Information Commissioner (FDPIC)"
  }
 }
