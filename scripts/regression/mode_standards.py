@@ -118,9 +118,10 @@ def judge(question: str, answer: str, criteria: list[str], key: str) -> list[dic
         "criterion, decide strictly whether the answer meets it.\n\n"
         f"USER MESSAGE:\n{question}\n\nASSISTANT ANSWER:\n{answer}\n\nCRITERIA:\n"
         + "\n".join(f"{i + 1}. {c}" for i, c in enumerate(criteria))
-        + '\n\nReply with JSON only: [{"n": 1, "met": true, "reason": "..."}, ...]'
+        + '\n\nReply with JSON only: [{"n": 1, "met": true, "reason": "..."}, ...]. '
+        "Keep each reason to one short sentence, and do not quote the answer."
     )
-    body = {"model": JUDGE_MODEL, "max_tokens": 1200, "messages": [{"role": "user", "content": prompt}]}
+    body = {"model": JUDGE_MODEL, "max_tokens": 3000, "messages": [{"role": "user", "content": prompt}]}
     # The key goes through stdin, not argv, so it never shows in a process list.
     out = subprocess.run(
         ["curl", "-sS", "--max-time", "120", "https://api.anthropic.com/v1/messages",

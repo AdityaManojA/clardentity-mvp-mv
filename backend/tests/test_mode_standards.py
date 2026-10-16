@@ -80,6 +80,14 @@ class TestGuidance:
         assert "advice are judgement - tag them opinion" in text
         assert "stay in the plain form so they are checked" in text
 
+    def test_the_gist_of_a_hard_moment_is_understanding_not_advice(self):
+        # The global gist rule asks for "the direct conclusion"; for someone
+        # hurting that came out as "it's worth seeing a professional" (2026-10-16).
+        text = _text("guidance")
+        assert "the <crux> sentence below is the exception" in text
+        assert text.index("the <crux> sentence below is the exception") < text.index("direct conclusion or bottom line")
+        assert "the <crux> sentence below is the exception" not in _text("knowing")
+
     def test_only_guidance_may_close_with_a_question(self):
         assert "in Guidance only" in _text("guidance")
         assert "in Guidance only" not in _text("knowing")

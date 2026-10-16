@@ -297,7 +297,11 @@ _GUIDANCE_CLOSING = (
     "that invites them to keep talking ('What's been the hardest part of it?'). "
     "Never more than one, never a quiz, and never when they asked something "
     "practical. If something unstated would change your answer, say what you "
-    "assumed and carry on.\n\n"
+    "assumed and carry on.\n"
+    "When the person is hurting, the <crux> sentence below is the exception to "
+    "'the direct conclusion': it says, warmly, what you understood about how "
+    "they are - never advice, never 'it's worth seeing a professional'. The "
+    "advice comes after, in the answer.\n\n"
 )
 
 # No instruction to ask anything. Clarifying questions are a separate
