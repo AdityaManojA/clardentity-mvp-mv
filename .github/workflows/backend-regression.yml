@@ -42,8 +42,12 @@ jobs:
       - name: MinIO
         working-directory: .
         run: |
-          docker run -d --name minio -p 19000:9000 -e MINIO_ROOT_USER=minioadmin -e MINIO_ROOT_PASSWORD=minioadmin minio/minio server /data
+          curl -sSfL -o /tmp/minio https://dl.min.io/server/minio/release/linux-amd64/minio
+          chmod +x /tmp/minio
+          mkdir -p /tmp/minio-data
+          MINIO_ROOT_USER=minioadmin MINIO_ROOT_PASSWORD=minioadmin nohup /tmp/minio server /tmp/minio-data --address :19000 > /tmp/minio.log 2>&1 &
           for i in $(seq 1 30); do curl -sf http://localhost:19000/minio/health/live && break; sleep 2; done
+          curl -sf http://localhost:19000/minio/health/live || { cat /tmp/minio.log; exit 1; }
       - run: pip install -q -r requirements.txt
       - name: Bucket
         run: python -c "import boto3; boto3.client('s3', endpoint_url='http://localhost:19000', aws_access_key_id='minioadmin', aws_secret_access_key='minioadmin', region_name='us-east-1').create_bucket(Bucket='clardentity-dev')"
