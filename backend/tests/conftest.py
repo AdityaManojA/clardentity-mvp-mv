@@ -67,3 +67,9 @@ async def _dispose_pools_between_tests():
 
     await analytics_redis.aclose()
     await analytics_redis.connection_pool.disconnect()
+    # And the paid companions' daily allowance, the first time a test sends a
+    # signed-in Co-Creative message after another test has used it.
+    from app.services.preview_access import _redis as preview_redis
+
+    await preview_redis.aclose()
+    await preview_redis.connection_pool.disconnect()

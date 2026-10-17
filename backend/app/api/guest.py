@@ -370,6 +370,36 @@ async def guest_chat(payload: GuestRequest, request: Request) -> EventSourceResp
                 ):
                     switched_from, mode = mode, suggested
                 gate = None
+            # A question moved into Healthcare meets Healthcare's own door,
+            # exactly as one asked there would (the check at the top of this
+            # stream ran for the mode the visitor picked, not this one).
+            # Where it is not offered, the question stays where it was asked;
+            # without consent, the visitor sees the switch and then the card,
+            # and agreeing re-sends it in Healthcare. The app gets the same
+            # outcome from its re-send hitting the consent check.
+            if switched_from and mode == "healthcare":
+                country, subdivision = await visitor_location(address, timezone)
+                health = consent_state(country, subdivision, demo=True)
+                if not health["available"]:
+                    mode, switched_from = switched_from, None
+                elif payload.health_consent != CONSENT_VERSION:
+                    plan_task.cancel()
+                    used, _ = await spent(session_id, address)
+                    await charge(session_id, address, 0, usage.total_tokens)
+                    yield {
+                        "event": "switched",
+                        "data": json.dumps({"from": switched_from, "to": mode}),
+                    }
+                    yield {"event": "health_consent", "data": json.dumps(health)}
+                    yield _budget_event(used)
+                    return
+            # A question moved into Co-Creative may be asking for a picture,
+            # which only Co-Creative checks for - without this it was answered
+            # in words, never drawn.
+            if switched_from and mode == "creative" and image_request is None:
+                image_request = await wanted_image(
+                    content, pairs, has_previous_image=previous_image is not None
+                )
             if gate is not None:
                 plan_task.cancel()
                 used, _ = await spent(session_id, address)
@@ -422,6 +452,10 @@ async def guest_chat(payload: GuestRequest, request: Request) -> EventSourceResp
             )
             search_started = time.monotonic()
 
+            # Someone who may be in danger is answered in words, never with a
+            # picture - the app's rule (api/chat.py).
+            if risk.crisis:
+                image_request = None
             references = (
                 await asyncio.to_thread(reference_images, [], previous_image)
                 if image_request and image_request.edit
@@ -482,7 +516,7 @@ async def guest_chat(payload: GuestRequest, request: Request) -> EventSourceResp
                 memory_summary=None,
                 make_generation=make_generation,
                 image_task=image_task,
-                image_only=bool(image_request and image_request.only),
+                image_only=bool(image_request and image_request.only) and not risk.flagged,
                 review_task=review_task,
                 thinking_task=thinking_task,
                 decision_task=decision_task,

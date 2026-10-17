@@ -471,6 +471,89 @@ class TestACrisisIsNeverGated:
             await _cleanup(user_id)
 
 
+    async def test_signed_in_a_picture_request_in_crisis_gets_words(self, monkeypatch):
+        """Co-Creative: a picture-only request wrote no answer at all, so a
+        person in crisis got the support card above an empty reply, and the
+        picture (never collected on the crisis path) was lost."""
+        from datetime import UTC, datetime
+
+        from app.api import chat as chat_api
+        from app.services.decision_classifier import NO_DECISION
+        from app.services.image_generation import ImageRequest
+        from app.services.search_planner import SearchPlan
+
+        headers, user_id, kept, _ = await _account("XP")
+        async with AsyncSessionLocal() as db:
+            user = await db.get(User, user_id)
+            user.preview_unlocked_at = datetime.now(UTC)
+            await db.commit()
+        seen: dict = {"instructions": None}
+        drawn: list[str] = []
+
+        async def crisis(message, history=None):
+            return safety.Assessment("crisis", "suicide_or_self_harm", "model")
+
+        async def gate(question, mode, history=None):
+            return None
+
+        async def plan(history, message):
+            return SearchPlan(retrieval_query=message, queries=[])
+
+        async def chunks(*a, **k):
+            return []
+
+        async def no_decision(message):
+            return NO_DECISION
+
+        async def wants(message, history=None, **sources):
+            return ImageRequest(prompt="a dark empty room", only=True)
+
+        async def draw(prompt, owner, references=None):
+            drawn.append(prompt)
+            return {"id": str(uuid.uuid4()), "owner": str(owner), "prompt": prompt}
+
+        async def nothing(*a, **k):
+            return None
+
+        async def title(question, gist, fallback):
+            return "t"
+
+        reply = "<crux>I'm really glad you told me.</crux>\n\nAre you safe right now?"
+
+        async def generate(*, instructions, input_text, **kwargs):
+            seen["instructions"] = "\n".join(b["text"] for b in instructions)
+            yield {"type": "delta", "text": reply}
+            yield {"type": "done", "full_text": reply}
+
+        monkeypatch.setattr(safety, "assess", crisis)
+        monkeypatch.setattr(chat_api, "propose_guidance", gate)
+        monkeypatch.setattr(chat_api, "plan_searches", plan)
+        monkeypatch.setattr(chat_api, "retrieve_chunks", chunks)
+        monkeypatch.setattr(chat_api, "classify_decision", no_decision)
+        monkeypatch.setattr(chat_api, "wanted_image", wants)
+        monkeypatch.setattr(chat_api, "generate_image", draw)
+        monkeypatch.setattr(chat_api, "name_conversation", title)
+        monkeypatch.setattr(chat_api, "capture_stated_facts", nothing)
+        monkeypatch.setattr(chat_api, "stream_generation", generate)
+        try:
+            async with client() as c:
+                res = await c.post(
+                    f"{API}/chat/{kept}/messages",
+                    json={"content": "draw how I feel, I don't want to be here anymore", "mode": "creative"},
+                    headers=headers,
+                )
+            assert res.status_code == 200, res.text
+            assert drawn == [], "a picture was made for someone in crisis"
+            assert seen["instructions"] and "SAFETY - this comes before everything else" in seen["instructions"]
+            async with AsyncSessionLocal() as db:
+                answer = (await db.execute(
+                    select(Message).where(Message.conversation_id == kept, Message.role == "assistant")
+                )).scalar_one()
+            assert answer.content and "safe right now" in answer.content
+        finally:
+            await _cleanup(user_id)
+
+
 class TestTheDemoAsksFirst:
     async def _ask(self, **body):
         payload = {"session_id": str(uuid.uuid4()), "history": [], **body}

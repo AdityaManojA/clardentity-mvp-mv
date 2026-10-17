@@ -499,6 +499,136 @@ class TestADemoAnswerIsTheProductsAnswer:
             assert "switched" not in [e for e, _ in events], suggestion
             assert dict(events)["final"]["message"]["mode_used"] == "knowing", suggestion
 
+    def _visitor_in(self, monkeypatch, country):
+        """A regulation table these tests control, and a visitor in it."""
+        from app.api import guest as guest_api
+        from app.services import regulations
+
+        table = {
+            "profiles": {
+                "baseline": {
+                    "name": "your location",
+                    "consent_age": 18,
+                    "storage": "persist",
+                    "laws": [{"name": "Baseline law"}],
+                    "healthcare_rules": ["Never diagnose."],
+                },
+                "XP": {"name": "Persistland"},
+                "XU": {"name": "Unavailableland", "storage": "unavailable", "storage_reason": "Not offered."},
+            }
+        }
+        monkeypatch.setattr(regulations, "_health", lambda: table)
+        monkeypatch.setattr(regulations, "_emergency", lambda: {})
+
+        async def where(address, timezone=None):
+            return country, None
+
+        monkeypatch.setattr(guest_api, "visitor_location", where)
+
+    async def test_a_switch_into_healthcare_asks_for_consent_first(self, monkeypatch):
+        """Healthcare's consent card was checked only for the companion the
+        visitor picked, so a question smart switching moved into Healthcare
+        was answered there without it. Now the switch meets the same door,
+        and nothing is written until the visitor agrees."""
+        from app.api.healthcare import CONSENT_VERSION
+
+        await self._available()
+        seen = self._fake_pipeline(
+            monkeypatch, guidance={"suggested_mode": "healthcare", "mode_reason": "Health."}
+        )
+        self._visitor_in(monkeypatch, "XP")
+        question = "Is a resting heart rate of 50 bad?"
+
+        res = await self._ask(mode="knowing", message=question)
+        events = _frames(res.text)
+        assert [e for e, _ in events] == ["switched", "health_consent", "budget"], res.text[:300]
+        assert events[0][1] == {"from": "knowing", "to": "healthcare"}
+        assert events[1][1]["jurisdiction"]["name"] == "Persistland"
+        assert seen["modes"] == [], "an answer was written before consent"
+
+        # Agreeing re-sends it in Healthcare, where it is answered.
+        res = await self._ask(
+            mode="healthcare", message=question,
+            health_consent=CONSENT_VERSION, mode_confirmed=True,
+        )
+        assert dict(_frames(res.text))["final"]["message"]["mode_used"] == "healthcare"
+
+    async def test_a_switch_into_healthcare_where_it_is_not_offered_stays_put(self, monkeypatch):
+        await self._available()
+        self._fake_pipeline(monkeypatch, guidance={"suggested_mode": "healthcare"})
+        self._visitor_in(monkeypatch, "XU")
+        res = await self._ask(mode="knowing", message="Is a resting heart rate of 50 bad?")
+        events = _frames(res.text)
+        names = [e for e, _ in events]
+        assert "switched" not in names and "health_consent" not in names
+        assert dict(events)["final"]["message"]["mode_used"] == "knowing"
+
+    async def test_a_switch_into_co_creative_can_still_draw(self, monkeypatch):
+        """Only Co-Creative asks whether a message wants a picture, and it
+        asked before the switch - so a drawing request moved there was
+        answered in words."""
+        from app.api import guest as guest_api
+        from app.services.image_generation import ImageRequest
+
+        await self._available()
+        self._fake_pipeline(monkeypatch, guidance={"suggested_mode": "creative"})
+        drawn: list[str] = []
+
+        async def wants(message, history=None, **sources):
+            return ImageRequest(prompt="a lighthouse at dusk", only=True)
+
+        async def draw(prompt, owner, references=None):
+            drawn.append(prompt)
+            return {"id": "00000000-0000-0000-0000-000000000001", "owner": str(owner), "prompt": prompt}
+
+        monkeypatch.setattr(guest_api, "wanted_image", wants)
+        monkeypatch.setattr(guest_api, "generate_image", draw)
+        res = await self._ask(mode="knowing", message="Draw me a lighthouse at dusk")
+        events = _frames(res.text)
+        assert events[0] == ("switched", {"from": "knowing", "to": "creative"})
+        assert drawn == ["a lighthouse at dusk"]
+
+    async def _picture_request_from_someone_at(self, monkeypatch, level):
+        from app.api import guest as guest_api
+        from app.services import safety
+        from app.services.image_generation import ImageRequest
+
+        seen = self._fake_pipeline(monkeypatch)
+        drawn: list[str] = []
+
+        async def assess(message, history=None):
+            return safety.Assessment(level, "suicide_or_self_harm" if level == "crisis" else "distress", "model")
+
+        async def wants(message, history=None, **sources):
+            return ImageRequest(prompt="a dark empty room", only=True)
+
+        async def draw(prompt, owner, references=None):
+            drawn.append(prompt)
+            return {"id": "00000000-0000-0000-0000-000000000001", "owner": str(owner), "prompt": prompt}
+
+        monkeypatch.setattr(safety, "assess", assess)
+        monkeypatch.setattr(guest_api, "wanted_image", wants)
+        monkeypatch.setattr(guest_api, "generate_image", draw)
+        res = await self._ask(mode="creative", message="draw how I feel, I don't want to be here anymore")
+        return seen, drawn, _frames(res.text)
+
+    async def test_someone_in_crisis_is_answered_in_words_not_drawn_a_picture(self, monkeypatch):
+        """A picture-only request skipped writing an answer altogether, so a
+        person in crisis got the support card above an empty reply."""
+        await self._available()
+        seen, drawn, events = await self._picture_request_from_someone_at(monkeypatch, "crisis")
+        assert drawn == []
+        assert seen["modes"], "no reply was written"
+        names = [e for e, _ in events]
+        assert "safety" in names
+        assert dict(events)["final"]["message"]["content"].strip()
+
+    async def test_a_flagged_picture_request_still_gets_words_beside_the_picture(self, monkeypatch):
+        await self._available()
+        seen, drawn, events = await self._picture_request_from_someone_at(monkeypatch, "concern")
+        assert drawn == ["a dark empty room"]
+        assert seen["modes"], "the concern reply was never written"
+
     async def test_the_quick_answer_skips_the_gates_and_the_checking(self, monkeypatch):
         await self._available()
         seen = self._fake_pipeline(

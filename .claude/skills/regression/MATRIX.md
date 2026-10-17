@@ -37,6 +37,7 @@ Add a row for every feature that ships and every bug found. Retire, never delete
 | B4b | Thought coach keeps its box above the gist (box, gist, journey) | browser |
 | B5 | Context-question card: answer it → answered turn; "Answer without this" → answered turn | browser |
 | B6 | Switch toast (4s ring, "Stay in X") then banner "Switched to X - … Back to Y"; labels use the app's spelling ("Thought coach") | browser |
+| B6b | **A smart switch into Healthcare meets Healthcare's door** in the demo: without consent the visitor sees the switch, then the consent card, and agreeing answers in Healthcare (not the companion they started in); where Healthcare is not offered, the question stays where it was asked; a switch into Co-Creative can still draw (2026-10-17: the switch skipped consent and availability, and a switched drawing request was answered in words) | test (`test_guest_demo.py::test_a_switch_into_healthcare_*`, `test_a_switch_into_co_creative_can_still_draw`) + browser |
 | B7 | Quick answer button appears after 7s with no gist and returns an instant answer | browser |
 | B8 | Regenerate replaces the last answer; edit a question re-asks from there; delete truncates | browser |
 | B8b | Stopping a regenerate in the demo (Stop, Esc, a dropped stream, an error or the wall before the new answer exists) puts the old answer back instead of leaving the question unanswered - the app re-reads the thread and shows it; Quick answer during a regenerate stays a regenerate (2026-10-12) | browser |
@@ -106,6 +107,7 @@ Add a row for every feature that ships and every bug found. Retire, never delete
 | IMAGE-EDIT-PREVIOUS | "Now make it …" with no attachment edits the last picture drawn | script (`--images`) |
 | IMAGE-SERVED | The picture is served from `/images/<owner>/<id>.webp` | script (`--images`) |
 | G2 | Image survives reload; prose request in Co-Creative still answers normally | browser |
+| G3 | **Someone in crisis is answered in words, never drawn a picture**: a crisis message that is also a picture request gets the crisis reply and no picture; a flagged (concern) picture request gets the picture *and* words beside it - app and demo (2026-10-17: a picture-only request wrote no answer, so the person got the support card above an empty reply) | test (`test_healthcare.py::TestACrisisIsNeverGated::test_signed_in_a_picture_request_in_crisis_gets_words`, `test_guest_demo.py::test_someone_in_crisis_*`, `test_a_flagged_picture_request_*`) |
 
 ## H. Workspaces and documents
 | ID | Proves | Kind |

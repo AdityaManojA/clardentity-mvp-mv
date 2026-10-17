@@ -235,6 +235,9 @@ export function GuestDemo({
     state: HealthConsentState;
     content: string;
     mode: string;
+    /** Smart switching moved the question into Healthcare on its way to
+     *  the card, so agreeing re-sends it there without asking again. */
+    switched: boolean;
   } | null>(null);
   const [pendingContext, setPendingContext] = useState<{
     question: string;
@@ -505,7 +508,14 @@ export function GuestDemo({
           },
           onHealthConsent: (state) => {
             rollBack();
-            setPendingHealth({ state, content: message, mode: sendMode });
+            // `answerMode`, not `sendMode`: a question switched into
+            // Healthcare reaches the card after the `switched` event.
+            setPendingHealth({
+              state,
+              content: message,
+              mode: answerMode,
+              switched: answerMode !== sendMode,
+            });
           },
           onContextQuestion: (asked) => {
             rollBack();
@@ -797,11 +807,11 @@ export function GuestDemo({
                 <HealthConsentCard
                   state={pendingHealth.state}
                   onAgree={() => {
-                    const { state, content, mode: healthMode } = pendingHealth;
+                    const { state, content, mode: healthMode, switched } = pendingHealth;
                     rememberSessionHealthConsent(state.version);
                     setPendingHealth(null);
                     track("consent_choice", { choice: "health_granted_demo" });
-                    void send(content, healthMode);
+                    void send(content, healthMode, switched ? { modeConfirmed: true } : {});
                   }}
                   onDecline={() => {
                     setPendingHealth(null);

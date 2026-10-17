@@ -1367,6 +1367,13 @@ async def send_message(
             attached_images=attached_image_count,
             has_previous_image=previous_image is not None,
         )
+    # Someone who may be in danger is answered in words, never with a
+    # picture. A crisis reply runs the short, unchecked path, which never
+    # collected the image anyway; worse, a picture-only request wrote no text
+    # at all, so the person got the support card above an empty answer.
+    risk = await risk_task
+    if risk.crisis:
+        image_request = None
     # An edit works from pictures - the ones attached to this turn, or the
     # last one this conversation drew - read off the request and out of
     # storage here, off the event loop.
@@ -1386,9 +1393,12 @@ async def send_message(
     # beside it, no gist, no claims to check. Asking for a village and being
     # handed a village is the expected outcome; the essay that used to come
     # with it was the thing being complained about.
-    image_only = bool(image_request and image_request.only)
+    #
+    # Not when the safety screen flagged the message: the SAFETY block asks
+    # the answer to begin with the person, and a picture-only turn writes no
+    # answer for it to begin.
+    image_only = bool(image_request and image_request.only) and not risk.flagged
 
-    risk = await risk_task
     resources = safety.for_turn(current_user.location_country, current_user.location_subdivision)
     safety_card = safety.card(risk, resources)
     instructions = build_system_instructions(
