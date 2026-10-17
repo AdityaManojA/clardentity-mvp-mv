@@ -30,6 +30,7 @@ celery_app = Celery(
         "app.workers.refresh_location",
         "app.workers.send_password_reset_email",
         "app.workers.send_welcome_email",
+        "app.workers.sweep_temporary_chats",
     ],
 )
 

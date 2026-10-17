@@ -28,9 +28,10 @@ type AvatarGestureMap = {
   thinking: string;
   decision: string;
   learning: string;
-  mentoring: string;
-  therapy: string;
   creative: string;
+  guidance: string;
+  healthcare: string;
+  legal: string;
 };
 
 type FeatureFlags = {
@@ -69,9 +70,10 @@ const MODES: (keyof AvatarGestureMap)[] = [
   "thinking",
   "decision",
   "learning",
-  "mentoring",
-  "therapy",
   "creative",
+  "guidance",
+  "healthcare",
+  "legal",
 ];
 
 export function AdminSettings() {

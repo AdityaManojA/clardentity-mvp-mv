@@ -1,0 +1,150 @@
+{
+ "baseline": {
+  "name": "your location",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [],
+  "notes": "Under every country, and all there is where nothing more specific is on file. Written to the strict end of the range: explicit, separate, withdrawable consent before any health conversation; adults only; general information only (the mode prompts carry the global rules).",
+  "complaints_to": "your data protection authority"
+ },
+ "AF": {
+  "name": "Afghanistan",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "unavailable",
+  "storage_reason": "Our AI providers do not offer their service in Afghanistan, so Healthcare can't be offered there.",
+  "laws": [],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "",
+  "confidence": "high",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.anthropic.com/supported-countries"
+  ],
+  "notes": "Not on Anthropic's supported-countries list (effective 12 May 2026). Overrides the South Asia profile's storage; the rest of that profile is kept for the day it is served."
+ },
+ "BY": {
+  "name": "Belarus",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "unavailable",
+  "storage_reason": "Our AI providers do not offer their service in Belarus, so Healthcare can't be offered there.",
+  "laws": [],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "",
+  "confidence": "high",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.anthropic.com/supported-countries",
+   "https://developers.openai.com/api/docs/supported-countries"
+  ],
+  "notes": "Not supported by Anthropic or OpenAI (checked 16 Oct 2026). Belarus also has a personal-data law (Law 99-Z, 2021) not researched here because the service cannot be offered."
+ },
+ "CU": {
+  "name": "Cuba",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "unavailable",
+  "storage_reason": "Our AI providers do not offer their service in Cuba, so Healthcare can't be offered there.",
+  "laws": [],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "",
+  "confidence": "high",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.anthropic.com/supported-countries",
+   "https://developers.openai.com/api/docs/supported-countries"
+  ],
+  "notes": "Not supported by Anthropic or OpenAI (checked 16 Oct 2026); comprehensive US sanctions (OFAC Cuban Assets Control Regulations)."
+ },
+ "KP": {
+  "name": "North Korea",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "unavailable",
+  "storage_reason": "Our AI providers do not offer their service in North Korea, so Healthcare can't be offered there.",
+  "laws": [],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "",
+  "confidence": "high",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.anthropic.com/supported-countries",
+   "https://developers.openai.com/api/docs/supported-countries"
+  ],
+  "notes": "Not supported by Anthropic or OpenAI (checked 16 Oct 2026); comprehensive US sanctions."
+ },
+ "RU": {
+  "name": "Russia",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "unavailable",
+  "storage_reason": "Our AI providers do not offer their service in Russia, so Healthcare can't be offered there.",
+  "laws": [],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "",
+  "confidence": "high",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.anthropic.com/supported-countries",
+   "https://developers.openai.com/api/docs/supported-countries"
+  ],
+  "notes": "Not supported by Anthropic or OpenAI (checked 16 Oct 2026). Russia's Federal Law 152-FZ would in any case require personal data of Russian citizens to be recorded and stored in Russia (localisation), so Healthcare could at most be transient."
+ },
+ "SY": {
+  "name": "Syria",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "unavailable",
+  "storage_reason": "Our AI providers do not offer their service in Syria, so Healthcare can't be offered there.",
+  "laws": [],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "",
+  "confidence": "high",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.anthropic.com/supported-countries",
+   "https://developers.openai.com/api/docs/supported-countries"
+  ],
+  "notes": "Not supported by Anthropic or OpenAI (checked 16 Oct 2026). Vendor support is the bar here; revisit if the vendors add Syria."
+ },
+ "YE": {
+  "name": "Yemen",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "unavailable",
+  "storage_reason": "Our AI providers do not offer their service in Yemen, so Healthcare can't be offered there.",
+  "laws": [],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "",
+  "confidence": "high",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.anthropic.com/supported-countries"
+  ],
+  "notes": "Not on Anthropic's supported-countries list (effective 12 May 2026); OpenAI lists Yemen. Healthcare runs on Anthropic models, so it is not offered."
+ }
+}

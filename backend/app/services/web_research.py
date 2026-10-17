@@ -29,6 +29,7 @@ decorative link under it.
 import asyncio
 import logging
 import re
+import time
 from dataclasses import dataclass, field, replace
 from urllib.parse import urlparse
 
@@ -209,9 +210,30 @@ def _search_tool(max_uses: int) -> dict:
 # ---------------------------------------------------------------------------
 _TAVILY_URL = "https://api.tavily.com/search"
 _TAVILY_TIMEOUT_SECONDS = 8.0
+
+# When Tavily refuses the account rather than the query - out of credits
+# (432/433), key revoked (401/403), rate-limited (429) - every search fails
+# the same way, and until 2026-10-15 each one quietly came back empty: the
+# key was set, so the API path was always taken, and with no sources a
+# Finder answer had nothing to check its claims against. Now the first such
+# refusal sets Tavily aside for a while and searches go to the model's own
+# search tool - slower, but the claims still get sources.
+_TAVILY_ACCOUNT_REFUSALS = {401, 403, 429, 432, 433}
+_TAVILY_COOLDOWN_SECONDS = 600.0
+_tavily_set_aside_until = 0.0
 # Forums and social feeds are where a claim's exact words turn up with no
 # authority behind them; the supervisor would reject them anyway, so they
 # are not worth the result slots.
+#
+# Filtered here, after the results arrive - never sent as Tavily's
+# `exclude_domains`. Sent, it wrecks the search: measured 2026-10-12, "why is
+# sky blue light scattering" with the list came back as five dictionary
+# entries for the word "why" (scores 0.04-0.11); the same body without it
+# returned NASA, NOAA and the Royal Observatory (0.84-0.88). Every pre-answer
+# search and every per-claim check had been going through that, which is
+# why answers arrived with few or no sources and Finder's claims went
+# unchecked. `country`, `topic` and `search_depth` were tested the same way
+# and are fine.
 _EXCLUDED_DOMAINS = [
     "facebook.com",
     "reddit.com",
@@ -225,10 +247,32 @@ _EXCLUDED_DOMAINS = [
     "alternatehistory.com",
 ]
 _EXCERPT_CHARS = 1800
+#: Asked for on top of the caller's count, to make up for the results the
+#: domain filter drops.
+_FILTER_HEADROOM = 4
+
+
+def _excluded(host: str | None) -> bool:
+    """Whether a result's host is one of the excluded sites or under one."""
+    if not host:
+        return False
+    host = host.lower()
+    return any(host == d or host.endswith("." + d) for d in _EXCLUDED_DOMAINS)
 
 
 def tavily_available() -> bool:
-    return bool(settings.tavily_api_key)
+    return bool(settings.tavily_api_key) and time.monotonic() >= _tavily_set_aside_until
+
+
+def _set_tavily_aside(status: int) -> None:
+    global _tavily_set_aside_until
+    if time.monotonic() >= _tavily_set_aside_until:
+        logger.warning(
+            "tavily refused the account (HTTP %s); using the model's search tool for %ds",
+            status,
+            int(_TAVILY_COOLDOWN_SECONDS),
+        )
+    _tavily_set_aside_until = time.monotonic() + _TAVILY_COOLDOWN_SECONDS
 
 
 # Tavily takes a country *name*, and the user record stores a two-letter
@@ -279,10 +323,11 @@ async def _tavily_search(
     body = {
         "query": query[:400],
         "search_depth": depth,
-        "max_results": max_results,
+        # More than needed, because the excluded sites are dropped below
+        # rather than excluded by Tavily - see _EXCLUDED_DOMAINS for why.
+        "max_results": min(max_results + _FILTER_HEADROOM, 20),
         "include_answer": False,
         "include_raw_content": False,
-        "exclude_domains": _EXCLUDED_DOMAINS,
     }
     if country:
         body["country"] = country
@@ -300,6 +345,9 @@ async def _tavily_search(
             res = await client.post(
                 _TAVILY_URL, json=body, headers={"Authorization": f"Bearer {key}"}
             )
+            if res.status_code in _TAVILY_ACCOUNT_REFUSALS:
+                _set_tavily_aside(res.status_code)
+                return []
             res.raise_for_status()
             data = res.json()
     except Exception:  # noqa: BLE001 - a failed search is an empty search
@@ -316,6 +364,8 @@ async def _tavily_search(
             host = urlparse(url).hostname or None
         except ValueError:
             host = None
+        if _excluded(host):
+            continue
         sources.append(
             WebSource(
                 url=url,
@@ -325,7 +375,7 @@ async def _tavily_search(
                 date=(str(item["published_date"])[:20] if item.get("published_date") else None),
             )
         )
-    return await _read_any_pdf_tables(sources)
+    return await _read_any_pdf_tables(sources[:max_results])
 
 
 #: At most this many PDFs per search. The fetch is worth it for the one
@@ -540,7 +590,11 @@ async def gather_context(
             ),
             return_exceptions=True,
         )
-        return _merge_sources([b for b in batches if isinstance(b, list)], set(), cap=8)
+        merged = _merge_sources([b for b in batches if isinstance(b, list)], set(), cap=8)
+        # Refused just now (see _TAVILY_ACCOUNT_REFUSALS): this turn still
+        # gets a search, from the fallback below.
+        if merged or tavily_available():
+            return merged
     return await _search_round(queries[0], guidance=None, max_uses=CONTEXT_SEARCHES)
 
 
@@ -567,10 +621,11 @@ async def research_claim(
     guidance: str | None = None
     pending_seed = [replace(s) for s in seed] if seed else []
     judged_urls: set[str] = set()
-    use_api = tavily_available()
 
     for round_index in range(MAX_ROUNDS):
         result.rounds_used = round_index + 1
+        # Asked every round: Tavily can be set aside mid-claim.
+        use_api = tavily_available()
 
         if use_api:
             queries = _round_queries(current_claim, guidance, first=round_index == 0)
@@ -580,6 +635,9 @@ async def research_claim(
             )
             found = [b for b in batches if isinstance(b, list)]
             sources = _merge_sources([pending_seed, *found], judged_urls)
+            if not sources and not tavily_available():
+                # Refused just now: this round still gets a search.
+                sources = await _search_round(current_claim, guidance)
         elif pending_seed:
             sources = pending_seed
         else:

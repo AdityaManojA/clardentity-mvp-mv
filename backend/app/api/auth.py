@@ -39,6 +39,7 @@ from app.schemas.auth import (
 )
 
 from app.workers.refresh_location import refresh_location_task
+from app.core.client_ip import client_ip
 from app.workers.send_password_reset_email import send_password_reset_email_task
 from app.workers.send_welcome_email import send_welcome_email_task
 
@@ -48,7 +49,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 def _client_ip(request: Request) -> str:
-    return request.client.host if request.client else "unknown"
+    return client_ip(request)
 
 
 def _issue_tokens(user: User) -> TokenResponse:

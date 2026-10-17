@@ -1,0 +1,778 @@
+{
+ "CN": {
+  "name": "China",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "unavailable",
+  "storage_reason": "Healthcare isn't available in mainland China because the AI model providers Clardentity uses don't support it there.",
+  "laws": [
+   {
+    "name": "Personal Information Protection Law (PIPL)",
+    "citation": "Presidential Order No. 91 (2021); Arts 28-29 sensitive PI and separate consent, 38-40 export, 53 representative"
+   },
+   {
+    "name": "Detailed Rules for the Supervision of Internet Diagnosis and Treatment (Trial)",
+    "citation": "NHC/NATCM 2022, Art 13 (AI may not replace the physician or generate prescriptions)",
+    "url": "https://www.chinanews.com.cn/cj/2022/06-27/9789307.shtml"
+   },
+   {
+    "name": "Interim Measures for the Administration of Generative AI Services",
+    "citation": "CAC et al. 2023, in force 15 Aug 2023; Art 20 (measures against non-compliant offshore services)",
+    "url": "https://www.cac.gov.cn/2023-07/13/c_1690898327029107.htm"
+   },
+   {
+    "name": "Interim Measures for the Administration of Anthropomorphic Interactive AI Services",
+    "citation": "CAC et al. Order No. 21 (10 Apr 2026), in force 15 Jul 2026",
+    "url": "https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072472.html"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Cyberspace Administration of China (CAC); National Health Commission; NMPA (medical device software)",
+  "confidence": "high",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.anthropic.com/supported-countries",
+   "https://developers.openai.com/api/docs/supported-countries",
+   "https://www.gov.cn/gongbao/2026/issue_12806/202606/content_7072472.html",
+   "https://www.cac.gov.cn/2023-07/13/c_1690898327029107.htm",
+   "https://www.gov.cn/gongbao/2025/issue_12426/202511/content_7049740.html",
+   "https://www.chinanews.com.cn/cj/2022/06-27/9789307.shtml"
+  ],
+  "notes": "Unavailable (vendor): Anthropic and OpenAI list mainland China as unsupported. Chinese law would also bar us: no CAC generative-AI filing or ICP licence, no PIPL Art 53 representative, and exporting health data needs separate consent plus a standard contract or certification (security assessment at 10,000+ people's sensitive PI a year). Research advises geo-blocking the whole product, incl. Guidance. The companion-AI Measures (Order 21, from 15 Jul 2026) are moot while unavailable, so no rules kept. Unverified: Cybersecurity Law amendments, incident deadlines."
+ },
+ "HK": {
+  "name": "Hong Kong",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "unavailable",
+  "storage_reason": "Healthcare isn't available in Hong Kong because the AI model providers Clardentity uses don't support it there.",
+  "laws": [
+   {
+    "name": "Personal Data (Privacy) Ordinance",
+    "citation": "Cap. 486; DPP1-4 (s.33 transfer restriction never in force)",
+    "url": "https://www.elegislation.gov.hk/hk/cap486"
+   },
+   {
+    "name": "Medical Registration Ordinance",
+    "citation": "Cap. 161, s.28"
+   },
+   {
+    "name": "Undesirable Medical Advertisements Ordinance",
+    "citation": "Cap. 231"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Privacy Commissioner for Personal Data (PCPD); Medical Council of Hong Kong; Department of Health",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.anthropic.com/supported-countries",
+   "https://developers.openai.com/api/docs/supported-countries",
+   "https://www.elegislation.gov.hk/hk/cap486"
+  ],
+  "notes": "Unavailable for a vendor reason, not HK law: Anthropic and OpenAI do not support Hong Kong (OpenAI warns accounts may be blocked). Research: geo-block all modes unless routed to a vendor that supports HK. HK law alone would allow persist: no statutory sensitive category, s.33 not in force; a PICS naming the US, DPP3 opt-in before training, PCPD model clauses. No rules kept while unavailable (Cap. 231: no disease-treatment marketing claims). Unverified: 2026 status of PDPO amendments (mandatory breach notice, fines)."
+ },
+ "MO": {
+  "name": "Macao",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "unavailable",
+  "storage_reason": "Healthcare isn't available in Macao because the AI model providers Clardentity uses don't support it there.",
+  "laws": [],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Not researched",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.anthropic.com/supported-countries",
+   "https://developers.openai.com/api/docs/supported-countries"
+  ],
+  "notes": "Unavailable (vendor), as settled in SPEC: the research's China and Hong Kong entries also record that Anthropic and OpenAI list Macau as unsupported and advise geo-blocking it with HK. Macao law was not researched: health_data 'sensitive' and consent_age 18 are cautious placeholders and laws are blank. Before Macao could ever be served, research its Personal Data Protection Act (understood to be Law 8/2005; not in the research) and its regulator."
+ },
+ "TW": {
+  "name": "Taiwan",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Personal Data Protection Act",
+    "citation": "Arts 6, 8, 21 (amended 2010, 2015, 2023)",
+    "url": "https://law.moj.gov.tw/ENG/LawClass/LawAll.aspx?pcode=I0050021"
+   },
+   {
+    "name": "Physicians Act",
+    "citation": "Art 28 (unlicensed practice of medicine)"
+   },
+   {
+    "name": "Psychologists Act",
+    "citation": "心理師法"
+   },
+   {
+    "name": "Regulations on Communication Diagnosis and Treatment",
+    "citation": "通訊診察治療辦法, amended 2024"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [
+   "Never call these conversations 心理諮商 (psychological counselling) or 心理治療 (psychotherapy), in any language; Taiwan's Psychologists Act reserves those services to licensed psychologists."
+  ],
+  "regulator": "Personal Data Protection Commission (preparatory office), with the Ministry of Health and Welfare for medical data in the interim",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://law.moj.gov.tw/ENG/LawClass/LawAll.aspx?pcode=I0050021"
+  ],
+  "notes": "Persist: no localisation and no Art 21 restriction on transfers to the US known; written (electronic) consent after an Art 8 notice naming the US and Anthropic/OpenAI, separate from the ToS. Diagnosis is reserved to physicians (Physicians Act Art 28) and telemedicine to medical institutions; Healthcare never diagnoses, so this needs no extra rule and does not affect availability. Unverified (prior knowledge): 2025 PDPA amendments (mandatory breach reporting, PDPC supervision) and the AI Basic Act. Psychologists Act scope medium confidence."
+ },
+ "JP": {
+  "name": "Japan",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Act on the Protection of Personal Information (APPI)",
+    "citation": "Act No. 57 of 2003; Arts 2(3), 20(2), 27, 28",
+    "url": "https://www.ppc.go.jp/en/legal/"
+   },
+   {
+    "name": "MHLW Guidelines for the Appropriate Implementation of Online Medical Care",
+    "citation": "2018, revised; limits non-physician remote health consultation"
+   },
+   {
+    "name": "Medical Practitioners' Act",
+    "citation": "Art 17; MHLW notice of 19 Dec 2018 on AI-assisted diagnosis"
+   },
+   {
+    "name": "Pharmaceuticals and Medical Devices Act (PMD Act)",
+    "citation": "MHLW guideline on programs as medical devices (2021, revised); Arts 66-68"
+   }
+  ],
+  "healthcare_rules": [
+   "Do not tell the person they are likely to have a particular disease; Japanese guidance treats that as practising medicine. Describe what can cause such symptoms in general and suggest seeing a doctor.",
+   "When suggesting care, name the kind of clinical department (such as internal medicine or dermatology) that usually sees such concerns; Japanese guidance limits non-doctor advice to general information and where to be seen.",
+   "Do not tell the person whether their own test or checkup results are normal or abnormal; Japan treats a software that interprets an individual's results as a medical device. Explain what the test measures and suggest asking their doctor."
+  ],
+  "guidance_rules": [],
+  "regulator": "Personal Information Protection Commission (PPC); Ministry of Health, Labour and Welfare and PMDA (medical practice, PMD Act)",
+  "confidence": "high",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.ppc.go.jp/en/legal/",
+   "https://www.ppc.go.jp/personalinfo/3nengotominaoshi/",
+   "https://www.ppc.go.jp/files/pdf/260407_gaiyou.pdf"
+  ],
+  "notes": "Persist: no localisation; the US transfer rests on Art 28 consent (naming the US, the PPC's US system information and recipients) or APPI-equivalent DPAs. Prior opt-in for special care-required data (Art 20(2)); no training on JP chats (PPC 2023 OpenAI warning). The MHLW and PMD Act lines shape the rules, not availability. Any health-data leak is reportable (preliminary report ~3-5 days). Pending: APPI bill (PPC outline 7 Apr 2026: under-16 regime, AI consent waivers, surcharges); Diet passage unverified. MHLW and PMD Act wording medium confidence.",
+  "complaints_to": "the Personal Information Protection Commission (PPC)"
+ },
+ "KR": {
+  "name": "South Korea",
+  "health_data": "sensitive",
+  "consent_age": 19,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Personal Information Protection Act (PIPA)",
+    "citation": "Act No. 10465 (2011, amended 2023); Arts 23, 28-8, 34",
+    "url": "https://www.pipc.go.kr/eng/"
+   },
+   {
+    "name": "Medical Service Act",
+    "citation": "Art 27(1); MOHW Guidelines on Non-medical Health Management Services (2019, revised)"
+   },
+   {
+    "name": "Suicide Prevention Act",
+    "citation": "Art 19 (suicide-inducing information)"
+   },
+   {
+    "name": "Framework Act on the Development of AI and Establishment of Trust (AI Basic Act)",
+    "citation": "Promulgated 21 Jan 2025, in force 22 Jan 2026"
+   }
+  ],
+  "healthcare_rules": [
+   "Keep to general health information, lifestyle and habit coaching, and which clinic or department to visit; Korea treats judging a specific person's condition or treatment-oriented advice as a medical act (Medical Service Act Art 27).",
+   "Never state lethal amounts of a medicine or substance, or describe self-harm methods, even as fiction or a hypothetical; Korea criminalises distributing suicide-inducing information online (Suicide Prevention Act Art 19)."
+  ],
+  "guidance_rules": [
+   "Never describe, compare or encourage suicide or self-harm methods, even in fiction, role-play or hypotheticals; Korea criminalises distributing suicide-inducing information online (Suicide Prevention Act Art 19)."
+  ],
+  "regulator": "Personal Information Protection Commission (https://www.pipc.go.kr/eng/); Ministry of Health and Welfare; Ministry of Food and Drug Safety; Ministry of Science and ICT (AI Basic Act)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.pipc.go.kr/eng/"
+  ],
+  "notes": "Persist: separate Art 23 and Art 28-8 consents in Korean. 'Medical acts' (incl. judging a specific person's condition) are reserved to doctors, but MOHW guidance allows general information and lifestyle coaching, so this limits wording, not availability. consent_age 19 is the Civil Act age of majority (not in the research; PIPA lets 14+ consent): confirm. Unresolved: whether this is 'high-impact AI' under the AI Basic Act and its domestic-agent thresholds; 2025 PIPA representative amendment. Health-chat leak: users and PIPC/KISA within 72h."
+ },
+ "SG": {
+  "name": "Singapore",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Personal Data Protection Act 2012 (PDPA)",
+    "citation": "Act 26 of 2012; ss.13-20, 26, 26A-26E",
+    "url": "https://sso.agc.gov.sg/Act/PDPA2012"
+   },
+   {
+    "name": "Health Products Act; HSA Regulatory Guidelines for Software Medical Devices",
+    "citation": "rev. 2022",
+    "url": "https://www.hsa.gov.sg"
+   },
+   {
+    "name": "Healthcare Services Act 2020",
+    "citation": "Telemedicine licensed from 26 Jun 2023"
+   },
+   {
+    "name": "Medical Registration Act 1997",
+    "citation": "Holding out as a medical practitioner"
+   }
+  ],
+  "healthcare_rules": [
+   "Do not sort this person's symptoms into a triage category or urgency level; Singapore's HSA treats patient-facing decision-support software as a medical device. Describe general warning signs and suggest a GP or polyclinic.",
+   "Do not call this chat a medical consultation or telemedicine; Singapore licenses those as healthcare services, and an information service must not hold itself out as one (Healthcare Services Act 2020)."
+  ],
+  "guidance_rules": [],
+  "regulator": "Personal Data Protection Commission (https://www.pdpc.gov.sg); Ministry of Health (https://www.moh.gov.sg); Health Sciences Authority (https://www.hsa.gov.sg)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://sso.agc.gov.sg/Act/PDPA2012",
+   "https://www.pdpc.gov.sg",
+   "https://www.hsa.gov.sg",
+   "https://www.moh.gov.sg"
+  ],
+  "notes": "Persist. No statutory sensitive category, but PDPC guidance expects a higher standard for health data and it is a prescribed significant-harm class for breaches (PDPC notice within 3 days of assessing a breach notifiable). Express opt-in naming US processing; s.26 transfers via DPAs with comparable-protection clauses. Government sites refused fetches, so HCSA and HSA details are prior knowledge (medium confidence); Health Information Bill status unverified.",
+  "complaints_to": "the Personal Data Protection Commission (PDPC)"
+ },
+ "AU": {
+  "name": "Australia",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Privacy Act 1988 (Cth) and Australian Privacy Principles",
+    "citation": "s.6(1), s.6D(4)(b), s.6FB; APPs 3, 5, 8, 11",
+    "url": "https://www.legislation.gov.au/C2004A03712/latest/text"
+   },
+   {
+    "name": "Therapeutic Goods Act 1989; Therapeutic Goods (Excluded Goods) Determination 2018",
+    "citation": "Software medical device reforms (Feb 2021)",
+    "url": "https://www.tga.gov.au"
+   },
+   {
+    "name": "eSafety Phase 2 industry codes",
+    "citation": "Registered Sept 2025; AI chatbot duties from Mar 2026",
+    "url": "https://www.esafety.gov.au"
+   },
+   {
+    "name": "Health Records Act 2001 (Vic); Health Records and Information Privacy Act 2002 (NSW)",
+    "citation": "Vic HPP 4; NSW s.25 (7-year retention)"
+   }
+  ],
+  "healthcare_rules": [
+   "Do not grade how urgent this person's symptoms are or recommend a specific treatment for their condition; Australia's TGA treats symptom checkers and triage tools as medical devices. Describe warning signs in general and suggest a GP.",
+   "Never describe yourself or this service as a symptom checker, triage or diagnostic tool; in Australia claims like these can make software a TGA-regulated medical device."
+  ],
+  "guidance_rules": [
+   "Do not label exercises or tips as CBT or any other named therapy, or say they treat anything; in Australia mental-health software that claims to treat is a TGA medical device unless based on referenced clinical guidelines.",
+   "If the person may be under 18, give no dieting, fasting or weight-loss tips and no sexual or self-harm content; Australia's eSafety codes require AI chatbots to shield children from such material."
+  ],
+  "regulator": "Office of the Australian Information Commissioner (OAIC); Therapeutic Goods Administration (https://www.tga.gov.au); eSafety Commissioner (https://www.esafety.gov.au)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.legislation.gov.au/C2004A03712/latest/text",
+   "https://www.tga.gov.au",
+   "https://www.oaic.gov.au/privacy/privacy-registers/privacy-codes/childrens-online-privacy-code",
+   "https://www.esafety.gov.au"
+  ],
+  "notes": "Persist: no localisation (My Health Records Act s.77 only if we integrate MHR). TGA excludes general consumer information, so the rules keep us outside the device line; no ARTG listing needed. Covered regardless of turnover as a 'health service' (s.6D(4)(b)), which may also exclude us from the Children's Online Privacy Code (due by 10 Dec 2026) but bring in Vic/NSW 7-year retention, colliding with user deletion; reach to an offshore app untested: get advice. TGA and eSafety details (codes from Mar 2026) medium confidence.",
+  "complaints_to": "the Office of the Australian Information Commissioner (OAIC)"
+ },
+ "NZ": {
+  "name": "New Zealand",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Health Information Privacy Code 2020",
+    "citation": "Rules 1-13 (rule 12 cross-border)",
+    "url": "https://www.privacy.org.nz"
+   },
+   {
+    "name": "Privacy Act 2020",
+    "citation": "2020 No 31; ss.4, 11; IPP 12; Part 6",
+    "url": "https://www.legislation.govt.nz/act/public/2020/0031/latest/whole.html"
+   },
+   {
+    "name": "Health Practitioners Competence Assurance Act 2003",
+    "citation": "Protected titles"
+   },
+   {
+    "name": "Medicines Act 1981",
+    "citation": "Medical devices: WAND notification; Medical Products Bill pending"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Office of the Privacy Commissioner (https://www.privacy.org.nz); Medsafe; Health and Disability Commissioner",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.legislation.govt.nz/act/public/2020/0031/latest/whole.html",
+   "https://www.privacy.org.nz"
+  ],
+  "notes": "Persist: no localisation; vendors acting only as our agents make no 'disclosure' (s.11) if DPAs bar own-purpose use, else OPC model clauses (IPP 12/rule 12). 'sensitive' because the HIPC 2020 likely applies (an app giving health information is arguably a 'health agency'; medium confidence). consent_age: the Age of Majority Act 1970 says 20 (not in the research); 18 kept as the research finds no statutory consent age: confirm. Check IPP 3A start (1 May 2026) and the Medical Products Bill. Prior knowledge, not fetched.",
+  "complaints_to": "the Office of the Privacy Commissioner"
+ },
+ "ID": {
+  "name": "Indonesia",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "transient",
+  "storage_reason": "Indonesian health rules may require health information to be kept in Indonesia, so Healthcare chats here are answered but not saved.",
+  "laws": [
+   {
+    "name": "Personal Data Protection Law (UU PDP)",
+    "citation": "Law No. 27 of 2022; Arts 4(2), 20, 25, 56",
+    "url": "https://peraturan.bpk.go.id"
+   },
+   {
+    "name": "Health Law and implementing regulation",
+    "citation": "Law No. 17 of 2023; GR 28/2024 (health information systems)"
+   },
+   {
+    "name": "Private Electronic System Operator rules",
+    "citation": "GR 71/2019; MOCI Regulation 5/2020, amended by 10/2021"
+   },
+   {
+    "name": "Governance of Electronic Systems for Child Protection (PP TUNAS)",
+    "citation": "GR 17/2025"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Ministry of Communication and Digital Affairs (Komdigi) until the PDP agency is set up; Ministry of Health",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://peraturan.bpk.go.id"
+  ],
+  "notes": "Transient: Health Law 17/2023 and GR 28/2024 point to in-country processing and storage of health data, offshore transfer only as regulated; the articles and whether they reach a foreign consumer app are unverified. If not: persist. If processing must be onshore: unavailable. Guidance arguably outside: confirm. Pre-launch: register as a foreign private ESO with Komdigi or geo-gate (blocking risk). Pending: PDP agency, implementing GR, PP TUNAS. Civil Code majority is 21 (not in research); 18 used per PDP Law."
+ },
+ "MY": {
+  "name": "Malaysia",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Personal Data Protection Act 2010 (Act 709)",
+    "citation": "As amended by Act A1727 (2024); ss.2, 4, 40, 129",
+    "url": "https://www.pdp.gov.my"
+   },
+   {
+    "name": "Medical Act 1971",
+    "citation": "Amended 2024"
+   },
+   {
+    "name": "Medical Device Act 2012 (Act 737)"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Personal Data Protection Commissioner (https://www.pdp.gov.my); Ministry of Health; Medical Device Authority",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.pdp.gov.my"
+  ],
+  "notes": "Persist: no localisation; s.129 (as amended, 2025) allows transfers on consent or other exceptions, so consent plus DPAs (Cross Border Transfer Guidelines 2025). Explicit consent for health data (s.40) with a Malay and English notice. Open: whether the PDPA (s.2) reaches a US controller with no Malaysian establishment or equipment; comply anyway. 2024 amendments in force by 1 Jun 2025: DPO, breach notice to the Commissioner within 72h and to users within 7 days. Prior knowledge, not fetched."
+ },
+ "PH": {
+  "name": "Philippines",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Data Privacy Act of 2012",
+    "citation": "Republic Act No. 10173 and 2016 IRR; Secs 3(l), 6, 13, 21",
+    "url": "https://privacy.gov.ph/data-privacy-act/"
+   },
+   {
+    "name": "NPC Circulars 2022-04 (registration) and 16-03 (breach management); NPC Advisory 2024-04 (AI systems)",
+    "url": "https://privacy.gov.ph"
+   },
+   {
+    "name": "Medical Act of 1959",
+    "citation": "RA 2382"
+   },
+   {
+    "name": "Mental Health Act",
+    "citation": "RA 11036"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "National Privacy Commission (https://privacy.gov.ph); Department of Health; FDA Philippines",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://privacy.gov.ph/data-privacy-act/",
+   "https://privacy.gov.ph"
+  ],
+  "notes": "Persist: no localisation or adequacy regime; transfers rest on accountability plus DPAs (Sec 21). Health data needs specific consent evidenced in writing or electronically (Sec 13(a)). Backend: DPO; NPC registration if processing 1,000+ people's sensitive data (Circular 2022-04; reach to foreign controllers uncertain); NPC and user breach notice within 72h; DPIA. AI advisory number and date medium confidence. Prior knowledge, not fetched."
+ },
+ "TH": {
+  "name": "Thailand",
+  "health_data": "special_category",
+  "consent_age": 20,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Personal Data Protection Act B.E. 2562 (2019)",
+    "citation": "ss.5, 19-20, 26, 28-29, 37",
+    "url": "https://www.pdpc.or.th"
+   },
+   {
+    "name": "PDPC Notifications on cross-border transfer",
+    "citation": "2023, under ss.28-29"
+   },
+   {
+    "name": "Medical Profession Act B.E. 2525"
+   },
+   {
+    "name": "Medical Device Act B.E. 2551",
+    "citation": "Amended 2019"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Personal Data Protection Committee (https://www.pdpc.or.th); Ministry of Public Health; Thai FDA",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.pdpc.or.th"
+  ],
+  "notes": "Persist: no localisation; US transfer by consent after disclosure or PDPC-accepted clauses (ss.28-29). 'special_category': s.26 is a GDPR-style closed list needing explicit consent, separate from the ToS (s.19). consent_age 20 is the age of majority; below it a parent must also consent (s.20). Backend: written Thai representative as a foreign controller (s.37(5); exemptions unverified), DPO if large-scale sensitive data, PDPC breach notice within 72h. ETDA draft AI law not enacted. Prior knowledge, not fetched."
+ },
+ "VN": {
+  "name": "Vietnam",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Law on Personal Data Protection",
+    "citation": "Law No. 91/2025/QH15, in force 1 Jan 2026"
+   },
+   {
+    "name": "Cybersecurity Law 2018 and Decree 53/2022/ND-CP",
+    "citation": "Art 26 (conditional data localisation)"
+   },
+   {
+    "name": "Law on Data",
+    "citation": "Law No. 60/2024/QH15, in force 1 Jul 2025"
+   },
+   {
+    "name": "Law on Medical Examination and Treatment",
+    "citation": "Law No. 15/2023/QH15"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Ministry of Public Security, Department of Cybersecurity and High-Tech Crime Prevention (A05); Ministry of Health",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [],
+  "notes": "Persist: Decree 53/2022 Art 26 localisation (high confidence) binds a foreign provider only after the MPS finds its service was used to break Vietnamese law and it fails to cooperate; if triggered, switch to transient. The cross-border transfer impact assessment is a dossier filed with MPS/A05 (Decree 13: within 60 days of starting), not a prior permit: file it with the processing impact assessment at launch or geo-gate. Low confidence: PDPL decree (reported 356/2025), AI Law, new Cybersecurity Law (~1 Jul 2026). No sources fetched."
+ },
+ "MN": {
+  "name": "Mongolia",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Law on Personal Data Protection",
+    "citation": "Adopted 17 Dec 2021, in force 1 May 2022",
+    "url": "https://legalinfo.mn"
+   },
+   {
+    "name": "Law on Health",
+    "citation": "Medical practitioner licensing"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Communications and Information Technology Authority; National Human Rights Commission oversight (low confidence)",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://legalinfo.mn"
+  ],
+  "notes": "Persist on the default basis (explicit consent plus disclosure of US processing). Health data treated as sensitive needing consent (medium-low confidence). Cross-border transfer, localisation, retention and breach rules were not researched, and the regulator is uncertain: confirm no transfer or localisation rule applies. Brief entry from prior knowledge; nothing verified."
+ },
+ "KH": {
+  "name": "Cambodia",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Law on E-Commerce",
+    "citation": "2019; general duty to protect electronic records and personal information"
+   },
+   {
+    "name": "Draft Law on Personal Data Protection",
+    "citation": "Not enacted as of last verified information"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Ministry of Post and Telecommunications; Ministry of Commerce (e-commerce)",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [],
+  "notes": "Persist on the default basis: no comprehensive data protection law. The draft PDP law was not enacted as of the last verified information (2026 status unknown) and could add a sensitive category, transfer or localisation rules. No transfer, localisation or breach rules verified. Brief, unverified entry; no sources fetched."
+ },
+ "MM": {
+  "name": "Myanmar",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "unavailable",
+  "storage_reason": "Healthcare isn't available in Myanmar because one of the AI model providers Clardentity uses doesn't support it there.",
+  "laws": [
+   {
+    "name": "Law Protecting the Privacy and Security of Citizens",
+    "citation": "2017, amended 2020 and 2021 (key protections suspended 2021)"
+   },
+   {
+    "name": "Cyber Security Law",
+    "citation": "State Administration Council, Jan 2025"
+   },
+   {
+    "name": "Myanmar Medical Council Law"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Ministry of Transport and Communications",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.anthropic.com/supported-countries",
+   "https://developers.openai.com/api/docs/supported-countries"
+  ],
+  "notes": "Unavailable (vendor): Anthropic lists Myanmar as unsupported; OpenAI supports it. Research offers routing Myanmar only to OpenAI instead of geo-blocking; that is a product decision, and SPEC treats either vendor's exclusion as unavailable. No comprehensive US embargo, but screen against OFAC lists. No modern data protection regime; the 2025 Cyber Security Law may require platform registration and data retention above user thresholds (low confidence). Legal details are unverified prior knowledge."
+ },
+ "LA": {
+  "name": "Laos",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Law on Electronic Data Protection",
+    "citation": "No. 25/NA, 2017"
+   },
+   {
+    "name": "Law on Prevention and Combating of Cyber Crime",
+    "citation": "2015"
+   },
+   {
+    "name": "Law on Health Care",
+    "citation": "Medical practitioner licensing"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Ministry of Technology and Communications",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [],
+  "notes": "Persist assumes the person's consent is enough for the US transfer: the Electronic Data Protection Law requires consent to collect and disclose personal data and restricts transfer abroad without consent or authorisation (exact terms low confidence). Confirm no government authorisation is also needed; if it is, storage needs revisiting. No sensitive-health category verified. Brief, unverified entry; no sources fetched."
+ },
+ "BN": {
+  "name": "Brunei",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Personal Data Protection Order 2025",
+    "citation": "Obligations phase in after about a one-year transition",
+    "url": "https://www.aiti.gov.bn"
+   },
+   {
+    "name": "Medical Practitioners and Dentists Act"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Authority for Info-communications Technology Industry (AITI) / Brunei PDP office (https://www.aiti.gov.bn)",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.aiti.gov.bn"
+  ],
+  "notes": "Persist: the PDPO 2025 follows Singapore's PDPA (consent and notice, transfer limitation, breach notice to AITI); enactment and phase-in dates medium-low confidence. Whether health data is a statutory sensitive category is unverified ('personal' assumed, as in Singapore). Transfers via DPAs with comparable-protection clauses. Breach-notice timing unverified (Singapore model: 3 days). Brief, unverified entry."
+ },
+ "PG": {
+  "name": "Papua New Guinea",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Constitution of Papua New Guinea",
+    "citation": "s.49 (privacy)"
+   },
+   {
+    "name": "Medical Registration Act"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Department of Information and Communications Technology",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [],
+  "notes": "Persist on the default basis with baseline consent and notice. No comprehensive data protection law; the Digital Government Act 2022 covers the government sector only. A national data governance and protection policy or bill was in development (2026 status low confidence). Brief, unverified entry; no sources fetched."
+ },
+ "FJ": {
+  "name": "Fiji",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Constitution of the Republic of Fiji 2013",
+    "citation": "s.24 (privacy)"
+   },
+   {
+    "name": "Online Safety Act 2018"
+   },
+   {
+    "name": "Medical and Dental Practitioner Act 2010"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Online Safety Commission (online harms); Ministry of Health and Medical Services",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [],
+  "notes": "Persist on the default basis with baseline consent and notice. No data protection statute verified; the Online Safety Act 2018 covers online harms, not health data. Brief, unverified entry; no sources fetched. The research did not cover the other Pacific micro-states (Kiribati, Tuvalu, Nauru, Marshall Islands, Palau, FSM, Cook Islands, Niue)."
+ },
+ "WS": {
+  "name": "Samoa",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "No data protection authority identified (not researched)",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [],
+  "notes": "Persist on the default basis with baseline consent and notice: no comprehensive data protection law verified. Nothing else was researched (only emergency numbers, from a secondary listing); the regulator and local age of majority are unconfirmed."
+ },
+ "TO": {
+  "name": "Tonga",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "No data protection authority identified (not researched)",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [],
+  "notes": "Persist on the default basis with baseline consent and notice: no comprehensive data protection law verified. Nothing else was researched (only emergency numbers, from a secondary listing); the regulator and local age of majority are unconfirmed."
+ },
+ "VU": {
+  "name": "Vanuatu",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "No data protection authority identified (not researched)",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [],
+  "notes": "Persist on the default basis with baseline consent and notice: no comprehensive data protection law verified. A data protection and privacy bill or policy was reported in development (low confidence). Nothing else was researched (only emergency numbers, from a secondary listing); the regulator and local age of majority are unconfirmed."
+ },
+ "SB": {
+  "name": "Solomon Islands",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "No data protection authority identified (not researched)",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [],
+  "notes": "Persist on the default basis with baseline consent and notice: no comprehensive data protection law verified. Nothing else was researched (only emergency numbers, from a secondary listing); the regulator and local age of majority are unconfirmed."
+ }
+}

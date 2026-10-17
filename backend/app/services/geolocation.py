@@ -13,6 +13,7 @@ and people travelling all produce a confident, wrong answer.
 """
 
 import ipaddress
+from functools import lru_cache
 import logging
 
 import httpx
@@ -46,7 +47,7 @@ def is_resolvable(ip: str | None) -> bool:
 
 
 async def resolve(ip: str) -> dict | None:
-    """{"label", "country", "timezone"} or None. Never raises."""
+    """{"label", "country", "subdivision", "timezone"} or None. Never raises."""
     if not is_resolvable(ip):
         return None
 
@@ -71,11 +72,66 @@ async def resolve(ip: str) -> dict | None:
     if not label:
         return None
 
+    country = (data.get("country_code") or "")[:2].upper() or None
+    region = (data.get("region_code") or "").strip().upper()
+    # ISO 3166-2: "US-WA", "CA-QC". Several US states and Canadian provinces
+    # set their own rules for health data and AI support tools.
+    subdivision = (
+        f"{country}-{region}" if country and region.isalnum() and len(region) <= 3 else None
+    )
     return {
         "label": label[:120],
-        "country": (data.get("country_code") or "")[:2] or None,
+        "country": country,
+        "subdivision": subdivision,
         "timezone": (data.get("timezone") or "")[:64] or None,
     }
+
+
+def country_from_timezone(timezone: str | None) -> str | None:
+    """The country a browser's IANA time zone belongs to - "Asia/Kolkata" and
+    the "Asia/Calcutta" Chrome still reports are both India. The fallback
+    when the address lookup cannot answer (the free tier rate-limits, and a
+    VPN hides the address anyway): first-party, instant, and right for the
+    one question it is asked, which country's rules and numbers apply."""
+    if not timezone:
+        return None
+    return _timezones().get(timezone.strip())
+
+
+@lru_cache(maxsize=1)
+def _timezones() -> dict[str, str]:
+    import json
+    from pathlib import Path
+
+    path = Path(__file__).resolve().parent.parent / "data" / "timezones.json"
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+async def resolve_cached(ip: str | None) -> dict | None:
+    """`resolve`, remembered for a day under a hash of the address - the
+    address itself is never stored. For the lookups a request has to wait
+    for (a signed-in user with no location yet, a visitor in the demo), so a
+    conversation pays for one lookup, not one per message."""
+    import hashlib
+    import json
+
+    from app.core.rate_limit import _redis
+
+    if not is_resolvable(ip):
+        return None
+    key = "geo:" + hashlib.sha256(ip.encode()).hexdigest()[:32]
+    try:
+        cached = await _redis.get(key)
+        if cached:
+            return json.loads(cached) or None
+    except Exception:  # noqa: BLE001 - a cache miss is a lookup, not an error
+        logger.info("location cache unavailable", exc_info=True)
+    located = await resolve(ip)
+    try:
+        await _redis.set(key, json.dumps(located or {}), ex=86400)
+    except Exception:  # noqa: BLE001
+        pass
+    return located
 
 
 def location_prompt_line(label: str | None, timezone: str | None) -> str | None:

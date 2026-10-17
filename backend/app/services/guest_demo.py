@@ -148,3 +148,19 @@ def trim_history(history: list[dict]) -> list[dict]:
     while turns and sum(len(t["content"]) for t in turns) > MAX_HISTORY_CHARS:
         turns.pop(0)
     return turns
+
+
+async def visitor_location(
+    address: str | None, timezone: str | None = None
+) -> tuple[str | None, str | None]:
+    """(country, subdivision) for a visitor, from their address - asked only
+    when the answer depends on it (a message the safety screen flagged, or
+    Guidance and Healthcare, whose rules and numbers are local). Cached a day
+    under a hash of the address (geolocation.resolve_cached); the browser's
+    time zone names the country when the lookup cannot."""
+    from app.services.geolocation import country_from_timezone, resolve_cached
+
+    located = await resolve_cached(address) or {}
+    if located.get("country"):
+        return located["country"], located.get("subdivision")
+    return country_from_timezone(timezone), None

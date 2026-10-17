@@ -33,6 +33,7 @@ async def search_history(
             FROM messages m
             JOIN conversations c ON c.id = m.conversation_id
             WHERE c.workspace_id = :workspace_id
+              AND NOT c.temporary
               AND to_tsvector('english', coalesce(m.content, '')) @@ plainto_tsquery('english', :q)
             ORDER BY rank DESC
             LIMIT :limit

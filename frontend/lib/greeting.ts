@@ -111,3 +111,40 @@ export function isFirstRun(
   if (Number.isNaN(finished)) return false;
   return now.getTime() - finished < FIRST_RUN_MINUTES * 60_000;
 }
+
+/** The line under the greeting in an empty chat - one of these, chosen per
+ *  chat (2026-10-15 feedback, replacing the single "Let's accomplish
+ *  something today."). */
+export const INVITATIONS = [
+  "Let’s accomplish something meaningful today.",
+  "Let’s make today a great day, one positive step at a time.",
+  "Let’s make something better today, even if it starts with a small step.",
+  "Every new day is an opportunity to learn, grow, and become better. Let’s make the most of it.",
+  "Let’s turn your ideas into something wonderful today.",
+  "You have the potential to do great things in life. Let’s start with one small step toward something meaningful.",
+  "Let’s move forward in life, one step at a time, and make today count.",
+  "Today is another opportunity to learn, grow, and shine. Let’s take that first step together.",
+  "You’re capable of achieving more than you may realise. Let’s discover what you can accomplish today.",
+  "Small steps today can lead to wonderful possibilities tomorrow. Let’s take the first step.",
+  "Let’s make your next step a meaningful one and move closer to what matters to you.",
+  "Every new day brings new possibilities. Let’s explore them and see where they lead.",
+  "Every challenge holds an opportunity to learn and grow. Let’s face today with courage and optimism.",
+  "You don’t have to do everything today. Let’s start with one thing and build from there.",
+  "Let’s build on what you already know, discover new possibilities, and see how far you can go.",
+  "Your goals are worth pursuing. Let’s take one positive step toward them today.",
+  "You can create things you’ll be proud of. Let’s bring one of your ideas to life today.",
+  "Wherever you’re starting from, there’s always room to learn, grow, and move forward. Let’s begin.",
+  "Let’s make time for what matters most to you and take a step toward a life you feel good about.",
+  "A better tomorrow begins with the steps we take today. Let’s take the next step with hope and confidence.",
+] as const;
+
+/** One of INVITATIONS for this chat. Chosen from the chat's id rather than
+ *  Math.random: random at render would pick a new line on every re-render
+ *  (and differ between the server's render and the browser's), where this
+ *  is a different line from chat to chat and the same one for as long as
+ *  you are looking at it. */
+export function invitationFor(seed: string | null | undefined): string {
+  let hash = 0;
+  for (const ch of seed ?? "") hash = (hash * 31 + ch.charCodeAt(0)) | 0;
+  return INVITATIONS[Math.abs(hash) % INVITATIONS.length];
+}

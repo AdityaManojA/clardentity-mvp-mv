@@ -16,9 +16,12 @@ gets one, and an entry with no empty chat to reuse gets a fresh one. That
 is the same thing the client did before, moved rather than invented.
 """
 
+import logging
 import uuid
 
-from fastapi import APIRouter, Depends
+from datetime import UTC, datetime
+
+from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -28,6 +31,11 @@ from app.db.session import get_db
 from app.models import Conversation, Message, User, Workspace, WorkspaceMember
 from app.schemas.auth import UserPublic
 from app.schemas.workspace import WorkspaceOut
+from app.workers.sweep_temporary_chats import sweep_temporary_chats_task
+from app.core.client_ip import client_ip
+from app.workers.refresh_location import STALE_AFTER
+
+logger = logging.getLogger("clardentity.bootstrap")
 
 router = APIRouter(prefix="/bootstrap", tags=["bootstrap"])
 
@@ -54,10 +62,19 @@ class BootstrapResult(BaseModel):
 @router.post("", response_model=BootstrapResult)
 async def bootstrap(
     payload: BootstrapRequest,
+    request: Request,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> BootstrapResult:
     """Everything needed to open the app, in one round trip."""
+    # Where they are, refreshed out of band on opening the app as well as at
+    # sign-in: a session kept alive by refresh tokens can go months without
+    # signing in, and never would have been located at all.
+    updated = current_user.location_updated_at
+    if updated is None or datetime.now(UTC) - updated > STALE_AFTER:
+        from app.api.auth import queue_location_refresh
+
+        queue_location_refresh(current_user, client_ip(request))
     rows = await db.execute(
         select(Workspace, WorkspaceMember.role)
         .join(WorkspaceMember, WorkspaceMember.workspace_id == Workspace.id)
@@ -109,6 +126,9 @@ async def bootstrap(
             .where(
                 Conversation.workspace_id == active.id,
                 Conversation.title.is_(None),
+                # A temporary chat never gets a title either, and is not an
+                # empty chat to be handed back - it is one being left.
+                Conversation.temporary.is_(False),
             )
             .order_by(func.coalesce(last_activity, Conversation.created_at).desc())
             .limit(1)
@@ -129,6 +149,14 @@ async def bootstrap(
     if created or made_workspace:
         await db.commit()
         await db.refresh(reusable)
+
+    # Temporary chats abandoned in a closed tab, everyone's, a day after they
+    # were last used - queued rather than run, so this request stays one
+    # round trip. See app/services/temporary_chats.py.
+    try:
+        sweep_temporary_chats_task.delay()
+    except Exception:  # noqa: BLE001 - housekeeping never blocks the way in
+        logger.warning("temporary chat sweep not queued", exc_info=True)
 
     return BootstrapResult(
         # .of rather than model_validate: the admin flag is computed on the

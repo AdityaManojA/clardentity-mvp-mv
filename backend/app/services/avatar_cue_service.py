@@ -7,8 +7,8 @@ GESTURE_BY_MODE: dict[str, str] = {
     "thinking": "chin_stroke",
     "decision": "weighing_scales",
     "learning": "open_hand_explaining",
-    "mentoring": "open_hand_explaining",
-    "therapy": "chin_stroke",
+    "guidance": "open_hand_explaining",
+    "healthcare": "open_hand_explaining",
     "creative": "presenting",
     "legal": "open_hand_explaining",
 }

@@ -29,6 +29,14 @@ class User(Base):
     location_label: Mapped[str | None] = mapped_column(String(120), nullable=True)
     location_country: Mapped[str | None] = mapped_column(String(2), nullable=True)
     location_timezone: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    # ISO 3166-2 state or province ("US-WA", "CA-QC"), for the rules that
+    # are set below the country - several US states regulate consumer health
+    # data and AI mental-health tools on their own. See services/regulations.
+    location_subdivision: Mapped[str | None] = mapped_column(String(8), nullable=True)
+    # The consent recorded before the first Healthcare conversation: what was
+    # agreed, when, under which jurisdiction's text, and the age confirmed.
+    # Null means not given (or withdrawn) - Healthcare asks first.
+    health_consent: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     # What this user calls their companion in each mode, keyed by mode id:
     # {"learning": "Nick", "knowing": "Gale"}. One row rather than a table
     # because it is at most four short strings and is always read whole with

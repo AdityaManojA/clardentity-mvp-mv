@@ -11,11 +11,13 @@ import {
   type ClarifyingOptionsSuggestion,
   type DecisionReviewData,
   type GeneratedImage,
+  type HealthConsentState,
   type ThinkingReviewData,
 } from "@/lib/sse";
+import { useRouter } from "next/navigation";
 import { ModeSelector, type CognitiveMode } from "@/components/chat/ModeSelector";
-import { forgetFreshChat, isFreshChat } from "@/lib/freshChats";
-import { ChatGreeting } from "@/components/chat/ChatGreeting";
+import { forgetFreshChat, isFreshChat, markFreshChat } from "@/lib/freshChats";
+import { ChatGreeting, ModeDisclosure, TemporaryChatIntro } from "@/components/chat/ChatGreeting";
 import { MessageList, type StreamingMessage } from "@/components/chat/MessageList";
 import { ModeCarousel, groupByMode } from "@/components/chat/ModeCarousel";
 import { MessageInput, type PendingAttachment } from "@/components/chat/MessageInput";
@@ -27,6 +29,9 @@ import { durationBucket, track } from "@/lib/analytics";
 import { setSmartSwitching, useSmartSwitching } from "@/lib/modeSwitching";
 import { getChoice as getModelChoice, PICKABLE_MODES } from "@/lib/pickableModels";
 import { ContextQuestionCard } from "@/components/chat/ContextQuestionCard";
+import { HealthConsentCard } from "@/components/chat/HealthConsentCard";
+import { fetchHealthConsent, giveHealthConsent } from "@/lib/healthConsent";
+import { holdTemporaryChat } from "@/lib/temporaryChat";
 import { LearningRoleCard } from "@/components/chat/LearningRoleCard";
 import { ModeSwitchToast } from "@/components/chat/ModeSwitchToast";
 import { RefinedQuestionCard } from "@/components/chat/RefinedQuestionCard";
@@ -49,6 +54,7 @@ type Conversation = {
   title: string | null;
   default_mode: CognitiveMode | null;
   workspace_id: string;
+  temporary?: boolean;
 };
 
 type AvatarCue = { expression: AvatarExpression; gesture: AvatarGesture };
@@ -77,9 +83,9 @@ const GESTURE_BY_MODE: Record<CognitiveMode, AvatarGesture> = {
   thinking: "chin_stroke",
   decision: "weighing_scales",
   learning: "open_hand_explaining",
-  mentoring: "open_hand_explaining",
-  therapy: "chin_stroke",
   creative: "presenting",
+  guidance: "open_hand_explaining",
+  healthcare: "open_hand_explaining",
   rapid: "presenting",
   legal: "open_hand_explaining",
 };
@@ -92,6 +98,17 @@ export function ChatView({ conversationId }: { conversationId: string }) {
   // Distinct from "no messages". Without it, reopening a chat rendered the
   // "Start a chat" empty state for the second or two the fetch took.
   const [loadingHistory, setLoadingHistory] = useState(true);
+  // Which chat is temporary, by id - so a stale answer for the chat before
+  // this one is ignored by derivation, as the shell does with its title.
+  const [temporaryId, setTemporaryId] = useState<string | null>(null);
+  const temporary = temporaryId === conversationId;
+  // Healthcare's consent, as the server sees it for where this person is.
+  // Read the first time Healthcare is picked; null until then.
+  const [healthConsent, setHealthConsent] = useState<HealthConsentState | null>(null);
+  const [healthBusy, setHealthBusy] = useState(false);
+  const [healthError, setHealthError] = useState<string | null>(null);
+  const router = useRouter();
+  const [workspaceId, setWorkspaceId] = useState<string | null>(null);
   // Never null in practice: a new chat opens in Finder, always - not in
   // whatever this device last used, which had a Decision-making chat
   // reopening the composer in Decision-making and read as the wrong
@@ -288,6 +305,8 @@ export function ChatView({ conversationId }: { conversationId: string }) {
         if (cancelled) return;
         forgetFreshChat(conversationId);
         setMessages(msgs);
+        setTemporaryId(conv.temporary ? conversationId : null);
+        setWorkspaceId(conv.workspace_id);
         setLoadingHistory(false);
         // Only a mode from the picker: a chat whose last answer was a quick
         // one must not reopen with the composer set to the unpickable path.
@@ -312,6 +331,63 @@ export function ChatView({ conversationId }: { conversationId: string }) {
       cancelled = true;
     };
   }, [conversationId]);
+
+  /** Where Healthcare's rules allow processing but not storing (backend
+   *  regulations: storage "transient"), it runs only in a temporary chat -
+   *  opened here, in Healthcare, and deleted when left. */
+  async function openHealthcareTemporaryChat() {
+    if (!workspaceId) return;
+    try {
+      const conv = await apiFetch<{ id: string }>("/chat/conversations", {
+        method: "POST",
+        body: { workspace_id: workspaceId, default_mode: "healthcare", temporary: true },
+      });
+      holdTemporaryChat(conv.id);
+      markFreshChat(conv.id);
+      router.push(`/chat/${conv.id}`);
+    } catch {
+      setError("Couldn't open a temporary chat for Healthcare. Try again?");
+    }
+  }
+
+  useEffect(() => {
+    if (mode !== "healthcare" || healthConsent) return;
+    let cancelled = false;
+    fetchHealthConsent()
+      .then((state) => {
+        if (!cancelled) setHealthConsent(state);
+      })
+      .catch(() => {
+        // The send path asks again (428) if this never answered.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [mode, healthConsent]);
+
+  // Consent given where Healthcare may only run as a temporary chat, but
+  // this chat is a saved one: move to a temporary one before anything is
+  // asked here.
+  const healthNeedsTemporary =
+    mode === "healthcare" && Boolean(healthConsent?.given) && healthConsent?.storage === "transient" && !temporary;
+  const healthBlocked =
+    mode === "healthcare" && healthConsent !== null && (!healthConsent.available || !healthConsent.given);
+
+  async function agreeToHealthcare(language: string) {
+    if (!healthConsent) return;
+    setHealthBusy(true);
+    setHealthError(null);
+    try {
+      const state = await giveHealthConsent(healthConsent.version, language);
+      setHealthConsent(state);
+      track("consent_choice", { choice: "health_granted" });
+      if (state.storage === "transient" && !temporary) await openHealthcareTemporaryChat();
+    } catch (err) {
+      setHealthError(authErrorMessage(err));
+    } finally {
+      setHealthBusy(false);
+    }
+  }
 
   async function handleSend(
     content: string,
@@ -464,6 +540,10 @@ export function ChatView({ conversationId }: { conversationId: string }) {
                 }
               : prev,
           );
+        },
+        onSafety: (card) => {
+          // Before any text: the numbers go up first, over the rabbit.
+          setStreaming((prev) => (prev ? { ...prev, safety: card } : prev));
         },
         onImage: (image) => {
           earlyImageRef.current = image;
@@ -642,7 +722,23 @@ export function ChatView({ conversationId }: { conversationId: string }) {
           setStreaming(null);
           setSending(false);
         },
-        onError: (detail) => {
+        onError: (detail, status) => {
+          // Healthcare refused before reading anything: not a failure, a
+          // precondition. The question goes back in the box, unasked.
+          if (sendMode === "healthcare" && (status === 428 || status === 409 || status === 403)) {
+            if (userMessage) setMessages((prev) => prev.filter((m) => m.id !== userMessage.id));
+            setDraft(content);
+            setStreaming(null);
+            setSending(false);
+            setSlowHint(false);
+            void fetchHealthConsent()
+              .then((state) => {
+                setHealthConsent(state);
+                if (status === 409) void openHealthcareTemporaryChat();
+              })
+              .catch(() => setError(detail));
+            return;
+          }
           track("answer_failed", { mode: sendMode, after: durationBucket(Date.now() - askedAtMs) });
           setError(detail);
           setStreaming(null);
@@ -1018,7 +1114,12 @@ export function ChatView({ conversationId }: { conversationId: string }) {
       // answer; this sets up the next question.
       onUseMode={(next) => setMode(next as CognitiveMode)}
       onAskRefined={(question) => handleSend(question, [])}
-      emptyState={<ChatGreeting />}
+      emptyState={
+        <>
+          {temporary ? <TemporaryChatIntro /> : <ChatGreeting seed={conversationId} />}
+          <ModeDisclosure mode={mode} />
+        </>
+      }
       emptyStateAvatar={
         <AvatarPanel
           state={avatarState}
@@ -1134,6 +1235,34 @@ export function ChatView({ conversationId }: { conversationId: string }) {
             pushing the composer off the bottom. */}
         <div className="scroll-slim max-h-[calc(var(--app-vh)*50)] shrink-0 overflow-y-auto">
         <ErrorBoundary where="question-card" label="This question couldn't be shown.">
+        {/* Healthcare asks first - in place of answering, not as one more
+            card under an answer. */}
+        {healthBlocked && healthConsent && (
+          <div className="mb-3">
+            <HealthConsentCard
+              state={healthConsent}
+              onAgree={(language) => void agreeToHealthcare(language)}
+              onDecline={() => setMode(DEFAULT_MODE)}
+              busy={healthBusy}
+              error={healthError}
+            />
+          </div>
+        )}
+        {healthNeedsTemporary && (
+          <div className="mb-3 rounded-2xl border border-hairline bg-surface px-4 py-3 text-sm text-ink">
+            <p>
+              In {healthConsent?.jurisdiction.name}, Healthcare runs only in a temporary chat,
+              deleted when you leave it.
+            </p>
+            <button
+              type="button"
+              onClick={() => void openHealthcareTemporaryChat()}
+              className="mt-2 rounded-full bg-brand px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-brand-dark"
+            >
+              Open a temporary Healthcare chat
+            </button>
+          </div>
+        )}
         {pendingContext && (
           <ContextQuestionCard
             // A new round is a new question with its own fresh textarea, not
@@ -1424,10 +1553,12 @@ export function ChatView({ conversationId }: { conversationId: string }) {
             </div>
           )}
           <MessageInput
-            disabled={!mode || sending || !online}
+            disabled={!mode || sending || !online || healthBlocked || healthNeedsTemporary}
             disabledReason={
               !online
                 ? "You're offline - what you've typed stays here until you reconnect"
+                : healthBlocked || healthNeedsTemporary
+                  ? "Healthcare is waiting on the card above"
                 : !mode
                   ? "Select a cognitive mode above to start typing"
                   : // The box is also disabled while an answer is being
@@ -1444,10 +1575,16 @@ export function ChatView({ conversationId }: { conversationId: string }) {
             onSend={handleSend}
             onTypingChange={setIsTyping}
             textareaRef={composerRef}
-            onStartCall={mode ? () => setCallOpen(true) : undefined}
+            onStartCall={
+              // A call in Healthcare is health information too: same card first.
+              mode && !healthBlocked && !healthNeedsTemporary ? () => setCallOpen(true) : undefined
+            }
             isGenerating={sending}
             onStop={handleStop}
             mode={mode}
+            // A greyed model, tapped outside Co-Creative: the plans, as for
+            // a locked companion.
+            onModelLocked={(label) => setUpsell(label)}
             trailing={
               mode ? (
                 // Not drawn in the design, and not droppable either: smart
@@ -1472,6 +1609,13 @@ export function ChatView({ conversationId }: { conversationId: string }) {
               ) : undefined
             }
           />
+          {/* Once a conversation is under way the greeting's disclosure has
+              scrolled away; in the two companions where it matters it stays
+              under the box (India's telemedicine and DPDP guidance both ask
+              for a label that stays on screen). */}
+          {messages.length > 0 && (
+            <ModeDisclosure mode={mode} className="mt-1.5 px-2 text-center text-xs text-ink-muted" />
+          )}
         </div>
         {/* On a new chat the design does not sit the composer on the floor:
             the rail and the box are centred in the space under the topbar,

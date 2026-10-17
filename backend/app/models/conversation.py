@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import CheckConstraint, DateTime, ForeignKey, String, func
+from sqlalchemy import Boolean, CheckConstraint, DateTime, ForeignKey, String, false, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -13,11 +13,27 @@ COGNITIVE_MODES = (
     "thinking",
     "decision",
     "learning",
-    "mentoring",
-    "therapy",
     "creative",
+    # Mentoring and Reflect & Relieve, merged on 2026-10-16: one companion
+    # for goals and for how you are doing (see prompt_builder).
+    "guidance",
+    # Health information and navigation, under the regulation suite in
+    # services/regulations.
+    "healthcare",
     "legal",
 )
+
+#: Mode values that no longer exist, and what a stored or remembered one now
+#: means. Read wherever a mode arrives from somewhere older than this code -
+#: a visitor's saved demo conversation, a browser's remembered choice.
+LEGACY_MODES = {"mentoring": "guidance", "therapy": "guidance"}
+
+
+def current_mode(value: str | None) -> str | None:
+    """A mode value as it is today."""
+    if value is None:
+        return None
+    return LEGACY_MODES.get(value, value)
 
 
 class Conversation(Base):
@@ -50,6 +66,10 @@ class Conversation(Base):
     # first) instead of falling back on activity, which is the thing pinning
     # exists to override.
     pinned_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    # A temporary chat: out of the recents list, search and the profile (it
+    # neither reads it nor feeds it), and deleted when its owner leaves it -
+    # see app/services/temporary_chats.py for when that is.
+    temporary: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default=false())
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     messages: Mapped[list["Message"]] = relationship(

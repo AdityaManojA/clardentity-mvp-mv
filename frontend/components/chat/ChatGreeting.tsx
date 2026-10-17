@@ -2,7 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import { useAuth } from "@/lib/auth";
-import { greetingFor, isFirstRun } from "@/lib/greeting";
+import { greetingFor, invitationFor, isFirstRun } from "@/lib/greeting";
 
 /* What an empty chat says.
  *
@@ -29,7 +29,7 @@ function subscribe(): () => void {
   return () => {};
 }
 
-export function ChatGreeting() {
+export function ChatGreeting({ seed }: { seed?: string | null }) {
   const { user } = useAuth();
   const name = user?.display_name ?? null;
   // Someone who signed up a minute ago is not coming back, and the night
@@ -56,10 +56,48 @@ export function ChatGreeting() {
       </p>
       {/* The invitation under the greeting. The greeting says the app
           noticed you; this says what it is for. Quieter and smaller, so the
-          pair reads as one thought rather than two headings. */}
-      <p className="mt-2 text-sm text-ink-muted sm:text-base">
-        Let&apos;s accomplish something today.
+          pair reads as one thought rather than two headings. One of twenty,
+          per chat - some run to two lines, hence the measure. */}
+      <p className="mx-auto mt-2 max-w-md text-balance text-sm text-ink-muted sm:text-base">
+        {invitationFor(seed)}
       </p>
     </div>
+  );
+}
+
+/** What an empty temporary chat says instead of the greeting: what the
+ *  header's dashed bubble did, in the words the chat is held to. The server
+ *  keeps every one of these promises (app/services/temporary_chats.py). */
+export function TemporaryChatIntro() {
+  return (
+    <div className="animate-[fade-in_0.4s_ease] text-center">
+      <p className="text-2xl font-medium text-ink-secondary sm:text-3xl">Temporary chat</p>
+      <p className="mx-auto mt-2 max-w-md text-sm text-ink-muted sm:text-base">
+        This chat won&apos;t appear in your history or shape your profile, and it&apos;s
+        deleted when you leave it.
+      </p>
+    </div>
+  );
+}
+
+/** The line Guidance and Healthcare open with, under the greeting: that this
+ *  is an AI, and what it is not. Said once, plainly, before anything is
+ *  asked - which is what California's companion-chatbot law (SB 243) and
+ *  the EU AI Act's transparency duty ask for, and what anyone would want to
+ *  know before telling a machine about their health or their worst week. */
+export const MODE_DISCLOSURE: Record<string, string> = {
+  guidance:
+    "Guidance is an AI companion - not a therapist, counsellor or crisis service. If you're in danger, call your local emergency number.",
+  healthcare:
+    "Healthcare is an AI giving general health information - not a doctor or a diagnosis, it can be wrong, and it is not for emergencies.",
+};
+
+export function ModeDisclosure({ mode, className }: { mode: string | null; className?: string }) {
+  const text = mode ? MODE_DISCLOSURE[mode] : undefined;
+  if (!text) return null;
+  return (
+    <p className={className ?? "mx-auto mt-3 max-w-md text-balance text-center text-xs text-ink-muted"}>
+      {text}
+    </p>
   );
 }

@@ -225,7 +225,7 @@ export function UpgradeDialog({
               </p>
               <p className="mt-1 text-xs leading-relaxed text-ink-secondary">
                 {preview.remainingToday} of {preview.dailyLimit} messages left today
-                in Mentoring, Reflect &amp; Relieve, Co-Creative and Legal. The
+                in Guidance, Healthcare, Co-Creative and Legal. The
                 allowance resets daily and doesn&apos;t touch the other companions.
               </p>
               <button

@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.admin import router as admin_router
 from app.api.admin_dashboard import router as admin_dashboard_router
+from app.api.healthcare import router as healthcare_router
 from app.api.audio import router as audio_router
 from app.api.compose import router as compose_router
 from app.api.auth import router as auth_router
@@ -63,6 +64,7 @@ API_PREFIX = "/api/v1"
 
 app.include_router(health_router)
 app.include_router(admin_dashboard_router, prefix=API_PREFIX)
+app.include_router(healthcare_router, prefix=API_PREFIX)
 app.include_router(auth_router, prefix=API_PREFIX)
 app.include_router(workspaces_router, prefix=API_PREFIX)
 app.include_router(chat_router, prefix=API_PREFIX)

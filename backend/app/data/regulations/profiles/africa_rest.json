@@ -1,0 +1,461 @@
+{
+  "AO": {
+    "name": "Angola",
+    "health_data": "sensitive",
+    "consent_age": 18,
+    "storage": "unavailable",
+    "storage_reason": "Angolan law lets only a registered health professional process health data, and sending it abroad needs a regulator authorisation we do not hold, so health chats are not available here.",
+    "laws": [
+      {"name": "Lei n.º 22/11 da Protecção de Dados Pessoais", "citation": "DR I Série n.º 114, 17 Jun 2011; art.3 (reaches foreign controllers using means in Angola), arts 13-14 (health data: written express consent and/or APD authorisation; processed by a registered health professional), arts 33-34 (transfers)", "url": "https://extranet.who.int/cpcd/sites/default/files/public_file_repository/AGO_Angola_Lei-No-22-11-Da-protecao-de-dados-pessoais_2011.pdf"},
+      {"name": "Lei n.º 23/11 das Comunicações Electrónicas e dos Serviços da Sociedade da Informação", "citation": "20 Jun 2011; consent for storing data on user devices, e-privacy"},
+      {"name": "Decreto Presidencial n.º 214/16 (Estatuto Orgânico da APD)", "citation": "10 Oct 2016; APD authorises international transfers", "url": "https://lex.ao/docs/presidente-da-republica/2016/decreto-presidencial-n-o-214-16-de-10-de-outubro/"}
+    ],
+    "healthcare_rules": [],
+    "guidance_rules": [],
+    "regulator": "Agência de Protecção de Dados (APD) (https://www.apd.ao)",
+    "confidence": "medium",
+    "needs_review": true,
+    "as_of": "2026-10-16",
+    "sources": [
+      "https://extranet.who.int/cpcd/sites/default/files/public_file_repository/AGO_Angola_Lei-No-22-11-Da-protecao-de-dados-pessoais_2011.pdf",
+      "https://www.dlapiperdataprotection.com/index.html?t=law&c=AO",
+      "https://plmj.com/xms/files/03_Novidades_legislativas/2024/N_Colab_RVA-PLMJ_Dados_Pessoais_e_Ciber-seguranca_em_Angola.pdf",
+      "https://anpg.co.ao/wp-content/uploads/2021/06/A-PROTECCAO-DE-DADOS-PESSOAIS-NO-SECTOR-PETROLIFERO-Versao-final.pdf",
+      "https://lex.ao/docs/presidente-da-republica/2016/decreto-presidencial-n-o-214-16-de-10-de-outubro/"
+    ],
+    "notes": "Read Lei 22/11 (Diario da Republica scan). Art.14(1): health data needs written express consent and/or APD authorisation; art.14(3): it must be processed by a registered health professional bound by secrecy (no consent exception). Art.34: transfers to non-adequate countries (US) need APD authorisation. Art.3(3): reaches foreign controllers using means in Angola, even transit. APD fined MAXAM USD 150k in 2024 for an unlawful transfer (PLMJ). 2025 revision draft not enacted (unverified). Lawyer: is 14(3) general or tied to 14(2)?"
+  },
+  "BI": {
+    "name": "Burundi",
+    "health_data": "sensitive",
+    "consent_age": 21,
+    "storage": "transient",
+    "storage_reason": "Burundi's 2026 data law only lets personal data go abroad to approved countries or under safeguards its new regulator approves, so health chats here are temporary and nothing is saved.",
+    "laws": [
+      {"name": "Loi n°1/03 du 10 mars 2026 portant protection des données à caractère personnel", "citation": "In force on promulgation (art.55); art.2 scope; arts 9-10 health data sensitive, express consent; art.15 transfers; arts 34-41 major controllers; art.53 six-month compliance window", "url": "https://assemblee.bi/wp-content/uploads/2026/03/n%C2%B003-du-10-mars-2026.pdf"},
+      {"name": "Loi n°1/012 du 30 mai 2018 portant Code de la santé (amended by Loi n°1/07 du 12 mars 2020)", "citation": "art.16: the patient decides on the use and transmission of their medical information"},
+      {"name": "Décret-loi n°1/024 du 28 avril 1993 portant réforme du Code des personnes et de la famille", "citation": "Civil majority at 21"}
+    ],
+    "healthcare_rules": [],
+    "guidance_rules": [],
+    "regulator": "Agence de protection des données à caractère personnel (created by Law 1/03 of 2026, art.42; organising decree not found, likely not yet operating)",
+    "confidence": "medium",
+    "needs_review": true,
+    "as_of": "2026-10-16",
+    "sources": [
+      "https://assemblee.bi/wp-content/uploads/2026/03/n%C2%B003-du-10-mars-2026.pdf",
+      "https://www.mofo.com/privacy-library/burundi",
+      "https://www.wearetech.africa/fr/fils/actualites/tech/burundi-le-parlement-adopte-une-loi-cle-sur-la-protection-des-donnees-personnelles",
+      "https://www.dlapiperdataprotection.com/index.html?t=law&c=BI",
+      "https://home.crin.org/s/burundi_access_to_justice_FR.pdf"
+    ],
+    "notes": "Law 1/03 of 10 Mar 2026 (read in the signed scan) ends the no-law position in DLA Piper (Jan 2024). Art.15: transfers only to countries on a ministerial list or with safeguards the Agency approves; consent is not a basis; no list or Agency found, so strictly no route today (unavailable). Kept transient because art.2 reaches foreign controllers only via processing means in Burundi. Private processors had until ~10 Sep 2026. 'Major controllers' (200+ staff or health processors) must register and get DPIA authorisation. Majority 21."
+  },
+  "BW": {
+    "name": "Botswana",
+    "health_data": "special_category",
+    "consent_age": 18,
+    "storage": "persist",
+    "storage_reason": "",
+    "laws": [
+      {"name": "Data Protection Act, 2024 (Act No. 18 of 2024)", "citation": "In force 29 Oct 2024 (DLA Piper; another source says 14 Jan 2025); s.4 extraterritorial; s.30 health is sensitive, explicit consent; s.54 representative; s.78(1)(a) explicit-consent transfer derogation (Bill No. 19 of 2024 text)", "url": "https://www.michalsons.com/wp-content/uploads/2025/02/Botswana-Data-Protection-Bill-2024.pdf"}
+    ],
+    "healthcare_rules": [],
+    "guidance_rules": [],
+    "regulator": "Information and Data Protection Commission (no verified website)",
+    "confidence": "medium",
+    "needs_review": false,
+    "as_of": "2026-10-16",
+    "sources": [
+      "https://www.michalsons.com/wp-content/uploads/2025/02/Botswana-Data-Protection-Bill-2024.pdf",
+      "https://www.dlapiperdataprotection.com/index.html?t=law&c=BW",
+      "https://cipit.strathmore.edu/understanding-botswanas-2018-and-2024-data-protection-acts/"
+    ],
+    "notes": "Read the published Bill (July 2024); the enacted Act text was not seen. GDPR-style: health is a special category needing explicit consent (s.30); a US transfer is allowed on explicit consent after a risk warning (s.78(1)(a)). Controllers not established in Botswana but offering services there must appoint a representative in Botswana (s.54) - back end. DLA Piper's page (Mar 2026) still describes the 2018 Act's notification and gazetted-country regime. Age of majority 18 since the 2010 Interpretation Act amendment (news, not statute)."
+  },
+  "DJ": {
+    "name": "Djibouti",
+    "health_data": "sensitive",
+    "consent_age": 18,
+    "storage": "persist",
+    "storage_reason": "",
+    "laws": [
+      {"name": "Code du numérique (Livre I: protection des données à caractère personnel)", "citation": "Adopted by the National Assembly 30 Jun 2025; promulgation, law number and article text not verified (MoFo links a 'Loi n°019/AN/23/9ème L portant code numérique')"}
+    ],
+    "healthcare_rules": [],
+    "guidance_rules": [],
+    "regulator": "Commission nationale de protection des données à caractère personnel (CNDP) - designated, not set up as of mid-2025",
+    "confidence": "low",
+    "needs_review": true,
+    "as_of": "2026-10-16",
+    "sources": [
+      "https://www.jonesday.com/en/insights/2025/07/national-assembly-of-the-republic-of-djibouti-approves-digital-code",
+      "https://www.mofo.com/privacy-library/djibouti",
+      "https://www.consentstack.io/regulations/dj-digital-code"
+    ],
+    "notes": "Could not reach the Digital Code text or the Journal officiel. Secondary sources only: Book I has ~156 GDPR-inspired articles, consent as the default basis, transfers only to 'adequate' countries (derogations unknown), 72h breach notice, CNDP not operational. If transfers turn out adequacy-only with no consent derogation, move storage to transient. health_data 'sensitive' and consent_age 18 are assumptions. No US sanctions programme."
+  },
+  "ER": {
+    "name": "Eritrea",
+    "health_data": "personal",
+    "consent_age": 18,
+    "storage": "persist",
+    "storage_reason": "",
+    "laws": [
+      {"name": "Constitution of Eritrea (1997)", "citation": "art.18 right to privacy; the Constitution has never been implemented"}
+    ],
+    "healthcare_rules": [],
+    "guidance_rules": [],
+    "regulator": "No data protection authority",
+    "confidence": "low",
+    "needs_review": true,
+    "as_of": "2026-10-16",
+    "sources": [
+      "https://dataprotection.africa/eritrea/",
+      "https://ofac.treasury.gov/recent-actions/20260918"
+    ],
+    "notes": "No data protection law or authority found; Telecom Proclamation 23/2017 and Cybercrime Proclamation 125/2019 are cited by some sources but not verified. Sanctions: no OFAC country programme; on 18 Sep 2026 OFAC removed all EO 14046 designations (PFDJ, Eritrean Defense Forces, Red Sea Trading Corp, Hidri Trust) after that emergency expired. Other individual listings not checked. Not on the vendors' unsupported lists. Age of majority 18 under the 2015 Civil Code is assumed, not verified."
+  },
+  "KM": {
+    "name": "Comoros",
+    "health_data": "sensitive",
+    "consent_age": 18,
+    "storage": "transient",
+    "storage_reason": "Comoros law requires a regulator's prior authorisation to process health data and limits sending data abroad, so health chats here are temporary and nothing is saved.",
+    "laws": [
+      {"name": "Loi n°14-___/AU portant protection des données à caractère personnel", "citation": "Adopted 26 Jun 2014 (number blank in the hosted text); arts 6-7 health data only with express consent; art.9 transfers only to states with sufficient protection; art.43(c),(h) prior CNIL authorisation for health data and clause-based transfers", "url": "https://justice.gouv.km/wp-content/uploads/2025/03/loi-du-26-juin-2014-portant-protection-des-donnees-a-caractere-personnel.pdf"}
+    ],
+    "healthcare_rules": [],
+    "guidance_rules": [],
+    "regulator": "Commission nationale de l'informatique et des libertés (CNIL) under the 2014 law - no evidence it was set up",
+    "confidence": "low",
+    "needs_review": true,
+    "as_of": "2026-10-16",
+    "sources": [
+      "https://justice.gouv.km/wp-content/uploads/2025/03/loi-du-26-juin-2014-portant-protection-des-donnees-a-caractere-personnel.pdf"
+    ],
+    "notes": "Text hosted by the Ministry of Justice (Mar 2025) shows Assembly adoption on 26 Jun 2014 but no law number; promulgation, implementing decree and the CNIL were not found, and one source gives 2021. If in force: health data needs express consent plus prior CNIL authorisation (art.43c), and there is no consent route for transfers (art.9), hence transient. If not in force there is no general law and storage could be persist. Majority 18 assumed (the 1979 Nationality Code uses 21)."
+  },
+  "LS": {
+    "name": "Lesotho",
+    "health_data": "sensitive",
+    "consent_age": 18,
+    "storage": "persist",
+    "storage_reason": "",
+    "laws": [
+      {"name": "Data Protection Act, 2011 (Act No. 5 of 2012)", "citation": "Gazette 22 Feb 2012; s.36 consent lifts the ban on sensitive data incl. health; s.52 transfers abroad allowed with the data subject's consent; s.53 notification to the Commission", "url": "https://dataprotection.africa/wp-content/uploads/2022/09/Lesotho_DPA.pdf"},
+      {"name": "Constitution of Lesotho, s.3A", "citation": "Age of majority 18 (inserted 2022)", "url": "https://constituteproject.org/constitution/Lesotho_2025"}
+    ],
+    "healthcare_rules": [],
+    "guidance_rules": [],
+    "regulator": "Data Protection Commission (not appointed as of Aug 2025)",
+    "confidence": "medium",
+    "needs_review": true,
+    "as_of": "2026-10-16",
+    "sources": [
+      "https://dataprotection.africa/wp-content/uploads/2022/09/Lesotho_DPA.pdf",
+      "https://www.dlapiperdataprotection.com/index.html?t=law&c=LS",
+      "https://www.afriwise.com/blog/data-protection-compliance-in-lesotho-why-the-time-to-act-is-now",
+      "https://dataprotection.africa/lesotho/",
+      "https://constituteproject.org/constitution/Lesotho_2025"
+    ],
+    "notes": "The gazetted Act (OCR copy) s.52 lets a controller in Lesotho transfer abroad with the data subject's consent, but DLA Piper (Mar 2026) and dataprotection.africa describe a SADC/adequacy-only regime with no consent route, probably from a later draft; confirm which text is law. Commission still not appointed (Afriwise, 19 Aug 2025), so s.53 notification cannot be made, though courts can hear claims. Age of majority 18 per Constitution s.3A (2022 amendment)."
+  },
+  "MG": {
+    "name": "Madagascar",
+    "health_data": "sensitive",
+    "consent_age": 21,
+    "storage": "persist",
+    "storage_reason": "",
+    "laws": [
+      {"name": "Loi n°2014-038 sur la protection des données à caractère personnel", "citation": "art.5 scope (established in, or using means in, Madagascar); art.18 health data with express consent; art.20 transfers allowed on unambiguous informed consent; art.46 prior CMIL authorisation for high-risk processing", "url": "https://cnlegis.gov.mg/page_acces_pdf/eoVdnWfpUcmXblY"},
+      {"name": "Décret n°2023-1541 (missions and organisation of the CMIL)", "citation": "6 Dec 2023; members sworn in Aug 2025"},
+      {"name": "Code pénal, art.317", "citation": "Abortion punished, no express exception"},
+      {"name": "Ordonnance n°62-041 du 19 septembre 1962", "citation": "Civil majority at 21"}
+    ],
+    "healthcare_rules": [
+      "If asked about ending a pregnancy, say plainly that abortion is a crime in Madagascar with no express exception (Penal Code art. 317), and urge urgent care for heavy bleeding, fever or pain after any pregnancy loss."
+    ],
+    "guidance_rules": [],
+    "regulator": "Commission Malagasy sur l'Informatique et des Libertés (CMIL), operational since Aug 2025 (no verified website)",
+    "confidence": "medium",
+    "needs_review": true,
+    "as_of": "2026-10-16",
+    "sources": [
+      "https://cnlegis.gov.mg/page_acces_pdf/eoVdnWfpUcmXblY",
+      "https://www.dlapiperdataprotection.com/index.html?t=law&c=MG",
+      "https://en.wikipedia.org/wiki/Abortion_in_Madagascar",
+      "https://unstats.un.org/unsd/demographic/meetings/wshops/1995_Rabat_CRVS/Docs/Doc.10_Madagascar.pdf",
+      "https://archive.crin.org/en/docs/resources/treaties/crc.7/Madagascar_OMCT_NGO_Report.pdf"
+    ],
+    "notes": "Read Law 2014-038. Health data needs express consent (art.18); a US transfer is allowed on unambiguous consent after being told protection is not equivalent (art.20), hence persist. Open: art.46 requires prior CMIL authorisation for processing with 'particular risks' to privacy, and the CMIL has been operational since Aug 2025 (news). Civil majority 21 (Ord. 62-041; older sources; voting and marriage at 18). Abortion ban with no express exception; the 2021 reform bill was still not passed in late 2025."
+  },
+  "MU": {
+    "name": "Mauritius",
+    "health_data": "special_category",
+    "consent_age": 18,
+    "storage": "persist",
+    "storage_reason": "",
+    "laws": [
+      {"name": "Data Protection Act 2017", "citation": "Proclamation No. 3 of 2018, in force 15 Jan 2018; GDPR-aligned special categories incl. health; explicit-consent transfer derogation; controller/processor registration and DPO duty"}
+    ],
+    "healthcare_rules": [],
+    "guidance_rules": [],
+    "regulator": "Data Protection Office (http://dataprotection.govmu.org)",
+    "confidence": "medium",
+    "needs_review": false,
+    "as_of": "2026-10-16",
+    "sources": [
+      "https://www.dlapiperdataprotection.com/index.html?t=law&c=MU",
+      "http://dataprotection.govmu.org/"
+    ],
+    "notes": "GDPR-aligned. Health is a special category; a US transfer is allowed with explicit consent after being told of the risks, or with safeguards proven to the Commissioner, so persist. Every controller and processor must register with the Commissioner (3-year certificate) and designate a DPO; check whether a US controller with no establishment or equipment in Mauritius is caught. Based on DLA Piper (16 Mar 2026); the statute was not re-read."
+  },
+  "MW": {
+    "name": "Malawi",
+    "health_data": "sensitive",
+    "consent_age": 18,
+    "storage": "persist",
+    "storage_reason": "",
+    "laws": [
+      {"name": "Data Protection Act, 2024 (Act No. 3 of 2024)", "citation": "Assented 31 Jan 2024, in force 3 Jun 2024; s.2 health status is sensitive; s.16 consent; ss.38-39 transfers, s.39(4)(a) informed consent; s.41 registration of controllers of significant importance", "url": "https://cdh-malawi.com/wp-content/uploads/2025/09/Data-Protection-Act-2024.pdf"},
+      {"name": "Penal Code (Cap. 7:01), s.229", "citation": "Attempted suicide is a misdemeanour"}
+    ],
+    "healthcare_rules": [],
+    "guidance_rules": [
+      "If someone mentions a suicide attempt, respond supportively and do not raise legality or imply it will be reported; attempted suicide is still an offence in Malawi (Penal Code s.229)."
+    ],
+    "regulator": "Malawi Communications Regulatory Authority (MACRA), designated data protection authority",
+    "confidence": "high",
+    "needs_review": false,
+    "as_of": "2026-10-16",
+    "sources": [
+      "https://cdh-malawi.com/wp-content/uploads/2025/09/Data-Protection-Act-2024.pdf",
+      "https://cipit.strathmore.edu/review-of-the-malawi-data-protection-act-2024/",
+      "https://www.techhiveadvisory.africa/insights/malawis-data-protection-act-aligning-to-the-new-regulatory-framework",
+      "https://www.southernafricalitigationcentre.org/malawi-man-arrested-and-convicted-for-attempting-to-commit-suicide/",
+      "https://mwnation.com/move-to-decriminalise-suicide/"
+    ],
+    "notes": "Read the Act. Commencement 3 Jun 2024 per secondary sources (notice not seen). Consent covers health data (s.16) and a US transfer after a risk warning (s.39(4)(a)), so persist. MACRA registration applies only to controllers of 'significant importance' (domiciled or operating in Malawi with over 10,000 data subjects, or data significant to the economy, society or security); check whether Clardentity reaches that. Attempted suicide still criminal (s.229) per 2022-2024 reports."
+  },
+  "MZ": {
+    "name": "Mozambique",
+    "health_data": "personal",
+    "consent_age": 18,
+    "storage": "persist",
+    "storage_reason": "",
+    "laws": [
+      {"name": "Constitution of the Republic of Mozambique (2004), art.71", "citation": "Bars computerised recording and processing of identifiable data on beliefs, party or union membership and private life"},
+      {"name": "Electronic Transactions Law (Law no. 3/2017)", "citation": "Ch. IX personal data: consent, prior notice to INTIC"},
+      {"name": "Decree no. 59/2023 (as amended by Decree no. 44/2025)", "citation": "Registration and licensing of intermediary e-service providers and digital platforms serving Mozambique, wherever based"},
+      {"name": "Decrees no. 71/2025 and 72/2025 (data centre and cloud regulations)", "citation": "31 Dec 2025, in force 31 Mar 2026", "url": "https://www.dlapiperafrica.com/en/mozambique/insights/2026/Approval-of-the-Data-Centre-Regulation"}
+    ],
+    "healthcare_rules": [],
+    "guidance_rules": [],
+    "regulator": "No data protection authority; INTIC (National Institute of Information and Communication Technologies) has partial competence",
+    "confidence": "medium",
+    "needs_review": true,
+    "as_of": "2026-10-16",
+    "sources": [
+      "https://www.dlapiperdataprotection.com/index.html?t=law&c=MZ",
+      "https://aimnews.org/2026/08/25/intic-alerta-para-desafios-na-proteccao-de-dados-pessoais-em-mocambique/",
+      "https://www.dlapiperafrica.com/en/mozambique/insights/2026/Approval-of-the-Data-Centre-Regulation",
+      "https://www.plmj.com/en/knowledge/guides-and-manuals/New-framework-for-data-centres-and-cloud-computing-services/34439"
+    ],
+    "notes": "No general data protection law (DLA Piper, Feb 2026). A Personal Data Protection Bill was reportedly approved by the Council of Ministers in Mar 2026 and is before the Assembly (AIM, 25 Aug 2026); recheck storage once enacted. Constitution art.71(1) bars computerised processing of identifiable private-life data with no consent exception in the text; a lawyer should say whether health chats fall under it. Digital platforms serving Mozambique must register with INTIC (Decree 59/2023). No health-data localisation found (decree texts not read)."
+  },
+  "NA": {
+    "name": "Namibia",
+    "health_data": "personal",
+    "consent_age": 18,
+    "storage": "persist",
+    "storage_reason": "",
+    "laws": [
+      {"name": "Constitution of Namibia, art.13", "citation": "Right to privacy"},
+      {"name": "Data Protection Bill (not enacted)", "citation": "Draft 2021/2023; due to be tabled 2025; would create a supervisory authority", "url": "https://www.we.com.na/technology-we/data-protection-bill-returns-to-parliament2025-08-18"}
+    ],
+    "healthcare_rules": [],
+    "guidance_rules": [],
+    "regulator": "No data protection authority; Ministry of Information and Communication Technology",
+    "confidence": "medium",
+    "needs_review": false,
+    "as_of": "2026-10-16",
+    "sources": [
+      "https://www.dlapiperdataprotection.com/index.html?t=law&c=NA",
+      "https://www.we.com.na/technology-we/data-protection-bill-returns-to-parliament2025-08-18"
+    ],
+    "notes": "No comprehensive data protection law (DLA Piper, 20 Mar 2026). The Data Protection Bill was due to be tabled in late 2025; no evidence of passage by Oct 2026 (Sep-Oct 2026 National Assembly order papers were not read in full). If enacted it would create a supervisory authority and likely make health data sensitive; recheck storage then. Age of majority 18 (Child Care and Protection Act) not re-verified."
+  },
+  "SC": {
+    "name": "Seychelles",
+    "health_data": "special_category",
+    "consent_age": 18,
+    "storage": "persist",
+    "storage_reason": "",
+    "laws": [
+      {"name": "Data Protection Act, 2023 (Act 24 of 2023)", "citation": "Gazette 22 Dec 2023; s.3 applies to processing within Seychelles; s.22 health is a special category, explicit consent; s.47 cross-border data flows", "url": "https://www.gazette.sc/sites/default/files/2023-12/Act%2024%20-%202023%20-%20Data%20Protection%20Act%202023.pdf"}
+    ],
+    "healthcare_rules": [],
+    "guidance_rules": [],
+    "regulator": "Information Commission (https://www.infocom.sc)",
+    "confidence": "medium",
+    "needs_review": true,
+    "as_of": "2026-10-16",
+    "sources": [
+      "https://www.gazette.sc/sites/default/files/2023-12/Act%2024%20-%202023%20-%20Data%20Protection%20Act%202023.pdf",
+      "https://www.infocom.sc/data-protection/",
+      "https://applebyglobal.com/publications/data-protection-law-now-in-force-in-seychelles",
+      "https://www.techhiveadvisory.africa/insights/review-of-seychelles-dpa",
+      "https://www.dlapiperdataprotection.com/index.html?t=law&c=SC"
+    ],
+    "notes": "Read the Act. s.47(1) bars transfers unless the recipient processor ensures a 'comparable level of protection'; no consent derogation. s.47(3) adds conditions for Seychellois citizens' special-category data (a designated controller in Seychelles, or telling users where processing happens; no 'and/or', and it cross-refers to s.23, likely meant s.22). s.3 may confine the Act to processing within Seychelles. Persist assumes disclosure of US processing plus processor contracts suffice. 18-month transition ended Jun 2025."
+  },
+  "SD": {
+    "name": "Sudan",
+    "health_data": "personal",
+    "consent_age": 18,
+    "storage": "persist",
+    "storage_reason": "",
+    "laws": [
+      {"name": "Combating Cybercrime Act 2018 (amended 2020)", "citation": "Sectoral; no general data protection law"},
+      {"name": "Electronic Transactions Act 2007", "citation": "Sectoral"}
+    ],
+    "healthcare_rules": [],
+    "guidance_rules": [
+      "If someone mentions a suicide attempt, respond supportively and do not raise legality or imply it will be reported; attempted suicide may still be an offence in Sudan."
+    ],
+    "regulator": "No data protection authority",
+    "confidence": "medium",
+    "needs_review": false,
+    "as_of": "2026-10-16",
+    "sources": [
+      "https://ofac.treasury.gov/sanctions-programs-and-country-information/sudan-and-darfur-sanctions",
+      "https://dataprotection.africa/sudan/",
+      "https://citizen.digital/article/attempted-suicide-no-longer-a-crime-in-kenya-high-court-rules-n355604"
+    ],
+    "notes": "No data protection law found (a 2018 draft bill never advanced). Not comprehensively sanctioned: OFAC revoked the Sudanese Sanctions Regulations' authorities on 12 Oct 2017 and US persons are 'not broadly prohibited' from Sudan dealings; the current programme (EO 14098, EO 13400) is list-based, last updated 26 Jun 2026, so screen counterparties only. Not on the vendors' unsupported lists. Attempted suicide reported as still criminal (Kenyan press, Jan 2025; statute not read). War since 2023 disrupts care."
+  },
+  "SO": {
+    "name": "Somalia",
+    "health_data": "sensitive",
+    "consent_age": 18,
+    "storage": "persist",
+    "storage_reason": "",
+    "laws": [
+      {"name": "Data Protection Act (Law No. 005 of 2023)", "citation": "In force Mar 2023; art.2 health status is sensitive; art.4 applies to targeting people in Somalia; art.14 consent; art.31(1)(a) transfer on informed consent; art.32 registration of major-importance controllers", "url": "https://dataprotection.africa/wp-content/uploads/Somalia_DPA.pdf"}
+    ],
+    "healthcare_rules": [],
+    "guidance_rules": [
+      "If someone mentions a suicide attempt, respond supportively and do not raise legality or imply it will be reported; attempted suicide may still be an offence in Somalia."
+    ],
+    "regulator": "Somali Data Protection Authority (https://www.dpa.gov.so)",
+    "confidence": "medium",
+    "needs_review": false,
+    "as_of": "2026-10-16",
+    "sources": [
+      "https://dataprotection.africa/wp-content/uploads/Somalia_DPA.pdf",
+      "https://ofac.treasury.gov/sanctions-programs-and-country-information/somalia-sanctions",
+      "https://www.techhiveadvisory.africa/insights/review-of-somalias-data-protection-act-and-implementing-regulations",
+      "https://moct.gov.so/en/launch-of-the-registration-of-data-controllers-and-data-processors/",
+      "https://citizen.digital/article/attempted-suicide-no-longer-a-crime-in-kenya-high-court-rules-n355604"
+    ],
+    "notes": "Read the Act. It reaches controllers targeting people in Somalia (art.4). Consent covers health data and a US transfer after a risk warning (art.31(1)(a)), so persist. The Authority opened controller registration in May 2026; art.32 requires it only of 'major importance' controllers. Implementing regulations not read. OFAC's Somalia programme (EO 13536) is list-based, not an embargo. Somaliland applies its own laws (not checked). Attempted suicide reported as still criminal (Jan 2025 press; statute not read)."
+  },
+  "SS": {
+    "name": "South Sudan",
+    "health_data": "personal",
+    "consent_age": 18,
+    "storage": "persist",
+    "storage_reason": "",
+    "laws": [
+      {"name": "Transitional Constitution of South Sudan (2011), art.22", "citation": "Right to privacy"},
+      {"name": "Cybercrimes and Computer Misuse Act 2026", "citation": "Reported signed 8 Feb 2026; text not read"}
+    ],
+    "healthcare_rules": [],
+    "guidance_rules": [
+      "If someone mentions a suicide attempt, respond supportively and do not raise legality or imply it will be reported; attempted suicide may still be an offence in South Sudan."
+    ],
+    "regulator": "No data protection authority",
+    "confidence": "medium",
+    "needs_review": false,
+    "as_of": "2026-10-16",
+    "sources": [
+      "https://ofac.treasury.gov/sanctions-programs-and-country-information/south-sudan-related-sanctions",
+      "https://www.radiotamazuj.org/en/news/article/south-sudan-to-get-data-protection-bill-in-2026-says-minister",
+      "https://citizen.digital/article/attempted-suicide-no-longer-a-crime-in-kenya-high-court-rules-n355604"
+    ],
+    "notes": "No data protection law; the ICT minister promised a first Data Protection Bill in 2026 (not seen tabled; a May 2026 tracker still lists none). A cybercrime act was reportedly signed Feb 2026 (text not read). OFAC's South Sudan programme (EO 13664) blocks 'certain persons' only; no embargo. Not on the vendors' unsupported lists. Attempted suicide reported as still an offence (Kenyan press, Jan 2025; Penal Code not read)."
+  },
+  "SZ": {
+    "name": "Eswatini",
+    "health_data": "sensitive",
+    "consent_age": 21,
+    "storage": "persist",
+    "storage_reason": "",
+    "laws": [
+      {"name": "Data Protection Act, 2022 (Act No. 5 of 2022)", "citation": "Gazette 4 Mar 2022; s.29(e) consent lifts the ban on sensitive data incl. health; s.33(4)(a) non-SADC transfers on unambiguous consent; s.46 notification to the Commission", "url": "https://dataprotection.africa/wp-content/uploads/2022/09/Eswatini_DPA.pdf"},
+      {"name": "Age of Majority Act, 1853", "citation": "Majority at 21", "url": "https://eswatinilii.org/akn/sz/act/1853/11/eng@1998-12-01"}
+    ],
+    "healthcare_rules": [],
+    "guidance_rules": [],
+    "regulator": "Eswatini Communications Commission (https://esccom.org.sz)",
+    "confidence": "high",
+    "needs_review": false,
+    "as_of": "2026-10-16",
+    "sources": [
+      "https://dataprotection.africa/wp-content/uploads/2022/09/Eswatini_DPA.pdf",
+      "https://eswatinilii.org/akn/sz/act/1853/11/eng@1998-12-01",
+      "https://dataprotection.africa/eswatini/"
+    ],
+    "notes": "Read the gazetted Act. Consent lifts the ban on health data (s.29(e)); transfers to non-SADC countries without adequacy are allowed on unambiguous consent (s.33(4)(a)), so persist. Controllers must notify the Commission of processing (s.46) and the Act reaches controllers using means in Eswatini - back end. One compliance site says enforcement started Sep 2025 (unverified). Majority is 21 under the Age of Majority Act 1853 (LII), so consent_age 21."
+  },
+  "ZM": {
+    "name": "Zambia",
+    "health_data": "sensitive",
+    "consent_age": 19,
+    "storage": "unavailable",
+    "storage_reason": "Zambian law allows health data to be processed only for medical care under a professional, not on your consent, and requires it to be stored in Zambia, so health chats are not available here.",
+    "laws": [
+      {"name": "Data Protection Act No. 3 of 2021", "citation": "Commenced 1 Apr 2021; s.14 sensitive data (incl. health) only for legal claims, medical care by or under a professional, or public interest; s.19 registration; s.70(3) sensitive data processed and stored in Zambia; s.71(4)(b)", "url": "https://database.cyberpolicyportal.org/api/files/1679306276406b9eypxn888v.pdf"},
+      {"name": "Constitution of Zambia (Amendment) Act 2016, art.266", "citation": "'adult' means a person aged 19; ConCourt (2025/CCZ/R001, Jul 2025) held 18-year-olds are not children", "url": "https://zambialii.org/akn/zm/doc/case-summary/2025-11-20/case-summary-the-people-v-john-sinkamba-and-ors-2025cczr001-2025-zmcc-14-28-july-2025/eng@2025-11-20"}
+    ],
+    "healthcare_rules": [],
+    "guidance_rules": [],
+    "regulator": "Office of the Data Protection Commissioner (no verified website)",
+    "confidence": "high",
+    "needs_review": true,
+    "as_of": "2026-10-16",
+    "sources": [
+      "https://database.cyberpolicyportal.org/api/files/1679306276406b9eypxn888v.pdf",
+      "https://www.dlapiperdataprotection.com/index.html?t=law&c=ZM",
+      "https://bowmanslaw.com/insights/zambia-office-of-the-data-protection-commissioner-operational/",
+      "https://www.afriwise.com/blog/data-localisation-requirements-under-the-data-protection-act",
+      "https://zambialii.org/akn/zm/doc/case-summary/2025-11-20/case-summary-the-people-v-john-sinkamba-and-ors-2025cczr001-2025-zmcc-14-28-july-2025/eng@2025-11-20"
+    ],
+    "notes": "Read the Act. Consent is not a ground for sensitive data (s.14); health processing must be by or under a professional bound by secrecy (s.14(2)). s.70(3) requires sensitive data to be processed and stored in Zambia; s.71(4)(b) permits a transfer on explicit consent, but local storage still applies. Registration is mandatory (s.19; portal deadline 30 Apr 2025). No amendment found. consent_age 19 because the Constitution defines adult as 19 (some say 21 at common law). Suicide law not checked."
+  },
+  "ZW": {
+    "name": "Zimbabwe",
+    "health_data": "sensitive",
+    "consent_age": 18,
+    "storage": "persist",
+    "storage_reason": "",
+    "laws": [
+      {"name": "Cyber and Data Protection Act [Chapter 12:07] (No. 5 of 2021)", "citation": "s.12 health data needs written consent and, absent it, a health professional; s.12(8) unique patient identifier; s.28 adequacy; s.29(a) transfer on unambiguous consent", "url": "https://www.veritaszim.net/sites/veritas_d/files/Cyber%20%26%20Data%20Protection%20Act%20Cap1207%20No%205%20of%202021%20gaz%202022-03-11.pdf"},
+      {"name": "Cyber and Data Protection (Licensing of Data Controllers and Appointment of Data Protection Officers) Regulations, 2024", "citation": "SI 155 of 2024; POTRAZ licence, deadline 12 Mar 2025, annual renewal"}
+    ],
+    "healthcare_rules": [],
+    "guidance_rules": [],
+    "regulator": "Postal and Telecommunications Regulatory Authority of Zimbabwe (POTRAZ), designated Data Protection Authority (https://www.potraz.gov.zw)",
+    "confidence": "medium",
+    "needs_review": true,
+    "as_of": "2026-10-16",
+    "sources": [
+      "https://www.veritaszim.net/sites/veritas_d/files/Cyber%20%26%20Data%20Protection%20Act%20Cap1207%20No%205%20of%202021%20gaz%202022-03-11.pdf",
+      "https://www.dlapiperdataprotection.com/index.html?t=law&c=ZW",
+      "https://zimbabwe.misa.org/2025/03/14/navigating-the-data-protection-act-requirements-ensuring-compliance-for-zimbabwean-data-controllers",
+      "https://ofac.treasury.gov/recent-actions/20240304"
+    ],
+    "notes": "Read the Act. Written consent covers health data (s.12(1),(4)) and unambiguous consent covers a US transfer (s.29(a)), so persist. Open: s.12(8) allows health data processing only with a state-issued unique patient identifier, unworkable for a consumer service; and SI 155/2024 requires a POTRAZ licence (US$50-2,000), reported in 2026 to apply to handlers inside or outside Zimbabwe, with enforcement notices. US Zimbabwe sanctions programme terminated 4 Mar 2024 (EO 14118)."
+  }
+}

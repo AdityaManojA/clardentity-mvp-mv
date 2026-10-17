@@ -131,6 +131,12 @@ function ExternalLinkIcon() {
   );
 }
 
+/** Where an open popover is rendered: the nearest layer marked
+ *  `data-portal-root` (the landing demo), or the page itself. */
+function portalRoot(from: HTMLElement | null): HTMLElement {
+  return from?.closest<HTMLElement>("[data-portal-root]") ?? document.body;
+}
+
 export function CitationPopover({
   marker,
   evidence,
@@ -148,6 +154,9 @@ export function CitationPopover({
   const buttonRef = useRef<HTMLButtonElement>(null);
   const popoverRef = useRef<HTMLSpanElement>(null);
   const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
+  // Where the open popover renders - found when the marker is tapped, since
+  // a ref cannot be read during render. See portalRoot.
+  const [root, setRoot] = useState<HTMLElement | null>(null);
 
   /* Measured, not guessed - and portaled to <body>, not just measured.
      Three attempts got this wrong before landing here:
@@ -171,7 +180,17 @@ export function CitationPopover({
      Rendering through a portal to `document.body` sidesteps the whole
      category: the popover is no longer a descendant of anything that could
      redefine its containing block, so `fixed` + viewport measurements
-     finally mean what they say. */
+     finally mean what they say.
+
+     Except inside something that is itself layered over the page - the
+     landing demo, a full-screen `fixed z-50` panel. Portaled to <body>
+     there, the popover (z-30) opened *behind* the demo and every citation
+     marker looked dead to a visitor, while the same answer worked in the
+     app (2026-10-12). So the portal goes to the nearest ancestor marked
+     `data-portal-root` when there is one: inside it the popover stacks above
+     the demo's content and takes the demo's dark theme with it. The demo
+     panel has no transform, filter or perspective, so `fixed` inside it is
+     still viewport-relative and the measurements below still hold. */
   useLayoutEffect(() => {
     // No reset on close: the portal isn't rendered while closed, and on
     // reopen this layout effect recomputes before the browser paints, so a
@@ -218,8 +237,24 @@ export function CitationPopover({
       <button
         ref={buttonRef}
         type="button"
-        onClick={() => setOpen((v) => !v)}
+        onClick={(event) => {
+          setRoot(portalRoot(event.currentTarget));
+          setOpen((v) => !v);
+        }}
         onBlur={() => setTimeout(() => setOpen(false), 150)}
+        // Escape closes this, and only this. In the landing demo Escape
+        // also closes the whole demo - and with it the visitor's
+        // conversation - so a key meant for a source card must stop here.
+        onKeyDown={(event) => {
+          if (event.key === "Escape" && open) {
+            // Both: React may be listening on the same node as the demo
+            // (Next hydrates the whole document), where only the
+            // immediate form keeps the other listener from running.
+            event.stopPropagation();
+            event.nativeEvent.stopImmediatePropagation();
+            setOpen(false);
+          }
+        }}
         aria-expanded={open}
         title={`Source: ${evidence.document_filename}`}
         className="mx-0.5 rounded border border-brand-border bg-brand-soft px-1 align-super text-xs font-semibold text-brand transition-colors hover:bg-brand hover:text-white"
@@ -227,6 +262,7 @@ export function CitationPopover({
         {marker}
       </button>
       {open &&
+        root &&
         createPortal(
           // `span`, not `div`/`blockquote`/`p`: harmless now that this is
           // portaled out to <body> rather than nested in the answer's own
@@ -306,7 +342,7 @@ export function CitationPopover({
               </span>
             )}
           </span>,
-          document.body,
+          root,
         )}
     </span>
   );

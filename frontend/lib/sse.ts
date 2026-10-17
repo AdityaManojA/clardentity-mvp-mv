@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "@/lib/apiClient";
+import { API_BASE_URL, clientTimezoneHeader } from "@/lib/apiClient";
 import { getAccessToken, networkErrorMessage, getRefreshToken, refreshAccessToken } from "@/lib/auth";
 
 export type Evidence = {
@@ -82,6 +82,54 @@ export type ThinkingReviewData = {
   biased: { approach: string; bias_name: string | null; bias_definition: string | null; why: string }[];
 };
 
+/** One number on a support card, from the verified table on the server. */
+export type SafetyResource = {
+  kind: "emergency" | "ambulance" | "crisis" | "poison";
+  label: string;
+  number: string;
+  hours: string;
+};
+
+/** The support card on a turn the safety screen flagged (backend
+ *  services/safety): shown above the answer, numbers never from the model. */
+export type SafetyCardData = {
+  level: "concern" | "crisis";
+  kind: string;
+  country: string | null;
+  resources: SafetyResource[];
+  fallback_url: string;
+};
+
+/** Healthcare's consent card, as the server composes it for where the
+ *  person is (backend api/healthcare.consent_state). */
+export type HealthConsentState = {
+  version: string;
+  given: boolean;
+  given_at: string | null;
+  jurisdiction: { code: string; name: string };
+  storage: "persist" | "transient" | "unavailable";
+  available: boolean;
+  storage_reason: string;
+  consent_age: number;
+  laws: { name: string; citation: string; url: string }[];
+  points: string[];
+  /** The languages the notice can be read in ("en" first) and its text in
+   *  each - Hindi in India. Absent from an older server. */
+  languages?: string[];
+  copy?: Record<string, HealthConsentCopy>;
+};
+
+export type HealthConsentCopy = {
+  eyebrow: string;
+  title: string;
+  points: string[];
+  given_under: string;
+  age_label: string;
+  agree: string;
+  decline: string;
+  footer: string;
+};
+
 export type ChatMessage = {
   id: string;
   role: "user" | "assistant" | "system";
@@ -107,6 +155,8 @@ export type ChatMessage = {
   generated_image: GeneratedImage | null;
   /** The user's own reaction to this answer - null until they tap something. */
   feedback: { rating: "up" | "down" | null; comment: string | null } | null;
+  /** The support card, on the rare turn the safety screen flagged. */
+  safety?: SafetyCardData | null;
   /** Null for the very first message(s) of a conversation. */
   parent_id: string | null;
   /** This message's position among its siblings (0-based) and how many
@@ -214,7 +264,10 @@ export type ChatStreamHandlers = {
    *  tapped option, a typed answer, or `clarifying_confirmed: true` alone
    *  if they'd rather skip it. */
   onClarifyingOptions?: (suggestion: ClarifyingOptionsSuggestion) => void;
-  onError: (detail: string) => void;
+  /** `status` is the HTTP status when the request itself was refused (no
+   *  stream) - Healthcare's 428 (consent needed) and 409 (temporary chat
+   *  only) are told apart by it. */
+  onError: (detail: string, status?: number) => void;
   /** Any bytes at all from the server, including the keep-alive pings it
    *  sends every 15 seconds. The caller uses it as a liveness signal: an
    *  answer that takes a minute still pings, so silence means the connection
@@ -234,6 +287,12 @@ export type ChatStreamHandlers = {
   /** Landing demo only: what this visitor has left of the allowance, sent
    *  last on every stream. */
   onBudget?: (budget: GuestBudget) => void;
+  /** The safety screen flagged this message: the support card, sent before
+   *  any text so the numbers are on screen first. */
+  onSafety?: (card: SafetyCardData) => void;
+  /** Landing demo only: Healthcare needs the visitor's consent before it
+   *  answers - nothing was processed. */
+  onHealthConsent?: (state: HealthConsentState) => void;
 };
 
 /** The demo allowance, as the server charged it. */
@@ -295,6 +354,7 @@ async function openStream(
     headers: {
       "Content-Type": "application/json",
       ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+      ...clientTimezoneHeader(),
     },
     body: JSON.stringify(body),
     signal,
@@ -348,7 +408,7 @@ export async function streamChatMessage(
     // over (a token past its 30 days, or revoked by a password reset). Say
     // that, in words - the server's "Not authenticated" read as a bug.
     if (res.status === 401) detail = "Your session has expired. Please sign in again.";
-    handlers.onError(detail);
+    handlers.onError(detail, res.status);
     return;
   }
 
@@ -415,6 +475,13 @@ export async function consumeChatStream(
           handlers.onBudget?.(b);
         }
       : undefined,
+    // Healthcare's consent card is the whole reply until it is answered.
+    onHealthConsent: handlers.onHealthConsent
+      ? (state) => {
+          concluded = true;
+          handlers.onHealthConsent?.(state);
+        }
+      : undefined,
   };
 
   while (true) {
@@ -476,6 +543,8 @@ function handleRawEvent(raw: string, handlers: ChatStreamHandlers) {
     else if (eventType === "refined_question") handlers.onRefinedQuestion?.(parsed);
     else if (eventType === "switched") handlers.onSwitched?.(parsed.from, parsed.to);
     else if (eventType === "budget") handlers.onBudget?.(parsed);
+    else if (eventType === "safety") handlers.onSafety?.(parsed);
+    else if (eventType === "health_consent") handlers.onHealthConsent?.(parsed);
     else if (eventType === "error") handlers.onError(parsed.detail);
   } catch {
     // ignore malformed frame

@@ -7,8 +7,8 @@ export const metadata: Metadata = {
   description: "The agreement between you and Clardentity.",
 };
 
-const VERSION = "2026-09-28";
-const UPDATED = "28 September 2026";
+const VERSION = "2026-10-17";
+const UPDATED = "17 October 2026";
 const CONTACT = "hello@clardentity.ai";
 
 export default function TermsPage() {
@@ -37,9 +37,12 @@ export default function TermsPage() {
           <strong>Nothing Clardentity says is professional advice.</strong> Not legal advice,
           not medical advice, not financial or investment advice, not tax advice, and not
           therapy. The Legal mode explains how rules generally work so you can talk to a lawyer
-          better informed; it does not replace one. The Reflect &amp; Relieve mode is
-          companionship for thinking something through; it is not treatment, and it is not a
-          crisis service.
+          better informed; it does not replace one. The Guidance mode is an AI companion for
+          working towards a goal or thinking something through; it is not therapy, counselling
+          or treatment, and it is not a crisis service. The Healthcare mode gives general
+          health information and says which signs mean getting care urgently; it does not
+          diagnose, prescribe or treat, and it does not replace a doctor, pharmacist or other
+          clinician who can examine you.
         </p>
         <p>
           <strong>If you are in crisis or someone is in danger, contact your local emergency

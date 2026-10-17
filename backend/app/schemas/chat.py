@@ -8,6 +8,10 @@ from pydantic import BaseModel, Field
 class ConversationCreate(BaseModel):
     workspace_id: uuid.UUID
     title: str | None = None
+    # A temporary chat (see Conversation.temporary). Fixed at creation: a chat
+    # that has been in the history cannot be taken out of it this way, and a
+    # temporary one is not kept by flipping it back.
+    temporary: bool = False
     # Optional, and only ever a starting point: the caller can pick a different
     # mode on the very first message. Lets a "start in Decision" entry point
     # carry that choice into the conversation instead of dropping it at the
@@ -20,9 +24,9 @@ class ConversationCreate(BaseModel):
             "thinking",
             "decision",
             "learning",
-            "mentoring",
-            "therapy",
             "creative",
+            "guidance",
+            "healthcare",
             "legal",
         ]
         | None
@@ -50,6 +54,7 @@ class ConversationOut(BaseModel):
     title: str | None
     default_mode: str | None
     pinned: bool = False
+    temporary: bool = False
     created_at: datetime
     # When something last happened in it (the newest message, else creation).
     # Lists sort by this; a chat continued today is at the top today.
@@ -209,6 +214,9 @@ class MessageOut(BaseModel):
     #: {"rating": "up"|"down"|None, "comment": str|None}. Null until the user
     #: reacts to this answer - see FeedbackIn.
     feedback: dict | None = None
+    #: The support card on a turn the safety screen flagged - see
+    #: services/safety.card. Null on almost every message.
+    safety: dict | None = None
     #: Null for the very first message(s) of a conversation. Editing resends
     #: with this as the new sibling's `parent_id` - see MessageCreate.
     parent_id: uuid.UUID | None = None

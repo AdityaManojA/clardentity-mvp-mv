@@ -20,8 +20,20 @@ import { useTouchKeyboard } from "@/lib/useTouchKeyboard";
 import { usePhoneLayout } from "@/lib/usePhoneLayout";
 import { track } from "@/lib/analytics";
 
-/** Tallest the composer's textarea grows before it scrolls: about five lines. */
-const COMPOSER_MAX_HEIGHT = 120;
+/** Tallest the composer's textarea grows before it scrolls - about five
+ *  lines on a phone, about eight at the desktop's larger type. Past that it
+ *  scrolls inside, so a pasted page never pushes the thread off the screen. */
+const COMPOSER_MAX_HEIGHT_PHONE = 120;
+const COMPOSER_MAX_HEIGHT_DESKTOP = 220;
+
+/** Size the composer's textarea to its text, up to the cap for this layout. */
+function fitComposer(el: HTMLTextAreaElement | null, phoneLayout: boolean): void {
+  if (!el) return;
+  const cap = phoneLayout ? COMPOSER_MAX_HEIGHT_PHONE : COMPOSER_MAX_HEIGHT_DESKTOP;
+  el.style.height = "auto";
+  el.style.height = `${Math.min(el.scrollHeight, cap)}px`;
+  el.style.overflowY = el.scrollHeight > cap ? "auto" : "hidden";
+}
 
 /** Something the next message carries. An image goes to the model as
  *  vision context; a document is read on the server and its text put in
@@ -65,6 +77,24 @@ export function attachmentProblem(file: File): string | null {
   return file.size > MAX_DOCUMENT_BYTES ? "Documents must be under 25MB" : null;
 }
 
+/** The files a paste carries that the user means as attachments - or none,
+ *  when it is really a text paste. Copying text out of Word, Excel or a web
+ *  page puts a rendered picture of it on the clipboard beside the text and
+ *  its formatting; pasting that as an image would turn every quoted paragraph
+ *  into a screenshot. So real text that comes with formatting stays text.
+ *  What attaches: a screenshot, an image copied from a page or an app (no
+ *  text with it), and files copied in Finder or Explorer (whose only text is
+ *  the file's name). */
+export function pastedFiles(data: DataTransfer | null): File[] {
+  if (!data) return [];
+  const files = Array.from(data.files ?? []);
+  if (files.length === 0) return [];
+  const text = data.getData("text/plain").trim();
+  const formatted = Array.from(data.types ?? []).includes("text/html");
+  if (text && formatted) return [];
+  return files;
+}
+
 function StopIcon() {
   return (
     <svg
@@ -92,6 +122,7 @@ export function MessageInput({
   textareaRef,
   onStartCall,
   trailing,
+  onModelLocked,
   mode,
   isGenerating,
   onStop,
@@ -129,6 +160,9 @@ export function MessageInput({
    *  call button needs nothing here: it already does whatever `onStartCall`
    *  says, and the demo passes an invitation. */
   gated?: (feature: "attach" | "voice" | "model") => void;
+  /** A greyed model was tapped in a mode where picking one is not part of
+   *  the plan - the caller shows the plans. Gets the model's name. */
+  onModelLocked?: (label: string) => void;
 }) {
   const touchKeyboard = useTouchKeyboard();
   const [attachments, setAttachments] = useState<PendingAttachment[]>([]);
@@ -231,25 +265,23 @@ export function MessageInput({
     };
   }, [taRef]);
 
-  // Phone layout only: grows with what's typed, up to about five lines, then
-  // scrolls inside. Desktop keeps the drawn one-row box.
-  // It used to stay one row tall whatever the length: a paragraph on a phone
-  // was read through a one-line slot. Measured before paint so the box never
-  // flashes at the old height; the cap keeps the thread above in view.
+  // Grows with what's typed, then scrolls inside past the cap - on every
+  // screen. It used to stay one row tall whatever the length: first on
+  // phones, then (until 2026-10-14) on desktop, where the phone fix had
+  // deliberately left "the drawn one-row box" - and a pasted paragraph was
+  // read through a one-line slot with a scrollbar. The empty box is still the
+  // drawn one: one row inside the card's own height floor. Measured before
+  // paint so the box never flashes at the old height.
   const phoneLayout = usePhoneLayout();
   useLayoutEffect(() => {
-    const el = taRef.current;
-    if (!el) return;
-    if (!phoneLayout) {
-      el.style.height = "";
-      el.style.overflowY = "";
-      return;
-    }
-    el.style.height = "auto";
-    const capped = Math.min(el.scrollHeight, COMPOSER_MAX_HEIGHT);
-    el.style.height = `${capped}px`;
-    el.style.overflowY = el.scrollHeight > COMPOSER_MAX_HEIGHT ? "auto" : "hidden";
+    fitComposer(taRef.current, phoneLayout);
   }, [value, taRef, phoneLayout]);
+  // A narrower window wraps the same text onto more lines.
+  useEffect(() => {
+    const refit = () => fitComposer(taRef.current, phoneLayout);
+    window.addEventListener("resize", refit);
+    return () => window.removeEventListener("resize", refit);
+  }, [taRef, phoneLayout]);
 
   useEffect(() => {
     const pos = pendingCaretRef.current;
@@ -336,6 +368,57 @@ export function MessageInput({
   async function handleFilesSelected(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
     if (fileInputRef.current) fileInputRef.current.value = "";
+    await addFiles(files, "picker");
+  }
+
+  /** Pasting a screenshot or a copied file into the box attaches it - the
+   *  quicker road to the same place as the paperclip, with the same checks.
+   *  A text paste is left entirely to the browser. */
+  function handlePaste(e: React.ClipboardEvent<HTMLTextAreaElement>) {
+    const files = pastedFiles(e.clipboardData);
+    if (files.length === 0) return;
+    e.preventDefault();
+    if (gated) {
+      gated("attach");
+      return;
+    }
+    void addFiles(files, "paste");
+  }
+
+  /* Dropping files on the card does the same. A counter rather than a flag:
+     dragenter/dragleave fire for every child the pointer crosses, and a flag
+     flickers off over the textarea. */
+  const [dragDepth, setDragDepth] = useState(0);
+  const carriesFiles = (e: React.DragEvent) => Array.from(e.dataTransfer.types).includes("Files");
+  const dropHandlers = {
+    onDragEnter: (e: React.DragEvent) => {
+      if (!carriesFiles(e) || disabled) return;
+      e.preventDefault();
+      setDragDepth((d) => d + 1);
+    },
+    onDragOver: (e: React.DragEvent) => {
+      if (!carriesFiles(e) || disabled) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "copy";
+    },
+    onDragLeave: (e: React.DragEvent) => {
+      if (!carriesFiles(e)) return;
+      setDragDepth((d) => Math.max(0, d - 1));
+    },
+    onDrop: (e: React.DragEvent) => {
+      if (!carriesFiles(e)) return;
+      e.preventDefault();
+      setDragDepth(0);
+      if (disabled) return;
+      if (gated) {
+        gated("attach");
+        return;
+      }
+      void addFiles(Array.from(e.dataTransfer.files), "drop");
+    },
+  };
+
+  async function addFiles(files: File[], via: "picker" | "paste" | "drop") {
     if (files.length === 0) return;
 
     setAttachError(null);
@@ -357,6 +440,7 @@ export function MessageInput({
         kind: isImage ? "image" : "document",
         extension: isImage ? undefined : fileExtension(file.name),
         size_kb: Math.round(file.size / 1024),
+        via,
       });
       setAttachments((prev) => [
         ...prev,
@@ -422,8 +506,22 @@ export function MessageInput({
         // question on top and the controls along the foot. Not a row - the
         // text gets the full width at every size, which is what the old
         // side-by-side arrangement could not give it on a phone.
-        className="flex min-h-[124px] flex-col rounded-[20px] max-lg:min-h-0 border border-[color:var(--border)] bg-surface-raised p-0 shadow-[0px_697px_195px_0px_rgba(0,0,0,0),0px_446px_178px_0px_rgba(0,0,0,0.01),0px_251px_150px_0px_rgba(0,0,0,0.03),0px_111px_111px_0px_rgba(0,0,0,0.04),0px_28px_61px_0px_rgba(0,0,0,0.05)]"
+        {...dropHandlers}
+        className={cx(
+          "relative flex min-h-[124px] flex-col rounded-[20px] max-lg:min-h-0 border border-[color:var(--border)] bg-surface-raised p-0 shadow-[0px_697px_195px_0px_rgba(0,0,0,0),0px_446px_178px_0px_rgba(0,0,0,0.01),0px_251px_150px_0px_rgba(0,0,0,0.03),0px_111px_111px_0px_rgba(0,0,0,0.04),0px_28px_61px_0px_rgba(0,0,0,0.05)]",
+          // The one time the card does change: something is being carried
+          // over it that it will take.
+          dragDepth > 0 && "border-brand-border ring-2 ring-brand-border",
+        )}
       >
+        {dragDepth > 0 && (
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-[20px] bg-brand-soft/80 text-sm font-medium text-brand"
+          >
+            Drop to attach
+          </div>
+        )}
         {/* On a phone the five controls and the textarea competed for one
             390px row, and the textarea lost - "Ask a question..." wrapped
             onto three lines inside a box two words wide. Stacked, the
@@ -445,7 +543,7 @@ export function MessageInput({
             data-tour="attach-image"
             onClick={() => (gated ? gated("attach") : fileInputRef.current?.click())}
             disabled={disabled}
-            title="Attach a file or image"
+            title="Attach a file or image - or paste or drop one into the box"
             aria-label="Attach a file or image"
             className="-ml-1.5 flex size-8 shrink-0 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-surface-hover hover:text-brand disabled:cursor-not-allowed disabled:opacity-50"
           >
@@ -461,7 +559,10 @@ export function MessageInput({
           />
 
           <div className="ml-auto flex min-w-0 items-center gap-1 max-lg:gap-4">
-            {mode && PICKABLE_MODES.has(mode) ? (
+            {/* Every mode since 2026-10-16. Where choosing is not part of
+                the plan the menu still shows what exists, greyed, rather
+                than hiding it - the choice is an upgrade, not a secret. */}
+            {mode ? (
               gated ? (
                 // The chip, without the menu behind it. Same shape and the
                 // same place, so the foot of the card reads as it does in
@@ -479,8 +580,12 @@ export function MessageInput({
                   </svg>
                 </button>
               ) : (
-                // The one mode where the user picks the model by name.
-                <VendorModelPicker mode={mode} disabled={disabled} />
+                <VendorModelPicker
+                  mode={mode}
+                  disabled={disabled}
+                  locked={!PICKABLE_MODES.has(mode)}
+                  onLocked={onModelLocked}
+                />
               )
             ) : null}
             {trailing}
@@ -618,6 +723,7 @@ export function MessageInput({
           value={value}
           onChange={(e) => handleChange(e.target.value)}
           onKeyDown={handleKeyDown}
+          onPaste={handlePaste}
           // One row, not two: the card's own 124px floor is what gives the
           // box its height, and asking for a second row made it taller than
           // the design before a word was typed.

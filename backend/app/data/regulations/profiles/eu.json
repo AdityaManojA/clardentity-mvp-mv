@@ -1,0 +1,1037 @@
+{
+ "EU": {
+  "name": "European Union / EEA",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "General Data Protection Regulation (GDPR)",
+    "citation": "Regulation (EU) 2016/679, Art 9(1) and 9(2)(a) (health data; explicit consent), Art 3(2) (applies to non-EU providers), Art 27",
+    "url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj"
+   },
+   {
+    "name": "Medical Device Regulation (MDR), read with MDCG 2019-11 rev.1 on software",
+    "citation": "Regulation (EU) 2017/745, Art 2(1), Annex VIII Rule 11; MDCG 2019-11 rev.1 (June 2025)",
+    "url": "https://eur-lex.europa.eu/eli/reg/2017/745/oj"
+   },
+   {
+    "name": "Artificial Intelligence Act",
+    "citation": "Regulation (EU) 2024/1689 as amended by Regulation (EU) 2026/1744; Art 5(1)(a)-(b) (manipulation, exploiting vulnerability), Art 50(1) (AI disclosure, from 2 Aug 2026)",
+    "url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+   },
+   {
+    "name": "EU-US Data Privacy Framework adequacy decision and Standard Contractual Clauses",
+    "citation": "Commission Implementing Decisions (EU) 2023/1795 and (EU) 2021/914",
+    "url": "https://eur-lex.europa.eu/eli/dec_impl/2023/1795/oj"
+   }
+  ],
+  "healthcare_rules": [
+   "Do not turn the person's own readings, lab or home-test results into a personal risk assessment or a dose (e.g. insulin); explain what is measured and usual ranges in general terms. EU MDR guidance (MDCG) makes that a device.",
+   "Do not grade how urgent or serious this person's symptoms are (no 'low risk', 'can wait' or triage levels); the EU MDR and AI Act treat triage as a regulated function. Describe in general terms which warning signs need urgent care.",
+   "When asked which treatment suits them, describe the usual options as general guideline information and say their clinician chooses; do not pick or rank treatments for this person (EU MDR intended-purpose line).",
+   "Discuss medicines factually, preferably by active ingredient, and never promote a brand of prescription-only medicine, a pharmacy or a seller; the EU bans advertising prescription-only medicines to the public (Directive 2001/83, Art 88)."
+  ],
+  "guidance_rules": [
+   "Do not run or score mental-health questionnaires (such as PHQ-9 or GAD-7) or offer a programme to assess, monitor or manage depression or anxiety; EU MDR software guidance (MDCG) classes that as a medical device.",
+   "Never use guilt, flattery, urgency or emotional pressure to keep the person talking or steer their choices, and never discourage them from turning to people around them (EU AI Act Art 5 bans exploiting vulnerability).",
+   "Do not tell the person which emotion you detect from their voice, face or photos; respond only to feelings they put into words. Emotion recognition from biometric data carries extra duties under the EU AI Act."
+  ],
+  "regulator": "Data protection authority of the member state where the user lives (no lead authority for a non-EU controller); EDPB (https://www.edpb.europa.eu); AI Office and national market-surveillance authorities for the AI Act (https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai)",
+  "confidence": "high",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+   "https://eur-lex.europa.eu/eli/reg/2026/1744/oj",
+   "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-50",
+   "https://eur-lex.europa.eu/eli/reg/2017/745/oj",
+   "https://health.ec.europa.eu/document/download/b45335c5-1679-4c71-a91c-fc7a4d37f12b_en?filename=mdcg_2019_11_en.pdf",
+   "https://www.edpb.europa.eu/documents/edpb-correspondence/edpb-letter-to-the-european-commission-on-us-supreme-court-judgment_en"
+  ],
+  "notes": "Transfers: DPF upheld at first instance (T-553/23) but appeal C-703/25 P pending, and the EDPB asked the Commission (31 Jul 2026) to reassess after Trump v. Slaughter. Anthropic, OpenAI and Supabase were not DPF-listed on 16 Oct 2026, so SCCs plus a TIA carry the transfers; no Art 3(2) SCC module adopted. Back end: Art 27 representative, DPO, DPIA, separate opt-in for training/analytics, Art 50(2) marking by 2 Dec 2026, new Art 5 image bans from 2 Dec 2026, PLD from 9 Dec 2026. AI Act not yet in the EEA Agreement (IS, LI, NO). GDPR Digital Omnibus pending.",
+  "complaints_to": "the data protection authority in your country"
+ },
+ "AT": {
+  "name": "Austria",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Datenschutzgesetz (DSG)",
+    "citation": "BGBl. I Nr. 165/1999 as amended; s.4(4) (child consent age 14)",
+    "url": "https://www.ris.bka.gv.at/GeltendeFassung.wxe?Abfrage=Bundesnormen&Gesetzesnummer=10001597"
+   },
+   {
+    "name": "Ärztegesetz 1998; Strafgesetzbuch s.184 (Kurpfuscherei)",
+    "citation": "Medical practice reserved to doctors; unlicensed medical practice is a criminal offence",
+    "url": "https://www.ris.bka.gv.at"
+   }
+  ],
+  "healthcare_rules": [
+   "Frame answers as general information about a topic, not as advice on this person's own case; in Austria medical advice given directly to an individual is reserved to doctors (Ärztegesetz) and unlicensed practice is a crime (s.184 StGB)."
+  ],
+  "guidance_rules": [],
+  "regulator": "Datenschutzbehörde (DSB) (https://www.dsb.gv.at)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.ris.bka.gv.at/GeltendeFassung.wxe?Abfrage=Bundesnormen&Gesetzesnummer=10001597",
+   "https://www.dsb.gv.at"
+  ],
+  "notes": "Digital-consent age 14 (DSG s.4(4)) for the general age gate; Healthcare stays 18+. The Ärztegesetz and s.184 StGB points come from knowledge because RIS blocked automated fetches. A March 2026 plan for an under-14 social-media ban targets social networks and was not adopted as far as verified."
+ },
+ "BE": {
+  "name": "Belgium",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Law of 30 July 2018 on the protection of natural persons with regard to the processing of personal data",
+    "citation": "Art 7 (child consent age 13); art 9 (special-category safeguards)",
+    "url": "https://www.ejustice.just.fgov.be/eli/loi/2018/07/30/2018040581/justel"
+   },
+   {
+    "name": "Coordinated Law of 10 May 2015 on the practice of healthcare professions",
+    "citation": "Art 3 (practice of medicine reserved to doctors); protected clinical psychologist title",
+    "url": "https://www.ejustice.just.fgov.be/eli/loi/2015/05/10/2015A24141/justel"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [
+   "Never describe these conversations as psychology or psychological treatment, or yourself as a psychologist; in Belgium the clinical psychologist title is protected by the coordinated law on healthcare professions."
+  ],
+  "regulator": "Autorité de protection des données / Gegevensbeschermingsautoriteit (APD/GBA) (https://www.autoriteprotectiondonnees.be)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.ejustice.just.fgov.be/eli/loi/2018/07/30/2018040581/justel",
+   "https://www.ejustice.just.fgov.be/eli/loi/2015/05/10/2015A24141/justel",
+   "https://www.autoriteprotectiondonnees.be"
+  ],
+  "notes": "Digital-consent age 13 (Law of 30 July 2018, art 7). Art 9 of that law requires a list of staff and processor roles with access to health data, bound to confidentiality (back end). The statute portal blocked automated access, so ages and articles are from knowledge."
+ },
+ "BG": {
+  "name": "Bulgaria",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Personal Data Protection Act (ZZLD)",
+    "citation": "Закон за защита на личните данни, art 25c (child consent age 14)"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Commission for Personal Data Protection (CPDP) (https://www.cpdp.bg)",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.cpdp.bg"
+  ],
+  "notes": "Low confidence: national specifics largely from knowledge, and no health-profession or AI rule was researched. Digital-consent age 14 (ZZLD art 25c). A May 2026 under-16 social-media proposal is pending and targets social networks. No staffed adult crisis line was verified (crisis routing falls back to 112)."
+ },
+ "HR": {
+  "name": "Croatia",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Act on the Implementation of the General Data Protection Regulation",
+    "citation": "Zakon o provedbi Opće uredbe o zaštiti podataka, NN 42/2018, art 19 (child consent age 16)",
+    "url": "https://www.zakon.hr/z/1023/"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Agencija za zaštitu osobnih podataka (AZOP) (https://azop.hr)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.zakon.hr/z/1023/",
+   "https://azop.hr"
+  ],
+  "notes": "Digital-consent age 16 for children resident in Croatia (NN 42/2018 art 19). A request for an under-15 social-media ban was rejected by the Justice Minister in March 2026. No national health-profession or AI rule identified that changes model behaviour."
+ },
+ "CY": {
+  "name": "Cyprus",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Law providing for the protection of natural persons with regard to the processing of personal data",
+    "citation": "Law 125(I)/2018, s.8 (child consent age 14), s.9 (no genetic or biometric data for insurance)",
+    "url": "https://www.cylaw.org/nomoi/enop/non-ind/2018_1_125/full.html"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Commissioner for Personal Data Protection (https://www.dataprotection.gov.cy)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.cylaw.org/nomoi/enop/non-ind/2018_1_125/full.html",
+   "https://www.dataprotection.gov.cy"
+  ],
+  "notes": "Digital-consent age 14 (Law 125(I)/2018 s.8). The President announced an intended social-media minimum age of 15 in April 2026 (not enacted as far as verified). No national health-profession or AI rule identified that changes model behaviour."
+ },
+ "CZ": {
+  "name": "Czechia",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Act on the Processing of Personal Data",
+    "citation": "Zákon č. 110/2019 Sb., s.7 (child consent age 15)",
+    "url": "https://www.zakonyprolidi.cz/cs/2019-110"
+   },
+   {
+    "name": "Act on Health Services",
+    "citation": "Zákon č. 372/2011 Sb. (providing health services requires authorisation)",
+    "url": "https://www.zakonyprolidi.cz/cs/2011-372"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Úřad pro ochranu osobních údajů (ÚOOÚ) (https://uoou.gov.cz)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.zakonyprolidi.cz/cs/2019-110",
+   "https://www.zakonyprolidi.cz/cs/2011-372",
+   "https://uoou.gov.cz"
+  ],
+  "notes": "Digital-consent age 15 (Act 110/2019 s.7). Act 372/2011 requires authorisation to provide health services; a general-information chatbot is not one, so nothing beyond the global and EU rules is needed as long as it stays general."
+ },
+ "DK": {
+  "name": "Denmark",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Databeskyttelsesloven (Danish Data Protection Act)",
+    "citation": "LBK nr 289 af 08/03/2024; s.6(2)-(3) (child consent age 15 since 1 Jan 2024), s.7 (special categories)",
+    "url": "https://www.retsinformation.dk/eli/lta/2024/289"
+   },
+   {
+    "name": "Autorisationsloven (Act on authorisation of health professionals)",
+    "citation": "ss.73-74 (no exposure to danger; contagious diseases and prescription-only medicines reserved to doctors)",
+    "url": "https://www.retsinformation.dk"
+   },
+   {
+    "name": "Danish AI Act implementation law",
+    "citation": "Lov nr 467 af 14/05/2025 (in force 2 Aug 2025)",
+    "url": "https://www.retsinformation.dk/eli/lta/2025/467"
+   }
+  ],
+  "healthcare_rules": [
+   "If the person may have a contagious disease, give only general information and tell them to see a doctor rather than how to treat it; in Denmark treating contagious diseases is reserved to doctors (Autorisationsloven s.74)."
+  ],
+  "guidance_rules": [],
+  "regulator": "Datatilsynet (https://www.datatilsynet.dk)",
+  "confidence": "high",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.retsinformation.dk/eli/lta/2024/289",
+   "https://www.retsinformation.dk/eli/lta/2025/467",
+   "https://www.datatilsynet.dk"
+  ],
+  "notes": "Digital-consent age 15 since 1 Jan 2024 (many tables still say 13). Lov nr 467/2025 makes Digitaliseringsstyrelsen the main AI Act market-surveillance authority, with Datatilsynet also competent. A political agreement of 7 Nov 2025 on an under-15 social-media ban awaits legislation."
+ },
+ "EE": {
+  "name": "Estonia",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Personal Data Protection Act (Isikuandmete kaitse seadus)",
+    "citation": "RT I, 04.01.2019, 11; s.8 (child consent age 13)",
+    "url": "https://www.riigiteataja.ee/en/eli/523012019001/consolide"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Andmekaitse Inspektsioon (AKI) (https://www.aki.ee)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.riigiteataja.ee/en/eli/523012019001/consolide",
+   "https://www.aki.ee"
+  ],
+  "notes": "Digital-consent age 13 (s.8). No national health-profession or AI rule identified that changes model behaviour."
+ },
+ "FI": {
+  "name": "Finland",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Data Protection Act (Tietosuojalaki)",
+    "citation": "1050/2018 as amended by 437/2025; s.5 (child consent age 13), s.6 (special categories)",
+    "url": "https://www.finlex.fi/fi/laki/ajantasa/2018/20181050"
+   },
+   {
+    "name": "Act on Health Care Professionals",
+    "citation": "559/1994 (protected professional titles)",
+    "url": "https://www.finlex.fi/fi/laki/ajantasa/1994/19940559"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Tietosuojavaltuutetun toimisto (Data Protection Ombudsman) (https://tietosuoja.fi)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.finlex.fi/fi/laki/ajantasa/2018/20181050",
+   "https://www.finlex.fi/fi/laki/ajantasa/1994/19940559",
+   "https://tietosuoja.fi"
+  ],
+  "notes": "Digital-consent age 13 (s.5). Protected titles (incl. psychotherapist) are already covered by the global rule against claiming to be a therapist. The Vastaamo psychotherapy-records breach is the national cautionary case for mental-health data security. An under-15 social-media ban was backed by the PM in Jan 2026; no bill as of Aug 2026."
+ },
+ "FR": {
+  "name": "France",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "transient",
+  "storage_reason": "French rules on hosting health data (HDS) require a certified host in Europe to store it. We don't use one yet, so Healthcare chats here are answered but not saved.",
+  "laws": [
+   {
+    "name": "Hébergement de données de santé (HDS)",
+    "citation": "Code de la santé publique L.1111-8 and R.1111-8-8 et seq.; HDS referential v2 (arrêté of 26 April 2024, EEA storage)",
+    "url": "https://esante.gouv.fr/produits-services/hds"
+   },
+   {
+    "name": "Loi Informatique et Libertés",
+    "citation": "Loi n° 78-17 du 6 janvier 1978; Art 45 (child consent age 15), Art 82 (cookies)",
+    "url": "https://www.legifrance.gouv.fr/loda/id/JORFTEXT000000886460"
+   },
+   {
+    "name": "Exercice illégal de la médecine",
+    "citation": "Code de la santé publique L.4161-1 and L.4161-5",
+    "url": "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000006689112"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "CNIL (https://www.cnil.fr); ANSM (medical devices); ANS / Ministry of Health (HDS certification)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://esante.gouv.fr/produits-services/hds",
+   "https://www.legifrance.gouv.fr/loda/id/JORFTEXT000000886460",
+   "https://www.cnil.fr/fr/technologies/intelligence-artificielle-ia",
+   "https://www.cnil.fr/fr/ia-conversationnelle-et-sante-mentale-des-jeunes-resultats-de-lenquete-europeenne"
+  ],
+  "notes": "Transient per the research: CSP L.1111-8 requires an HDS-certified host for in-scope personal health data, and HDS v2 (existing hosts to May 2026) requires EEA storage. Whether a consumer AI information service is in scope is unsettled; an HDS-certified EEA host would allow persist. Guidance chats are arguably outside scope - confirm. HDS v2 details and the Doctissimo fine (EUR 380,000, May 2023) are from memory. CNIL: analytics consent-exempt only under its conditions; under-15s need joint parental consent (Art 45)."
+ },
+ "DE": {
+  "name": "Germany",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Bundesdatenschutzgesetz (BDSG)",
+    "citation": "BDSG 2018, s.22 (special categories and safeguards), s.38 (DPO), s.1(4) no.3 (non-EU controllers)",
+    "url": "https://www.gesetze-im-internet.de/bdsg_2018/"
+   },
+   {
+    "name": "Heilpraktikergesetz (HeilprG)",
+    "citation": "s.1 (Ausübung der Heilkunde requires a licence)",
+    "url": "https://www.gesetze-im-internet.de/heilprg/__1.html"
+   },
+   {
+    "name": "Heilmittelwerbegesetz (HWG)",
+    "citation": "s.9 (advertising remote treatment), s.3 (misleading health advertising)",
+    "url": "https://www.gesetze-im-internet.de/heilmwerbg/__9.html"
+   },
+   {
+    "name": "Psychotherapeutengesetz (PsychThG)",
+    "citation": "Psychotherapy reserved to licensed psychotherapists"
+   }
+  ],
+  "healthcare_rules": [
+   "Never describe yourself or this service as able to diagnose or treat ('Diagnose', 'Behandlung', 'Therapie'); German law bans advertising remote treatment (HWG s.9) and reserves Heilkunde to licensed practitioners (HeilprG s.1)."
+  ],
+  "guidance_rules": [
+   "Never call these conversations 'Therapie', 'Psychotherapie' or 'Behandlung', even loosely; in Germany psychotherapy is reserved to licensed psychotherapists (Psychotherapeutengesetz)."
+  ],
+  "regulator": "Data protection authority of the user's Land, with the BfDI; BfArM (medical devices); Bundesnetzagentur (AI Act, expected)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.gesetze-im-internet.de/bdsg_2018/__22.html",
+   "https://www.gesetze-im-internet.de/bdsg_2018/__38.html",
+   "https://www.gesetze-im-internet.de/heilprg/__1.html",
+   "https://www.gesetze-im-internet.de/heilmwerbg/__9.html",
+   "https://www.gesetze-im-internet.de/ttdsg/__25.html"
+  ],
+  "notes": "Digital-consent age 16. Back end: BDSG s.22(2) safeguards for health data (audit log, access restriction, encryption, pseudonymisation, training); DPO mandatory (s.38) because a DPIA is required; TDDDG s.25 consent for any analytics storage (no exemption). Competitors send Abmahnungen over HWG breaches, so marketing copy matters too. DiGA rules apply only if reimbursement is sought. The AI Act implementing law and BGH I ZR 146/20 were not verified."
+ },
+ "GR": {
+  "name": "Greece",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Law 4624/2019",
+    "citation": "Art 21 (child consent age 15), Art 22 (special categories)"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Hellenic Data Protection Authority (HDPA) (https://www.dpa.gr)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dpa.gr"
+  ],
+  "notes": "Digital-consent age 15 (Law 4624/2019 art 21). An under-15 social-media bill was reportedly tabled on 13 Oct 2026 (vote expected late Oct, effective 1 Jan 2027); check whether its scope reaches AI chat services. No national health-profession or AI rule identified that changes model behaviour."
+ },
+ "HU": {
+  "name": "Hungary",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Act CXII of 2011 on Informational Self-Determination and Freedom of Information (Infotv.)",
+    "citation": "No GDPR Art 8 derogation (age 16)"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Nemzeti Adatvédelmi és Információszabadság Hatóság (NAIH) (https://naih.hu)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://naih.hu"
+  ],
+  "notes": "No Art 8 derogation, so 16 for the general age gate; Healthcare stays 18+. No national health-profession or AI rule identified that changes model behaviour."
+ },
+ "IE": {
+  "name": "Ireland",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Data Protection Act 2018",
+    "citation": "No. 7 of 2018; s.31 (child consent age 16; 'information society service' excludes preventative or counselling services)",
+    "url": "https://revisedacts.lawreform.ie/eli/2018/act/7/section/31/revised/en/html"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Data Protection Commission (DPC) (https://www.dataprotection.ie)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://revisedacts.lawreform.ie/eli/2018/act/7/section/31/revised/en/html",
+   "https://enterprise.gov.ie/en/what-we-do/innovation-research-development/artificial-intelligence/eu-ai-act/",
+   "https://www.dataprotection.ie"
+  ],
+  "notes": "s.31(2) excludes 'preventative or counselling services' from the Art 8 child-consent rule. Relying on it for Guidance would mean treating Guidance as a counselling service, which clashes with the product never presenting itself as counselling; get legal sign-off first. Healthcare is 18+ regardless. The s.30 ban on profiling children is believed not commenced. AI Office of Ireland set up 2 Aug 2026. An EU main establishment in Ireland would make the DPC lead authority (one-stop shop)."
+ },
+ "IT": {
+  "name": "Italy",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Law 23 September 2025 n. 132 on artificial intelligence",
+    "citation": "Art 4(3)-(4) (plain-language notice; parental consent for under-14 access to AI), art 7(3) and 7(5) (AI in healthcare is support only; the doctor decides)",
+    "url": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:2025-09-23;132"
+   },
+   {
+    "name": "Codice in materia di protezione dei dati personali",
+    "citation": "D.Lgs. 196/2003 as amended by D.Lgs. 101/2018; art 2-quinquies (child consent age 14), art 2-septies (health data; para 8 bans dissemination)",
+    "url": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:decreto.legislativo:2003-06-30;196"
+   },
+   {
+    "name": "Law 56/1989 on the psychologist profession; Criminal Code art 348",
+    "citation": "Art 1 (psychological support reserved to psychologists); art 348 c.p. (unauthorised practice of a profession)",
+    "url": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:1989-02-18;56"
+   }
+  ],
+  "healthcare_rules": [
+   "When discussing tests, results or treatment options, say plainly that AI can only support and that the decision always rests with their doctor (Italian AI Law 132/2025, art 7).",
+   "If the person shares a medical report or scan, suggest they remove names and ID numbers first and have their own doctor interpret it; the Garante has warned against uploading medical reports to AI chatbots."
+  ],
+  "guidance_rules": [
+   "Never describe these conversations as 'supporto psicologico' (psychological support) or therapy; psychological support is reserved to psychologists in Italy (Law 56/1989). Frame it as mentoring and suggest a psicologo when it fits."
+  ],
+  "regulator": "Garante per la protezione dei dati personali (https://www.garanteprivacy.it); ACN (AI Act market surveillance); AgID",
+  "confidence": "high",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:2025-09-23;132",
+   "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:decreto.legislativo:2003-06-30;196",
+   "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:1989-02-18;56",
+   "https://www.garanteprivacy.it/home/docweb/-/docweb-display/docweb/10132048",
+   "https://www.garanteprivacy.it"
+  ],
+  "notes": "Law 132/2025 art 4(4): under-14s need parental consent to access ANY AI service, so the gate is product-wide, not only Healthcare; art 4(3) needs a plain-language notice of AI risks and the right to object. Art 2-septies(8) bans disseminating health data: disable sharing or publishing of Healthcare chats for Italian users. The Garante fined Replika EUR 5m (10 Apr 2025). Without an EU main establishment it can act directly (its OpenAI fine was reportedly annulled 18 Mar 2026 on one-stop-shop grounds; secondary source)."
+ },
+ "LV": {
+  "name": "Latvia",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Personal Data Processing Law",
+    "citation": "Fizisko personu datu apstrādes likums, s.33 (child consent age 13)",
+    "url": "https://likumi.lv/ta/id/300099"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Datu valsts inspekcija (DVI) (https://www.dvi.gov.lv)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://likumi.lv/ta/id/300099",
+   "https://www.dvi.gov.lv"
+  ],
+  "notes": "Digital-consent age 13 (s.33). No national health-profession or AI rule identified that changes model behaviour."
+ },
+ "LT": {
+  "name": "Lithuania",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Law on Legal Protection of Personal Data",
+    "citation": "Asmens duomenų teisinės apsaugos įstatymas, art 6 (child consent age 14)"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Valstybinė duomenų apsaugos inspekcija (VDAI) (https://vdai.lrv.lt)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://vdai.lrv.lt"
+  ],
+  "notes": "Digital-consent age 14 (art 6). No national health-profession or AI rule identified that changes model behaviour."
+ },
+ "LU": {
+  "name": "Luxembourg",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Law of 1 August 2018 on the organisation of the CNPD and the general data protection framework",
+    "citation": "No GDPR Art 8 derogation (age 16)"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Commission nationale pour la protection des données (CNPD) (https://cnpd.public.lu)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://cnpd.public.lu"
+  ],
+  "notes": "No Art 8 derogation, so 16 for the general age gate. No national health-profession or AI rule identified that changes model behaviour."
+ },
+ "MT": {
+  "name": "Malta",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Data Protection Act (Cap. 586); Processing of Child's Personal Data in relation to the Offer of Information Society Services Regulations",
+    "citation": "Cap. 586; S.L. 586.11 (child consent age 13)",
+    "url": "https://legislation.mt/eli/sl/586.11/eng"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Information and Data Protection Commissioner (IDPC) (https://idpc.org.mt)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://legislation.mt/eli/sl/586.11/eng",
+   "https://idpc.org.mt"
+  ],
+  "notes": "Digital-consent age 13 (S.L. 586.11). No national health-profession or AI rule identified that changes model behaviour."
+ },
+ "NL": {
+  "name": "Netherlands",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Uitvoeringswet AVG (UAVG)",
+    "citation": "Art 5 (child consent age 16; a child of 12+ may withdraw consent), art 30 (health-data exceptions do not fit a consumer chatbot)",
+    "url": "https://wetten.overheid.nl/BWBR0040940/"
+   },
+   {
+    "name": "Wet BIG (Individual Healthcare Professions Act)",
+    "citation": "Protected titles; art 96 (offence to cause harm or significant risk of harm to health)",
+    "url": "https://wetten.overheid.nl/BWBR0006251/"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [
+   "Never call yourself or these conversations by a protected Dutch care title or a look-alike, such as 'arts', 'psycholoog', 'gezondheidszorgpsycholoog' or 'psychotherapeut' (Wet BIG)."
+  ],
+  "regulator": "Autoriteit Persoonsgegevens (AP) (https://www.autoriteitpersoonsgegevens.nl); IGJ for AI in medical devices",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://wetten.overheid.nl/BWBR0040940/",
+   "https://wetten.overheid.nl/BWBR0006251/",
+   "https://zoek.officielebekendmakingen.nl/kst-22112-4318.html",
+   "https://www.autoriteitpersoonsgegevens.nl"
+  ],
+  "notes": "Digital-consent age 16 (UAVG art 5). Wet BIG art 96 makes causing harm or significant risk of harm to health an offence, so crisis handling and referral matter legally. Per the Kamerbrief of 19 May 2026 the AP is to supervise AI Act transparency and prohibited practices (bill not yet in parliament). Its Feb 2025 report faulted companion and therapy chatbots on AI disclosure, crisis responses, referral and addictive design (details from knowledge)."
+ },
+ "PL": {
+  "name": "Poland",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Act on the professions of physician and dentist",
+    "citation": "Art 2(1) (giving medical advice is practising medicine), art 58 (unlicensed diagnosis or treatment is an offence)",
+    "url": "https://isap.sejm.gov.pl/isap.nsf/DocDetails.xsp?id=WDU20260000037"
+   },
+   {
+    "name": "Act of 23 January 2026 on the profession of psychologist",
+    "citation": "Dz.U. 2026 poz. 187; main entry into force 19 May 2028; art 127 (unlicensed psychological help is a crime)"
+   },
+   {
+    "name": "Act of 10 May 2018 on the Protection of Personal Data",
+    "citation": "Dz.U. 2019 poz. 1781; no GDPR Art 8 derogation (age 16)"
+   },
+   {
+    "name": "Act of 3 July 2026 on artificial intelligence systems",
+    "citation": "Dz.U. 2026 poz. 1003, in force 11 Aug 2026 (KRiBSI is the AI Act authority)"
+   }
+  ],
+  "healthcare_rules": [
+   "Keep to general health information and give no medical advice ('porady lekarskie') on the person's own case; Polish law counts that as practising medicine, an offence without a licence (Physicians Act, arts 2 and 58)."
+  ],
+  "guidance_rules": [
+   "Never describe these conversations as 'pomoc psychologiczna' (psychological help) or yourself as a 'psycholog'; Poland's Act on the profession of psychologist reserves both to licensed psychologists."
+  ],
+  "regulator": "Prezes Urzędu Ochrony Danych Osobowych (UODO) (https://uodo.gov.pl); KRiBSI (AI Act)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://isap.sejm.gov.pl/isap.nsf/DocDetails.xsp?id=WDU20260000037",
+   "https://uodo.gov.pl"
+  ],
+  "notes": "From 19 May 2028 (Act of 23 Jan 2026) 'pomoc psychologiczna', including support in crisis, trauma or stress, is reserved to licensed psychologists and unlicensed provision is a crime (art 127). That reaches the activity, not just the label: decide before then whether to geo-restrict or reframe Guidance's emotional support in Poland. The guidance rule already avoids the reserved terms. No Art 8 derogation (16); an under-15 social-media plan was presented Feb 2026."
+ },
+ "PT": {
+  "name": "Portugal",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Lei n.º 58/2019",
+    "citation": "Art 16 (child consent age 13)",
+    "url": "https://diariodarepublica.pt/dr/detalhe/lei/58-2019-123815982"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Comissão Nacional de Proteção de Dados (CNPD) (https://www.cnpd.pt)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://diariodarepublica.pt/dr/detalhe/lei/58-2019-123815982",
+   "https://www.cnpd.pt"
+  ],
+  "notes": "Digital-consent age 13 (art 16). A social-media bill (first vote 12 Feb 2026) would bar under-13s and require parental consent up to 15/16; final vote pending, watch for changes to art 16. No national health-profession or AI rule identified that changes model behaviour."
+ },
+ "RO": {
+  "name": "Romania",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Law no. 190/2018 implementing the GDPR",
+    "citation": "No GDPR Art 8 derogation (age 16)"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Autoritatea Națională de Supraveghere a Prelucrării Datelor cu Caracter Personal (ANSPDCP) (https://www.dataprotection.ro)",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dataprotection.ro"
+  ],
+  "notes": "Low confidence per the research; no health-profession or AI rule was researched. No Art 8 derogation (16). 'Digital majority' and under-15 bills from 2025-2026 are pending."
+ },
+ "SK": {
+  "name": "Slovakia",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Act No. 18/2018 Coll. on Personal Data Protection",
+    "citation": "s.15 (child consent age 16)"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Úrad na ochranu osobných údajov SR (https://dataprotection.gov.sk)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://dataprotection.gov.sk"
+  ],
+  "notes": "Digital-consent age 16 (s.15). No national health-profession or AI rule identified that changes model behaviour."
+ },
+ "SI": {
+  "name": "Slovenia",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Personal Data Protection Act (ZVOP-2)",
+    "citation": "Uradni list RS 163/2022, art 8 (child consent age 15)"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Informacijski pooblaščenec (Information Commissioner) (https://www.ip-rs.si)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.ip-rs.si"
+  ],
+  "notes": "Digital-consent age 15 (ZVOP-2 art 8). An under-15 social-media law was in preparation in Feb 2026. No national health-profession or AI rule identified that changes model behaviour."
+ },
+ "ES": {
+  "name": "Spain",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Ley Orgánica 3/2018 de Protección de Datos Personales y garantía de los derechos digitales (LOPDGDD)",
+    "citation": "BOE-A-2018-16673; art 7 (child consent age 14), art 9 (special categories)",
+    "url": "https://www.boe.es/buscar/act.php?id=BOE-A-2018-16673"
+   },
+   {
+    "name": "Ley 44/2003 de ordenación de las profesiones sanitarias; Código Penal art 403 (intrusismo)",
+    "citation": "Acts reserved to licensed health professionals; 'Psicólogo General Sanitario' is a regulated health title",
+    "url": "https://www.boe.es/buscar/act.php?id=BOE-A-2003-21340"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [
+   "Never describe these conversations as psychology or therapy, or yourself as a 'psicólogo'; 'Psicólogo General Sanitario' is a regulated health title in Spain and intrusismo is a crime (Código Penal art 403)."
+  ],
+  "regulator": "Agencia Española de Protección de Datos (AEPD) (https://www.aepd.es); AESIA (AI)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.boe.es/buscar/act.php?id=BOE-A-2018-16673",
+   "https://www.boe.es/buscar/act.php?id=BOE-A-2003-21340",
+   "https://www.congreso.es/public_oficiales/L15/CONG/BOCG/A/BOCG-15-A-52-1.PDF",
+   "https://www.aepd.es"
+  ],
+  "notes": "Digital-consent age 14 (LOPDGDD art 7). The minors-in-digital-environments bill (BOCG-15-A-52-1, in committee Sept 2026) would raise it to 16 for all consent-based processing. Explicit consent is valid for health data (art 9.1 bars consent alone only for ideology, religion, origin and similar). The AI governance bill (BOCG-15-A-97-1, June 2026) would make AESIA supervise AI Act transparency; pending."
+ },
+ "SE": {
+  "name": "Sweden",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Patientsäkerhetslag (2010:659)",
+    "citation": "5 kap. 1 § (no written treatment advice without a personal examination; reserved conditions and children under 8)",
+    "url": "https://www.riksdagen.se/sv/dokument-och-lagar/dokument/svensk-forfattningssamling/patientsakerhetslag-2010659_sfs-2010-659/"
+   },
+   {
+    "name": "Lag (2018:218) med kompletterande bestämmelser till EU:s dataskyddsförordning",
+    "citation": "2 kap. 4 § (child consent age 13)",
+    "url": "https://www.riksdagen.se/sv/dokument-och-lagar/dokument/svensk-forfattningssamling/lag-2018218-med-kompletterande-bestammelser_sfs-2018-218/"
+   }
+  ],
+  "healthcare_rules": [
+   "Do not write treatment instructions for this person's own condition; give general information and refer them to Vårdguiden or a clinician. Sweden bars written treatment advice without an examination (Patientsäkerhetslagen 5:1).",
+   "For cancer, diabetes, epilepsy, pregnancy or childbirth, notifiable infections, or any child under eight, give only general background and send them to a clinician; Swedish law reserves treating these to licensed health professionals."
+  ],
+  "guidance_rules": [],
+  "regulator": "Integritetsskyddsmyndigheten (IMY) (https://www.imy.se)",
+  "confidence": "high",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.riksdagen.se/sv/dokument-och-lagar/dokument/svensk-forfattningssamling/patientsakerhetslag-2010659_sfs-2010-659/",
+   "https://www.riksdagen.se/sv/dokument-och-lagar/dokument/svensk-forfattningssamling/lag-2018218-med-kompletterande-bestammelser_sfs-2018-218/",
+   "https://www.imy.se/en/news/administrative-fines-against-apoteket-and-apohem-for-transferring-personal-data-to-meta/",
+   "https://www.imy.se"
+  ],
+  "notes": "Digital-consent age 13 (2 kap. 4 §). IMY fined Apoteket (SEK 37m) and Apohem (SEK 8m) because the Meta Pixel sent health-related data to Meta: send no health content or health-topic events to analytics. IMY's 2026 priorities are AI and children. A June 2026 commission proposed a social-media minimum age of 15."
+ },
+ "IS": {
+  "name": "Iceland",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Act on Data Protection and the Processing of Personal Data",
+    "citation": "Lög nr. 90/2018, art 10 (child consent age 13)"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Persónuvernd (https://www.personuvernd.is)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.personuvernd.is"
+  ],
+  "notes": "Digital-consent age 13 (art 10). GDPR and MDR apply via the EEA; AI Act incorporation into the EEA Agreement is pending (not verified), so the EU layer's AI Act-based rules apply here as a precaution. No national health-profession rule identified."
+ },
+ "LI": {
+  "name": "Liechtenstein",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Datenschutzgesetz (DSG)",
+    "citation": "LGBl. 2018 Nr. 272 (version 01.04.2026); no GDPR Art 8 age provision (16)",
+    "url": "https://www.gesetze.li/konso/2018272000"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Datenschutzstelle Liechtenstein (https://www.datenschutzstelle.li)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.gesetze.li/konso/2018272000",
+   "https://www.datenschutzstelle.li"
+  ],
+  "notes": "No Art 8 derogation (16). GDPR and MDR apply via the EEA; AI Act EEA incorporation is pending, so the EU layer's AI Act-based rules apply as a precaution. Helplines are shared with Switzerland. No national health-profession rule identified."
+ },
+ "NO": {
+  "name": "Norway",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Lov om alternativ behandling av sykdom",
+    "citation": "LOV-2003-06-27-64, ss.5-7 (serious and dangerous infectious diseases reserved to health personnel)",
+    "url": "https://lovdata.no/dokument/NL/lov/2003-06-27-64"
+   },
+   {
+    "name": "Personopplysningsloven",
+    "citation": "LOV-2018-06-15-38, s.5 (child consent age 13)",
+    "url": "https://lovdata.no/dokument/NL/lov/2018-06-15-38"
+   }
+  ],
+  "healthcare_rules": [
+   "For a serious illness or a dangerous infectious disease, do not suggest remedies or self-treatment for the disease itself; give general information and say it needs a doctor's care. Norwegian law reserves treating these to health personnel."
+  ],
+  "guidance_rules": [],
+  "regulator": "Datatilsynet (https://www.datatilsynet.no)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://lovdata.no/dokument/NL/lov/2003-06-27-64",
+   "https://lovdata.no/dokument/NL/lov/2018-06-15-38",
+   "https://www.datatilsynet.no/regelverk-og-verktoy/rapporter-og-utredninger/rapporter-fra-sandkassa/",
+   "https://www.datatilsynet.no"
+  ],
+  "notes": "Digital-consent age 13 (s.5). AI Act EEA incorporation and a national AI law are pending (not verified); the EU layer's AI Act-based rules apply as a precaution. Datatilsynet's AI sandbox reports are useful design references. A social-media age-15 bill was consulted on (closed 7 Oct 2025); 2026 status not verified."
+ },
+ "GB": {
+  "name": "United Kingdom",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "UK GDPR",
+    "citation": "Retained Regulation (EU) 2016/679 as amended by the Data (Use and Access) Act 2025; Art 9(2)(a) explicit consent; Art 3(2)",
+    "url": "https://www.legislation.gov.uk/eur/2016/679/contents"
+   },
+   {
+    "name": "Data Protection Act 2018",
+    "citation": "2018 c.12; s.9 (age 13), Sch 1 (special-category conditions), ss.164A-164B (complaints)",
+    "url": "https://www.legislation.gov.uk/ukpga/2018/12/contents"
+   },
+   {
+    "name": "UK Medical Devices Regulations 2002, with MHRA software and digital mental health guidance",
+    "citation": "SI 2002/618 as amended; MHRA stand-alone software guidance (Appendix 1, symptom checkers)",
+    "url": "https://www.gov.uk/government/publications/medical-devices-software-applications-apps"
+   },
+   {
+    "name": "Online Safety Act 2023",
+    "citation": "Search-service duties (web search feature); s.184 (encouraging or assisting serious self-harm)",
+    "url": "https://www.ofcom.org.uk/online-safety/illegal-and-harmful-content/ai-chatbots-and-online-regulation-what-you-need-to-know"
+   }
+  ],
+  "healthcare_rules": [
+   "Do not give a ranked or 'most likely' list of conditions, or sort this person's symptoms by severity; MHRA treats those as medical-device functions. Give non-ranked reference information and signpost to their GP or NHS services.",
+   "Do not give treatment or first-aid steps tailored to this person, or interpret their own lab values; MHRA symptom-checker guidance treats these as device functions. Explain in general terms and point them to a clinician.",
+   "Discuss medicines factually, preferably by active ingredient, and never promote a brand of prescription-only medicine or a pharmacy; UK law bans advertising prescription-only medicines to the public (Human Medicines Regulations, reg 284).",
+   "Never describe yourself or your answers as coming from a dietitian, psychologist or other registered practitioner; these are protected titles in the UK (Medical Act s.49; HCPC)."
+  ],
+  "guidance_rules": [
+   "Treat stress, sadness and worry as everyday experiences, never as conditions to treat, manage or prevent; MHRA's digital mental health guidance makes targeting low mood, worry, depression or anxiety a medical purpose.",
+   "Do not present yourself as an AI coach, companion or therapist for mental health, or as a psychologist (a protected title); MHRA rates an AI coach or companion for mental health as high-function device software.",
+   "Do not run or score mental-health questionnaires (such as PHQ-9 or GAD-7) or assess whether the person has a condition; MHRA guidance treats that as a medical purpose."
+  ],
+  "regulator": "Information Commission (ICO) (https://ico.org.uk); MHRA (medical devices); Ofcom (Online Safety Act)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/lawful-basis/special-category-data/what-are-the-conditions-for-processing/",
+   "https://www.gov.uk/government/publications/medical-devices-software-applications-apps",
+   "https://www.gov.uk/government/publications/digital-mental-health-technology-qualification-and-classification",
+   "https://medregs.blog.gov.uk/2023/03/03/large-language-models-and-software-as-a-medical-device/",
+   "https://www.ofcom.org.uk/online-safety/illegal-and-harmful-content/ai-chatbots-and-online-regulation-what-you-need-to-know",
+   "https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/international-transfers/adequacy-regulations/how-does-the-uk-extension-to-the-eu-us-data-privacy-framework-work/"
+  ],
+  "notes": "Online Safety Act: the web-search feature plausibly makes the product a search service, so a scoping decision and risk assessments are needed; Crime and Policing Act 2026 chatbot regulations pending. UK-US data bridge covers only Render and PostHog (Render renews 10 Dec 2026); IDTA/UK Addendum plus a transfer risk assessment for Anthropic, OpenAI, Supabase. AI Commission recommendations accepted 6 Oct 2026; device-definition consultation due spring 2027. Keep under-18s out (Children's code). The first-aid rule is conservative - confirm.",
+  "complaints_to": "the Information Commissioner's Office (ICO)"
+ },
+ "CH": {
+  "name": "Switzerland",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Federal Act on Data Protection (revised FADP)",
+    "citation": "SR 235.1; Art 5(c)(2) (health data is sensitive), Art 6(7)(a) (express consent), Arts 16-17 (transfers)",
+    "url": "https://www.fedlex.admin.ch/eli/cc/2022/491/en"
+   },
+   {
+    "name": "Data Protection Ordinance (DPO / DSV)",
+    "citation": "SR 235.11; Annex 1 (USA adequate for Swiss-US DPF-certified organisations since 15 Sept 2024)",
+    "url": "https://www.fedlex.admin.ch/eli/cc/2022/568/en"
+   },
+   {
+    "name": "Medical Devices Ordinance (MedDO / MepV)",
+    "citation": "SR 812.213, aligned with EU MDR incl. Rule 11",
+    "url": "https://www.fedlex.admin.ch/eli/cc/2020/552/en"
+   },
+   {
+    "name": "Therapeutic Products Act - advertising",
+    "citation": "HMG Arts 31 and 32; AWV (no advertising of prescription-only medicines to the public)",
+    "url": "https://www.fedlex.admin.ch/eli/cc/2001/422/en"
+   }
+  ],
+  "healthcare_rules": [
+   "Do not turn the person's own readings, lab or home-test results into a personal risk score, triage level or dose; explain what is measured and usual ranges in general terms. Swiss MedDO follows the EU MDR on device software.",
+   "Discuss medicines factually, preferably by active ingredient, and never promote a brand of prescription-only medicine; Swiss law bans advertising them to the public (Therapeutic Products Act, Arts 31 and 32)."
+  ],
+  "guidance_rules": [
+   "Do not run or score mental-health questionnaires (such as PHQ-9 or GAD-7) or offer a programme to manage depression or anxiety; the Swiss MedDO follows the EU MDR, under which that is medical-device software."
+  ],
+  "regulator": "Federal Data Protection and Information Commissioner (FDPIC / EDÖB) (https://www.edoeb.admin.ch); Swissmedic (medical devices)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.fedlex.admin.ch/eli/cc/2022/491/en",
+   "https://www.fedlex.admin.ch/eli/cc/2020/552/en",
+   "https://www.edoeb.admin.ch/en/update-current-legislation-directly-applicable-ai",
+   "https://www.edoeb.admin.ch/en/cross-border-transfer-of-personal-data",
+   "https://www.edoeb.admin.ch/en/adequacy",
+   "https://www.anthropic.com/legal/data-processing-addendum"
+  ],
+  "notes": "Swiss-US DPF covers only certified recipients (Render); use EU SCCs with Swiss adaptations plus a risk assessment for Anthropic, OpenAI, Supabase (Anthropic's Swiss addendum still cites the 1992 FADP). A Swiss representative (Art 14) is likely needed. Individuals face fines up to CHF 250,000 for intentional breaches of information and transfer duties. FDPIC expects users told they talk to AI and whether inputs train models. Minors: capacity of judgment, no fixed age. FADP article numbers from knowledge; device-based rules inferred from MedDO-MDR alignment.",
+  "complaints_to": "the Federal Data Protection and Information Commissioner (FDPIC)"
+ }
+}

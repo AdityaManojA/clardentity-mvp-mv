@@ -35,7 +35,7 @@ type Wire = {
  *  taking it away reads as a bug, the other way round reads as loading. */
 const LOCKED: PreviewAccess = {
   unlocked: false,
-  modes: ["mentoring", "therapy", "creative", "legal"],
+  modes: ["guidance", "healthcare", "creative", "legal"],
   dailyLimit: 0,
   usedToday: 0,
   remainingToday: 0,

@@ -28,6 +28,12 @@ class Document(Base):
     file_type: Mapped[str | None] = mapped_column(String, nullable=True)
     storage_path: Mapped[str | None] = mapped_column(String, nullable=True)
     status: Mapped[str] = mapped_column(String, nullable=False, default="uploading")
+    # Set only for a file attached inside a temporary chat: it belongs to that
+    # chat, not the workspace - left out of the Attachments list and of every
+    # other chat's retrieval, and deleted with the chat. Null for the rest.
+    conversation_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("conversations.id", ondelete="CASCADE"), nullable=True, index=True
+    )
     uploaded_by: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 

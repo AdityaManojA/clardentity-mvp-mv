@@ -1,6 +1,19 @@
 import { getAccessToken, getRefreshToken, refreshAccessToken } from "@/lib/auth";
 import { trackServerWait } from "@/lib/serverWait";
 
+/** The browser's IANA time zone, sent with every API call. The backend
+ *  uses it only to name a country when it cannot look up the address -
+ *  which decides the crisis numbers and health-data rules someone gets
+ *  ("Asia/Kolkata" is India). */
+export function clientTimezoneHeader(): Record<string, string> {
+  try {
+    const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return zone ? { "X-Client-Timezone": zone } : {};
+  } catch {
+    return {};
+  }
+}
+
 export const BACKEND_ROOT_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8000";
 
@@ -102,6 +115,7 @@ async function request<T>(
     headers: {
       ...(body !== undefined ? { "Content-Type": "application/json" } : {}),
       ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+      ...clientTimezoneHeader(),
       ...headers,
     },
     body: body !== undefined ? JSON.stringify(body) : undefined,

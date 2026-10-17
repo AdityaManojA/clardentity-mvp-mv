@@ -125,3 +125,42 @@ class TestSpendPerModel:
         # Only the readable one, and a model that spent nothing is left out
         # rather than drawn as an empty bar.
         assert totals == {"good": 10}
+
+
+class TestGlobalSettingsAreAdminOnly:
+    """The answer model, scoring weights and feature flags apply to everyone,
+    so only an administrator may read or change them. Until 2026-10-17 any
+    signed-in account could. Needs a database."""
+
+    async def test_an_ordinary_account_is_refused_and_an_admin_is_not(self, monkeypatch):
+        import uuid
+
+        import httpx
+        import pytest
+
+        from app.core import config
+        from app.main import app
+
+        email = f"settings-{uuid.uuid4().hex[:8]}@example.com"
+        async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://t") as c:
+            reg = await c.post(
+                "/api/v1/auth/register",
+                json={"email": email, "password": "settings-password-123", "accepted_terms": True},
+            )
+            if reg.status_code >= 500:
+                pytest.skip("no database available")
+            headers = {"Authorization": f"Bearer {reg.json()['access_token']}"}
+            try:
+                monkeypatch.setattr(config.settings, "admin_emails", "someone-else@example.com")
+                assert (await c.get("/api/v1/admin/settings", headers=headers)).status_code == 404, "hidden, like the dashboard"
+                put = await c.put(
+                    "/api/v1/admin/settings",
+                    json={"key": "feature_flags", "value": {"web_search_enabled": False}},
+                    headers=headers,
+                )
+                assert put.status_code == 404
+
+                monkeypatch.setattr(config.settings, "admin_emails", email)
+                assert (await c.get("/api/v1/admin/settings", headers=headers)).status_code == 200
+            finally:
+                await c.delete("/api/v1/auth/me", headers=headers)

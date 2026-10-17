@@ -1,0 +1,512 @@
+{
+ "AD": {
+  "name": "Andorra",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Llei 29/2021, del 28 d'octubre, qualificada de protecció de dades personals (LQPD)",
+    "citation": "GDPR-modelled; in force May 2022; health data is a special category; transfers to non-adequate countries need APDA-reviewed safeguards or a derogation such as explicit, risk-informed consent"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Agència Andorrana de Protecció de Dades (APDA) (https://www.apda.ad)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://apda.ad/storage/guides/yciX32KAj21RF66Yzh5C0QyMcT3CZ24tbM7KI1hV.pdf"
+  ],
+  "notes": "APDA guide (28 Jan 2022) confirms transfers without safeguards on the user's explicit consent after being told the risks of having no adequacy decision or safeguards; that must be said before the transfer, so the consent card should. Countries the EU deems adequate count as adequate, so DPF-certified US recipients may qualify (not verified). SCC/BCR-based transfers need APDA review before transfer. Under-16s need parental consent. Law text and article numbers not checked against the BOPA."
+ },
+ "AL": {
+  "name": "Albania",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Law No. 124/2024 on Personal Data Protection",
+    "citation": "Official Gazette No. 9, 17 Jan 2025; in force 1 Feb 2025; Art. 9 sensitive data (explicit consent); Art. 41(3)(a) explicit, risk-informed transfer consent; some articles apply from 17 Jan 2027 (Art. 101(2))",
+    "url": "https://idp.al/wp-content/uploads/2025/03/Law-no.124-2024.pdf"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Commissioner for the Right to Information and Personal Data Protection (https://idp.al)",
+  "confidence": "high",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://idp.al/wp-content/uploads/2025/03/Law-no.124-2024.pdf",
+   "https://www.dlapiperdataprotection.com/?t=law&c=AL"
+  ],
+  "notes": "GDPR-aligned law replaced Law 9887/2008; Art. 4 reaches non-established controllers offering services in Albania. No Commissioner adequacy decision covering the US was found, so US transfers rest on Art. 41(3)(a): explicit consent after the user is clearly told the risks. Contract-clause safeguards need Commissioner authorisation (Art. 41(2)). Arts 29(3), 31, 32, 35, 36, 64, 65 and 67(2),(3),(5) apply from 17 Jan 2027; check what they add. Child consent age online is 16 (Art. 8)."
+ },
+ "AM": {
+  "name": "Armenia",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "transient",
+  "storage_reason": "Armenia requires regulator permission to send personal data abroad, which we don't hold yet, so Healthcare chats here are answered but not saved.",
+  "laws": [
+   {
+    "name": "Law HO-49-N on Protection of Personal Data",
+    "citation": "18 May 2015, in force 1 Jul 2015; health status is special-category data (consent required); Art. 27 transfers to non-adequate states need prior PDPA permission (decided within 30 days)"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Personal Data Protection Agency, Ministry of Justice (https://pdpa.am/en)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/?t=law&c=AM",
+   "https://gpg-pdf.chambers.com/Doing-Business-In-2026/45/",
+   "https://armenian-lawyer.com/business-immigration/armenia-data-protection-foreign-companies/",
+   "https://www.siberson.com/central-asia-caucasus-data-security-compliance.html"
+  ],
+  "notes": "Transient: per DLA Piper and Chambers (2026), Art. 27 lets data go to a state without adequate protection only with prior PDPA permission, on an agreement with PDPA-approved safeguards; the US is not believed to be on the 2017 adequacy list (not checked). A local firm says explicit consent avoids the permit (Art. 27(1)); if counsel agrees, persist. Apply for permission (30-day decision), then switch. Special-category processing needs prior notice to the PDPA. Reach over a foreign online service is unclear."
+ },
+ "AZ": {
+  "name": "Azerbaijan",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Law on Personal Data No. 998-IIIQ",
+    "citation": "11 May 2010, as amended; health is special-category data; processing and cross-border transfer on the data subject's prior written consent; transfers barred if they threaten national security"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Ministry of Digital Development and Transport (https://mincom.gov.az); National Cybersecurity Agency under it since 2 Jun 2026",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/?t=law&c=AZ",
+   "https://gpg-pdf.chambers.com/investing-in-2026/47/",
+   "https://vlolawfirm.com/tpost/azerbaijan-data-protection",
+   "https://www.siberson.com/central-asia-caucasus-data-security-compliance.html"
+  ],
+  "notes": "Consent to process health data and to send it abroad must be prior and documented (written or electronic); transfers to non-equivalent countries are allowed with consent. Server-localisation duties were found only for financial, telecom and public-sector data, not a foreign consumer app. Personal-data information systems may need state registration. DLA Piper page dates from 2022; the reported 2024 amendment (Law 1193-VIQD) and the new National Cybersecurity Agency's personal-data role (decree of 2 Jun 2026) are unverified."
+ },
+ "BA": {
+  "name": "Bosnia and Herzegovina",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Law on the Protection of Personal Data of Bosnia and Herzegovina",
+    "citation": "Official Gazette of BiH 12/25, adopted 30 Jan 2025, in force 8 Mar 2025; GDPR-aligned; explicit consent for special categories and as a transfer derogation"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Personal Data Protection Agency (AZLP) (https://www.azlp.ba)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/?t=law&c=BA"
+  ],
+  "notes": "GDPR-aligned law replaced the 2006 law. Dates conflict in secondary sources: in force 8 Mar 2025 (DLA Piper) but some say it applied from about 4-5 Oct 2025 after a 210-day delay, with a 2-year alignment period for existing processing. US transfers can rest on explicit consent; Agency SCC templates were still pending. No adequacy decision for the US found. Whether non-established controllers must name a local representative was not checked."
+ },
+ "GE": {
+  "name": "Georgia",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Law of Georgia on Personal Data Protection No. 3144-XIმს-Xმპ",
+    "citation": "14 Jun 2023, main provisions in force 1 Mar 2024; Art. 6 special categories (consent); Art. 37(2)(d) written transfer consent after being told safeguards are lacking; Art. 7 under-16s need a parent",
+    "url": "https://matsne.gov.ge/en/document/view/5827307?publication=0"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "State Audit Office of Georgia (https://sao.ge), personal-data supervisor since 2 Mar 2026",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://matsne.gov.ge/en/document/view/5827307?publication=0",
+   "https://www.dlapiperdataprotection.com/?t=law&c=GE",
+   "https://1tv.ge/lang/en/news/sao-to-assume-functions-of-personal-data-protection-service-business-ombudsman-to-move-to-economy-ministry/"
+  ],
+  "notes": "US transfers rest on Art. 37(2)(d): written consent after the user is told proper safeguards are lacking, so the consent card must say the US lacks them; a permit is needed only for agreement-based transfers (Art. 37(3)). The Personal Data Protection Service was liquidated on 2 Mar 2026 and its powers moved to the State Audit Office. Read from the 2023 initial text; the consolidated version (10 Jun 2026) was not checked."
+ },
+ "KG": {
+  "name": "Kyrgyzstan",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Digital Code of the Kyrgyz Republic No. 178",
+    "citation": "31 Jul 2025, in force 5 Feb 2026; replaced Law No. 58 on Personal Information; health, genetic and biometric data specially protected (processing prohibited except as the Code allows); transfers abroad on consent, treaty or other legal ground"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "State Agency for Personal Data Protection under the Cabinet of Ministers (https://dpa.gov.kg)",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://invest.gov.kg/en/invest-compass/assets/personal-data",
+   "https://economist.kg/society/2026/08/12/utechka-dannyh-kazahstan-zashchita-kyrgyzstan/",
+   "https://www.siberson.com/central-asia-caucasus-data-security-compliance.html",
+   "https://www.dlapiperdataprotection.com/?t=law&c=KG"
+  ],
+  "notes": "Digital Code text not retrieved: the special-category exceptions (whether explicit or written consent suffices) and the transfer article come from secondary sources (invest.gov.kg, economist.kg Aug 2026, Siberson). No localisation found. No adequacy list seen, so get explicit consent to the US transfer. Unlawful cross-border transfers are fined under the Code on Offences. A DPIA is reportedly needed for special-category processing of over 1,000 people. DLA Piper still describes the 2008 law."
+ },
+ "KZ": {
+  "name": "Kazakhstan",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "transient",
+  "storage_reason": "Kazakh law requires personal data to be stored in Kazakhstan. Our servers are outside Kazakhstan, so Healthcare chats here are answered but not saved.",
+  "laws": [
+   {
+    "name": "Law No. 94-V on Personal Data and Their Protection",
+    "citation": "21 May 2013, amended to 2026 (Laws 231-VIII, 256-VIII, 326-VIII); Art. 12(2) storage in a database or digital object in Kazakhstan; Art. 16 transfers to non-protecting states on consent",
+    "url": "https://adilet.zan.kz/rus/docs/Z1300000094/z13094.htm"
+   },
+   {
+    "name": "Law on Artificial Intelligence No. 230-VIII",
+    "citation": "Signed 17 Nov 2025, in force 18 Jan 2026; bans manipulative AI, exploiting vulnerabilities and emotion recognition without consent; synthetic-content labelling"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Ministry of Artificial Intelligence and Digital Development (Committee for Information Security); prosecutors supervise compliance",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/?t=law&c=KZ",
+   "https://uppersetup.com/en/blog/personal-data-and-localisation-in-kazakhstan-in-2026-law-no",
+   "https://www.morganlewis.com/pubs/2026/07/republic-of-kazakhstan-data-protection-law-amendments-in-2026",
+   "https://www.siberson.com/central-asia-caucasus-data-security-compliance.html"
+  ],
+  "notes": "Transient: Art. 12(2) requires storage in Kazakhstan with no category exemption; health data is restricted-access (KZ hosting, national crypto). Art. 16 consent permits transfer, so on-request processing is arguable, but one source says restricted-access data must also be collected and processed on KZ-hosted systems (Order 179); if so, unavailable. Reach over a service with no KZ presence is unsettled. AI Law bans emotion recognition without consent: check avatar cues. Persist needs in-country hosting."
+ },
+ "MC": {
+  "name": "Monaco",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Loi n° 1.565 du 3 décembre 2024 relative à la protection des données personnelles",
+    "citation": "Journal de Monaco 13 Dec 2024; Art. 7 explicit consent for health data; Art. 99 explicit, risk-informed transfer consent; Art. 100 APDP authorisation otherwise; Art. 25 representative",
+    "url": "https://legimonaco.mc/tnc/loi/2024/12-03-1.565/"
+   },
+   {
+    "name": "Ordonnance Souveraine n° 11.327 du 10 juillet 2025",
+    "citation": "Adequacy criteria and commitments for transfers to non-adequate countries"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Autorité de protection des données personnelles (APDP) (https://apdp.mc)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://legimonaco.mc/tnc/loi/2024/12-03-1.565/",
+   "https://cms.law/fr/mco/publication/nouvelle-loi-monegasque-sur-la-protection-des-donnees-personnelles",
+   "https://cms.law/fr/mco/publication/protection-des-donnees-personnelles-obligations-des-employeurs",
+   "https://edpo.com/monaco-personal-data-protection-law-what-it-means-for-companies-outside-monaco/"
+  ],
+  "notes": "Law 1.565 replaced Law 1.165 and the CCIN. It reaches non-established controllers processing data of people in Monaco, who must name a written representative in Monaco or an EU state (Art. 25). US transfers can rest on Art. 99 explicit consent after being told the risks; APDP authorisation (Art. 100, silence = refusal) is only for transfers outside Arts 97-99. Prior APDP opinion (Art. 58) covers health research and genetic/biometric data, not this. Under-15s need parental authorisation. OS 11.327 not read."
+ },
+ "MD": {
+  "name": "Moldova",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Law No. 195/2024 on personal data protection",
+    "citation": "Adopted 25 Jul 2024, published 23 Aug 2024, in force 23 Aug 2026; transposes the GDPR; repeals Law 133/2011; explicit-consent transfer derogation",
+    "url": "https://www.legis.md/cautare/getResults?doc_id=144681&lang=ro"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "National Center for Personal Data Protection (CNPDCP) (https://datepersonale.md)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://datepersonale.md/wp-content/uploads/2026/02/CONSIDERENTE_Legea_195.pdf",
+   "https://www.dlapiperdataprotection.com/?t=law&c=MD",
+   "https://ecom.md/en/blog/protectia-datelor-lege-195-2024",
+   "https://www.clym.io/regulations/law-no-195-2024-republic-of-moldova"
+  ],
+  "notes": "Law 195/2024 applies from 23 Aug 2026 and reaches controllers without a Moldovan presence that serve people in Moldova; DLA Piper says they must name a representative in Moldova. Its recitals mirror the GDPR derogations, including explicit consent to an occasional, necessary transfer (CNPDCP considerations, Feb 2026), so the old Law 133 transfer authorisations no longer apply. Article text not read (legis.md blocked). Under-14s need a legal representative's consent online (secondary source)."
+ },
+ "ME": {
+  "name": "Montenegro",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Law on Personal Data Protection",
+    "citation": "Official Gazette 79/2008, 70/2009, 44/2012, 22/2017, 77/2024; health is sensitive data; transfers to non-adequate countries need Agency approval unless the user consented after being told the consequences"
+   },
+   {
+    "name": "Law on Personal Data Protection (2026)",
+    "citation": "Adopted 4 Sep 2026, in force 19 Sep 2026, applies 19 Mar 2027; Art. 10 special categories (explicit consent); Art. 50 derogations incl. explicit, risk-informed consent; Art. 28 representative"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Agency for Personal Data Protection and Free Access to Information (AZLP) (https://www.azlp.me)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/?t=law&c=ME",
+   "https://ppc.land/firms-face-up-to-4-turnover-fines-under-montenegros-new-data-law/"
+  ],
+  "notes": "Until 19 Mar 2027 the 2008 law applies: US transfers avoid prior Agency approval only if the user consented after being told the possible consequences, so the consent card must say them. The new GDPR-style law (adopted 4 Sep 2026, applies 19 Mar 2027) reaches foreign services targeting Montenegro and requires a local representative (Art. 28); its dates come from one source (ppc.land) and the gazette publication is unverified. Fines up to EUR 2m or 4% of turnover."
+ },
+ "MK": {
+  "name": "North Macedonia",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Law on Personal Data Protection",
+    "citation": "Official Gazette 42/20, 294/21, 101/2025; GDPR-aligned; transfers on derogations (incl. explicit consent) need no DPA Transfer Approval"
+   },
+   {
+    "name": "Rulebook on the Security of Personal Data Processing",
+    "citation": "Official Gazette 266/2024, applies from 1 Jul 2025"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Personal Data Protection Agency (AZLP) (https://azlp.mk)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/?t=law&c=MK"
+  ],
+  "notes": "Derogation transfers (explicit consent) are not conditioned on a DPA Transfer Approval, but the DPA is conservative and since 2022 expects a documented transfer impact assessment with approval requests; keep one for the US processors anyway. The DPA has adopted no adequacy decisions. Only DLA Piper was checked; whether a local representative is required for non-established controllers was not."
+ },
+ "RS": {
+  "name": "Serbia",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Law on Personal Data Protection",
+    "citation": "Official Gazette RS 87/2018, applies from 21 Aug 2019; GDPR-aligned; explicit, risk-informed consent is a transfer derogation; foreign controllers serving Serbia must appoint a representative"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Commissioner for Information of Public Importance and Personal Data Protection (https://www.poverenik.rs)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/?t=law&c=RS"
+  ],
+  "notes": "The US is not among the adequate countries DLA Piper lists (EU, Convention 108 parties, Canada for business, Japan), so US transfers rest on explicit consent after the user is told the risks; SCCs exist only for processor importers. A representative in Serbia is required for some foreign controllers. A Serbian AI law (EU AI Act-aligned) is still being drafted and is not in force."
+ },
+ "SM": {
+  "name": "San Marino",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Legge 21 dicembre 2018 n.171 (protezione delle persone fisiche con riguardo al trattamento dei dati personali)",
+    "citation": "GDPR-modelled; Art. 8 explicit consent for health data; Art. 50(1)(a) explicit, risk-informed transfer consent; Art. 47(3) contract clauses need Garante authorisation; online child consent 16",
+    "url": "https://www.consigliograndeegenerale.sm/on-line/home/in-evidenza-in-home-page/documento17105723.html"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Autorità Garante per la protezione dei dati personali (https://www.garanteprivacy.sm)",
+  "confidence": "high",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.consigliograndeegenerale.sm/on-line/home/in-evidenza-in-home-page/documento17105723.html",
+   "https://www.cybersecurity360.it/legal/privacy-dati-personali/legge-sammarinese-sulla-tutela-dei-dati-personali-post-gdpr-che-ce-da-sapere/"
+  ],
+  "notes": "Read from the promulgated 2018 text; later amendments (2019-2021, e.g. Decreto Delegato 84/2021 on the Garante) not reviewed. US transfers can rest on Art. 50(1)(a) explicit consent after the user is told the risks. San Marino has ratified Convention 108+ (Garante, Nov 2023). No AI law found, only a 2024 Istanza d'Arengo asking for one."
+ },
+ "TJ": {
+  "name": "Tajikistan",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "transient",
+  "storage_reason": "Tajik law may require personal data to be stored in Tajikistan. Our servers are outside Tajikistan, so Healthcare chats here are answered but not saved.",
+  "laws": [
+   {
+    "name": "Law No. 1537 on Personal Data Protection",
+    "citation": "3 Aug 2018; Art. 14 accumulation and storage; Art. 17 biometric data needs written consent; Art. 18 cross-border transfer (allowed with consent)",
+    "url": "https://base.spinform.ru/show_doc.fwx?rgn=108952"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Communication Service under the Government (https://khadamotialoqa.tj), per DLA Piper; designation unclear",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/?t=law&c=TJ",
+   "https://gratanet.com/publications/personal-data-protection-in-the-republic-of-tajikistan",
+   "https://base.spinform.ru/show_doc.fwx?rgn=108952",
+   "https://www.siberson.com/central-asia-caucasus-data-security-compliance.html"
+  ],
+  "notes": "Transient on a conflict: Siberson (2026) says Art. 14 requires storage in Tajikistan unless agreed with the authorised body; GRATA (Oct 2020) says there is no localisation and DLA Piper mentions none. Art. 14's text was not retrieved (paywalled). If counsel confirms no localisation, persist. Health data has no special category (only biometric data, written consent); transfers to non-adequate states are allowed with consent. Sources disagree on the regulator."
+ },
+ "TM": {
+  "name": "Turkmenistan",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "transient",
+  "storage_reason": "Turkmen law requires personal data to be stored in Turkmenistan. Our servers are outside Turkmenistan, so Healthcare chats here are answered but not saved.",
+  "laws": [
+   {
+    "name": "Law No. 519-V on Information about Private Life and its Protection",
+    "citation": "20 Mar 2017, in force 1 Jul 2017; collecting medical-condition data prohibited except with written consent or for health protection; Art. 12(2) storage in Turkmenistan; transfers abroad need consent and a copy kept in Turkmenistan"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "No data protection authority; the General Prosecutor's Office enforces",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/?t=law&c=TM",
+   "https://www.siberson.com/central-asia-caucasus-data-security-compliance.html"
+  ],
+  "notes": "Transient: personal data must be stored in Turkmenistan and data sent abroad must also be kept there; transfer abroad needs consent. Medical-condition data may be collected only with written consent: check the consent card qualifies. The law bars operators from sending data abroad to a third party under a processing contract, which could reach the US model vendors even on request; if so, unavailable. DLA Piper page last reviewed 2022; no primary text read; reach over foreign services untested."
+ },
+ "UA": {
+  "name": "Ukraine",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Law No. 2297-VI on Personal Data Protection",
+    "citation": "1 Jun 2010, in force 1 Jan 2011; health data processed only on unambiguous consent or statutory grounds; Art. 29 transfers to non-adequate states on unambiguous consent"
+   },
+   {
+    "name": "Law No. 4223-IX on the Mental Health Care System",
+    "citation": "Adopted 15 Jan 2025; certification of psychologists and psychotherapists, voluntary for six years then mandatory; Cabinet procedure No. 288 of 4 Mar 2026"
+   },
+   {
+    "name": "Draft Law No. 8153 on Personal Data Protection",
+    "citation": "GDPR-aligned replacement; first reading 20 Nov 2024; not adopted as of 2026"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Ukrainian Parliament Commissioner for Human Rights (https://ombudsman.gov.ua)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/?t=law&c=UA",
+   "https://medplatforma.com.ua/article/19066-sertyfikatsiia-ta-bpr-fakhivtsiv-u-sferi-psykhichnogo-zdorovia-za-novym-zakonodavstvom",
+   "https://en.lb.ua/news/2025/01/15/34562_verkhovna_rada_adopts_law_mental.html",
+   "https://voxukraine.org/en/mandatory-informing-control-and-high-penalties-how-the-new-draft-law-changes-the-rules-of-personal-data-protection"
+  ],
+  "notes": "Anthropic and OpenAI support Ukraine except Crimea, Donetsk, Kherson, Luhansk and Zaporizhzhia: geo-block those regions in every mode (vendor terms, not Ukrainian law, so storage stays persist). US transfers rest on Art. 29 unambiguous consent. Bill 8153 (new independent regulator) is still pending after first reading. Law 4223-IX makes psychologist certification mandatory only after six years and budget-funded services certified-only after three; no model rule needed now."
+ },
+ "UZ": {
+  "name": "Uzbekistan",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "transient",
+  "storage_reason": "Uzbek law lets health information be stored abroad only under conditions that aren't in place yet, so Healthcare chats here are answered but not saved.",
+  "laws": [
+   {
+    "name": "Law No. ZRU-547 on Personal Data, as amended by Law No. ZRU-1125",
+    "citation": "2 Jul 2019; ZRU-1125 of 26 Mar 2026, in force on publication: Art. 27-1 localisation now only for biometric, genetic and telecom-user data; other data abroad only via adequacy list, approved SCCs/BCRs or approved standards"
+   },
+   {
+    "name": "Law No. ZRU-1115 (AI amendments) and Ethical Rules (Order No. 3787)",
+    "citation": "ZRU-1115 of 21 Jan 2026; Order 3787 of 14 Mar 2026 in force 17 Jun 2026; users must be told AI outputs are not always accurate and are advisory or informational"
+   }
+  ],
+  "healthcare_rules": [
+   "Say plainly that AI answers can be inaccurate and are for information only, and that decisions on diagnosis or treatment belong to a doctor; Uzbekistan's 2026 AI rules (ZRU-1115) require users to be told this."
+  ],
+  "guidance_rules": [],
+  "regulator": "Personalization Agency under the Ministry of Justice (https://pd.gov.uz); ZRU-1125's 'authorised state body' unnamed; Ministry of Digital Technologies for AI",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/?t=law&c=UZ",
+   "https://yuz.uz/en/news/v-uzbekistane-usilena-zaita-personalnx-dannx",
+   "https://www.spot.uz/ru/2026/03/27/personal-data/",
+   "https://settleadvisory.com/news-en/localization-of-personal-data-in-uzbekistan-transition-to-a-more-flexible-regulatory-model/",
+   "https://www.legal500.com/developments/thought-leadership/legislative-updates-in-the-field-of-artificial-intelligence-and-personal-data-regulation-uzbekistan/"
+  ],
+  "notes": "Transient: since ZRU-1125 health data may be stored or processed abroad only if the country is on the Cabinet's adequacy list (not approved as of mid-2026) or the operator follows SCCs/BCRs or international standards approved by the authorised body (approval status unknown). Biometric (incl. voice samples) and genetic data must stay in Uzbekistan: don't store Uzbek users' voice audio. Breaching sites can be listed and blocked. Persist once a route exists."
+ },
+ "VA": {
+  "name": "Vatican City",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "General Regulation on the Protection of Personal Data (Decree No. DCLVII)",
+    "citation": "Pontifical Commission for Vatican City State, 30 Apr 2024, in force the same day, ad experimentum for three years; GDPR-inspired; sensitive categories prohibited save exceptions"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "No independent authority; complaints go to the Data Protection Officer (General Counsellor of Vatican City State)",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.vaticanstate.va/en/privacy-policy.html",
+   "https://digitalpolicyalert.org/event/19901-adopted-general-regulation-on-the-protection-of-personal-data-decree-no-dclvii",
+   "https://www.mofo.com/privacy-library/vatican-city"
+  ],
+  "notes": "Decree text not retrieved: whether health is in its sensitive list, its transfer rules, and whether it binds anyone beyond the Governorate and State bodies are unverified. The ad experimentum period runs to about 30 Apr 2027. No supervisory authority exists. Vendors support the Holy See (not on the SPEC exclusion list). Treat as persist with explicit consent pending review."
+ }
+}

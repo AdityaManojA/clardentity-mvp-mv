@@ -1,0 +1,578 @@
+{
+ "AG": {
+  "name": "Antigua and Barbuda",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Data Protection Act, 2013",
+    "citation": "No. 10 of 2013; s.2 health is sensitive personal data; s.18(1)(a) explicit consent; no transfer-abroad section",
+    "url": "http://laws.gov.ag/wp-content/uploads/2019/02/a2013-10.pdf"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Information Commissioner (Freedom of Information Act 2004; no website located)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "http://laws.gov.ag/wp-content/uploads/2019/02/a2013-10.pdf",
+   "https://tradecca.thecommonwealth.org/policy-repository/data-protection-act-2013/",
+   "https://www.mofo.com/privacy-library/antigua-and-barbuda"
+  ],
+  "notes": "Act gazetted 7 Nov 2013 with no separate commencement clause, so treated as in force from publication. Health is sensitive and needs explicit consent (s.18(1)(a)). The Act has no cross-border transfer section, so explicit consent plus disclosure of US processing is enough. Regulator is the FOI Act Information Commissioner; no website or recent enforcement found. No amendment or replacement bill located (Oct 2026)."
+ },
+ "BB": {
+  "name": "Barbados",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Data Protection Act, 2019",
+    "citation": "Act 2019-29; s.2 sensitive list omits health; s.9(1)(a) written consent for sensitive data; ss.22, 26(a) transfers with consent derogation; s.50 registration",
+    "url": "https://barbadosparliament.com/uploads/bill_resolution/9334bcb78912cda2f298450aae95a8c9.pdf"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Data Protection Commissioner (https://www.gov.bb/Departments/data-protection-commissioner)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://barbadosparliament.com/uploads/bill_resolution/9334bcb78912cda2f298450aae95a8c9.pdf",
+   "https://www.gov.bb/Departments/data-protection-commissioner",
+   "https://www.dlapiperdataprotection.com/?t=law&c=BB"
+  ],
+  "notes": "Read from the April 2019 Bill; DLA Piper's summary of the enacted Act gives the same s.2 list, which omits health (genetic and biometric data are sensitive and need written consent, s.9(1)(a)), hence 'personal'; confirm against the enacted text. Transfers: s.22 adequacy, s.26(a) consent derogation. In force 31 Mar 2021 except registration ss.50-52, 55-57 (DataGuidance, Oct 2023); once proclaimed, a non-resident controller must register and nominate a Barbados representative (s.50(3))."
+ },
+ "BS": {
+  "name": "Bahamas",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Data Protection (Privacy of Personal Information) Act, 2003",
+    "citation": "Ch. 324A; s.2 physical or mental health is sensitive; s.17 Commissioner may restrict transfers, s.17(8) consent exempts"
+   },
+   {
+    "name": "Data Protection Act, 2025 (not yet in force)",
+    "citation": "Gazette 11 Dec 2025; s.35 written consent; s.36 health data only by or under a health care professional; ss.54-55 transfers",
+    "url": "https://laws.bahamas.gov.bs/cms/images/LEGISLATION/PRINCIPAL/2025/2025-0074/2025-0074_1.pdf"
+   },
+   {
+    "name": "Penal Code",
+    "citation": "Ch. 84, s.294 attempted suicide a misdemeanour"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [
+   "If someone mentions a past or planned suicide attempt, respond supportively and never raise legality or suggest it will be reported; attempting suicide is still a misdemeanour in the Bahamas (Penal Code Ch. 84 s.294)."
+  ],
+  "regulator": "Office of the Data Protection Commissioner (https://dataprotection.gov.bs, site not verified)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://laws.bahamas.gov.bs/cms/images/LEGISLATION/PRINCIPAL/2025/2025-0074/2025-0074_1.pdf",
+   "https://laws.bahamas.gov.bs/cms/legislation/acts_only/not-in-force.html",
+   "https://www.dlapiperdataprotection.com/?t=law&c=BS",
+   "https://www.suicide-decrim.network/countries/bahamas"
+  ],
+  "notes": "2003 Act still operative: health is sensitive but no extra safeguards were issued; consent exempts transfers (s.17(8)). The 2025 Act is on the official Not in Force list; commencement by Ministerial notice, possibly staged. Once in force, s.36 lets only a health care professional, or someone under a statutory secrecy duty, process health data, which would make Healthcare unavailable here; re-check monthly. Suicide offence per suicide-decrim.network, not re-verified against the Code."
+ },
+ "DM": {
+  "name": "Dominica",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "None (no data protection authority)",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://uwi.edu/data-protection/pg-external_dominica.php"
+  ],
+  "notes": "No comprehensive data protection law found (UWI data protection resource, Feb 2025; no bill located since). Privacy rests on the Constitution and sectoral rules; no regulator. The OECS harmonised data protection effort (2022) has not produced a Dominica Act that we could find. No official Dominica legislation source was reached; re-check for a bill."
+ },
+ "DO": {
+  "name": "Dominican Republic",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Ley No. 172-13 sobre Protección de Datos de Carácter Personal",
+    "citation": "13 Dec 2013; Art. 6 health data sensitive; Art. 76 express written consent; Art. 80 international transfer with the person's free authorisation",
+    "url": "https://www.one.gob.do/media/u5ohmfyp/ley-172-13.pdf"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "No data protection authority; Pro Consumidor hears consumer data complaints (no URL verified)",
+  "confidence": "medium",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.one.gob.do/media/u5ohmfyp/ley-172-13.pdf",
+   "https://drlawyer.com/espanol/leyes/ley-172-13-sobre-proteccion-de-datos-de-caracter-personal/",
+   "https://www.dlapiperdataprotection.com/?t=law&c=DO",
+   "https://elnuevodiario.com.do/esta-preparada-la-republica-dominicana-para-proteger-sus-datos-en-la-era-digital/"
+  ],
+  "notes": "Ley 172-13 remains the framework; no replacement law found (El Nuevo Diario, 29 Jan 2026; older Senate draft of unknown status). Health data needs express written consent (Art. 76), so keep a recorded electronic opt-in; Art. 80 allows international transfer when the person freely authorises it. No authority for private processing; Pro Consumidor cannot fine. Text read via the Guzmán Ariza reproduction (official ONE PDF blocked)."
+ },
+ "GD": {
+  "name": "Grenada",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Data Protection Act, 2023 (not in force)",
+    "citation": "Act No. 1 of 2023; assented 9 May 2023, gazetted 10 May 2023, commencement by order"
+   },
+   {
+    "name": "Age of Civil Legal Responsibility Act, 2011",
+    "citation": "Act No. 14 of 2011; full civil capacity at 18"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "None operating (Act provides for a commission not yet set up)",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.offlist.me/what-is-grenada-data-protection-act-2023",
+   "https://www.dataguidance.com/jurisdiction/grenada"
+  ],
+  "notes": "Data Protection Act No. 1 of 2023 was gazetted with no commencement date; no commencement order found, and a 2026 government document reportedly calls it not in force (OfflistMe review, 9 Oct 2026). Its text (sensitive categories, transfer rules) could not be read: the parliament site was unreachable. Age of majority is 18 under the Age of Civil Legal Responsibility Act 2011 (some lists wrongly say 21). Re-check commencement and the Act's health and transfer clauses."
+ },
+ "HT": {
+  "name": "Haiti",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Arrêté fixant les règles relatives à la protection des données à caractère personnel",
+    "citation": "Le Moniteur No. 87, 15 May 2018; art. 4 bars releasing data that harms rights and freedoms"
+   },
+   {
+    "name": "Penal Code (reformed)",
+    "citation": "Data and cybercrime offences; entry into force reported for January 2027"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "None (no data protection authority)",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/?t=law&c=HT"
+  ],
+  "notes": "No general data protection law or regulator. A 15 May 2018 arrêté sets basic rules; its scope is unclear. The reformed Penal Code with personal and sensitive data offences is reported (secondary sources, incl. a July 2026 UNDP notice) to enter into force in January 2027. Severe insecurity and a transitional government make enforcement unpredictable. Re-check once the Penal Code is in force."
+ },
+ "JM": {
+  "name": "Jamaica",
+  "health_data": "special_category",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Data Protection Act, 2020",
+    "citation": "Act 7 of 2020; s.2 health is sensitive; s.24(1)(a) consent in writing; s.31(4)(a) consent exception to the eighth standard; s.3(2) local representative; s.15 registration; s.20 DPO",
+    "url": "https://japarliament.gov.jm/attachments/article/339/The%20Data%20Protection%20Act,%202020.pdf"
+   },
+   {
+    "name": "Data Protection (Data Controller Registration) Regulations, 2024",
+    "citation": "Registration with the Information Commissioner",
+    "url": "https://oic.gov.jm/publications/gazette/data-protection-data-controller-registration-regulations-2024"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Office of the Information Commissioner (https://oic.gov.jm)",
+  "confidence": "high",
+  "needs_review": false,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://japarliament.gov.jm/attachments/article/339/The%20Data%20Protection%20Act,%202020.pdf",
+   "https://oic.gov.jm/page/data-protection-standards",
+   "https://oic.gov.jm/",
+   "https://www.psoj.org/wp-content/uploads/2023/11/PSOJ-DPA-Presentation.pdf"
+  ],
+  "notes": "Fully in force from 1 Dec 2023. Sensitive data needs consent in writing (s.24(1)(a)); keep a recorded electronic opt-in. Transfers: eighth standard (adequacy) with a consent exception (s.31(4)(a)). Back-end items: a controller offering services to people in Jamaica must appoint a local representative (s.3(2)), register before processing (s.15; OIC registration temporarily paused, Oct 2026) and appoint a DPO because it processes sensitive data (s.20(6)(b))."
+ },
+ "KN": {
+  "name": "Saint Kitts and Nevis",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Data Protection Act, 2018 (not in force)",
+    "citation": "No. 5 of 2018; s.1(2) commencement by Ministerial order; s.2 health sensitive; s.20 explicit consent",
+    "url": "https://media2.mofo.com/v3/assets/blt5775cc69c999c255/blt276be72a2b8694e4/saint-kitts-nevis-data-protection-act-5-2018.pdf"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "None operating (the Act designates the Information Commissioner)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://media2.mofo.com/v3/assets/blt5775cc69c999c255/blt276be72a2b8694e4/saint-kitts-nevis-data-protection-act-5-2018.pdf",
+   "https://uwi.edu/data-protection/pg-external_skn.php",
+   "https://www.hunton.com/privacy-and-cybersecurity-law-blog/st-kitts-nevis-pass-data-protection-bill-2018"
+  ],
+  "notes": "Act No. 5 of 2018 (gazetted 7 June 2018) needs a Ministerial commencement order; none found (UWI, Feb 2025; later secondary checks), so no general law applies yet. On commencement health becomes sensitive with explicit consent (s.20), a non-resident controller using equipment in the Federation must nominate a local representative, and the Information Commissioner enforces. No transfer-abroad section seen. Re-check the Gazette."
+ },
+ "LC": {
+  "name": "Saint Lucia",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Data Protection Act",
+    "citation": "Act 11 of 2011 as amended by Act 2 of 2015; partly in force 31 Jan 2023 (SI 4/2023); s.35(b)(i) explicit consent; s.37 health purposes; s.45 transfers (not in force)",
+    "url": "https://attorneygeneralchambers.com/laws-of-saint-lucia/data-protection-act/act"
+   },
+   {
+    "name": "Criminal Code",
+    "citation": "s.94 attempted suicide an offence"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [
+   "If someone mentions a past or planned suicide attempt, respond supportively and never raise legality or suggest it will be reported; attempting suicide is still an offence in Saint Lucia (Criminal Code s.94)."
+  ],
+  "regulator": "Data Protection Commissioner (Part II not yet in force; no office or website found)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://attorneygeneralchambers.com/laws-of-saint-lucia/data-protection-act/act",
+   "https://attorneygeneralchambers.com/laws-of-saint-lucia/data-protection-act/section-35",
+   "https://attorneygeneralchambers.com/laws-of-saint-lucia/data-protection-act/section-45",
+   "https://attorneygeneralchambers.com/laws-of-saint-lucia/data-protection-act/section-2",
+   "https://www.suicide-decrim.network/countries/saint-lucia"
+  ],
+  "notes": "SI 4/2023 commenced only Part I, ss.32-43, Part VI and Sch. 2(a)-(g) from 31 Jan 2023: explicit consent for sensitive data (s.35(b)(i)) applies, but the Commissioner (Part II) and transfers (s.45) are not in force. When s.45 starts, every transfer abroad needs Commissioner authorisation (s.45(1)(b)); consent waives only the comparable-safeguards limb, so storage may then need to become transient. Suicide offence per suicide-decrim.network, not re-verified against the Code."
+ },
+ "TT": {
+  "name": "Trinidad and Tobago",
+  "health_data": "sensitive",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Data Protection Act, 2011",
+    "citation": "Act 13 of 2011 (Chap. 22:04), partly proclaimed; s.2 health is sensitive; s.6(h) and (l) general privacy principles; Part IV private sector not in force",
+    "url": "https://www.ttparliament.org/wp-content/uploads/2011/06/a2011_13g.pdf"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Office of the Information Commissioner (established by s.7; no website or appointment confirmed)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.ttparliament.org/wp-content/uploads/2011/06/a2011_13g.pdf",
+   "https://www.dlapiperdataprotection.com/?t=law&c=TT",
+   "https://www.uwi.edu/data-protection/resources-external-tt",
+   "https://www.ttparliament.org/publication/the-data-protection-bill-2011/"
+  ],
+  "notes": "Only Part I, ss.7-18, 22, 23, 25(1), 26, 28 and 42(a)-(b) are proclaimed (2012, 2021); private-sector duties (Part IV, incl. s.72 consent to transfers) and penalties are not, and no reform bill was found. In-force s.6 says sensitive data is 'protected from processing except where otherwise provided for by written law' (s.6(h)) and data sent abroad needs comparable safeguards (s.6(l)); no adequacy list exists. Persist kept because no in-force mechanism enforces these, but a literal reading is a risk."
+ },
+ "VC": {
+  "name": "Saint Vincent and the Grenadines",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Privacy Act, 2003 (not in force)",
+    "citation": "Public authorities only; never commenced"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "None (no data protection authority)",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://uwi.edu/data-protection/pg-external_svg.php"
+  ],
+  "notes": "No general data protection law in force: the Privacy Act 2003 covers only public authorities and was never commenced (UWI, Feb 2025); no newer bill found. No regulator. No official SVG legislation source was reached; re-check for an OECS-model bill."
+ },
+ "FM": {
+  "name": "Micronesia",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "FSM Code Title 21, ss.349-350",
+    "citation": "Telecom providers must keep customer information confidential"
+   },
+   {
+    "name": "Personal Data Protection Act of 2025 (bill)",
+    "citation": "Congressional Bill 24-17; national government departments only",
+    "url": "https://www.cfsm.gov.fm/wp-content/uploads/2025/06/CB-24-17.pdf"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "None (no data protection authority)",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://dlapiperdataprotection.com/?c=FM&t=law",
+   "https://www.cfsm.gov.fm/wp-content/uploads/2025/06/CB-24-17.pdf",
+   "https://www.cfsm.gov.fm/wp-content/uploads/2026/05/SCR-No.-24-30.pdf"
+  ],
+  "notes": "No general data protection law (DLA Piper, 2 Feb 2026). The Personal Data Protection Act of 2025 (CB 24-17) would cover national government departments only; a committee report followed hearings in late 2025 and passage is unconfirmed. State-level laws (Chuuk, Kosrae, Pohnpei, Yap) were not checked."
+ },
+ "KI": {
+  "name": "Kiribati",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Data Protection Act 2025",
+    "citation": "s.2 commencement by notice; s.5(1)(b) applies to services offered to people in Kiribati; no sensitive category; s.24(a) informed consent for transfers",
+    "url": "https://www.mict.gov.ki/sites/default/files/publications/Data%20Protection%20Act%202025.pdf"
+   },
+   {
+    "name": "Notice of Commencement, Data Protection Act",
+    "citation": "Gazette, scanned 24 Aug 2026",
+    "url": "https://www.president.gov.ki/images/Gazettes/2026/240826/Notice_of_Commencement_Data_Protection_Act.pdf"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "Digital Transformation Office, Ministry of Information, Communications and Transport (https://mict.gov.ki/dto, not verified)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.mict.gov.ki/sites/default/files/publications/Data%20Protection%20Act%202025.pdf",
+   "https://www.president.gov.ki/images/Gazettes/2026/240826/Notice_of_Commencement_Data_Protection_Act.pdf",
+   "https://www.offlist.me/what-is-kiribati-data-protection-act-2025"
+  ],
+  "notes": "A Notice of Commencement was gazetted around 24 Aug 2026, but the scan could not be read, so the start date is unconfirmed. The Act has no sensitive-data category, hence 'personal'. Transfers without adequate protection need consent given after being told of the risks (s.24(a)), so the consent card should say US processing may lack equivalent protection; keep a record (s.25). The 2-year grace (s.6(2)) covers only local controllers. Age of majority unconfirmed; the Act treats under-18s as children (s.12)."
+ },
+ "MH": {
+  "name": "Marshall Islands",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Personal Data Protection Act 2025",
+    "citation": "P.L. 2025-43 (6 MIRC Ch. 4); s.403 core Government ministries and agencies only; s.418 effective 12 months after certification",
+    "url": "https://rmiparliament.org/cms/images/LEGISLATION/PRINCIPAL/2025/2025-0043/2025-0043_1.pdf"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "None for private services (EPSSO is the authority for government agencies)",
+  "confidence": "medium",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://rmiparliament.org/cms/images/LEGISLATION/PRINCIPAL/2025/2025-0043/2025-0043_1.pdf",
+   "https://www.offlist.me/what-is-marshall-islands-personal-data-protection-act-2025"
+  ],
+  "notes": "The Personal Data Protection Act 2025 applies only to core Government ministries and agencies (s.403), so no general law reaches a private foreign service; health_data is 'personal'. Certification date, and so the government-sector effective date, not found. Text read from the Nitijela PDF."
+ },
+ "NR": {
+  "name": "Nauru",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Cybercrime Act 2015",
+    "citation": "Computer offences only"
+   },
+   {
+    "name": "Communications and Broadcasting Act 2018",
+    "citation": "Subscriber information confidentiality"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "None (no data protection authority)",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.lawgratis.com/blog-detail/privacy-law-at-nauru"
+  ],
+  "notes": "No general data protection law found; only the Cybercrime Act 2015 and subscriber confidentiality under the Communications and Broadcasting Act 2018, per a secondary source. No 2024-2026 bill found. No regulator. No official Nauru legislation source was reached."
+ },
+ "PW": {
+  "name": "Palau",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "None (no data protection authority found)",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://pina.com.fj/2025/10/24/palau-senate-passes-nations-first-comprehensive-cybersecurity-bill/",
+   "https://help.observepoint.com/en/articles/9121493-oceania-privacy-resources"
+  ],
+  "notes": "Sources conflict: one secondary site cites a c.2019 Privacy Act at 6 PNCA ss.205-206, but no official text was found and other sources (IAPP list, Dec 2021; 2025 guides) say Palau has no comprehensive law. Senate Bill 12-9 (Cybersecurity Act) passed the Senate in Oct 2025; enactment unconfirmed. Check the Palau National Code before relying on 'personal'."
+ },
+ "TV": {
+  "name": "Tuvalu",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "None (no data protection authority)",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://seap.nationalityforall.org/digital-id/regional-overview/the-pacific/tuvalu/",
+   "https://help.observepoint.com/en/articles/9121493-oceania-privacy-resources"
+  ],
+  "notes": "No verified general data protection law; a 'Data Protection and Privacy Act 2020' appears only in unverified secondary sources and was not found on PacLII. A Cybercrime Bill was reported pending in May 2026. No regulator. Age of majority not confirmed; 18 used as the floor."
+ },
+ "TL": {
+  "name": "Timor-Leste",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Constitution of the Democratic Republic of Timor-Leste",
+    "citation": "Art. 38 protection of personal data; no implementing law",
+    "url": "https://www.constituteproject.org/constitution/East_Timor_2002.pdf?lang=en"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "None (no data protection authority)",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://timor-leste.gov.tl/?lang=en&n=1&p=50772",
+   "https://www.constituteproject.org/constitution/East_Timor_2002.pdf?lang=en",
+   "https://www.vda.pt/en/media/news-and-media/timor-leste-privacy-overview/27861/"
+  ],
+  "notes": "No general data protection law; Constitution art. 38 protects personal data but no implementing law exists (secondary sources, 2026). On 31 Jul 2026 the Government asked Parliament for legislative authorisation for a cybersecurity package that includes personal data and privacy rules; watch for decree-laws. Civil majority is reportedly 17, so 18 is used. No regulator."
+ },
+ "PS": {
+  "name": "Palestine",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Cabinet Decision No. 3 of 2019 on citizens' personal data",
+    "citation": "Bars commercial use of citizens' personal data by service companies without prior permission",
+    "url": "https://maqam.najah.edu/legislation/247/"
+   },
+   {
+    "name": "Draft Decree-Law on Personal Data Protection (not enacted)",
+    "citation": "Third reading 15 June 2022; still before the Cabinet in Oct 2023"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "None (no data protection authority)",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://maqam.najah.edu/legislation/247/",
+   "https://7amleh.org/post/position-paper-personal-data-protection-draft-law-by-decree-from-a-human-rights-based-perspective",
+   "https://ifex.org/privacy-and-personal-data-protection-in-palestine-double-violations-and-absent-legislation/",
+   "https://journals.najah.edu/article/1813/"
+  ],
+  "notes": "No data protection law: the draft decree-law (third reading June 2022) was still with the Cabinet in Oct 2023 and no enactment was found since. Cabinet Decision 3/2019 needs prior permission for commercial use of citizens' data (West Bank and Gaza). Majority age 18 rests on a scholarly reading of the Majalla. The Gaza war and divided governance make the position unstable; this covers PA-administered law only."
+ },
+ "LY": {
+  "name": "Libya",
+  "health_data": "personal",
+  "consent_age": 18,
+  "storage": "persist",
+  "storage_reason": "",
+  "laws": [
+   {
+    "name": "Law No. 6 of 2022 on Electronic Transactions",
+    "citation": "Arts. 73-84: explicit consent (art. 73), transfers with due regard to protection level (art. 78), penalties (arts. 81-84)",
+    "url": "https://lawsociety.ly/en/legislation/law-no-6-of-2022-concerning-electronic-transactions/"
+   },
+   {
+    "name": "Law No. 17 of 1992 on Minors",
+    "citation": "Art. 9 majority at 18 Gregorian years",
+    "url": "https://lawsociety.ly/en/legislation/law-no-17-of-1992-regolating-of-minors-and-those-of-equivalent-status/"
+   },
+   {
+    "name": "Law No. 5 of 2022 on Combating Cybercrime",
+    "citation": "Computer and content offences",
+    "url": "https://lawsociety.ly/en/legislation/law-no-5-of-2022-regarding-combating-cybercrimes/"
+   }
+  ],
+  "healthcare_rules": [],
+  "guidance_rules": [],
+  "regulator": "None (no data protection authority; NISSA policies bind state bodies only)",
+  "confidence": "low",
+  "needs_review": true,
+  "as_of": "2026-10-16",
+  "sources": [
+   "https://www.dlapiperdataprotection.com/index.html?t=law&c=LY",
+   "https://lawsociety.ly/en/legislation/law-no-6-of-2022-concerning-electronic-transactions/",
+   "https://lawsociety.ly/en/legislation/law-no-17-of-1992-regolating-of-minors-and-those-of-equivalent-status/",
+   "https://dataprotection.africa/libya/"
+  ],
+  "notes": "No dedicated data protection law or regulator. Law 6/2022 arts. 73-84 require explicit consent and due regard to the destination's protection level for transfers (art. 78), but may only cover e-certification services; health is not a special category (DLA Piper, Jan 2024; statute text not read). Rival governments and conflict make enforcement unpredictable. US sanctions on Libya are list-based, not comprehensive."
+ }
+}

@@ -11,6 +11,9 @@ import { MessageInput } from "@/components/chat/MessageInput";
 import { MessageList, type StreamingMessage } from "@/components/chat/MessageList";
 import { ModeSelector, type CognitiveMode } from "@/components/chat/ModeSelector";
 import { ContextQuestionCard } from "@/components/chat/ContextQuestionCard";
+import { HealthConsentCard } from "@/components/chat/HealthConsentCard";
+import { ModeDisclosure } from "@/components/chat/ChatGreeting";
+import { rememberSessionHealthConsent } from "@/lib/healthConsent";
 import { RefinedQuestionCard } from "@/components/chat/RefinedQuestionCard";
 import { ClarifyingOptionsCard } from "@/components/chat/ClarifyingOptionsCard";
 import { ModeSwitchToast } from "@/components/chat/ModeSwitchToast";
@@ -22,6 +25,7 @@ import type {
   GeneratedImage,
   RefinedQuestionSuggestion,
   ThinkingReviewData,
+  HealthConsentState,
 } from "@/lib/sse";
 
 /* Try it here, without signing up.
@@ -163,6 +167,7 @@ function stashOf(messages: ChatMessage[]): StashedTurn[] {
       decision_review: m.decision_review,
       thinking_review: m.thinking_review,
       generated_image: m.generated_image,
+      safety: m.safety ?? null,
     }));
 }
 
@@ -201,6 +206,13 @@ export function GuestDemo({
      change it is what makes the touch safe. */
   const [mode, setMode] = useState(initialMode);
   const modeLabel = modes.find((m) => m.value === mode)?.name ?? "Finder";
+  // Who is listening, as a companion (2026-10-15 feedback: "You're with your
+  // learning companion" rather than "You're in Learning."). Thought coach
+  // already names a person, so it needs no "companion" after it.
+  const companionLine =
+    mode === "thinking"
+      ? "You’re with your thought coach."
+      : `You’re with your ${modeLabel.toLowerCase()} companion.`;
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [streaming, setStreaming] = useState<StreamingMessage | null>(null);
   const [sending, setSending] = useState(false);
@@ -217,6 +229,16 @@ export function GuestDemo({
   /* The pre-answer questions, held exactly as ChatView holds them: the
      accumulated send so far, so an answer is appended rather than replacing
      what was asked. */
+  // Healthcare asked for the visitor's consent before answering (the app's
+  // card, kept for this browser session - lib/healthConsent).
+  const [pendingHealth, setPendingHealth] = useState<{
+    state: HealthConsentState;
+    content: string;
+    mode: string;
+    /** Smart switching moved the question into Healthcare on its way to
+     *  the card, so agreeing re-sends it there without asking again. */
+    switched: boolean;
+  } | null>(null);
   const [pendingContext, setPendingContext] = useState<{
     question: string;
     content: string;
@@ -258,6 +280,12 @@ export function GuestDemo({
   const hasAnsweredRef = useRef(false);
   const pendingQuestionIdRef = useRef<string | null>(null);
   const lastSendRef = useRef<{ content: string; mode: string } | null>(null);
+  // What a regenerate took off the screen - the old answer and anything
+  // after it - kept until the new answer exists. Stopped, dropped or refused
+  // before then, the question gets its old answer back rather than being
+  // left unanswered, which is what the app shows: it re-reads the thread,
+  // and there the old answer was never deleted.
+  const replacedRef = useRef<ChatMessage[] | null>(null);
 
   useEffect(() => {
     messagesRef.current = messages;
@@ -296,20 +324,35 @@ export function GuestDemo({
     return () => clearTimeout(timer);
   }, [sending]);
 
-  /** Cut the answer off. Before the answer event nothing exists, so the
-   *  question comes back off the screen too - the app's rule. */
-  const stop = useCallback(() => {
-    abortRef.current?.abort();
-    if (!hasAnsweredRef.current && pendingQuestionIdRef.current) {
-      const id = pendingQuestionIdRef.current;
-      setMessages((prev) => prev.filter((m) => m.id !== id));
-    }
-    pendingQuestionIdRef.current = null;
-    setStreaming(null);
-    setSending(false);
-    setSlowHint(false);
-    setValidatingId(null);
+  /** Put back what a regenerate replaced, if its replacement never came. */
+  const restoreReplaced = useCallback(() => {
+    const replaced = replacedRef.current;
+    replacedRef.current = null;
+    if (hasAnsweredRef.current || !replaced?.length) return;
+    setMessages((prev) => [...prev, ...replaced]);
   }, []);
+
+  /** Cut the answer off. Before the answer event nothing exists, so the
+   *  question comes back off the screen too - the app's rule - and a
+   *  regenerate's old answer comes back on, unless `restore` is false
+   *  because the same regenerate is about to be asked again. */
+  const halt = useCallback(
+    (restore: boolean) => {
+      abortRef.current?.abort();
+      if (!hasAnsweredRef.current && pendingQuestionIdRef.current) {
+        const id = pendingQuestionIdRef.current;
+        setMessages((prev) => prev.filter((m) => m.id !== id));
+      }
+      if (restore) restoreReplaced();
+      pendingQuestionIdRef.current = null;
+      setStreaming(null);
+      setSending(false);
+      setSlowHint(false);
+      setValidatingId(null);
+    },
+    [restoreReplaced],
+  );
+  const stop = useCallback(() => halt(true), [halt]);
 
   const send = useCallback(
     async (content: string, sendMode: string, options: SendOptions = {}) => {
@@ -320,6 +363,8 @@ export function GuestDemo({
       setError(null);
       setGate(null);
       setPendingContext(null);
+    setPendingHealth(null);
+      setPendingHealth(null);
       setPendingRefined(null);
       setPendingClarifying(null);
       setPhase((p) => (p === "inviting" ? "talking" : p));
@@ -333,6 +378,7 @@ export function GuestDemo({
       );
       const question = options.regenerate ? null : questionMessage(message, sendMode);
       if (question) setMessages((prev) => [...prev, question]);
+      if (!options.regenerate) replacedRef.current = null;
       pendingQuestionIdRef.current = question?.id ?? null;
       hasAnsweredRef.current = false;
       earlyReviewRef.current = null;
@@ -349,6 +395,7 @@ export function GuestDemo({
 
       const rollBack = () => {
         if (question) setMessages((prev) => prev.filter((m) => m.id !== question.id));
+        restoreReplaced();
         setStreaming(null);
         setSending(false);
         setSlowHint(false);
@@ -401,6 +448,9 @@ export function GuestDemo({
                 : prev,
             );
           },
+          onSafety: (card) => {
+            setStreaming((prev) => (prev ? { ...prev, safety: card } : prev));
+          },
           onImage: (image) => {
             earlyImageRef.current = image;
             setStreaming((prev) => (prev ? { ...prev, generatedImage: image } : prev));
@@ -428,6 +478,7 @@ export function GuestDemo({
             // composer comes back now rather than after it - the app's rule.
             hasAnsweredRef.current = true;
             pendingQuestionIdRef.current = null;
+            replacedRef.current = null;
             setSlowHint(false);
             const early = earlyReviewRef.current;
             const earlyImage = earlyImageRef.current;
@@ -455,6 +506,17 @@ export function GuestDemo({
             setStreaming(null);
             setSending(false);
           },
+          onHealthConsent: (state) => {
+            rollBack();
+            // `answerMode`, not `sendMode`: a question switched into
+            // Healthcare reaches the card after the `switched` event.
+            setPendingHealth({
+              state,
+              content: message,
+              mode: answerMode,
+              switched: answerMode !== sendMode,
+            });
+          },
           onContextQuestion: (asked) => {
             rollBack();
             setPendingContext({
@@ -476,6 +538,7 @@ export function GuestDemo({
             if (!budget.limit_reached) return;
             // The wall can also be the whole reply - an allowance already
             // spent - in which case nothing is being written.
+            restoreReplaced();
             setStreaming(null);
             setSending(false);
             setValidatingId(null);
@@ -491,6 +554,7 @@ export function GuestDemo({
             });
           },
           onError: (detail) => {
+            restoreReplaced();
             setError(detail);
             setStreaming(null);
             setSending(false);
@@ -504,6 +568,7 @@ export function GuestDemo({
             if (!hasAnsweredRef.current && question) {
               setMessages((prev) => prev.filter((m) => m.id !== question.id));
             }
+            restoreReplaced();
             setError("The answer stopped partway. Try again?");
             setStreaming(null);
             setSending(false);
@@ -514,7 +579,7 @@ export function GuestDemo({
         controller.signal,
       );
     },
-    [smartSwitching],
+    [smartSwitching, restoreReplaced],
   );
 
   useEffect(() => {
@@ -543,6 +608,7 @@ export function GuestDemo({
      finding that out here is better than finding it out after signing up. */
   const newChat = useCallback(() => {
     abortRef.current?.abort();
+    replacedRef.current = null;
     setMessages([]);
     setStreaming(null);
     setSending(false);
@@ -569,6 +635,7 @@ export function GuestDemo({
       const question = index > 0 ? list[index - 1] : null;
       if (!question || question.role !== "user") return;
       track("answer_regenerated", { mode: list[index].mode_used });
+      replacedRef.current = list.slice(index);
       setMessages(list.slice(0, index));
       messagesRef.current = list.slice(0, index);
       void send(question.content ?? "", list[index].mode_used, { regenerate: true });
@@ -599,9 +666,12 @@ export function GuestDemo({
     const last = lastSendRef.current;
     if (!last) return;
     track("quick_answer_tapped", { mode: last.mode });
-    stop();
-    void send(last.content, "rapid", { modeConfirmed: true });
-  }, [send, stop]);
+    // The quick answer to a regenerate is still a regenerate: the question
+    // stays where it is and the old answer stays off.
+    const regenerating = replacedRef.current !== null && !hasAnsweredRef.current;
+    halt(!regenerating);
+    void send(last.content, "rapid", { modeConfirmed: true, regenerate: regenerating });
+  }, [send, halt]);
 
   const zoom = typeof window === "undefined" ? 1 : Number(getComputedStyle(document.documentElement).zoom) || 1;
   const start: React.CSSProperties =
@@ -628,6 +698,9 @@ export function GuestDemo({
          product's own component in the product's own theme; the page behind
          this one stays light. */
       data-theme="dark"
+      // Popovers that portal out of the answer (citation details) render in
+      // here rather than in <body>, where they would open behind this panel.
+      data-portal-root=""
       className="fixed z-50 overflow-hidden transition-all duration-[460ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
       style={{ ...start, background: DARK }}
     >
@@ -696,7 +769,11 @@ export function GuestDemo({
                   an account - the way in is already on the screen, and
                   leading with what the visitor lacks is a strange way to
                   open. */}
-              <p className="mt-2 text-sm text-white/70">You&apos;re in {modeLabel}.</p>
+              <p className="mt-2 text-sm text-white/70">{companionLine}</p>
+              <ModeDisclosure
+                mode={mode}
+                className="mx-auto mt-2 max-w-md text-balance text-xs text-white/55"
+              />
             </div>
           ) : (
             <div className="flex min-h-0 flex-1 flex-col">
@@ -725,6 +802,24 @@ export function GuestDemo({
           {/* The pre-answer questions, between the thread and the composer,
               exactly where the app puts them and with the app's cards. */}
           <div className="scroll-slim max-h-[calc(var(--app-vh)*45)] shrink-0 overflow-y-auto">
+            {pendingHealth && (
+              <div className="mb-3">
+                <HealthConsentCard
+                  state={pendingHealth.state}
+                  onAgree={() => {
+                    const { state, content, mode: healthMode, switched } = pendingHealth;
+                    rememberSessionHealthConsent(state.version);
+                    setPendingHealth(null);
+                    track("consent_choice", { choice: "health_granted_demo" });
+                    void send(content, healthMode, switched ? { modeConfirmed: true } : {});
+                  }}
+                  onDecline={() => {
+                    setPendingHealth(null);
+                    setDraft(pendingHealth.content);
+                  }}
+                />
+              </div>
+            )}
             {pendingContext && (
               <ContextQuestionCard
                 key={pendingContext.rounds}
@@ -975,6 +1070,9 @@ export function GuestDemo({
                   </button>
                 }
               />
+              {messages.length > 0 && (
+                <ModeDisclosure mode={mode} className="mt-1.5 px-2 text-center text-xs text-white/55" />
+              )}
             </div>
           )}
         </div>

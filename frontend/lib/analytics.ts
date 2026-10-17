@@ -179,9 +179,21 @@ export function routePattern(value: string): string {
  *  works to keep out. Every property that looks like a URL or a path is
  *  rewritten to its pattern on the way out, and the query string dropped:
  *  no reset token, no email in a link, ever. */
+/** Modes whose use is itself sensitive: that someone opened Healthcare or
+ *  Guidance can be health or mental-health information (Washington's My
+ *  Health My Data Act counts even "seeking" health services). Analytics
+ *  learns only that a sensitive companion was used - which one, and the
+ *  counts per mode, stay in our own database (the admin overview). */
+const SENSITIVE_MODES = new Set(["guidance", "healthcare"]);
+const MODE_KEYS = /^(mode|from|to|suggested)$/;
+
 function sanitize(properties: Record<string, unknown>): Record<string, unknown> {
   const out: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(properties)) {
+    if (typeof value === "string" && MODE_KEYS.test(key) && SENSITIVE_MODES.has(value)) {
+      out[key] = "sensitive";
+      continue;
+    }
     if (typeof value === "string" && /url|pathname|referrer|host|origin/i.test(key)) {
       const [withoutQuery] = value.split(/[?#]/);
       out[key] = routePattern(withoutQuery);

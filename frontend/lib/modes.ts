@@ -79,31 +79,33 @@ export const COGNITIVE_MODES = [
       "Writes, codes, and builds structured documents - reports, presentations, spreadsheets - offered as an actual file, not just described in chat.",
   },
   {
-    value: "mentoring",
-    /** The design's own mark for this companion, used by the mode rail. */
-    icon: "/ui/mode-mentoring.svg",
-    label: "Mentoring",
-    companion: "Mentoring Companion",
-    hint: "Get guided toward a goal",
-    when: "When you want guidance from someone who's been where you're headed.",
-    cta: "Try getting mentored.",
+    value: "guidance",
+    /** Compass: direction, the thing both halves of this companion help with. */
+    icon: "/ui/mode-guidance.svg",
+    // Mentoring and Reflect & Relieve, merged 2026-10-16: one companion for
+    // where you are going and for how you are doing. Never "therapy" or
+    // "counselling" - see docs/modes/guidance.md.
+    label: "Guidance",
+    companion: "Guidance Companion",
+    hint: "Find your direction, and your footing",
+    when: "When you want a mentor for your goals, or a steady listener when things are hard.",
+    cta: "Try getting guidance.",
     detail:
-      "Advises the way a person who has actually done this before would - honest about what's hard and how long it really takes, not just encouraging.",
+      "Mentors you toward a goal - honest about what's hard and how long it really takes - and listens when life gets heavy, with practical steps you can try today. An AI companion, not a therapist: it says so, and points you to a person when that's what you need.",
   },
   {
-    value: "therapy",
-    /** The design's own mark for this companion, used by the mode rail. */
-    icon: "/ui/mode-reflect.svg",
-    // Renamed from "Psycho-Therapy" - that word, and "counselling", read as a
-    // claim to a clinical service this product doesn't provide and isn't
-    // licensed for. The mode itself is unchanged; only the naming is.
-    label: "Reflect & Relieve",
-    companion: "Reflect & Relieve Companion",
-    hint: "Talk it through",
-    when: "When you want supportive, on-demand conversation to think and feel things through.",
-    cta: "Try talking it through.",
+    value: "healthcare",
+    /** Heartbeat. */
+    icon: "/ui/mode-healthcare.svg",
+    // Added 2026-10-16, under the regulation suite (backend services/
+    // regulations): consent first, local rules, local emergency numbers.
+    label: "Healthcare",
+    companion: "Healthcare Companion",
+    hint: "Understand your health",
+    when: "When you want a symptom, condition, test result or medicine explained, and to know when to see a doctor.",
+    cta: "Try asking about your health.",
     detail:
-      "Listens fully and reflects back what's actually being said, helping you notice your own patterns. Companionship, not clinical treatment - it says so plainly when something calls for a licensed professional.",
+      "Explains symptoms, conditions, lab results and medicines in plain language, checks every claim against trusted health sources, and tells you how urgently to get care. General information under your country's health-data rules - not diagnosis or treatment.",
   },
   {
     value: "legal",
@@ -119,6 +121,15 @@ export const COGNITIVE_MODES = [
       "Explains the rules that apply, the questions a lawyer will ask, and what to gather beforehand. Orientation, not legal advice - it says so, and points you to a professional for anything that turns on your specific facts.",
   },
 ] as const;
+
+/** Mode values that no longer exist, and what a remembered one now means:
+ *  Mentoring and Reflect & Relieve became Guidance on 2026-10-16. Read
+ *  wherever a mode comes back out of the browser's storage. */
+export const LEGACY_MODES: Record<string, string> = { mentoring: "guidance", therapy: "guidance" };
+
+export function currentMode<T extends string | null | undefined>(value: T): T | string {
+  return value && LEGACY_MODES[value] ? LEGACY_MODES[value] : value;
+}
 
 /** A mode the user can pick. */
 export type PickableMode = (typeof COGNITIVE_MODES)[number]["value"];
@@ -148,8 +159,8 @@ export function modeLabel(value: string | null | undefined): string {
  *  backend already answers requests in these modes; this is purely about
  *  when the UI lets someone start one. */
 export const COMING_SOON_MODES: readonly PickableMode[] = [
-  "mentoring",
-  "therapy",
+  "guidance",
+  "healthcare",
   "creative",
   // Announced, not built: no prompt behind it yet, and the backend's mode
   // validator doesn't accept it. It exists here so the pickers show the
