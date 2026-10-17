@@ -286,6 +286,36 @@ async def create_conversation(
 ) -> ConversationOut:
     await require_workspace_member(db, payload.workspace_id, current_user.id)
 
+    # "New chat" pressed again and again stacked an "Untitled chat" on the
+    # list each time, all of them empty. An untitled, unpinned chat in this
+    # workspace that nothing has been asked in yet is handed back instead -
+    # with the mode asked for and a fresh timestamp, so it is the new chat
+    # at the top of the list. Empty is checked on the messages themselves,
+    # not just the title (a renamed-back chat can be untitled and full).
+    if payload.title is None:
+        has_messages = (
+            select(Message.id).where(Message.conversation_id == Conversation.id).exists()
+        )
+        reusable = (
+            await db.execute(
+                select(Conversation)
+                .where(
+                    Conversation.workspace_id == payload.workspace_id,
+                    Conversation.title.is_(None),
+                    Conversation.pinned_at.is_(None),
+                    ~has_messages,
+                )
+                .order_by(Conversation.created_at.desc())
+                .limit(1)
+            )
+        ).scalar_one_or_none()
+        if reusable is not None:
+            reusable.default_mode = payload.default_mode
+            reusable.created_at = datetime.now(UTC)
+            await db.commit()
+            await db.refresh(reusable)
+            return _conversation_out(reusable)
+
     conversation = Conversation(
         workspace_id=payload.workspace_id,
         title=payload.title,
