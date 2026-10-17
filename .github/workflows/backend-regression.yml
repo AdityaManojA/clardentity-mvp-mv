@@ -46,7 +46,7 @@ jobs:
           for i in $(seq 1 30); do curl -sf http://localhost:19000/minio/health/live && break; sleep 2; done
       - run: pip install -q -r requirements.txt
       - name: Bucket
-        run: python -c "import boto3; boto3.client('s3', endpoint_url="http://localhost:19000", aws_access_key_id='minioadmin', aws_secret_access_key='minioadmin', region_name='us-east-1').create_bucket(Bucket='clardentity-dev')"
+        run: python -c "import boto3; boto3.client('s3', endpoint_url='http://localhost:19000', aws_access_key_id='minioadmin', aws_secret_access_key='minioadmin', region_name='us-east-1').create_bucket(Bucket='clardentity-dev')"
       - name: Migrate
         run: alembic upgrade head
       - name: Pytest
