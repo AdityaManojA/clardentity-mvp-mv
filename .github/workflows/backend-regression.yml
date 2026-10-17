@@ -22,7 +22,7 @@ jobs:
     env:
       DATABASE_URL: postgresql+asyncpg://clardentity:clardentity_dev_pw@localhost:5432/clardentity
       REDIS_URL: redis://localhost:6379/0
-      S3_ENDPOINT: http://localhost:9000
+      S3_ENDPOINT: http://localhost:19000
       S3_ACCESS_KEY: minioadmin
       S3_SECRET_KEY: minioadmin
       S3_BUCKET: clardentity-dev
@@ -42,11 +42,11 @@ jobs:
       - name: MinIO
         working-directory: .
         run: |
-          docker run -d --name minio -p 9000:9000 -e MINIO_ROOT_USER=minioadmin -e MINIO_ROOT_PASSWORD=minioadmin minio/minio server /data
-          for i in $(seq 1 30); do curl -sf http://localhost:9000/minio/health/live && break; sleep 2; done
+          docker run -d --name minio -p 19000:9000 -e MINIO_ROOT_USER=minioadmin -e MINIO_ROOT_PASSWORD=minioadmin minio/minio server /data
+          for i in $(seq 1 30); do curl -sf http://localhost:19000/minio/health/live && break; sleep 2; done
       - run: pip install -q -r requirements.txt
       - name: Bucket
-        run: python -c "import boto3; boto3.client('s3', endpoint_url='http://localhost:9000', aws_access_key_id='minioadmin', aws_secret_access_key='minioadmin', region_name='us-east-1').create_bucket(Bucket='clardentity-dev')"
+        run: python -c "import boto3; boto3.client('s3', endpoint_url="http://localhost:19000", aws_access_key_id='minioadmin', aws_secret_access_key='minioadmin', region_name='us-east-1').create_bucket(Bucket='clardentity-dev')"
       - name: Migrate
         run: alembic upgrade head
       - name: Pytest
