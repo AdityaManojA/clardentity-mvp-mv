@@ -3,7 +3,7 @@ import logging
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_current_user
+from app.api.admin_dashboard import require_admin
 from app.db.session import get_db
 from app.models import User
 from app.schemas.admin import AdminSettingsOut, AdminSettingUpdate
@@ -13,13 +13,15 @@ logger = logging.getLogger("clardentity.admin")
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
-# No RBAC beyond workspace owner/member in MVP scope (§3.2) - admin settings
-# are global, gated on authentication only, same as the rest of the API.
+# Global settings - the answer model, scoring weights, feature flags - so
+# administrators only (ADMIN_EMAILS), the same check the dashboard uses. Until
+# 2026-10-17 these were gated on sign-in alone: any registered account could
+# switch web search or verification off for everyone.
 
 
 @router.get("/settings", response_model=AdminSettingsOut)
 async def get_settings(
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db),
 ) -> AdminSettingsOut:
     return AdminSettingsOut(settings=await get_all_settings(db))
@@ -28,7 +30,7 @@ async def get_settings(
 @router.put("/settings", response_model=AdminSettingsOut)
 async def update_setting(
     payload: AdminSettingUpdate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db),
 ) -> AdminSettingsOut:
     if payload.key not in DEFAULTS:
